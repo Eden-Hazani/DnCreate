@@ -3,6 +3,7 @@
 # dependencies
 Client/node_modules
 Backend/node_modules
+Backend/package-lock.json
 Backend/package.json
 Backend/config
 /.pnp
