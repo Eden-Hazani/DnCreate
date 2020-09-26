@@ -1,7 +1,9 @@
 
 if (process.env.PORT) {
+  console.log('prod')
   global.config = require("./config/production.json");
 } else {
+  console.log('dev')
   global.config = require("./config/development.json");
 }
 require("./data-access-layer/dal");

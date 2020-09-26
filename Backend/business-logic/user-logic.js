@@ -1,4 +1,3 @@
-const c = require("config");
 const Character = require("../models/characterModel");
 
 

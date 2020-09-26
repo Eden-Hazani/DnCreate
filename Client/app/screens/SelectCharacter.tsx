@@ -30,6 +30,7 @@ interface SelectCharacterState {
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -41,7 +42,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             character: new CharacterModel(),
             resetHpModal: false
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+    onFocus = async () => {
+        this.setState({ loading: true })
+        setTimeout(() => {
+            this.setState({ loading: false })
+        }, 1000);
+        this.setState({ character: this.props.route.params }, () => {
+            this.maxHpCheck();
+        });
+    }
+
     componentDidMount() {
         setTimeout(() => {
             this.setState({ loading: false })
@@ -131,7 +143,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         if (!this.state.character.maxHp) {
             const character = { ...this.state.character };
             let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
-            console.log(this.state.character.characterClass)
             character.maxHp = maxHp;
             this.setState({ character }, () => {
                 userCharApi.updateChar(this.state.character)
@@ -215,8 +226,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign={"left"} fontSize={35} color={colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
                                     <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
                                 </View>
-                                <View style={{ flex: .1 }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
+                                <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
+                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
+                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
+                                        this.setState({ backGroundStoryVisible: false }, () => {
+                                            this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
+                                        })
+                                    }} />
                                 </View>
                             </Modal>
 
@@ -278,20 +294,28 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </View>
                             <View style={styles.personality}>
                                 <View style={styles.list}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
+                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
+                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
+                                    </TouchableOpacity>
                                     {this.state.character.personalityTraits.map((trait, index) => <AppText key={index}>{`${index + 1}. ${trait}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
+                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharIdeals", { updateIdeals: true, character: this.state.character }) }}>
+                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
+                                    </TouchableOpacity>
                                     {this.state.character.ideals.map((ideal, index) => <AppText key={index}>{`${index + 1}. ${ideal}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
-                                    {this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
+                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharFlaws", { updateFlaws: true, character: this.state.character }) }}>
+                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
+                                        {this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
+                                    </TouchableOpacity>
                                 </View>
                                 <View style={styles.list}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
-                                    {this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
+                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharBonds", { updateBonds: true, character: this.state.character }) }}>
+                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
+                                        {this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                         </View>

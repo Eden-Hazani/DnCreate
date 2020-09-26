@@ -55,13 +55,13 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
         await authApi.login(values).then(result => {
             const userInfo: any = result.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
-                console.log(validToken)
                 const { user, setUser } = this.context
                 setUser(validToken);
                 store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
                 this.setState({ loading: false })
             })
         }).catch(err => {
+            this.setState({ loading: false })
             errorHandler(err.request)
         })
 

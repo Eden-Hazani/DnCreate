@@ -11,15 +11,19 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 
 interface CharBondsState {
+    baseState: string
     characterInfo: CharacterModel
     confirmed: boolean
+    updateBonds: boolean
 }
 
-export class CharBonds extends Component<{ navigation: any }, CharBondsState>{
+export class CharBonds extends Component<{ route: any, navigation: any, updateBonds: boolean }, CharBondsState>{
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
+            baseState: null,
+            updateBonds: this.props.route.params.updateBonds,
             confirmed: false,
             characterInfo: store.getState().character
         }
@@ -30,6 +34,14 @@ export class CharBonds extends Component<{ navigation: any }, CharBondsState>{
         this.UnsubscribeStore()
     }
     componentDidMount() {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            e.preventDefault();
+        })
+        if (this.props.route.params.updateBonds) {
+            this.setState({ characterInfo: this.props.route.params.character }, () => {
+                this.setState({ baseState: JSON.stringify(this.state.characterInfo) })
+            })
+        }
         const characterInfo = { ...this.state.characterInfo };
         if (!characterInfo.bonds) {
             characterInfo.bonds = [];
@@ -43,11 +55,13 @@ export class CharBonds extends Component<{ navigation: any }, CharBondsState>{
             characterInfo.bonds = [];
         }
         characterInfo.bonds[index] = bond;
-        this.setState({ characterInfo }, () => {
-        });
+        this.setState({ characterInfo });
     }
 
     insertInfoAndContinue = () => {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            this.props.navigation.dispatch(e.data.action)
+        })
         const characterInfo = { ...this.state.characterInfo };
         if (!this.state.characterInfo.bonds || this.state.characterInfo.bonds.length === 0) {
             Alert.alert("No Bonds", "Are you sure you want to continue without any Bonds?", [{
@@ -71,6 +85,41 @@ export class CharBonds extends Component<{ navigation: any }, CharBondsState>{
         }
     }
 
+    updateBonds = () => {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            this.props.navigation.dispatch(e.data.action)
+        })
+        const characterInfo = { ...this.state.characterInfo };
+        if (!this.state.characterInfo.bonds || this.state.characterInfo.bonds.length === 0) {
+            Alert.alert("No Bonds", "Are you sure you want to continue without any Bonds?", [{
+                text: 'Yes', onPress: () => {
+                    this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
+                }
+            }, { text: 'No' }])
+        } else {
+            characterInfo.bonds = characterInfo.bonds.filter(bond => { return bond !== undefined })
+            this.setState({ confirmed: true })
+            this.setState({ characterInfo }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                setTimeout(() => {
+                    this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
+                }, 800);
+                setTimeout(() => {
+                    this.setState({ confirmed: false })
+                }, 1100);
+            })
+        }
+    }
+
+    cancelUpdate = () => {
+        this.setState({ characterInfo: JSON.parse(this.state.baseState) }, () => {
+            this.props.navigation.addListener('beforeRemove', (e: any) => {
+                this.props.navigation.dispatch(e.data.action)
+            })
+            this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
+        });
+    }
+
     render() {
         const bonds = this.state.characterInfo.bonds;
         return (
@@ -90,7 +139,14 @@ export class CharBonds extends Component<{ navigation: any }, CharBondsState>{
                         <AppTextInput value={bonds ? bonds[4] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 4) }} padding={10} placeholder={'I protect those who cannot protect themselves..'} width={"80%"} />
                         <AppTextInput value={bonds ? bonds[5] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 5) }} padding={10} placeholder={"I pursue wealth to secure someone's love..."} width={"80%"} />
                         <View style={{ paddingBottom: 25 }}>
-                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            {this.state.updateBonds ?
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
+                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateBonds() }} />
+                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                </View>
+                                :
+                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            }
                         </View>
                     </View>}
             </ScrollView>

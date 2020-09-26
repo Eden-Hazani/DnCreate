@@ -19,7 +19,11 @@ const validateCharName = (name: string, user_id: string) => client.get(`${endpoi
 const deleteChar = (char_id: string) => client.delete(`${endpoint}/deleteChar/${char_id}`);
 
 
-const updateChar = (character: CharacterModel) => client.patch(`${endpoint}/updateCharacter`, character);
+const updateChar = (character: CharacterModel) => {
+    let formData: FormData = new FormData();
+    formData.append("charInfo", JSON.stringify(character))
+    return client.patch(`${endpoint}/updateCharacter`, formData);
+};
 
 
 

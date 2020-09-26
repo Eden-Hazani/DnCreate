@@ -2,6 +2,7 @@
 
 # dependencies
 Client/node_modules
+Client/config.ts
 Backend/node_modules
 Backend/package-lock.json
 Backend/package.json

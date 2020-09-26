@@ -14,6 +14,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
 
     switch (action.type) {
         case ActionType.SetInfoToChar:
+            console.log(action.payload)
             newState.character = action.payload;
             break;
         case ActionType.SetUserInfo:

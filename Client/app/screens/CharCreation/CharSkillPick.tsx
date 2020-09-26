@@ -70,7 +70,7 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
                 this.setState({ characterInfo }, () => {
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
                     setTimeout(() => {
-                        this.props.navigation.navigate("CharBackstory");
+                        this.props.navigation.navigate("CharBackstory", { updateStory: false });
                     }, 800);
                     setTimeout(() => {
                         this.setState({ confirmed: false })

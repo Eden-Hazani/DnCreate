@@ -11,15 +11,19 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 
 interface CharFlawsState {
+    baseState: string
     characterInfo: CharacterModel
     confirmed: boolean
+    updateFlaws: boolean
 }
 
-export class CharFlaws extends Component<{ navigation: any }, CharFlawsState>{
+export class CharFlaws extends Component<{ route: any, navigation: any, updateFlaws: boolean }, CharFlawsState>{
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
+            baseState: null,
+            updateFlaws: this.props.route.params.updateFlaws,
             confirmed: false,
             characterInfo: store.getState().character
         }
@@ -30,6 +34,14 @@ export class CharFlaws extends Component<{ navigation: any }, CharFlawsState>{
         this.UnsubscribeStore()
     }
     componentDidMount() {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            e.preventDefault();
+        })
+        if (this.props.route.params.updateFlaws) {
+            this.setState({ characterInfo: this.props.route.params.character }, () => {
+                this.setState({ baseState: JSON.stringify(this.state.characterInfo) })
+            })
+        }
         const characterInfo = { ...this.state.characterInfo };
         if (!characterInfo.flaws) {
             characterInfo.flaws = [];
@@ -47,12 +59,15 @@ export class CharFlaws extends Component<{ navigation: any }, CharFlawsState>{
     }
 
     insertInfoAndContinue = () => {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            this.props.navigation.dispatch(e.data.action)
+        })
         const characterInfo = { ...this.state.characterInfo };
         if (!this.state.characterInfo.flaws || this.state.characterInfo.flaws.length === 0) {
             Alert.alert("No Flaws", "Are you sure you want to continue without any Flaws?", [{
                 text: 'Yes', onPress: () => {
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    this.props.navigation.navigate("CharBonds")
+                    this.props.navigation.navigate("CharBonds", { updateBonds: false })
                 }
             }, { text: 'No' }])
         } else {
@@ -61,13 +76,48 @@ export class CharFlaws extends Component<{ navigation: any }, CharFlawsState>{
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
                 setTimeout(() => {
-                    this.props.navigation.navigate("CharBonds")
+                    this.props.navigation.navigate("CharBonds", { updateBonds: false })
                 }, 800);
                 setTimeout(() => {
                     this.setState({ confirmed: false })
                 }, 1100);
             })
         }
+    }
+
+    updateFlaws = () => {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            this.props.navigation.dispatch(e.data.action)
+        })
+        const characterInfo = { ...this.state.characterInfo };
+        if (!this.state.characterInfo.flaws || this.state.characterInfo.flaws.length === 0) {
+            Alert.alert("No Flaws", "Are you sure you want to continue without any Flaws?", [{
+                text: 'Yes', onPress: () => {
+                    this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
+                }
+            }, { text: 'No' }])
+        } else {
+            characterInfo.flaws = characterInfo.flaws.filter(flaw => { return flaw !== undefined })
+            this.setState({ confirmed: true })
+            this.setState({ characterInfo }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                setTimeout(() => {
+                    this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
+                }, 800);
+                setTimeout(() => {
+                    this.setState({ confirmed: false })
+                }, 1100);
+            })
+        }
+    }
+
+    cancelUpdate = () => {
+        this.setState({ characterInfo: JSON.parse(this.state.baseState) }, () => {
+            this.props.navigation.addListener('beforeRemove', (e: any) => {
+                this.props.navigation.dispatch(e.data.action)
+            })
+            this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
+        });
     }
 
     render() {
@@ -89,7 +139,14 @@ export class CharFlaws extends Component<{ navigation: any }, CharFlawsState>{
                         <AppTextInput value={flaws ? flaws[4] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 4) }} padding={10} placeholder={'I am slow to trust members of other races...'} width={"80%"} />
                         <AppTextInput value={flaws ? flaws[5] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 5) }} padding={10} placeholder={"In fact, the world does revolve around me..."} width={"80%"} />
                         <View style={{ paddingBottom: 25 }}>
-                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            {this.state.updateFlaws ?
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
+                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateFlaws() }} />
+                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                </View>
+                                :
+                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            }
                         </View>
                     </View>}
             </ScrollView>

@@ -21,8 +21,8 @@ const Stack = createStackNavigator();
 
 const CharNavigator = () => {
     return <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center" }}>
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen options={{ headerShown: false }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ title: "Character Info" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "Pick Class" }} name="ClassPick" component={ClassPick} />
         <Stack.Screen options={{ title: "Skills" }} name="CharSkillPick" component={CharSkillPick} />

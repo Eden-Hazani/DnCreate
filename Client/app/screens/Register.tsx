@@ -7,23 +7,18 @@ import * as Yup from 'yup';
 import { AppFormField } from '../components/forms/AppFormField';
 import { SubmitButton } from '../components/forms/SubmitButton';
 import { AppForm } from '../components/forms/AppForm';
-import jwtDecode from 'jwt-decode';
-import { ImageInput } from '../components/ImageInput';
-import { FormImagePicker } from '../components/forms/FormImagePicker';
 import authApi from '../api/authApi';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import { Unsubscribe } from 'redux';
 import { store } from '../redux/store';
-import { ActionType } from '../redux/action-type';
 import errorHandler from '../../utility/errorHander';
 import AuthContext from '../auth/context';
-import reduxToken from '../auth/reduxToken';
 import { AppRegisterDone } from '../components/AppRegisterDone';
 
 
 const ValidationSchema = Yup.object().shape({
     username: Yup.string().required().email().label("Username"),
-    password: Yup.string().length(8).required().label("Password"),
+    password: Yup.string().matches(/^.{5,16}$/, "Must be 5-16 Characters").required().label("Password"),
     passwordConfirmation: Yup.string().oneOf([Yup.ref('password')], 'passwords Must match').required(),
 })
 
@@ -58,7 +53,6 @@ export class Register extends Component<{ props: any, navigation: any }, Registe
             });
         }).catch(err => {
             this.setState({ loading: false })
-            console.log(err)
             errorHandler(err.request)
         });
 

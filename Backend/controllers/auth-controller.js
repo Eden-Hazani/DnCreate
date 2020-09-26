@@ -103,11 +103,18 @@ router.get('/activate/:token', async (request, response) => {
         if (registrationToken) {
             jwt.verify(registrationToken, config.jwt.secretKey, async function (err, decodedToken) {
                 if (err) {
+                    if (err.message === "jwt expired") {
+                        return response.status(400).send('this activation request has been expired')
+                    }
                     return response.status(400).json({ error: err.message })
+                }
+                const verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
+                if (verify) {
+                    console.log(verify)
+                    return response.status(403).send('User has already been activated')
                 }
                 const newUser = new User(JSON.parse(decodedToken.userInfo));
                 const user = await authLogic.register(newUser);
-                console.log(user);
                 return response.redirect('https://eden-hazani.github.io/DnCreateStaticAvtivation/')
             });
         } else {
