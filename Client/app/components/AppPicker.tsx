@@ -58,7 +58,7 @@ export class AppPicker extends Component<{ itemList: any, placeholder: any, icon
                                 }} />} />
                     </View>
                     <View style={{ flex: .1 }}>
-                        <AppButton width={100} fontSize={20} height={40} title={"close"} onPress={() => { this.setState({ visible: false }) }} />
+                        <AppButton backgroundColor={colors.bitterSweetRed} width={100} fontSize={20} height={40} title={"close"} onPress={() => { this.setState({ visible: false }) }} />
                     </View>
                 </Modal>
             </View>

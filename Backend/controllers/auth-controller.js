@@ -110,7 +110,6 @@ router.get('/activate/:token', async (request, response) => {
                 }
                 const verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
                 if (verify) {
-                    console.log(verify)
                     return response.status(403).send('User has already been activated')
                 }
                 const newUser = new User(JSON.parse(decodedToken.userInfo));
@@ -190,7 +189,6 @@ router.post("/login", upload.none(), async (request, response) => {
             response.status(401).send("Incorrect username or password");
             return;
         }
-        console.log(user)
         const token = jwt.sign({ user }, config.jwt.secretKey, { expiresIn: "50h" })
         response.json({ token });
     } catch (err) {

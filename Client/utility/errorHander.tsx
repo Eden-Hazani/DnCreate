@@ -12,8 +12,7 @@ const errorHandler = (answer: ApiResponse<unknown, unknown> | any) => {
         return true
     }
     if (answer.status === 400) {
-        console.log(answer.request)
-        // alert(answer.request.replace(/['"]+/g, ''))
+        alert(answer.response)
         return true
     }
     return false;

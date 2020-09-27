@@ -14,6 +14,7 @@ import { UserModel } from '../models/userModel';
 import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
 import * as Yup from 'yup';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -43,6 +44,7 @@ export class Account extends Component<{ props: any }, AccountState> {
     }
 
     logout = () => {
+        AsyncStorage.clear();
         store.dispatch({ type: ActionType.Logout })
         const { user, setUser } = this.context
         setUser(null);

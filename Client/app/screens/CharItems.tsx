@@ -134,7 +134,6 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
         const character = { ...this.state.character };
         this.setState({ search })
         if (search.trim() === "") {
-            console.log(store.getState().character)
             this.setState({ character: store.getState().character })
             return;
         }
@@ -249,7 +248,6 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                             keyExtractor={(stats, index) => index.toString()}
                             renderItem={({ item }) => <ListItem
                                 title={`Item - ${item}`}
-                                subTitle={console.log(item)}
                                 direction={'row'}
                                 subColor={colors.bitterSweetRed}
                                 headerFontSize={20}

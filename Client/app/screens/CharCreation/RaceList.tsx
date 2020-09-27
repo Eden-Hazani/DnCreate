@@ -58,7 +58,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     getRaces = async () => {
         try {
             const cachedRaces = await AsyncStorage.getItem('raceList');
-            console.log(cachedRaces)
             if (cachedRaces) {
                 this.setState({ loading: false })
                 const races = JSON.parse(cachedRaces);

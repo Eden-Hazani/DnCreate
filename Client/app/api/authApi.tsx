@@ -48,7 +48,6 @@ const resetPass = (values: any) => {
 const sendResetEmail = (email: string) => {
     let formData: FormData = new FormData();
     formData.append("email", email)
-    console.log(formData)
     return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/forgotPassword`, formData)
 
 }

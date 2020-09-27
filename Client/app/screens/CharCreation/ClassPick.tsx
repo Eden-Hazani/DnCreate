@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Linking } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
 import charClassApi from '../../api/charClassApi';
@@ -73,7 +74,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
 
     render() {
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View style={styles.container}>
                         <AppActivityIndicator visible={this.state.loading} />
@@ -110,7 +111,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
                             </View>
                         }
                     </View>}
-            </View>
+            </ScrollView>
         )
     }
 }

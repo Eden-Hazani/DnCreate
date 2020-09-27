@@ -10,7 +10,6 @@ export function FormImagePicker({ name }: any) {
     }
     return (
         <>
-            {console.log(name)}
             <ImageInput
                 imageUri={values[name]}
                 onChangeImage={(uri: any) => handleChangeImage(uri)} />
