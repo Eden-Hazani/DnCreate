@@ -15,7 +15,8 @@ import storage from './app/auth/storage';
 import { ActionType } from './app/redux/action-type';
 import JwtDecode from 'jwt-decode';
 import TokenHandler from './app/auth/TokenHandler';
-
+import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob'
+import { Config } from './config';
 
 interface AppState {
   fontsLoaded: boolean
@@ -24,6 +25,7 @@ interface AppState {
 }
 
 export class App extends React.Component<{ props: any }, AppState> {
+  public interstitialAd: string;
   navigationSubscription: any;
   static contextType = AuthContext;
   private UnsubscribeStore: Unsubscribe;
@@ -35,18 +37,30 @@ export class App extends React.Component<{ props: any }, AppState> {
       fontsLoaded: false
     }
     this.UnsubscribeStore = store.subscribe(() => { })
+    this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
+  }
+
+  displayAds = async () => {
+    AdMobInterstitial.setAdUnitID(this.interstitialAd);
+    AdMobInterstitial.requestAdAsync().then(() => AdMobInterstitial.showAdAsync());
   }
 
 
   async componentDidMount() {
-    store.dispatch({ type: ActionType.CleanCreator })
-    await TokenHandler().then(user => {
-      this.setState({ user })
-    });
-    Font.loadAsync({
-      'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
+    try {
+      this.displayAds().then(async () => {
+        store.dispatch({ type: ActionType.CleanCreator })
+        await TokenHandler().then(user => {
+          this.setState({ user })
+        });
+        Font.loadAsync({
+          'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
+        }
+        ).then(() => this.setState({ fontsLoaded: true }))
+      })
+    } catch (err) {
+      console.log(err.message)
     }
-    ).then(() => this.setState({ fontsLoaded: true }))
   }
 
   componentWillUnmount() {

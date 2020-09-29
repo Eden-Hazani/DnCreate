@@ -9,6 +9,10 @@ function getCharacters(user_id) {
     return Character.find({ user_id: { $eq: user_id } });
 }
 
+function getChar(_id) {
+    return Character.find({ _id: { $eq: _id } });
+}
+
 function removeCharacter(char_id) {
     return Character.deleteOne({ _id: { $eq: char_id } }).exec()
 }
@@ -24,6 +28,7 @@ async function updateCharacter(character) {
 
 
 module.exports = {
+    getChar,
     addCharacter,
     getCharacters,
     removeCharacter,

@@ -55,6 +55,9 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
             characterInfo.bonds = [];
         }
         characterInfo.bonds[index] = bond;
+        if (bond.trim() === "") {
+            characterInfo.bonds.splice(index, 1)
+        }
         this.setState({ characterInfo });
     }
 

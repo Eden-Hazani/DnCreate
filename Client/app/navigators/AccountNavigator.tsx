@@ -7,7 +7,7 @@ import colors from '../config/colors';
 const Stack = createStackNavigator();
 const AccNavigator = () => {
     return <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center" }}>
-        <Stack.Screen name="Account" component={Account} />
+        <Stack.Screen options={{ headerShown: false }} name="Account" component={Account} />
     </Stack.Navigator>
 }
 

@@ -6,6 +6,7 @@ import CharNavigator from './CharacterNavigator';
 import colors from '../config/colors';
 import { IconGen } from '../components/IconGen';
 import AccNavigator from './AccountNavigator';
+import AdventuresNavigator from './AdventuresNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,6 +19,7 @@ const AppNavigator = () => {
     }}>
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"home"} iconColor={color} /> }} name="Home" component={CharNavigator} />
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"account"} iconColor={color} /> }} name="Account" component={AccNavigator} />
+        <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"map-outline"} iconColor={color} /> }} name="Adventures" component={AdventuresNavigator} />
     </Tab.Navigator>
 }
 

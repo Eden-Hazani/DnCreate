@@ -17,7 +17,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5186238714913357~4090565931"
+      }
+    },
+    "android": {
+      "package": "com.DnCreate",
+      "versionCode": 1,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5186238714913357~1441201925"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

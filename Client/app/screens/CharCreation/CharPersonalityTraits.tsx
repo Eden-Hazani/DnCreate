@@ -41,6 +41,9 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
             characterInfo.personalityTraits = [];
         }
         characterInfo.personalityTraits[index] = trait;
+        if (trait.trim() === "") {
+            characterInfo.personalityTraits.splice(index, 1)
+        }
         this.setState({ characterInfo }, () => {
         });
     }

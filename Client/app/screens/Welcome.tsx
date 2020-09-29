@@ -22,7 +22,7 @@ export class Welcome extends Component<any> {
                     <View>
                         <View style={styles.textContainer}>
                             <AppTextHeadline>Welcome to DnCreate</AppTextHeadline>
-                            <AppText fontSize={20} textAlign={"center"} color={colors.text} padding={20}>Creating D&amp;D characters has never been easier, register to begin!</AppText>
+                            <AppText fontSize={20} textAlign={"center"} color={colors.text} padding={20}>Creating fifth edition characters has never been easier, register to begin!</AppText>
                             <AppText fontSize={20} textAlign={"center"} color={colors.text} padding={20}>Already a user? Login Now</AppText>
                         </View>
                         <View style={styles.buttonsView}>

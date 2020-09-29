@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 const hash = require('../utilities/hash')
 const User = require('../models/userModel');
+const Character = require('../models/characterModel');
 
 
 function register(user) {
@@ -11,6 +12,10 @@ function register(user) {
 
 function validateRegister(username) {
     return User.findOne({ username: { $eq: username } });
+}
+
+function validateInSystem(_id) {
+    return User.findOne({ _id: { $eq: _id } });
 }
 
 function resetLinkValidator(resetLink) {
@@ -41,6 +46,11 @@ async function addResetLink(user) {
     return info.n ? user : null;
 }
 
+async function deleteAccount(_id) {
+    return User.deleteOne({ _id }).exec().then(() => {
+        Character.deleteMany({ user_id: { $eq: _id } }).exec()
+    });
+}
 
 
 module.exports = {
@@ -50,5 +60,7 @@ module.exports = {
     updateUser,
     addResetLink,
     resetLinkValidator,
-    updateUserWithPassword
+    updateUserWithPassword,
+    deleteAccount,
+    validateInSystem
 }

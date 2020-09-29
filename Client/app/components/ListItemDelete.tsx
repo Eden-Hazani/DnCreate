@@ -4,7 +4,7 @@ import colors from '../config/colors';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { IconGen } from './IconGen';
 
-export function listItemDelete({ onPress }: any) {
+export function ListItemDelete({ onPress }: any) {
     return (
         <TouchableWithoutFeedback onPress={onPress} style={{ flex: 1 }}>
             <View style={styles.container}>
@@ -25,4 +25,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default listItemDelete;
+export default ListItemDelete;

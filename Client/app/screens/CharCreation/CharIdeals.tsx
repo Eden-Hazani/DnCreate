@@ -51,6 +51,9 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
             characterInfo.ideals = [];
         }
         characterInfo.ideals[index] = ideal;
+        if (ideal.trim() === "") {
+            characterInfo.ideals.splice(index, 1)
+        }
         this.setState({ characterInfo });
     }
 

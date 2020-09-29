@@ -9,6 +9,8 @@ const uuid = require('uuid');
 const verifyInSystem = require('../middleware/validateUserInSystem')
 const verifyLoggedIn = require('../middleware/verify-logged-in')
 const validateExistingImage = require('../middleware/validateExistingImage')
+const fs = require('fs');
+
 
 const mailgun = require("mailgun-js");
 const { response } = require("express");
@@ -25,6 +27,26 @@ const storage = multer.diskStorage({
     }
 })
 var upload = multer({ storage: storage })
+
+
+
+router.delete("/deleteAccount/:user_id", async (request, response) => {
+    try {
+        const user = request.params.user_id;
+        const userInSystem = await authLogic.validateInSystem(request.params.user_id);
+        if (userInSystem.profileImg) {
+            fs.unlink(`./public/uploads/profile-imgs/${userInSystem.profileImg}`, function (err) {
+                if (err) return console.log(err);
+                console.log('file deleted successfully');
+            });
+        }
+        await authLogic.deleteAccount(user);
+        response.sendStatus(204);
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
+    }
+})
+
 
 
 router.post('/forgotPassword', upload.none(), async (request, response) => {

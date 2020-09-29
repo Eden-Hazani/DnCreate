@@ -55,6 +55,9 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
             characterInfo.flaws = [];
         }
         characterInfo.flaws[index] = flaws;
+        if (flaws.trim() === "") {
+            characterInfo.flaws.splice(index, 1)
+        }
         this.setState({ characterInfo });
     }
 

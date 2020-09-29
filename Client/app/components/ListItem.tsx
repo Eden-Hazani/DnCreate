@@ -18,6 +18,7 @@ import colors from '../config/colors';
  * @param  textDistanceFromImg: number or string% 
  * @param  title: string
  * @param  subTitle: string
+ * @param  alignListItem: string
  *   
  */
 
@@ -29,8 +30,8 @@ export class ListItem extends Component<any>{
                 renderRightActions={this.props.renderRightActions}>
                 <TouchableOpacity onPress={this.props.onPress} >
                     <View style={{
-                        justifyContent: this.props.justifyContent, alignItems: 'center',
-                        flexDirection: this.props.direction, padding: 30, paddingBottom: this.props.padding
+                        justifyContent: this.props.justifyContent, alignItems: this.props.alignListItem ? this.props.alignListItem : 'center',
+                        flexDirection: this.props.direction, padding: this.props.totalPadding ? this.props.totalPadding : 30, paddingBottom: this.props.padding
                     }}>
                         <View>
                             {this.props.imageUrl ?

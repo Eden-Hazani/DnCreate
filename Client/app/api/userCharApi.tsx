@@ -10,7 +10,10 @@ const saveChar = (character: CharacterModel) => {
 };
 
 
-const getChars = (user_id: string) => client.get<CharacterModel[]>(`${endpoint}/getChar/${user_id}`);
+const getChars = (user_id: string) => client.get<CharacterModel[]>(`${endpoint}/getChars/${user_id}`);
+
+
+const getChar = (_id: string) => client.get<CharacterModel>(`${endpoint}/getChar/${_id}`);
 
 
 const validateCharName = (name: string, user_id: string) => client.get(`${endpoint}/validateChar/${name}/${user_id}`);
@@ -28,6 +31,7 @@ const updateChar = (character: CharacterModel) => {
 
 
 export default {
+    getChar,
     saveChar,
     getChars,
     deleteChar,

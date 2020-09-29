@@ -70,7 +70,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
 
     characterWindow = (character: CharacterModel) => {
         store.dispatch({ type: ActionType.SetInfoToChar, payload: character })
-        this.props.navigation.navigate("SelectCharacter", character)
+        this.props.navigation.navigate("SelectCharacter", { character: character, isDm: false })
     }
 
     render() {

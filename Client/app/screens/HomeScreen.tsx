@@ -37,9 +37,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 <AnimatedLogo></AnimatedLogo>
                 <View style={styles.container}>
                     <AnimateContactUpwards>
-                        <View style={{ alignItems: "center", flex: .5 }}>
+                        <View style={{ alignItems: "center", flex: .5, padding: 20 }}>
                             <AppTextHeadline>DnCreate</AppTextHeadline>
-                            <AppText color={colors.text}>Creating D&amp;D characters has never been easier</AppText>
+                            <AppText textAlign={'center'} color={colors.text}>Creating fifth edition characters has never been easier</AppText>
                             <AppText color={colors.text}>Tap below to begin</AppText>
                         </View>
                         <View style={styles.buttonsView}>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     buttonsView: {
         flex: .3,
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "space-evenly",
         alignItems: "center",
     },
     container: {
