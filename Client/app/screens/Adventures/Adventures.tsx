@@ -26,7 +26,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     constructor(props: any) {
         super(props)
         this.state = {
-            characters: null,
+            characters: [],
             loading: true,
             leadingAdventures: [],
             refreshing: false,
@@ -54,16 +54,20 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
         this.setState({ leadingAdventures: leadingAdventures.data })
     }
     getParticipatingAdv = async () => {
-        let charIds = [];
-        for (let character of this.state.characters) {
-            charIds.push(character._id)
+        try {
+            let charIds = [];
+            for (let character of this.state.characters) {
+                charIds.push(character._id)
+            }
+            const adventures = await adventureApi.getParticipationAdventures(charIds);
+            let participatingAdventures = []
+            for (let adventure of adventures.data[0]) {
+                participatingAdventures.push(adventure)
+            }
+            this.setState({ participatingAdventures })
+        } catch (err) {
+            console.log(err.message)
         }
-        const adventures = await adventureApi.getParticipationAdventures(charIds);
-        let participatingAdventures = []
-        for (let adventure of adventures.data[0]) {
-            participatingAdventures.push(adventure)
-        }
-        this.setState({ participatingAdventures })
     }
     render() {
         return (

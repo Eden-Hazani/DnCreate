@@ -10,7 +10,7 @@ function getCharacters(user_id) {
 }
 
 function getChar(_id) {
-    return Character.find({ _id: { $eq: _id } });
+    return Character.findOne({ _id: { $eq: _id } });
 }
 
 function removeCharacter(char_id) {

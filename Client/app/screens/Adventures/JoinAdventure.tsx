@@ -68,6 +68,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
         this.setState({ confirmedAdventure }, async () => {
             adventureApi.updateAdventure(this.state.confirmedAdventure).then(adventure => {
                 if (!adventure.ok) {
+                    this.setState({ loading: false })
                     alert(adventure.data);
                     return;
                 }

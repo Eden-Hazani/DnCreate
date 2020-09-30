@@ -47,6 +47,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     characterWindow = (character: any) => {
         this.props.navigation.navigate("SelectCharacter", { character: character, isDm: true })
     }
+
     render() {
         const adventure = this.state.adventure;
         return (
@@ -62,7 +63,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                         <AppText textAlign={'center'} fontSize={15}>Share the adventure identifier with your friends to let them join.</AppText>
                     </View>
                     :
-                    <View>
+                    <View style={{ flex: .8 }}>
                         <FlatList
                             data={adventure.participants_id}
                             keyExtractor={(currentParticipants, index) => index.toString()}

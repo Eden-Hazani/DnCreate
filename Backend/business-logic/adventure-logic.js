@@ -12,7 +12,7 @@ async function getLeadingAdventures(user_id) {
 }
 
 function getParticipatingAdventures(character_id) {
-    const adventures = Adventure.find({ participants_id: { $all: [character_id] } });
+    const adventures = Adventure.find({ participants_id: { $all: [character_id] } }).populate('participants_id').exec();
     return adventures
 }
 

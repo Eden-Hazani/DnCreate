@@ -2,6 +2,7 @@ const express = require("express");
 const adventureLogic = require('../business-logic/adventure-logic')
 const router = express.Router();
 const verifyLogged = require('../middleware/verify-logged-in');
+const verifyUserInAdventure = require('../middleware/verifyUserInAdventure');
 var multer = require('multer');
 const Adventure = require("../models/AdventureModel");
 var upload = multer({})
@@ -17,15 +18,8 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
     }
 });
 
-router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, response) => {
+router.patch("/updateAdventure", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
     try {
-        const participants_id = JSON.parse(request.body.adventure).participants_id;
-        const CharInAdv = await adventureLogic.findAdventure(JSON.parse(request.body.adventure).adventureIdentifier);
-        const verify = CharInAdv[0].participants_id.find(participant => participant === participants_id[participants_id.length - 1]);
-        if (verify) {
-            response.status(400).send('Character Already part Of This Adventure.');
-            return;
-        }
         const adventure = new Adventure(JSON.parse(request.body.adventure))
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         response.json(updatedAdventure);
