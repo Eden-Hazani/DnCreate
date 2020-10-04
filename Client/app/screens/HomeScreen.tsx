@@ -43,8 +43,8 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                             <AppText color={colors.text}>Tap below to begin</AppText>
                         </View>
                         <View style={styles.buttonsView}>
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={100} height={100} title={"New Character"} />
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={100} height={100} title={"Character Hall"} />
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                         </View>
                     </AnimateContactUpwards>
                 </View>

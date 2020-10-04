@@ -15,6 +15,7 @@ import { CharacterModel } from '../../models/characterModel';
 import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface ClassPickState {
     loading: boolean
@@ -65,7 +66,17 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
 
     getClasses = async () => {
         this.setState({ loading: true })
+        const cachedClasses = await AsyncStorage.getItem('classList');
+        this.setState({ loading: true })
+        if (cachedClasses) {
+            const classes = JSON.parse(cachedClasses);
+            this.setState({ classes }, () => {
+                this.setState({ loading: false })
+            })
+            return;
+        }
         const result = await charClassApi.getClassesList();
+        await AsyncStorage.setItem('classList', JSON.stringify(result.data));
         this.setState({ loading: false })
         const classes = result.data;
         this.setState({ classes, error: errorHandler(result) })
@@ -74,7 +85,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
 
     render() {
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View style={styles.container}>
                         <AppActivityIndicator visible={this.state.loading} />

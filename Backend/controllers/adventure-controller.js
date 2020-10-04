@@ -3,6 +3,7 @@ const adventureLogic = require('../business-logic/adventure-logic')
 const router = express.Router();
 const verifyLogged = require('../middleware/verify-logged-in');
 const verifyUserInAdventure = require('../middleware/verifyUserInAdventure');
+const validateUserIsLeader = require('../middleware/validateUserIsLeader');
 var multer = require('multer');
 const Adventure = require("../models/AdventureModel");
 var upload = multer({})
@@ -20,7 +21,18 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
 
 router.patch("/updateAdventure", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
     try {
+        console.log(request)
         const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        response.json(updatedAdventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/leaveAdventure", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const adventure = new Adventure(JSON.parse(request.body.adventure));
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         response.json(updatedAdventure);
     } catch (err) {
@@ -64,6 +76,17 @@ router.get("/findAdventure/:adventureIdentifier", verifyLogged, async (request, 
         response.status(500).send(err.message);
     }
 });
+
+router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, validateUserIsLeader, async (request, response) => {
+    try {
+        const adventureIdentifier = request.params.adventureIdentifier;
+        await adventureLogic.removeAdventure(adventureIdentifier);
+        response.sendStatus(204);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 
 
 module.exports = router;

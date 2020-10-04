@@ -58,10 +58,12 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     getRaces = async () => {
         try {
             const cachedRaces = await AsyncStorage.getItem('raceList');
+            this.setState({ loading: true })
             if (cachedRaces) {
-                this.setState({ loading: false })
                 const races = JSON.parse(cachedRaces);
-                this.setState({ races })
+                this.setState({ races }, () => {
+                    this.setState({ loading: false })
+                })
                 return;
             }
             this.setState({ loading: true })
@@ -93,7 +95,12 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
     pickRace = (race: RaceModel) => {
         const characterInfo = { ...this.state.characterInfo }
-        characterInfo.modifiers = Object.assign(characterInfo.modifiers, race.abilityBonus)
+        characterInfo.strength = race.abilityBonus.strength;
+        characterInfo.constitution = race.abilityBonus.constitution;
+        characterInfo.dexterity = race.abilityBonus.dexterity;
+        characterInfo.charisma = race.abilityBonus.charisma;
+        characterInfo.wisdom = race.abilityBonus.wisdom;
+        characterInfo.intelligence = race.abilityBonus.intelligence;
         characterInfo.race = race.name;
         characterInfo.image = race.image;
         characterInfo.user_id = this.state.userInfo._id;

@@ -126,7 +126,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
     render() {
         const bonds = this.state.characterInfo.bonds;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>

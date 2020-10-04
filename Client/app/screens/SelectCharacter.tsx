@@ -138,7 +138,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         const character = { ...this.state.character };
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
         let maxHp: number = this.state.character.maxHp;
-        maxHp = maxHp + Math.floor(Math.random() * hitDice) + 1;
+        maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + this.state.character.modifiers.constitution;
         character.maxHp = maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character)
@@ -160,7 +160,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     setNewMaxHp = (maxHp: number) => {
         const character = { ...this.state.character };
-        character.maxHp = maxHp;
+        character.maxHp = +maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character);
         })
@@ -170,7 +170,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     render() {
         const isDm = this.state.isDm;
         return (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
                         <View>

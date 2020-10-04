@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View } from 'react-native';
 import 'react-native-gesture-handler';
 import * as Font from 'expo-font'
 import { NavigationContainer } from '@react-navigation/native'
@@ -18,6 +18,7 @@ import TokenHandler from './app/auth/TokenHandler';
 import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob'
 import { Config } from './config';
 
+
 interface AppState {
   fontsLoaded: boolean
   user: UserModel
@@ -26,6 +27,7 @@ interface AppState {
 
 export class App extends React.Component<{ props: any }, AppState> {
   public interstitialAd: string;
+  public bannerAd: string;
   navigationSubscription: any;
   static contextType = AuthContext;
   private UnsubscribeStore: Unsubscribe;
@@ -38,6 +40,7 @@ export class App extends React.Component<{ props: any }, AppState> {
     }
     this.UnsubscribeStore = store.subscribe(() => { })
     this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
+    this.bannerAd = Platform.OS === 'ios' ? Config.iosBanner : Config.androidBanner
   }
 
   displayAds = async () => {
@@ -84,6 +87,10 @@ export class App extends React.Component<{ props: any }, AppState> {
                 {user ? <AppNavigator /> : <AuthNavigator />}
               </NavigationContainer>}
           </AuthContext.Provider>}
+        <AdMobBanner
+          bannerSize="banner"
+          adUnitID={this.bannerAd}
+          servePersonalizedAds={false} />
       </SafeAreaView>
     );
   }

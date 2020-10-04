@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView } from 'react-native';
 import { Unsubscribe } from 'redux';
 import switchModifier from '../../../utility/abillityModifierSwitch';
 import { RollingDiceAnimation } from '../../animations/RollingDiceAnimation';
@@ -131,9 +131,9 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
     }
     updateStat = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
-        characterInfo[attribute] = this.state.sumOfDice;
-        characterInfo.modifiers[attribute] = this.state.pickedRace.abilityBonus[attribute];
-        characterInfo.modifiers[attribute] = characterInfo.modifiers[attribute] + (switchModifier(this.state.sumOfDice));
+        const baseAtt = characterInfo[attribute]
+        characterInfo[attribute] = characterInfo[attribute] + this.state.sumOfDice;
+        characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
         this.setState({ characterInfo }, () => {
             this.setState({ jiggleOn: false, sumOfDice: 0 })
         })
@@ -152,12 +152,12 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
     }
 
     insertInfoAndContinue = () => {
-        if (this.state.characterInfo.strength !== undefined
-            && this.state.characterInfo.constitution !== undefined
-            && this.state.characterInfo.dexterity !== undefined
-            && this.state.characterInfo.intelligence !== undefined
-            && this.state.characterInfo.wisdom !== undefined
-            && this.state.characterInfo.charisma !== undefined
+        if (this.state.characterInfo.modifiers.strength !== undefined
+            && this.state.characterInfo.modifiers.constitution !== undefined
+            && this.state.characterInfo.modifiers.dexterity !== undefined
+            && this.state.characterInfo.modifiers.intelligence !== undefined
+            && this.state.characterInfo.modifiers.wisdom !== undefined
+            && this.state.characterInfo.modifiers.charisma !== undefined
         ) {
             this.setState({ confirmed: true })
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
@@ -175,10 +175,9 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
 
     render() {
         return (
-            <View>
+            <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
-
                         <View style={[styles.rollingDice, { backgroundColor: this.state.rollingDice ? colors.softBlack : colors.totalWhite }]} pointerEvents={this.state.rollingDice ? "none" : "auto"}>
                             {this.state.rollingDice && <View style={{
                                 position: 'absolute', top: 0, left: 0,
@@ -200,7 +199,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.strength}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.strength ? this.updateStat('strength') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.strength}</AppText>
@@ -212,7 +211,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.constitution}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.constitution ? this.updateStat('constitution') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.constitution}</AppText>
@@ -224,7 +223,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.dexterity}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.dexterity ? this.updateStat('dexterity') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.dexterity}</AppText>
@@ -237,7 +236,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.intelligence}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.intelligence ? this.updateStat('intelligence') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.intelligence}</AppText>
@@ -249,7 +248,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.wisdom}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.wisdom ? this.updateStat('wisdom') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.wisdom}</AppText>
@@ -261,7 +260,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.charisma}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.charisma ? this.updateStat('charisma') : null }} />
+                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.charisma}</AppText>
@@ -350,7 +349,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                             </View>
                         </View>
                     </View>}
-            </View>
+            </ScrollView>
 
         )
     }
@@ -364,6 +363,7 @@ const styles = StyleSheet.create({
 
     },
     dicePool: {
+        paddingTop: 25,
         alignItems: "center"
     },
     stat: {

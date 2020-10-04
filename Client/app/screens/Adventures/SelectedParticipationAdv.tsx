@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Config } from '../../../config';
+import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
@@ -10,7 +11,6 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
 
     render() {
         const adventure = this.props.route.params.adventure;
-        console.log(this.props.route.params)
         return (
             <View style={styles.container}>
                 <View style={styles.textContainer}>
@@ -39,6 +39,8 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                             justifyContent={"flex-start"} textDistanceFromImg={10} />}
                         ItemSeparatorComponent={ListItemSeparator} />
                 </View>
+                <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
+                    fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
             </View>
         )
     }

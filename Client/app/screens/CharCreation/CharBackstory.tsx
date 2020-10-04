@@ -73,13 +73,13 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
     updateInfo = async () => {
         store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         userCharApi.updateChar(this.state.characterInfo)
-        this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
+        this.props.navigation.navigate("SelectCharacter", { character: this.state.characterInfo, isDm: false })
     }
 
     render() {
         const character = this.state.characterInfo;
         return (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     this.state.updateStory ?
                         <View>

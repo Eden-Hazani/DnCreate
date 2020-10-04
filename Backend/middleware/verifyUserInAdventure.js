@@ -9,7 +9,6 @@ async function verifyUserInAdventure(request, response, next) {
     let chars = null
     for (let participant of currentAdventure[0].participants_id) {
         chars = await userLogic.getChar(participant).populate('user_id');
-        console.log(response.locals.user._id === chars.user_id._id.toString())
         if (response.locals.user._id === chars.user_id._id.toString()) {
             response.status(403).send("User Is already part of this adventure!");
             return;

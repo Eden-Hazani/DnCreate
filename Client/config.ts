@@ -8,12 +8,18 @@ export class Config {
     public static serverUrl: string;
     public static adAndroidInterstitial: string;
     public static adIosInterstitial: string;
+    public static androidBanner: string;
+    public static iosBanner: string;
     public static _initialize() {
         if (__DEV__) {
             Config.serverUrl = "http://192.168.1.18:9000";
+            Config.androidBanner = "ca-app-pub-3940256099942544/6300978111"
+            Config.iosBanner = "ca-app-pub-3940256099942544/2934735716"
             Config.adAndroidInterstitial = "ca-app-pub-3940256099942544/1033173712"
             Config.adIosInterstitial = "ca-app-pub-3940256099942544/4411468910"
         } else {
+            Config.androidBanner = "ca-app-pub-5186238714913357/2206638629"
+            Config.iosBanner = "ca-app-pub-5186238714913357/5212075912"
             Config.adAndroidInterstitial = "ca-app-pub-5186238714913357/8155795848"
             Config.adIosInterstitial = "ca-app-pub-5186238714913357/2028359436"
             Config.serverUrl = "https://dncreate.azurewebsites.net";

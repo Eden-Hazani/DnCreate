@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { AppForm } from '../../components/forms/AppForm';
 import * as Yup from 'yup';
 import { AppText } from '../../components/AppText';
@@ -15,6 +15,8 @@ import { AdventureModel } from '../../models/AdventureModel';
 import errorHandler from '../../../utility/errorHander';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
+import { store } from '../../redux/store';
+import { ActionType } from '../../redux/action-type';
 
 const ValidationSchema = Yup.object().shape({
     adventureIdentifier: Yup.string().required().label("Adventure Identifier"),
@@ -72,6 +74,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                     alert(adventure.data);
                     return;
                 }
+                store.dispatch({ type: ActionType.UpdateParticipatingAdv, payload: adventure.data })
                 this.setState({ loading: false })
                 this.props.navigation.navigate("Adventures")
             });
@@ -88,7 +91,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                             onSubmit={(values: any) => this.findAdventure(values)}
                             validationSchema={ValidationSchema}>
                             <View style={{ flex: 1 }}>
-                                <View style={{ flex: .2, paddingTop: 35 }}>
+                                <View style={{ height: Dimensions.get('screen').height / 5, paddingTop: 35 }}>
                                     <AppText fontSize={18} textAlign={'center'}>Adventure Identifier</AppText>
                                     <AppFormField
                                         keyboardType={'numeric'}
@@ -97,8 +100,12 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                                         iconName={"text-short"}
                                         placeholder={"Adventure Identifier..."} />
                                 </View>
-                                <View style={{ flex: .5 }}>
+                                <View style={{ height: Dimensions.get('screen').height / 5 }}>
                                     <SubmitButton width={250} title={"Find Adventure"} />
+                                </View>
+                                <View style={{ height: Dimensions.get('screen').height / 5 }}>
+                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
+                                        borderRadius={100} width={250} height={100} title={"Cancel"} onPress={() => { this.props.navigation.navigate('Adventures') }} />
                                 </View>
                             </View>
                         </AppForm>

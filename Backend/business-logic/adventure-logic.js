@@ -27,12 +27,15 @@ async function updateAdventure(adventure) {
     return info.n ? adventure : null;
 }
 
-
+function removeAdventure(adventureIdentifier) {
+    return Adventure.deleteOne({ adventureIdentifier: { $eq: adventureIdentifier } }).exec()
+}
 
 module.exports = {
     getParticipatingAdventures,
     createAdventure,
     getLeadingAdventures,
     updateAdventure,
-    findAdventure
+    findAdventure,
+    removeAdventure
 }

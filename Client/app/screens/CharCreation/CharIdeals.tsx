@@ -122,7 +122,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
     render() {
         const ideals = this.state.characterInfo.ideals;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>

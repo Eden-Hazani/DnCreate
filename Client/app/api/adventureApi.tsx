@@ -26,11 +26,21 @@ const getParticipationAdventures = (characters: string[]) => {
 
 const findAdventure = (adventureIdentifier: string) => client.get<AdventureModel>(`${endpoint}/findAdventure/${adventureIdentifier}`);
 
+const leaveAdventure = (adventure: AdventureModel) => {
+    let formData = new FormData();
+    formData.append("adventure", JSON.stringify(adventure));
+    return client.patch(`${endpoint}/leaveAdventure`, formData);
+};
+
+const deleteAdventure = (adventureIdentifier: string, leader_id: string) =>
+    client.delete(`${endpoint}/deleteAdventure/${adventureIdentifier}/${leader_id}`);
 
 export default {
     saveAdventure,
     getLeadingAdventures,
     updateAdventure,
     findAdventure,
-    getParticipationAdventures
+    getParticipationAdventures,
+    leaveAdventure,
+    deleteAdventure
 }

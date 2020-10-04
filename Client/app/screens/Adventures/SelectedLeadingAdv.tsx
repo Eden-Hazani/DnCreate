@@ -9,7 +9,9 @@ import { ListItemDelete } from '../../components/ListItemDelete';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
 import colors from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
-import { CharacterModel } from '../../models/characterModel';
+import errorHandler from '../../../utility/errorHander';
+import { store } from '../../redux/store';
+import { ActionType } from '../../redux/action-type';
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
@@ -39,13 +41,22 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
         adventure.participants_id = participants_id;
         this.setState({ adventure }, () => {
-            console.log(this.state.adventure)
-            adventureApi.updateAdventure(this.state.adventure)
+            adventureApi.leaveAdventure(this.state.adventure)
         })
     }
 
     characterWindow = (character: any) => {
         this.props.navigation.navigate("SelectCharacter", { character: character, isDm: true })
+    }
+
+    deleteAdventure = async () => {
+        const response = await adventureApi.deleteAdventure(this.state.adventure.adventureIdentifier, this.state.adventure.leader_id);
+        if (!response.ok) {
+            errorHandler(response.status);
+            return;
+        }
+        store.dispatch({ type: ActionType.DeleteAdventure, payload: this.state.adventure._id });
+        this.back();
     }
 
     render() {
@@ -89,9 +100,11 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                     <AppText fontSize={18}>Adventure identifier:</AppText>
                     <AppText fontSize={20} color={colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                 </View>
-                <View style={{ flex: .2 }}>
+                <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
                     <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.back() }}
-                        fontSize={18} borderRadius={25} width={120} height={65} title={"Adventures"} />
+                        fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
+                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
+                        fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
                 </View>
             </View>
         )

@@ -7,6 +7,8 @@ import { AppFormField } from '../../components/forms/AppFormField';
 import { SubmitButton } from '../../components/forms/SubmitButton';
 import AuthContext from '../../auth/context';
 import adventureApi from '../../api/adventureApi';
+import { store } from '../../redux/store';
+import { ActionType } from '../../redux/action-type';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -19,6 +21,7 @@ export class StartAdventure extends Component<{ navigation: any }> {
     static contextType = AuthContext;
     startAdventure = (values: any) => {
         adventureApi.saveAdventure(values).then((adventure) => {
+            store.dispatch({ type: ActionType.UpdateLeadingAdv, payload: adventure.data })
             this.props.navigation.navigate("SelectedLeadingAdv", { adventure: adventure.data })
         });
     }

@@ -57,14 +57,12 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
 
 
     handleDelete = (character: CharacterModel) => {
-        //delete the character from list.
         for (let item of this.state.characters) {
             if (item._id === character._id) {
                 const characters = this.state.characters.filter(m => m._id !== item._id)
                 this.setState({ characters })
             }
         }
-        //delete the character from the server.
         userCharApi.deleteChar(character._id)
     }
 
