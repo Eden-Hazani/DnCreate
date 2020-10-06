@@ -7,7 +7,7 @@ Backend/node_modules
 Backend/package-lock.json
 Backend/package.json
 Backend/config
-Client/config.ts
+Client/config
 /.pnp
 .pnp.js
 
