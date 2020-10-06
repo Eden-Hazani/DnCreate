@@ -3,10 +3,12 @@
 # dependencies
 Client/node_modules
 Client/config.ts
+Client/DnCreate.jks
 Backend/node_modules
 Backend/package-lock.json
 Backend/package.json
 Backend/config
+BeforeUse
 /.pnp
 .pnp.js
 

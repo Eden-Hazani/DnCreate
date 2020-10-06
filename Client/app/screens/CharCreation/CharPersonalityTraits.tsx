@@ -41,6 +41,9 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
             characterInfo.personalityTraits = [];
         }
         characterInfo.personalityTraits[index] = trait;
+        if (trait.trim() === "") {
+            characterInfo.personalityTraits.splice(index, 1)
+        }
         this.setState({ characterInfo }, () => {
         });
     }
@@ -126,7 +129,7 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
     render() {
         const traits = this.state.characterInfo.personalityTraits;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>

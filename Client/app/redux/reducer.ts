@@ -16,6 +16,11 @@ export function reduce(currentState: AppState, action: Action): AppState {
         case ActionType.SetInfoToChar:
             newState.character = action.payload;
             break;
+        case ActionType.SetCharacters:
+            for (let character of action.payload) {
+                newState.characters.push(character);
+            }
+            break;
         case ActionType.SetUserInfo:
             const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg)
             newState.user = user;
@@ -30,6 +35,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
             newState.user = null;
             storage.removeToken();
             break;
+
         case ActionType.PickedRace:
             newState.race = action.payload;
             break;
@@ -37,6 +43,45 @@ export function reduce(currentState: AppState, action: Action): AppState {
         case ActionType.CleanCreator:
             newState.character = new CharacterModel();
             break;
+
+        case ActionType.SetParticipatingAdv:
+            for (let adv of action.payload) {
+                newState.participatingAdv.push(adv)
+            }
+            break;
+        case ActionType.ClearParticipatingAdv:
+            newState.participatingAdv = [];
+            for (let adv of action.payload) {
+                newState.participatingAdv.push(adv)
+            }
+            break;
+
+        case ActionType.SetLeadingAdv:
+            for (let adv of action.payload) {
+                newState.leadingAdv.push(adv)
+            }
+            break;
+        case ActionType.ClearLeadingAdv:
+            newState.leadingAdv = [];
+            for (let adv of action.payload) {
+                newState.leadingAdv.push(adv)
+            }
+            break;
+        case ActionType.UpdateLeadingAdv:
+            newState.leadingAdv.push(action.payload)
+            break;
+        case ActionType.UpdateParticipatingAdv:
+            newState.participatingAdv.push(action.payload)
+            break;
+        case ActionType.DeleteAdventure:
+            newState.leadingAdv = newState.leadingAdv.filter(adv => adv._id !== action.payload);
+            break;
+        case ActionType.UpdateSingleAdventure:
+            const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
+            newState.leadingAdv[index] = action.payload;
+
+            break;
+
         default: break;
     }
 

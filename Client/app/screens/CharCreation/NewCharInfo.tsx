@@ -83,7 +83,7 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
 
     render() {
         return (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
                 <View style={styles.container}>
                     {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                         <View>

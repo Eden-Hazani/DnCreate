@@ -1,8 +1,15 @@
 import { ApiResponse } from 'apisauce';
-import { compose } from 'redux';
+import { ActionType } from '../app/redux/action-type';
+import { store } from '../app/redux/store';
+
 
 
 const errorHandler = (answer: ApiResponse<unknown, unknown> | any) => {
+    if (answer.data === 'Your Logging session has expired') {
+        alert('Your Logging session has expired, Please login again.');
+        store.dispatch({ type: ActionType.Logout });
+        return true;
+    }
     if (answer.status === 401) {
         alert("Incorrect Credentials")
         return true
@@ -12,10 +19,11 @@ const errorHandler = (answer: ApiResponse<unknown, unknown> | any) => {
         return true
     }
     if (answer.status === 400) {
-        alert(answer.response)
+        alert(answer.data)
         return true
     }
     return false;
+
 }
 
 export default errorHandler;

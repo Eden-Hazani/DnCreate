@@ -4,5 +4,14 @@ export enum ActionType {
     SetUserInfoLoginRegister,
     Logout,
     PickedRace,
-    CleanCreator
+    CleanCreator,
+    SetParticipatingAdv,
+    SetLeadingAdv,
+    UpdateLeadingAdv,
+    UpdateParticipatingAdv,
+    SetCharacters,
+    DeleteAdventure,
+    ClearParticipatingAdv,
+    ClearLeadingAdv,
+    UpdateSingleAdventure
 }

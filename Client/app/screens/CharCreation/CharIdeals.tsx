@@ -51,6 +51,9 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
             characterInfo.ideals = [];
         }
         characterInfo.ideals[index] = ideal;
+        if (ideal.trim() === "") {
+            characterInfo.ideals.splice(index, 1)
+        }
         this.setState({ characterInfo });
     }
 
@@ -119,7 +122,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
     render() {
         const ideals = this.state.characterInfo.ideals;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>

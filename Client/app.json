@@ -2,7 +2,7 @@
   "expo": {
     "name": "DnCreate",
     "slug": "DnCreate",
-    "version": "1.0.0",
+    "version": "1.5.0",
     "orientation": "portrait",
     "icon": "./assets/appIcon.png",
     "splash": {
@@ -17,7 +17,21 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5186238714913357~4090565931"
+      }
+    },
+    "android": {
+      "package": "com.DnCreate",
+      "permissions": [
+        "CAMERA"
+      ],
+      "versionCode": 6,
+      "enableDangerousExperimentalLeanBuilds": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5186238714913357~1441201925"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

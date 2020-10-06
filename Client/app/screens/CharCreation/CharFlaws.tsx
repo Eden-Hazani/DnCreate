@@ -55,6 +55,9 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
             characterInfo.flaws = [];
         }
         characterInfo.flaws[index] = flaws;
+        if (flaws.trim() === "") {
+            characterInfo.flaws.splice(index, 1)
+        }
         this.setState({ characterInfo });
     }
 
@@ -123,7 +126,7 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
     render() {
         const flaws = this.state.characterInfo.flaws;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>

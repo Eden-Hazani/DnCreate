@@ -58,10 +58,12 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     getRaces = async () => {
         try {
             const cachedRaces = await AsyncStorage.getItem('raceList');
+            this.setState({ loading: true })
             if (cachedRaces) {
-                this.setState({ loading: false })
                 const races = JSON.parse(cachedRaces);
-                this.setState({ races })
+                this.setState({ races }, () => {
+                    this.setState({ loading: false })
+                })
                 return;
             }
             this.setState({ loading: true })
@@ -73,6 +75,15 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         } catch (err) {
             console.log(err.message)
         }
+    }
+
+    getRacesFromServer = async () => {
+        this.setState({ loading: true })
+        const result = await racesApi.getRaceList();
+        await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
+        this.setState({ loading: false })
+        const races = result.data;
+        this.setState({ races, error: errorHandler(result) })
     }
 
     updateSearch = async (search: string) => {
@@ -93,17 +104,27 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
     pickRace = (race: RaceModel) => {
         const characterInfo = { ...this.state.characterInfo }
-        characterInfo.modifiers = Object.assign(characterInfo.modifiers, race.abilityBonus)
+        characterInfo.strength = race.abilityBonus.strength;
+        characterInfo.constitution = race.abilityBonus.constitution;
+        characterInfo.dexterity = race.abilityBonus.dexterity;
+        characterInfo.charisma = race.abilityBonus.charisma;
+        characterInfo.wisdom = race.abilityBonus.wisdom;
+        characterInfo.intelligence = race.abilityBonus.intelligence;
         characterInfo.race = race.name;
         characterInfo.image = race.image;
         characterInfo.user_id = this.state.userInfo._id;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
+            console.log(race)
             store.dispatch({ type: ActionType.PickedRace, payload: race });
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
-            this.props.navigation.navigate("NewCharInfo")
+            if (characterInfo.race === 'Half Elf') {
+                this.props.navigation.navigate("SpacialProficiencyRaces");
+                return;
+            }
+            this.props.navigation.navigate("NewCharInfo");
         }, 800);
         setTimeout(() => {
             this.setState({ confirmed: false })
@@ -140,7 +161,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                                 padding={80} width={100} height={100}
                                                 direction={'column'} onPress={() => this.pickRace(item)} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
                                             onRefresh={() => {
-                                                this.state.races
+                                                this.getRacesFromServer()
                                             }} />
                                     </View>
                                 </View>}

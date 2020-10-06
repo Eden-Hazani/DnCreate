@@ -37,14 +37,14 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 <AnimatedLogo></AnimatedLogo>
                 <View style={styles.container}>
                     <AnimateContactUpwards>
-                        <View style={{ alignItems: "center", flex: .5 }}>
+                        <View style={{ alignItems: "center", flex: .5, padding: 20 }}>
                             <AppTextHeadline>DnCreate</AppTextHeadline>
-                            <AppText color={colors.text}>Creating D&amp;D characters has never been easier</AppText>
+                            <AppText textAlign={'center'} color={colors.text}>Creating fifth edition characters has never been easier</AppText>
                             <AppText color={colors.text}>Tap below to begin</AppText>
                         </View>
                         <View style={styles.buttonsView}>
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={100} height={100} title={"New Character"} />
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={100} height={100} title={"Character Hall"} />
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                         </View>
                     </AnimateContactUpwards>
                 </View>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     buttonsView: {
         flex: .3,
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "space-evenly",
         alignItems: "center",
     },
     container: {

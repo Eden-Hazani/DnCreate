@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { Config } from '../../config';
 import colors from '../config/colors';
 import { AppButton } from './AppButton';
 import { AppPickerItem } from './AppPickerItem';
@@ -23,7 +24,7 @@ interface AppPickerState {
  */
 
 
-export class AppPicker extends Component<{ itemList: any, placeholder: any, iconName: any, selectItem: any, numColumns: number, selectedItem: any, selectedItemIcon: any }, AppPickerState>{
+export class AppPicker extends Component<{ itemColor?: string, itemList: any, placeholder: any, iconName: any, selectItem: any, numColumns: number, selectedItem: any, selectedItemIcon: any }, AppPickerState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -48,8 +49,9 @@ export class AppPicker extends Component<{ itemList: any, placeholder: any, icon
                             keyExtractor={races => races._id.toString()}
                             numColumns={this.props.numColumns}
                             renderItem={({ item }) => <AppPickerItem
-                                iconBackgroundColor={item.backgroundColor}
+                                iconBackgroundColor={item.backgroundColor ? item.backgroundColor : this.props.itemColor}
                                 text={item.name}
+                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
                                 iconName={item.icon}
                                 padding={80} width={100} height={100}
                                 direction={'column'} onPress={() => {

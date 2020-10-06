@@ -49,15 +49,20 @@ const sendResetEmail = (email: string) => {
     let formData: FormData = new FormData();
     formData.append("email", email)
     return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/forgotPassword`, formData)
-
 }
 
+const deleteAccount = (user_id: string) => {
+    return client.setHeader('content-type', 'multipart/form-data').delete<any>(`${endpoint}/deleteAccount/${user_id}`)
+}
 
+const isUserLogged = () => client.get(`${endpoint}/isUserLogged`)
 
 export default {
     register,
     login,
     updateProfilePic,
     resetPass,
-    sendResetEmail
+    sendResetEmail,
+    deleteAccount,
+    isUserLogged
 }

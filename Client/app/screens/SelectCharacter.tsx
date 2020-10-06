@@ -27,6 +27,7 @@ interface SelectCharacterState {
     currentLevel: number
     currentProficiency: number,
     resetHpModal: boolean
+    isDm: boolean
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -40,7 +41,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             backGroundStoryVisible: false,
             statsVisible: false,
             character: new CharacterModel(),
-            resetHpModal: false
+            resetHpModal: false,
+            isDm: this.props.route.params.isDm
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -48,17 +50,22 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         this.setState({ loading: true })
         setTimeout(() => {
             this.setState({ loading: false })
-        }, 1000);
-        this.setState({ character: this.props.route.params }, () => {
+        }, 800);
+        this.setState({ character: this.props.route.params.character }, () => {
             this.maxHpCheck();
         });
     }
 
     componentDidMount() {
+        if (this.state.isDm) {
+            this.props.navigation.addListener('beforeRemove', (e: any) => {
+                this.props.navigation.navigate("Adventures")
+            })
+        }
         setTimeout(() => {
             this.setState({ loading: false })
         }, 1000);
-        this.setState({ character: this.props.route.params }, () => {
+        this.setState({ character: this.props.route.params.character }, () => {
             this.maxHpCheck();
             this.setState({ currentLevel: this.state.character.level })
             this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
@@ -131,7 +138,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         const character = { ...this.state.character };
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
         let maxHp: number = this.state.character.maxHp;
-        maxHp = maxHp + Math.floor(Math.random() * hitDice) + 1;
+        maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + this.state.character.modifiers.constitution;
         character.maxHp = maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character)
@@ -153,7 +160,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     setNewMaxHp = (maxHp: number) => {
         const character = { ...this.state.character };
-        character.maxHp = maxHp;
+        character.maxHp = +maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character);
         })
@@ -161,8 +168,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
 
     render() {
+        const isDm = this.state.isDm;
         return (
-            <ScrollView>
+            <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
                         <View>
@@ -170,7 +178,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={styles.upperContainer}>
                                     <View style={{ flexDirection: "column", paddingLeft: 2 }}>
                                         <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
-                                        <AppText textAlign="center" fontSize={25} color={colors.text}>{this.state.character.name}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.name}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.race}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.characterClass}</AppText>
                                     </View>
                                     <View style={{ flex: 1, marginLeft: 10 }}>
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -182,7 +192,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Level</AppText>
-                                                <TouchableOpacity style={styles.triContainer}
+                                                <TouchableOpacity disabled={isDm} style={styles.triContainer}
                                                     onPress={() => { this.setLevel(this.state.character.level + 1) }}
                                                     onLongPress={() => { this.setLevel(this.state.character.level - 1) }}>
                                                     <AppText fontSize={25}>{this.state.character.level}</AppText>
@@ -228,7 +238,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                                 <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
                                     <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
-                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
+                                    <AppButton disabled={isDm} backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
                                         this.setState({ backGroundStoryVisible: false }, () => {
                                             this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
                                         })
@@ -293,26 +303,29 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                             <View style={styles.personality}>
+                                <View style={{ width: '30%', paddingLeft: 18 }}>
+                                    <AppText textAlign={'center'}>To change a personality feature press and hold on its title.</AppText>
+                                </View>
                                 <View style={styles.list}>
-                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
+                                    <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
                                         <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
                                     </TouchableOpacity>
                                     {this.state.character.personalityTraits.map((trait, index) => <AppText key={index}>{`${index + 1}. ${trait}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
-                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharIdeals", { updateIdeals: true, character: this.state.character }) }}>
+                                    <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharIdeals", { updateIdeals: true, character: this.state.character }) }}>
                                         <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
                                     </TouchableOpacity>
                                     {this.state.character.ideals.map((ideal, index) => <AppText key={index}>{`${index + 1}. ${ideal}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
-                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharFlaws", { updateFlaws: true, character: this.state.character }) }}>
+                                    <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharFlaws", { updateFlaws: true, character: this.state.character }) }}>
                                         <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
                                         {this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.list}>
-                                    <TouchableOpacity onLongPress={() => { this.props.navigation.navigate("CharBonds", { updateBonds: true, character: this.state.character }) }}>
+                                    <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharBonds", { updateBonds: true, character: this.state.character }) }}>
                                         <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
                                         {this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
                                     </TouchableOpacity>

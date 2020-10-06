@@ -10,14 +10,20 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
     useEffect(() => {
         requestPermission();
     }, [])
+    const [allowed, setAllowed] = useState(true);
 
     const requestPermission = async () => {
         const result = await ImagePicker.requestCameraRollPermissionsAsync();
         if (!result.granted) {
-            alert("Must enable permissions")
+            alert("Must enable permissions");
+            setAllowed(false)
         }
     }
-    const handelPress = () => {
+    const handelPress = async () => {
+        if (!allowed) {
+            alert("Must enable permissions");
+            return;
+        }
         if (!imageUri) selectImg();
         else {
             Alert.alert("Delete", "Remove profile image?", [{ text: 'Yes', onPress: () => onChangeImage(null) }, { text: 'No' }])

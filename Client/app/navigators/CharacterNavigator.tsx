@@ -16,6 +16,7 @@ import { CharBonds } from '../screens/CharCreation/CharBonds';
 import { SaveCharacter } from '../screens/CharCreation/SaveCharacter';
 import { CharSkillPick } from '../screens/CharCreation/CharSkillPick';
 import { CharItems } from '../screens/CharItems';
+import { SpacialProficiencyRaces } from '../screens/CharCreation/SpacialProficiencyRaces';
 
 const Stack = createStackNavigator();
 
@@ -23,15 +24,16 @@ const CharNavigator = () => {
     return <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center" }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
         <Stack.Screen options={{ headerShown: false }} name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "Character Info" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "Pick Class" }} name="ClassPick" component={ClassPick} />
         <Stack.Screen options={{ title: "Skills" }} name="CharSkillPick" component={CharSkillPick} />
         <Stack.Screen options={{ title: "Pick Attribute Points" }} name="AttributePicking" component={AttributePicking} />
-        <Stack.Screen options={{ title: "Personality Traits" }} name="CharPersonalityTraits" component={CharPersonalityTraits} />
-        <Stack.Screen options={{ title: "Ideals" }} name="CharIdeals" component={CharIdeals} />
-        <Stack.Screen options={{ title: "Flaws" }} name="CharFlaws" component={CharFlaws} />
-        <Stack.Screen options={{ title: "Bonds" }} name="CharBonds" component={CharBonds} />
-        <Stack.Screen options={{ title: "Congratulations" }} name="SaveCharacter" component={SaveCharacter} />
+        <Stack.Screen options={{ title: "Personality Traits", headerShown: false }} name="CharPersonalityTraits" component={CharPersonalityTraits} />
+        <Stack.Screen options={{ title: "Ideals", headerShown: false }} name="CharIdeals" component={CharIdeals} />
+        <Stack.Screen options={{ title: "Flaws", headerShown: false }} name="CharFlaws" component={CharFlaws} />
+        <Stack.Screen options={{ title: "Bonds", headerShown: false }} name="CharBonds" component={CharBonds} />
+        <Stack.Screen options={{ title: "Congratulations", headerShown: false }} name="SaveCharacter" component={SaveCharacter} />
         <Stack.Screen options={{ title: "BackStory" }} name="CharBackstory" component={CharBackstory} />
         <Stack.Screen options={{ title: "Character Hall" }} name="CharacterHall" component={CharacterHall} />
         <Stack.Screen options={{ title: "Character Sheet" }} name="SelectCharacter" component={SelectCharacter} />

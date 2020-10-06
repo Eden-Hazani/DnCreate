@@ -106,6 +106,12 @@ const CharacterSchema = mongoose.Schema({
     versionKey: false
 })
 
+CharacterSchema.virtual("users", {
+    ref: "User",
+    localField: "user_id",
+    foreignField: "_id",
+    justOne: true
+})
 
 const Character = mongoose.model("Character", CharacterSchema, "characters");
 

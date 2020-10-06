@@ -59,11 +59,21 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
     }
 });
 
-router.get("/getChar/:user_id", verifyLogged, async (request, response) => {
+router.get("/getChars/:user_id", verifyLogged, async (request, response) => {
     try {
         const user_id = request.params.user_id
         const chars = await userLogic.getCharacters(user_id);
         response.json(chars);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/getChar/:_id", verifyLogged, async (request, response) => {
+    try {
+        const _id = request.params._id
+        const char = await userLogic.getChar(_id);
+        response.json(char);
     } catch (err) {
         response.status(500).send(err.message);
     }

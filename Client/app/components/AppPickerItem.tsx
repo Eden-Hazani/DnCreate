@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import colors from '../config/colors';
 import { AppText } from './AppText';
 import { IconGen } from './IconGen';
@@ -19,9 +19,13 @@ export class AppPickerItem extends Component<any>{
         return (
             <TouchableOpacity onPress={this.props.onPress} style={{ width: "35%" }}>
                 <View style={styles.container}>
-                    <IconGen size={70} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={colors.white} />
+                    {this.props.iconName ?
+                        <IconGen size={70} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={colors.white} />
+                        :
+                        <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} source={{ uri: this.props.imageUrl }} />
+                    }
                     <View style={{ marginTop: 10 }}>
-                        <AppText textAlign={"center"}>{this.props.text}</AppText>
+                        <AppText fontSize={18} textAlign={"center"}>{this.props.text}</AppText>
                     </View>
                 </View>
             </TouchableOpacity>

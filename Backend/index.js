@@ -13,6 +13,7 @@ const raceController = require("./controllers/race-controller")
 const charClassController = require("./controllers/charClass-controller")
 const authController = require("./controllers/auth-controller")
 const userController = require("./controllers/user-controller")
+const adventureController = require("./controllers/adventure-controller")
 const compression = require("compression");
 const config = require("config");
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/auth", authController);
 app.use("/api/races", raceController);
 app.use("/api/classes", charClassController);
 app.use("/api/user", userController);
+app.use("/api/adventures", adventureController);
 
 const port = process.env.PORT || config.get("port");
 app.listen(port, function () {
