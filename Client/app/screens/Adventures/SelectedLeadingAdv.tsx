@@ -41,6 +41,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
         adventure.participants_id = participants_id;
         this.setState({ adventure }, () => {
+            store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure })
             adventureApi.leaveAdventure(this.state.adventure)
         })
     }

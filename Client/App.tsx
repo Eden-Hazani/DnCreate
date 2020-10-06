@@ -17,6 +17,8 @@ import JwtDecode from 'jwt-decode';
 import TokenHandler from './app/auth/TokenHandler';
 import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob'
 import { Config } from './config';
+import authApi from './app/api/authApi';
+import errorHandler from './utility/errorHander';
 
 
 interface AppState {
@@ -25,7 +27,7 @@ interface AppState {
   isReady: boolean
 }
 
-export class App extends React.Component<{ props: any }, AppState> {
+export class App extends React.Component<{ props: any, navigation: any }, AppState> {
   public interstitialAd: string;
   public bannerAd: string;
   navigationSubscription: any;
@@ -38,10 +40,13 @@ export class App extends React.Component<{ props: any }, AppState> {
       user: new UserModel(),
       fontsLoaded: false
     }
-    this.UnsubscribeStore = store.subscribe(() => { })
+    this.UnsubscribeStore = store.subscribe(() => {
+      this.setState({ user: store.getState().user })
+    })
     this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     this.bannerAd = Platform.OS === 'ios' ? Config.iosBanner : Config.androidBanner
   }
+
 
   displayAds = async () => {
     AdMobInterstitial.setAdUnitID(this.interstitialAd);
@@ -54,7 +59,15 @@ export class App extends React.Component<{ props: any }, AppState> {
       this.displayAds().then(async () => {
         store.dispatch({ type: ActionType.CleanCreator })
         await TokenHandler().then(user => {
-          this.setState({ user })
+          this.setState({ user }, async () => {
+            if (user !== null) {
+              const result = await authApi.isUserLogged();
+              if (!result.ok) {
+                errorHandler(result);
+                return;
+              }
+            }
+          })
         });
         Font.loadAsync({
           'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
@@ -74,6 +87,14 @@ export class App extends React.Component<{ props: any }, AppState> {
     this.setState((prevState) => ({ user }))
   }
 
+  isUserLogged = async () => {
+    const result = await authApi.isUserLogged();
+    if (result.status === 403) {
+      errorHandler(result);
+      return;
+    }
+  }
+
 
   render() {
     const user = this.state.user
@@ -83,7 +104,7 @@ export class App extends React.Component<{ props: any }, AppState> {
         {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
           <AuthContext.Provider value={{ user, setUser }}>
             {!this.state.fontsLoaded ? <AppLoading /> :
-              <NavigationContainer theme={navigationTheme}>
+              <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
                 {user ? <AppNavigator /> : <AuthNavigator />}
               </NavigationContainer>}
           </AuthContext.Provider>}

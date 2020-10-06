@@ -87,6 +87,30 @@ router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, 
     }
 });
 
+router.get("/userInAdv/:user_id/:adventureIdentifier", async (request, response) => {
+    try {
+        const adventureIdentifier = request.params.adventureIdentifier
+        const user_id = request.params.user_id;
+        const adventure = await adventureLogic.findAdventure(adventureIdentifier).populate('participants_id').exec();
+        if (adventure.length === 0) {
+            response.status(400).send('This adventure no longer exists');
+            return;
+        }
+        if (adventure[0].participants_id.length === 0) {
+            response.status(400).send('You are not part of this adventure');
+            return;
+        }
+        for (let participant of adventure[0].participants_id) {
+            if (user_id !== participant.user_id.toString()) {
+                response.status(400).send('You are not part of this adventure, please refresh your list');
+                return;
+            }
+        }
+        response.json(true);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
 
 
 module.exports = router;

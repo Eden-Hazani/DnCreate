@@ -178,7 +178,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={styles.upperContainer}>
                                     <View style={{ flexDirection: "column", paddingLeft: 2 }}>
                                         <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
-                                        <AppText textAlign="center" fontSize={25} color={colors.text}>{this.state.character.name}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.name}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.race}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.characterClass}</AppText>
                                     </View>
                                     <View style={{ flex: 1, marginLeft: 10 }}>
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>

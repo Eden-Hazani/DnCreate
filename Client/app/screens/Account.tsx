@@ -15,6 +15,7 @@ import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
 import * as Yup from 'yup';
 import AsyncStorage from '@react-native-community/async-storage';
+import errorHandler from '../../utility/errorHander';
 
 //Account with profileImages
 
@@ -28,7 +29,7 @@ interface AccountState {
     changeProfileModal: boolean
 }
 
-export class Account extends Component<{ props: any }, AccountState> {
+export class Account extends Component<{ props: any, navigation: any }, AccountState> {
     static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -39,6 +40,7 @@ export class Account extends Component<{ props: any }, AccountState> {
         }
         this.UnsubscribeStore = store.subscribe(() => { })
     }
+
 
     componentWillUnmount() {
         this.UnsubscribeStore()

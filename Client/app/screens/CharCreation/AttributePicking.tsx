@@ -280,7 +280,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                         {this.state.dicePool.map((result, index) =>
                                             <View key={index} style={{ padding: 5 }}>
                                                 <AppButton disabled={this.state.rollDisabled[index] || !this.state.finishRolls || this.state.sumOfDice > 0}
-                                                    borderRadius={10} backgroundColor={colors.bitterSweetRed} title={result}
+                                                    borderRadius={10} backgroundColor={colors.bitterSweetRed} title={result.toString()}
                                                     onPress={() => { this.setSumAndDisableRoll(result, index) }}
                                                     width={50} height={40} fontSize={15} key={result} />
                                             </View>

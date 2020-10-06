@@ -55,7 +55,7 @@ const deleteAccount = (user_id: string) => {
     return client.setHeader('content-type', 'multipart/form-data').delete<any>(`${endpoint}/deleteAccount/${user_id}`)
 }
 
-
+const isUserLogged = () => client.get(`${endpoint}/isUserLogged`)
 
 export default {
     register,
@@ -63,5 +63,6 @@ export default {
     updateProfilePic,
     resetPass,
     sendResetEmail,
-    deleteAccount
+    deleteAccount,
+    isUserLogged
 }

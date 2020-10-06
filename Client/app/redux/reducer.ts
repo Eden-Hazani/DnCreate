@@ -35,6 +35,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
             newState.user = null;
             storage.removeToken();
             break;
+
         case ActionType.PickedRace:
             newState.race = action.payload;
             break;
@@ -48,7 +49,20 @@ export function reduce(currentState: AppState, action: Action): AppState {
                 newState.participatingAdv.push(adv)
             }
             break;
+        case ActionType.ClearParticipatingAdv:
+            newState.participatingAdv = [];
+            for (let adv of action.payload) {
+                newState.participatingAdv.push(adv)
+            }
+            break;
+
         case ActionType.SetLeadingAdv:
+            for (let adv of action.payload) {
+                newState.leadingAdv.push(adv)
+            }
+            break;
+        case ActionType.ClearLeadingAdv:
+            newState.leadingAdv = [];
             for (let adv of action.payload) {
                 newState.leadingAdv.push(adv)
             }
@@ -61,6 +75,11 @@ export function reduce(currentState: AppState, action: Action): AppState {
             break;
         case ActionType.DeleteAdventure:
             newState.leadingAdv = newState.leadingAdv.filter(adv => adv._id !== action.payload);
+            break;
+        case ActionType.UpdateSingleAdventure:
+            const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
+            newState.leadingAdv[index] = action.payload;
+
             break;
 
         default: break;

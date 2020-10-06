@@ -77,6 +77,15 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         }
     }
 
+    getRacesFromServer = async () => {
+        this.setState({ loading: true })
+        const result = await racesApi.getRaceList();
+        await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
+        this.setState({ loading: false })
+        const races = result.data;
+        this.setState({ races, error: errorHandler(result) })
+    }
+
     updateSearch = async (search: string) => {
         this.setState({ search })
         if (search.trim() === "") {
@@ -106,11 +115,16 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.user_id = this.state.userInfo._id;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
+            console.log(race)
             store.dispatch({ type: ActionType.PickedRace, payload: race });
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
-            this.props.navigation.navigate("NewCharInfo")
+            if (characterInfo.race === 'Half Elf') {
+                this.props.navigation.navigate("SpacialProficiencyRaces");
+                return;
+            }
+            this.props.navigation.navigate("NewCharInfo");
         }, 800);
         setTimeout(() => {
             this.setState({ confirmed: false })
@@ -147,7 +161,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                                 padding={80} width={100} height={100}
                                                 direction={'column'} onPress={() => this.pickRace(item)} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
                                             onRefresh={() => {
-                                                this.state.races
+                                                this.getRacesFromServer()
                                             }} />
                                     </View>
                                 </View>}

@@ -216,6 +216,14 @@ router.post("/login", upload.none(), async (request, response) => {
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));
     }
+}); 4
+
+router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
+    try {
+        response.json(true);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
 });
 
 

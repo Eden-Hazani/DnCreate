@@ -35,6 +35,9 @@ const leaveAdventure = (adventure: AdventureModel) => {
 const deleteAdventure = (adventureIdentifier: string, leader_id: string) =>
     client.delete(`${endpoint}/deleteAdventure/${adventureIdentifier}/${leader_id}`);
 
+
+const userInAdv = (adventureIdentifier: string, user_id: string) => client.get(`${endpoint}/userInAdv/${user_id}/${adventureIdentifier}`)
+
 export default {
     saveAdventure,
     getLeadingAdventures,
@@ -42,5 +45,6 @@ export default {
     findAdventure,
     getParticipationAdventures,
     leaveAdventure,
-    deleteAdventure
+    deleteAdventure,
+    userInAdv
 }

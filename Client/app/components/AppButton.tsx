@@ -21,7 +21,8 @@ export class AppButton extends Component<any>{
                         backgroundColor: this.props.backgroundColor, width: this.props.width, height: this.props.height,
                         borderRadius: this.props.borderRadius, display: this.props.display
                     }, this.props.disabled ? styles.disabled : null]}>
-                    <AppText color={this.props.color} fontSize={this.props.fontSize} textAlign={"center"} padding={5}>{this.props.title.replace(" ", '\n')}</AppText>
+                    <AppText color={this.props.color} fontSize={this.props.fontSize}
+                        textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppText>
                 </View>
             </TouchableOpacity>
         )

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Unsubscribe } from 'redux';
+import errorHandler from '../../../utility/errorHander';
 import adventureApi from '../../api/adventureApi';
+import authApi from '../../api/authApi';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
@@ -86,6 +88,10 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                     charIds.push(character._id)
                 }
                 const adventures = await adventureApi.getParticipationAdventures(charIds);
+                if (!adventures.ok) {
+                    errorHandler(adventures)
+                    return;
+                }
                 if (adventures.data[0] === undefined) {
                     return;
                 }
@@ -105,9 +111,10 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     getLeadingFromServer = async () => {
         const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
         this.setState({ leadingAdventures: leadingAdventures.data }, () => {
-            store.dispatch({ type: ActionType.SetLeadingAdv, payload: this.state.leadingAdventures })
+            store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })
         })
     }
+
 
     getParticipatingFromServer = async () => {
         try {
@@ -115,7 +122,12 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             for (let character of this.state.characters) {
                 charIds.push(character._id)
             }
+            console.log(this.state.characters)
             const adventures = await adventureApi.getParticipationAdventures(charIds);
+            if (!adventures.ok) {
+                errorHandler(adventures)
+                return;
+            }
             if (adventures.data[0] === undefined) {
                 return;
             }
@@ -124,13 +136,23 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 participatingAdventures.push(adventure)
             }
             this.setState({ participatingAdventures }, () => {
-                store.dispatch({ type: ActionType.SetParticipatingAdv, payload: this.state.participatingAdventures })
+                store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
             })
         } catch (err) {
             console.log(err.message)
         }
     }
 
+    goToParticipatingAdv = async (adventure: any) => {
+        const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
+        console.log(response.data)
+        if (!response.ok) {
+            errorHandler(response)
+            this.getParticipatingFromServer();
+            return;
+        }
+        this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
+    }
 
     render() {
         return (
@@ -144,7 +166,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                             <FlatList
                                 style={{ marginBottom: 10 }}
                                 data={this.state.participatingAdventures}
-                                keyExtractor={(adventures) => adventures._id.toString()}
+                                keyExtractor={(adventures, index) => index.toString()}
                                 renderItem={({ item }) => <ListItem
                                     title={`Adventure name: ${item.adventureName}`}
                                     subTitle={`Summery: ${item.adventureSetting}`}
@@ -156,7 +178,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                                     subFontSize={15}
                                     totalPadding={20}
                                     padding={10}
-                                    direction={'column'} onPress={() => { this.props.navigation.navigate("SelectedParticipationAdv", { adventure: item }) }} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
+                                    direction={'column'} onPress={() => { this.goToParticipatingAdv(item) }} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
                                 onRefresh={() => {
                                     this.getParticipatingFromServer()
                                 }} />
@@ -167,7 +189,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                             </View>
                             <FlatList
                                 data={this.state.leadingAdventures}
-                                keyExtractor={adventures => adventures._id.toString()}
+                                keyExtractor={(adventures, index) => index.toString()}
                                 renderItem={({ item }) => <ListItem
                                     title={`Adventure name: ${item.adventureName}`}
                                     subTitle={`Summery: ${item.adventureSetting}`}

@@ -16,6 +16,7 @@ import { CharBonds } from '../screens/CharCreation/CharBonds';
 import { SaveCharacter } from '../screens/CharCreation/SaveCharacter';
 import { CharSkillPick } from '../screens/CharCreation/CharSkillPick';
 import { CharItems } from '../screens/CharItems';
+import { SpacialProficiencyRaces } from '../screens/CharCreation/SpacialProficiencyRaces';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ const CharNavigator = () => {
     return <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center" }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
         <Stack.Screen options={{ headerShown: false }} name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "Character Info" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "Pick Class" }} name="ClassPick" component={ClassPick} />
         <Stack.Screen options={{ title: "Skills" }} name="CharSkillPick" component={CharSkillPick} />

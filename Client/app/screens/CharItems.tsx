@@ -113,10 +113,14 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
     }
 
     changeCurrencyAmount = () => {
+        if (this.state.newGold < 0 || this.state.newSilver < 0 || this.state.newCopper < 0) {
+            alert('Currency values must be above 0');
+            return
+        }
         const character = { ...this.state.character };
-        character.currency.gold = this.state.newGold;
-        character.currency.silver = this.state.newSilver;
-        character.currency.copper = this.state.newCopper;
+        character.currency.gold = +this.state.newGold;
+        character.currency.silver = +this.state.newSilver;
+        character.currency.copper = +this.state.newCopper;
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             userCharApi.updateChar(this.state.character)
@@ -156,11 +160,11 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                         <View style={{ flex: 1 }}>
                             <View style={{ flex: .8, justifyContent: "center", paddingTop: 25, alignItems: "center" }}>
                                 <AppText fontSize={18} color={colors.bitterSweetRed}>Gold</AppText>
-                                <AppTextInput iconName={"podium-gold"} value={`${this.state.newGold}`} placeholder={'Gold'} onChangeText={(amount: number) => { this.setState({ newGold: amount }) }} />
+                                <AppTextInput keyboardType={'numeric'} iconName={"podium-gold"} value={`${this.state.newGold}`} placeholder={'Gold'} onChangeText={(amount: number) => { this.setState({ newGold: amount }) }} />
                                 <AppText fontSize={18} color={colors.bitterSweetRed}>Silver</AppText>
-                                <AppTextInput iconName={"podium-silver"} value={`${this.state.newSilver}`} placeholder={'Silver'} onChangeText={(amount: number) => { this.setState({ newSilver: amount }) }} />
+                                <AppTextInput keyboardType={'numeric'} iconName={"podium-silver"} value={`${this.state.newSilver}`} placeholder={'Silver'} onChangeText={(amount: number) => { this.setState({ newSilver: amount }) }} />
                                 <AppText fontSize={18} color={colors.bitterSweetRed}>Copper</AppText>
-                                <AppTextInput iconName={"podium-bronze"} value={`${this.state.newCopper}`} placeholder={'Copper'} onChangeText={(amount: number) => { this.setState({ newCopper: amount }) }} />
+                                <AppTextInput keyboardType={'numeric'} iconName={"podium-bronze"} value={`${this.state.newCopper}`} placeholder={'Copper'} onChangeText={(amount: number) => { this.setState({ newCopper: amount }) }} />
                             </View>
                             <View style={{ flex: .2, flexDirection: 'row' }}>
                                 <View style={{ flex: .5 }}>
