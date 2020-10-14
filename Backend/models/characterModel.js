@@ -56,8 +56,51 @@ const CharacterSchema = mongoose.Schema({
         wisdom: { type: Number },
         charisma: { type: Number },
     },
-    characterClass: {
+    magic: {
+        cantrips: { type: Number },
+        firstLevelSpells: { type: Number },
+        secondLevelSpells: { type: Number },
+        thirdLevelSpells: { type: Number },
+        forthLevelSpells: { type: Number },
+        fifthLevelSpells: { type: Number },
+        sixthLevelSpells: { type: Number },
+        seventhLevelSpells: { type: Number },
+        eighthLevelSpells: { type: Number },
+        ninthLevelSpells: { type: Number },
+    },
+    spells: {
+        cantrips: { type: Array },
+        firstLevelSpells: { type: Array },
+        secondLevelSpells: { type: Array },
+        thirdLevelSpells: { type: Array },
+        forthLevelSpells: { type: Array },
+        fifthLevelSpells: { type: Array },
+        sixthLevelSpells: { type: Array },
+        seventhLevelSpells: { type: Array },
+        eighthLevelSpells: { type: Array },
+        ninthLevelSpells: { type: Array },
+    },
+    charSpecials: {
+        rageAmount: { type: Number },
+        fightingStyle: { type: Object },
+        warlockPactBoon: { type: Object },
+        kiPoints: { type: Number },
+        martialPoints: { type: Number },
+        sneakAttackDie: { type: Number },
+        sorceryPoints: { type: Number },
+        sorcererMetamagic: { type: Array },
+        eldritchInvocations: { type: Array },
+        warlockPatron: { type: String }
+    },
+    spellsKnown: {
         type: String
+    },
+    characterClass: {
+        type: String,
+    },
+    characterClassId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CharClass"
     },
     image: {
         type: String
@@ -84,11 +127,17 @@ const CharacterSchema = mongoose.Schema({
     skills: {
         type: Array
     },
+    tools: {
+        type: Array
+    },
     maxHp: {
         type: Number
     },
     items: {
         type: Array
+    },
+    path: {
+        type: String
     },
     currency: {
         gold: {
@@ -103,12 +152,21 @@ const CharacterSchema = mongoose.Schema({
     }
 
 }, {
-    versionKey: false
+    versionKey: false,
+    toJSON: { virtuals: true }
+
 })
 
 CharacterSchema.virtual("users", {
     ref: "User",
     localField: "user_id",
+    foreignField: "_id",
+    justOne: true
+})
+
+CharacterSchema.virtual("charClasses", {
+    ref: "CharClass",
+    localField: "characterClassId",
     foreignField: "_id",
     justOne: true
 })

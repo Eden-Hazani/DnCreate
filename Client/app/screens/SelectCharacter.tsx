@@ -12,7 +12,17 @@ import userCharApi from '../api/userCharApi';
 import switchProficiency from '../../utility/ProficiencyBonusSwitch';
 import skillModifier from '../../utility/skillModifier';
 import hitDiceSwitch from '../../utility/hitDiceSwitch';
-
+import * as levelUpTree from '../classFeatures/levelUpTree'
+import { LevelUpOptions } from './charOptions/LevelUpOptions';
+import errorHandler from '../../utility/errorHander';
+import AsyncStorage from '@react-native-community/async-storage';
+import { hpColors } from '../../utility/hpColors';
+import { skillExpertiseCheck } from '../../utility/skillExpertiseCheck';
+import { UniqueCharStats } from './charOptions/UniqueCharStats';
+import { ClassModel } from '../models/classModel';
+import switchModifier from '../../utility/abillityModifierSwitch';
+import { CharMagic } from './charOptions/CharMagic';
+import { getSpecialSaveThrows } from '../../utility/getSpecialSaveThrows';
 
 /**
  * 
@@ -20,6 +30,9 @@ import hitDiceSwitch from '../../utility/hitDiceSwitch';
  *   
  */
 interface SelectCharacterState {
+    currentHp: string
+    levelUpFunctionActive: boolean
+    levelUpFunction: any
     backGroundStoryVisible: boolean
     statsVisible: boolean
     character: CharacterModel
@@ -28,6 +41,7 @@ interface SelectCharacterState {
     currentProficiency: number,
     resetHpModal: boolean
     isDm: boolean
+    setCurrentHpModal: boolean
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -35,6 +49,10 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            setCurrentHpModal: false,
+            currentHp: '',
+            levelUpFunctionActive: false,
+            levelUpFunction: null,
             currentProficiency: null,
             currentLevel: null,
             loading: true,
@@ -46,14 +64,28 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+
+    refreshData = async () => {
+        this.setState({ loading: true })
+        const response = await userCharApi.getChar(this.state.character._id);
+        if (!response.ok) {
+            errorHandler(response);
+            return;
+        }
+        const character = response.data;
+        this.setState({ character }, () => {
+            this.setState({ loading: false })
+        });
+    }
+
     onFocus = async () => {
         this.setState({ loading: true })
         setTimeout(() => {
             this.setState({ loading: false })
         }, 800);
-        this.setState({ character: this.props.route.params.character }, () => {
+        this.refreshData().then(() => {
             this.maxHpCheck();
-        });
+        })
     }
 
     componentDidMount() {
@@ -64,13 +96,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         }
         setTimeout(() => {
             this.setState({ loading: false })
-        }, 1000);
-        this.setState({ character: this.props.route.params.character }, () => {
+        }, 800);
+        this.setState({ character: this.props.route.params.character }, async () => {
+            if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null) {
+                const { operation, action } = levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
+                this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
+            }
             this.maxHpCheck();
             this.setState({ currentLevel: this.state.character.level })
             this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
+
         })
     }
+
+
 
 
     listStats = () => {
@@ -88,17 +127,21 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     setLevel = (level: number) => {
         let validLevel: number = level;
         if (level < this.state.character.level) {
-            Alert.alert("Lowering Level", "Are you sure you want to lower your level? (this action requires a manual input for max HP)", [{
-                text: 'Yes', onPress: () => {
+            if (level === 0) {
+                return;
+            }
+            Alert.alert("Lowering Level", "Are you sure you want to lower your level?", [{
+                text: 'Yes', onPress: async () => {
                     if (level < 0 || level.toString() === '') {
                         validLevel = 1;
                     }
-                    this.setState({ resetHpModal: true })
-                    const character = { ...this.state.character };
-                    character.level = validLevel;
-                    this.setState({ character, currentLevel: validLevel }, () => {
+                    const character = await AsyncStorage.getItem(`current${this.state.character._id}level${level}`);
+                    this.setState({ character: JSON.parse(character), currentLevel: validLevel }, () => {
                         this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
-                        userCharApi.updateChar(this.state.character)
+                        userCharApi.updateChar(this.state.character).then(() => {
+                            this.setState({ currentHp: this.state.character.maxHp.toString() });
+                            this.refreshData();
+                        })
                     })
                 }
             }, {
@@ -106,13 +149,22 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             }])
         } else {
             Alert.alert("Level Up", "Are you sure you wish to level up?", [{
-                text: 'Yes', onPress: () => {
+                text: 'Yes', onPress: async () => {
                     if (level > 20) {
                         validLevel = 20;
+                        const character = { ...this.state.character };
+                        character.level = validLevel;
+                        this.setState({ character })
+                        return;
                     }
                     if (level < 0) {
                         validLevel = 1;
+                        const character = { ...this.state.character };
+                        character.level = validLevel;
+                        this.setState({ character })
+                        return;
                     }
+                    await AsyncStorage.setItem(`current${this.state.character._id}level${this.state.character.level}`, JSON.stringify(this.state.character));
                     const character = { ...this.state.character };
                     character.level = validLevel;
                     this.setState({ character, currentLevel: validLevel }, () => {
@@ -134,6 +186,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         }
     }
 
+
     levelUp = () => {
         const character = { ...this.state.character };
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
@@ -142,30 +195,42 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         character.maxHp = maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character)
+            if (levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
+                const { operation, action } = levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
+                this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
+            }
+            this.setState({ currentHp: this.state.character.maxHp.toString() }, async () => {
+                await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
+            });
         })
-
     }
 
-    maxHpCheck = () => {
+
+    maxHpCheck = async () => {
         if (!this.state.character.maxHp) {
             const character = { ...this.state.character };
             let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
             character.maxHp = maxHp;
-            this.setState({ character }, () => {
+            this.setState({ character }, async () => {
+                const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
+                currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp.toString() });
                 userCharApi.updateChar(this.state.character)
             })
         }
+        const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
+        currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp.toString() });
         return this.state.character.maxHp;
     }
 
-    setNewMaxHp = (maxHp: number) => {
-        const character = { ...this.state.character };
-        character.maxHp = +maxHp;
-        this.setState({ character }, () => {
-            userCharApi.updateChar(this.state.character);
-        })
+
+    handleLevelUpFunctionActiveCloser = (closed: boolean) => {
+        this.setState({ levelUpFunctionActive: closed })
     }
 
+    setCurrentHp = async () => {
+        await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
+        this.setState({ setCurrentHpModal: false })
+    }
 
     render() {
         const isDm = this.state.isDm;
@@ -173,6 +238,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
+                        <Modal visible={this.state.levelUpFunctionActive} >
+                            <ScrollView>
+                                <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
+                            </ScrollView>
+                        </Modal>
                         <View>
                             <View style={styles.imageContainer}>
                                 <View style={styles.upperContainer}>
@@ -204,21 +274,27 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                     <AppText fontSize={25}>{`${this.state.character.maxHp}`}</AppText>
                                                 </View>
                                             </View>
-                                            <Modal visible={this.state.resetHpModal}>
-                                                <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 25 }}>
-                                                    <AppText fontSize={18}>Please Input your new max HP score</AppText>
-                                                    <AppTextInput placeholder={'Max HP'} keyboardType={"numeric"} onChangeText={(hp: number) => { this.setNewMaxHp(hp) }} />
-                                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Ok"} onPress={() => { this.setState({ resetHpModal: false }) }} />
-                                                </View>
-                                            </Modal>
                                         </View>
                                         <View style={{ flexDirection: "row" }}>
-                                            <View style={{ alignItems: "center", flex: .9 }}>
+                                            <View style={{ alignItems: "center", flex: .55 }}>
                                                 <AppText>Proficiency Bonus</AppText>
                                                 <View style={styles.triContainer}>
                                                     <AppText fontSize={25}>{`+${this.state.currentProficiency}`}</AppText>
                                                 </View>
                                             </View>
+                                            <View style={{ alignItems: "center", flex: .40 }}>
+                                                <AppText>Current Hp</AppText>
+                                                <TouchableOpacity onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: colors.black, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
+                                                    <AppText fontSize={25}>{this.state.currentHp}</AppText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <Modal visible={this.state.setCurrentHpModal}>
+                                                <View style={{ flex: .9, alignItems: "center" }}>
+                                                    <AppText color={colors.bitterSweetRed} fontSize={35}>Insert Current Hp</AppText>
+                                                    <AppTextInput keyboardType={'numeric'} iconName={'plus'} onChangeText={(hp: string) => { this.setState({ currentHp: hp }) }} />
+                                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Ok'} onPress={() => { this.setCurrentHp() }} />
+                                                </View>
+                                            </Modal>
                                         </View>
                                     </View>
                                 </View>
@@ -279,7 +355,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
                                 </View>
                             </Modal>
-
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems") }}>
                                 <IconGen size={80} backgroundColor={colors.danger} name={"sack"} iconColor={colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -287,20 +362,60 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </TouchableOpacity>
                         </View>
+                        <View style={styles.secRowIconContainer}>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeatures", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.shadowBlue} name={"pentagon"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Features</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View>
+                            <UniqueCharStats character={this.state.character} />
+                        </View>
+                        <View>
+                            <AppText textAlign={'center'}>Saving Throws</AppText>
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                                {getSpecialSaveThrows(this.state.character).map(saveThrow =>
+                                    <View style={{ borderColor: colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5 }} key={saveThrow}>
+                                        <AppText fontSize={18}>{saveThrow} </AppText>
+                                    </View>)}
+                            </View>
+                        </View>
                         <View style={styles.infoContainer}>
                             <View style={{ flexDirection: 'row' }}>
-                                <View style={[styles.list, { width: '50%' }]}>
+                                <View style={[styles.list, { width: '35%' }]}>
                                     <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Skills:</AppText>
                                     {this.state.character.skills.map(skill =>
                                         <View key={skill} style={styles.skill}>
-                                            <AppText>{`${skill} +${this.skillCheck(skill) + this.state.currentProficiency}`}</AppText>
+                                            <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
+                                            <AppText fontSize={20} color={colors.bitterSweetRed}
+                                                textAlign={'center'}>{`+${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                         </View>
                                     )}
                                 </View>
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "50%" }}>
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "65%" }}>
                                     <AppText fontSize={25}>Hit Dice</AppText>
                                     <AppText fontSize={25} color={colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
+                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength} for melee weapons</AppText>
+                                    </View>
+                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity} for ranged weapons</AppText>
+                                    </View>
+                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                        <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} for {this.state.character.characterClassId.weaponProficiencies.map(v => <AppText key={v}>{`\n`} - {v} - </AppText>)}</AppText>
+                                    </View>
                                 </View>
+                            </View>
+                            <View style={[styles.list, { width: '100%' }]}>
+                                <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
+                                {this.state.character.tools.map(tool =>
+                                    <View key={tool} style={styles.tools}>
+                                        {}
+                                        <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
+                                    </View>
+                                )}
                             </View>
                             <View style={styles.personality}>
                                 <View style={{ width: '30%', paddingLeft: 18 }}>
@@ -332,6 +447,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
+                        <View>
+                            <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={30}>Magic</AppText>
+                            {this.state.character.characterClass === 'Barbarian' || this.state.character.characterClass === 'Fighter' || this.state.character.characterClass === 'Monk' || this.state.character.characterClass === 'Rogue'
+                                ? <AppText>The {this.state.character.characterClass} class does not possess magic</AppText> :
+                                <CharMagic character={this.state.character} currentProficiency={this.state.currentProficiency} />
+                            }
+                        </View>
                     </View>}
             </ScrollView>
         )
@@ -352,6 +474,12 @@ const styles = StyleSheet.create({
         resizeMode: "cover",
     },
     iconContainer: {
+        flex: .2,
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-evenly"
+    },
+    secRowIconContainer: {
         flex: .2,
         width: "100%",
         flexDirection: "row",
@@ -409,7 +537,15 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 1,
         borderColor: colors.bitterSweetRed,
-        width: 150,
+        width: 100,
+        padding: 5,
+        marginVertical: 2
+    },
+    tools: {
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: colors.bitterSweetRed,
+        width: 200,
         padding: 5,
         marginVertical: 2
     }

@@ -136,7 +136,7 @@ router.get('/activate/:token', async (request, response) => {
                 }
                 const newUser = new User(JSON.parse(decodedToken.userInfo));
                 const user = await authLogic.register(newUser);
-                return response.redirect('https://eden-hazani.github.io/DnCreateStaticAvtivation/')
+                return response.redirect('https://dncreate.herokuapp.com/index.html')
             });
         } else {
             return response.json({ message: 'Something Went Wrong' })

@@ -49,6 +49,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
     insertInfoAndContinue = () => {
         const characterInfo = { ...this.state.characterInfo };
         characterInfo.characterClass = this.state.pickedClass.name;
+        characterInfo.characterClassId = this.state.pickedClass._id as any;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })

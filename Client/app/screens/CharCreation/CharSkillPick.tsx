@@ -11,11 +11,15 @@ import colors from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
+import AsyncStorage from '@react-native-community/async-storage';
+import { CharSpacialModel } from '../../models/CharSpacialModel';
+import { startingToolsSwitch } from '../../../utility/startingToolsSwitch';
+
 
 interface CharSkillPickState {
     characterInfo: CharacterModel
     availableSkills: string[]
-    pickedSkills: string[]
+    pickedSkills: any[]
     amountToPick: number
     loading: boolean
     skillClicked: boolean[]
@@ -62,13 +66,21 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
             return;
         }
         characterInfo.skills = this.state.pickedSkills;
+        characterInfo.tools = startingToolsSwitch(this.state.characterInfo.characterClass);
+        characterInfo.charSpecials = new CharSpacialModel();
+        Object.keys(characterInfo.charSpecials).forEach(v => {
+            characterInfo.charSpecials[v] = false
+            characterInfo.charSpecials.sorcererMetamagic = []
+            characterInfo.charSpecials.eldritchInvocations = []
+        })
         this.setState({ characterInfo }, () => {
             userCharApi.saveChar(this.state.characterInfo).then(result => {
                 let characterInfo: CharacterModel;
                 result.data === 'Character Already exists in system!' ? characterInfo = this.state.characterInfo : characterInfo = result.data;
                 this.setState({ confirmed: true })
-                this.setState({ characterInfo }, () => {
+                this.setState({ characterInfo }, async () => {
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                    await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
                     setTimeout(() => {
                         this.props.navigation.navigate("CharBackstory", { updateStory: false });
                     }, 800);
@@ -89,14 +101,14 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
             const pickedSkills = this.state.pickedSkills;
             const skillClicked = this.state.skillClicked;
             skillClicked[index] = true;
-            pickedSkills.push(skill)
+            pickedSkills.push([skill, 0])
             this.setState({ skillClicked, pickedSkills });
         }
         else if (this.state.skillClicked[index]) {
             const oldPickedSkills = this.state.pickedSkills;
             const skillClicked = this.state.skillClicked;
             skillClicked[index] = false;
-            const pickedSkills = oldPickedSkills.filter(item => item !== skill);
+            const pickedSkills = oldPickedSkills.filter(item => item[0] !== skill);
             this.setState({ skillClicked, pickedSkills });
         }
     }

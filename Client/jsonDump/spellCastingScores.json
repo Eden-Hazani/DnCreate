@@ -1,0 +1,42 @@
+{
+    "Druid": {
+        "spellcastingAbility": "wisdom",
+        "baseSpellSaveDc": "8+proficiency+wisdom",
+        "spellAttackModifier": "proficiency+wisdom"
+    },
+    "Bard": {
+        "spellcastingAbility": "wisdom",
+        "baseSpellSaveDc": "8+proficiency+wisdom",
+        "spellAttackModifier": "proficiency+wisdom"
+    },
+    "Cleric": {
+        "spellcastingAbility": "wisdom",
+        "baseSpellSaveDc": "8+proficiency+wisdom",
+        "spellAttackModifier": "proficiency+wisdom"
+    },
+    "Paladin": {
+        "spellcastingAbility": "charisma",
+        "baseSpellSaveDc": "8+proficiency+charisma",
+        "spellAttackModifier": "proficiency+charisma"
+    },
+    "Ranger": {
+        "spellcastingAbility": "wisdom",
+        "baseSpellSaveDc": "8+proficiency+charisma",
+        "spellAttackModifier": "proficiency+charisma"
+    },
+    "Sorcerer": {
+        "spellcastingAbility": "charisma",
+        "baseSpellSaveDc": "8+proficiency+charisma",
+        "spellAttackModifier": "proficiency+charisma"
+    },
+    "Warlock": {
+        "spellcastingAbility": "charisma",
+        "baseSpellSaveDc": "8+proficiency+charisma",
+        "spellAttackModifier": "proficiency+charisma"
+    },
+    "Wizard": {
+        "spellcastingAbility": "intelligence",
+        "baseSpellSaveDc": "8+proficiency+intelligence",
+        "spellAttackModifier": "proficiency+intelligence"
+    }
+}

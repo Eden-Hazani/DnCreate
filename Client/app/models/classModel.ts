@@ -8,7 +8,7 @@ export class ClassModel {
         public brifInfo?: string,
         public armorProficiencies?: [],
         public weaponProficiencies?: [],
-        public savingThrows?: [],
+        public savingThrows?: any[],
         public recommendation?: string,
         public information?: string
 

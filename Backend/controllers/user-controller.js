@@ -42,6 +42,7 @@ router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, re
 
 router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
     try {
+        console.log(JSON.parse(request.body.charInfo))
         const char = new Character(JSON.parse(request.body.charInfo));
         char.level = 1;
         char.items = [];

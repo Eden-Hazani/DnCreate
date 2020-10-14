@@ -5,12 +5,12 @@ const Character = require("../models/characterModel");
 function addCharacter(character) {
     return character.save();
 }
-function getCharacters(user_id) {
-    return Character.find({ user_id: { $eq: user_id } });
+async function getCharacters(user_id) {
+    return Character.find({ user_id: { $eq: user_id } }).populate('characterClassId').exec();
 }
 
-function getChar(_id) {
-    return Character.findOne({ _id: { $eq: _id } });
+async function getChar(_id) {
+    return Character.findOne({ _id: { $eq: _id } }).populate('characterClassId').exec();;
 }
 
 function removeCharacter(char_id) {

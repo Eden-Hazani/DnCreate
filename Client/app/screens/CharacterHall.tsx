@@ -16,6 +16,7 @@ import errorHandler from '../../utility/errorHander';
 import { AppError } from '../components/AppError';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 
@@ -56,14 +57,18 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     }
 
 
-    handleDelete = (character: CharacterModel) => {
+    handleDelete = async (character: CharacterModel) => {
         for (let item of this.state.characters) {
             if (item._id === character._id) {
                 const characters = this.state.characters.filter(m => m._id !== item._id)
                 this.setState({ characters })
             }
         }
+        for (let level = 1; level < 20; level++) {
+            await AsyncStorage.removeItem(`current${character._id}level${level}`)
+        }
         userCharApi.deleteChar(character._id)
+
     }
 
     characterWindow = (character: CharacterModel) => {

@@ -19,6 +19,7 @@ import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob'
 import { Config } from './config';
 import authApi from './app/api/authApi';
 import errorHandler from './utility/errorHander';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 interface AppState {
@@ -49,8 +50,8 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
 
 
   displayAds = async () => {
-    AdMobInterstitial.setAdUnitID(this.interstitialAd);
-    AdMobInterstitial.requestAdAsync().then(() => AdMobInterstitial.showAdAsync());
+    // AdMobInterstitial.setAdUnitID(this.interstitialAd);
+    // AdMobInterstitial.requestAdAsync().then(() => AdMobInterstitial.showAdAsync());
   }
 
 

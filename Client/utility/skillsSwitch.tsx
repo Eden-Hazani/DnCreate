@@ -38,7 +38,7 @@ const skillSwitch = (charClass: string) => {
             skills.skillList = ['Animal Handling', 'Athletics', 'Insight', 'Investigation', 'Nature', 'Perception', 'Survival', 'Stealth'];
             skills.amount = 3;
             break;
-        case charClass === 'Rouge':
+        case charClass === 'Rogue':
             skills.skillList = ['Acrobatics', 'Athletics', 'Deception', 'Insight', 'Intimidation', 'Investigation', 'Perception', 'Stealth', 'Performance', 'Persuasion', 'Sleight of Hand'];
             skills.amount = 4;
             break;

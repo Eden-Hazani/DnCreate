@@ -1,4 +1,8 @@
+import { CharSpacialModel } from "./CharSpacialModel";
+import { ClassModel } from "./classModel";
+import { MagicModel } from "./magicModel";
 import { ModifiersModel } from "./modifiersModel";
+import { SpellsModel } from "./spellsModel";
 
 export class CharacterModel {
     public constructor(
@@ -20,6 +24,7 @@ export class CharacterModel {
         public charisma?: number,
         public modifiers?: ModifiersModel,
         public characterClass?: any,
+        public characterClassId?: ClassModel,
         public image?: string,
         public backStory?: string,
         public flaws?: string[],
@@ -27,17 +32,32 @@ export class CharacterModel {
         public bonds?: string[],
         public personalityTraits?: string[],
         public level?: number,
-        public skills?: string[],
+        public skills?: any[],
         public maxHp?: number,
         public items?: any,
+        public path?: any,
+        public spellsKnown?: any,
         public currency?: {
             gold: number,
             silver: number,
             copper: number
-        }
+        },
+        public magic?: MagicModel,
+        public spells?: SpellsModel,
+        public charSpecials?: CharSpacialModel,
+        public tools?: any[]
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();
+        }
+        if (!magic) {
+            this.magic = new MagicModel();
+        }
+        if (!spells) {
+            this.spells = new SpellsModel();
+        }
+        if (!charSpecials) {
+            this.charSpecials = new CharSpacialModel();
         }
     }
 }

@@ -17,6 +17,7 @@ import { SaveCharacter } from '../screens/CharCreation/SaveCharacter';
 import { CharSkillPick } from '../screens/CharCreation/CharSkillPick';
 import { CharItems } from '../screens/CharItems';
 import { SpacialProficiencyRaces } from '../screens/CharCreation/SpacialProficiencyRaces';
+import { CharFeatures } from '../screens/CharFeatures';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,7 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "Character Hall" }} name="CharacterHall" component={CharacterHall} />
         <Stack.Screen options={{ title: "Character Sheet" }} name="SelectCharacter" component={SelectCharacter} />
         <Stack.Screen options={{ title: "Items and Currency" }} name="CharItems" component={CharItems} />
+        <Stack.Screen options={{ title: "Character Features" }} name="CharFeatures" component={CharFeatures} />
     </Stack.Navigator>
 }
 

@@ -47,7 +47,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
     }
 
     logout = () => {
-        AsyncStorage.clear();
+        AsyncStorage.multiRemove(['classList', 'raceList']);
         store.dispatch({ type: ActionType.Logout })
         const { user, setUser } = this.context
         setUser(null);

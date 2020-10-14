@@ -27,7 +27,7 @@ const hitDiceSwitch = (charClass: string) => {
         case charClass === "Ranger":
             dice = 10;
             break;
-        case charClass === "Rouge":
+        case charClass === "Rogue":
             dice = 8;
             break;
         case charClass === "Sorcerer":

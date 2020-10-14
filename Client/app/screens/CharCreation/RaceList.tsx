@@ -115,7 +115,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.user_id = this.state.userInfo._id;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
-            console.log(race)
             store.dispatch({ type: ActionType.PickedRace, payload: race });
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })

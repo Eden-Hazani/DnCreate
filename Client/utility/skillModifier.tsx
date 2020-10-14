@@ -6,7 +6,7 @@ function skillModifier(skill: string) {
 
     let result: number = null;
     skills.filter((item, index) => {
-        if (item.includes(skill)) {
+        if (item.includes(skill[0])) {
             result = index
             return result;
         }

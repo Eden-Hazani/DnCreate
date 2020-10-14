@@ -122,7 +122,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             for (let character of this.state.characters) {
                 charIds.push(character._id)
             }
-            console.log(this.state.characters)
             const adventures = await adventureApi.getParticipationAdventures(charIds);
             if (!adventures.ok) {
                 errorHandler(adventures)
@@ -145,7 +144,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
 
     goToParticipatingAdv = async (adventure: any) => {
         const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
-        console.log(response.data)
         if (!response.ok) {
             errorHandler(response)
             this.getParticipatingFromServer();
