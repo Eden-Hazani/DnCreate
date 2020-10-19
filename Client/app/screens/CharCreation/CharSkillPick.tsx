@@ -68,6 +68,13 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
         characterInfo.skills = this.state.pickedSkills;
         characterInfo.tools = startingToolsSwitch(this.state.characterInfo.characterClass);
         characterInfo.charSpecials = new CharSpacialModel();
+        characterInfo.equippedArmor = {
+            id: '1',
+            name: 'No Armor Equipped',
+            ac: 0,
+            disadvantageStealth: false,
+            armorType: 'None'
+        }
         Object.keys(characterInfo.charSpecials).forEach(v => {
             characterInfo.charSpecials[v] = false
             characterInfo.charSpecials.sorcererMetamagic = []
@@ -80,6 +87,7 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
                 this.setState({ confirmed: true })
                 this.setState({ characterInfo }, async () => {
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                    store.dispatch({ type: ActionType.SetCharacters, payload: [this.state.characterInfo] })
                     await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
                     setTimeout(() => {
                         this.props.navigation.navigate("CharBackstory", { updateStory: false });

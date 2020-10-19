@@ -27,6 +27,7 @@ router.get("/validateChar/:charName/:user_id", verifyLogged, async (request, res
 router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, response) => {
     try {
         const char = new Character(JSON.parse(request.body.charInfo));
+        console.log(char)
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)

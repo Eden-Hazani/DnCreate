@@ -17,7 +17,7 @@ export function SubmitButton({ ...props }: any) {
     return (
         <TouchableOpacity activeOpacity={.8} style={styles.container} onPress={() => handleSubmit()}>
             <View style={[styles.button, { width: props.width ? props.width : 100 }]}>
-                <AppText fontSize={20} padding={5} color={'white'}>{props.title}</AppText>
+                <AppText textAlign={props.textAlign} fontSize={20} padding={5} color={'white'}>{props.title}</AppText>
             </View>
         </TouchableOpacity>
     )

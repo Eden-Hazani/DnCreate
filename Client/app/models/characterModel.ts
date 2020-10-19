@@ -1,5 +1,6 @@
 import { CharSpacialModel } from "./CharSpacialModel";
 import { ClassModel } from "./classModel";
+import { EquippedArmorModel } from "./EquippedArmorModel";
 import { MagicModel } from "./magicModel";
 import { ModifiersModel } from "./modifiersModel";
 import { SpellsModel } from "./spellsModel";
@@ -45,7 +46,11 @@ export class CharacterModel {
         public magic?: MagicModel,
         public spells?: SpellsModel,
         public charSpecials?: CharSpacialModel,
-        public tools?: any[]
+        public tools?: any[],
+        public addedWeaponProf?: any[],
+        public addedArmorProf?: any[],
+        public feats?: any[],
+        public equippedArmor?: EquippedArmorModel,
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();
@@ -58,6 +63,9 @@ export class CharacterModel {
         }
         if (!charSpecials) {
             this.charSpecials = new CharSpacialModel();
+        }
+        if (!equippedArmor) {
+            this.equippedArmor = new EquippedArmorModel();
         }
     }
 }

@@ -12,9 +12,12 @@ import { AdventureModel } from '../../models/AdventureModel';
 import errorHandler from '../../../utility/errorHander';
 import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
+import { AppActivityIndicator } from '../../components/AppActivityIndicator';
+import userCharApi from '../../api/userCharApi';
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
+    loading: boolean
 }
 
 export class SelectedLeadingAdv extends Component<{ navigation: any, route: any }, SelectedLeadingAdvState> {
@@ -22,6 +25,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         super(props)
         this.state = {
             adventure: this.props.route.params.adventure,
+            loading: false
         }
     }
     componentDidMount() {
@@ -46,8 +50,17 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         })
     }
 
-    characterWindow = (character: any) => {
-        this.props.navigation.navigate("SelectCharacter", { character: character, isDm: true })
+    characterWindow = async (character: any) => {
+        this.setState({ loading: true })
+        const char = await userCharApi.getChar(character._id);
+        if (!char.ok) {
+            errorHandler(char)
+            this.setState({ loading: false })
+            return;
+        }
+        this.setState({ loading: false }, () => {
+            this.props.navigation.navigate("SelectCharacter", { character: char.data, isDm: true })
+        })
     }
 
     deleteAdventure = async () => {
@@ -64,49 +77,54 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         const adventure = this.state.adventure;
         return (
             <View style={styles.container}>
-                <View style={{ paddingBottom: 15 }}>
-                    <AppText fontSize={25} textAlign={'center'}>{adventure.adventureName}</AppText>
-                    <AppText>Setting: {adventure.adventureSetting}</AppText>
-                </View>
-                <AppText color={colors.bitterSweetRed} fontSize={20}>Participants</AppText>
-                {adventure.participants_id.length === 0 ?
-                    <View style={styles.main}>
-                        <AppText textAlign={'center'} fontSize={15}>No one is currently participating in this adventure.</AppText>
-                        <AppText textAlign={'center'} fontSize={15}>Share the adventure identifier with your friends to let them join.</AppText>
-                    </View>
+                {this.state.loading ? <AppActivityIndicator visible={this.state.loading} />
                     :
-                    <View style={{ flex: .8 }}>
-                        <FlatList
-                            data={adventure.participants_id}
-                            keyExtractor={(currentParticipants, index) => index.toString()}
-                            renderItem={({ item }) => <ListItem
-                                title={item.name}
-                                subTitle={item.characterClass}
-                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
-                                direction={'row'}
-                                headerFontSize={18}
-                                headColor={colors.bitterSweetRed}
-                                subFontSize={15}
-                                padding={20} width={60} height={60}
-                                headTextAlign={"left"}
-                                subTextAlign={"left"}
-                                justifyContent={"flex-start"} textDistanceFromImg={10}
-                                renderRightActions={() =>
-                                    <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
-                                onPress={() => this.characterWindow(item)} />}
-                            ItemSeparatorComponent={ListItemSeparator} />
+                    <View style={{ flex: 1 }}>
+                        <View style={{ paddingBottom: 15 }}>
+                            <AppText fontSize={25} textAlign={'center'}>{adventure.adventureName}</AppText>
+                            <AppText>Setting: {adventure.adventureSetting}</AppText>
+                        </View>
+                        <AppText color={colors.bitterSweetRed} fontSize={20}>Participants</AppText>
+                        {adventure.participants_id.length === 0 ?
+                            <View style={styles.main}>
+                                <AppText textAlign={'center'} fontSize={15}>No one is currently participating in this adventure.</AppText>
+                                <AppText textAlign={'center'} fontSize={15}>Share the adventure identifier with your friends to let them join.</AppText>
+                            </View>
+                            :
+                            <View style={{ flex: .8 }}>
+                                <FlatList
+                                    data={adventure.participants_id}
+                                    keyExtractor={(currentParticipants, index) => index.toString()}
+                                    renderItem={({ item }) => <ListItem
+                                        title={item.name}
+                                        subTitle={item.characterClass}
+                                        imageUrl={`${Config.serverUrl}/assets/${item.image}`}
+                                        direction={'row'}
+                                        headerFontSize={18}
+                                        headColor={colors.bitterSweetRed}
+                                        subFontSize={15}
+                                        padding={20} width={60} height={60}
+                                        headTextAlign={"left"}
+                                        subTextAlign={"left"}
+                                        justifyContent={"flex-start"} textDistanceFromImg={10}
+                                        renderRightActions={() =>
+                                            <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
+                                        onPress={() => this.characterWindow(item)} />}
+                                    ItemSeparatorComponent={ListItemSeparator} />
+                            </View>
+                        }
+                        <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
+                            <AppText fontSize={18}>Adventure identifier:</AppText>
+                            <AppText fontSize={20} color={colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
+                        </View>
+                        <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.back() }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
+                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
+                        </View>
                     </View>
                 }
-                <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
-                    <AppText fontSize={18}>Adventure identifier:</AppText>
-                    <AppText fontSize={20} color={colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
-                </View>
-                <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
-                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.back() }}
-                        fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
-                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
-                        fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
-                </View>
             </View>
         )
     }

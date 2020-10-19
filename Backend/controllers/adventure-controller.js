@@ -21,7 +21,6 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
 
 router.patch("/updateAdventure", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
     try {
-        console.log(request)
         const adventure = new Adventure(JSON.parse(request.body.adventure))
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         response.json(updatedAdventure);
@@ -55,7 +54,11 @@ router.post("/getParticipatingAdventures", verifyLogged, upload.none(), async (r
         const characters = JSON.parse(request.body.characters);
         let adventures = []
         for (let character of characters) {
-            adventures.push(await adventureLogic.getParticipatingAdventures(character));
+            let adv = await adventureLogic.getParticipatingAdventures(character);
+            if (adv.length === 0) {
+                continue
+            }
+            adventures.push(adv);
         }
         response.json(adventures);
     } catch (err) {
@@ -96,15 +99,22 @@ router.get("/userInAdv/:user_id/:adventureIdentifier", async (request, response)
             response.status(400).send('This adventure no longer exists');
             return;
         }
+        const inAdv = adventure[0].participants_id.map(participant => user_id === participant.user_id.toString())
+        console.log(inAdv)
         if (adventure[0].participants_id.length === 0) {
+            const isEmpty_idInAdv = await adventureLogic.findAdventure(adventureIdentifier)
+            if (isEmpty_idInAdv.length > 0) {
+                for (let item of isEmpty_idInAdv) {
+                    item.participants_id = [];
+                    adventureLogic.updateAdventure(item);
+                }
+            }
             response.status(400).send('You are not part of this adventure');
             return;
         }
-        for (let participant of adventure[0].participants_id) {
-            if (user_id !== participant.user_id.toString()) {
-                response.status(400).send('You are not part of this adventure, please refresh your list');
-                return;
-            }
+        if (!inAdv.includes(true)) {
+            response.status(400).send('You are not part of this adventure, please refresh your list');
+            return;
         }
         response.json(true);
     } catch (err) {

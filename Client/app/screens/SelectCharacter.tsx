@@ -23,6 +23,9 @@ import { ClassModel } from '../models/classModel';
 import switchModifier from '../../utility/abillityModifierSwitch';
 import { CharMagic } from './charOptions/CharMagic';
 import { getSpecialSaveThrows } from '../../utility/getSpecialSaveThrows';
+import { Unsubscribe } from 'redux';
+import { store } from '../redux/store';
+import { ActionType } from '../redux/action-type';
 
 /**
  * 
@@ -45,6 +48,7 @@ interface SelectCharacterState {
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
+    private UnsubscribeStore: Unsubscribe;
     navigationSubscription: any;
     constructor(props: any) {
         super(props)
@@ -62,7 +66,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             resetHpModal: false,
             isDm: this.props.route.params.isDm
         }
+        this.UnsubscribeStore = store.subscribe(() => {
+            this.setState({ character: store.getState().character })
+        })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+
+    componentWillUnmount() {
+        this.UnsubscribeStore()
     }
 
     refreshData = async () => {
@@ -89,16 +100,26 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     componentDidMount() {
+        console.log(this.state.character)
+        let startCharInfo: CharacterModel = null;
         if (this.state.isDm) {
+            startCharInfo = this.props.route.params.character;
             this.props.navigation.addListener('beforeRemove', (e: any) => {
                 this.props.navigation.navigate("Adventures")
+            })
+        }
+        if (!this.state.isDm) {
+            startCharInfo = store.getState().character;
+            this.props.navigation.addListener('beforeRemove', (e: any) => {
+                this.setState({ loading: true })
+                store.dispatch({ type: ActionType.CleanCreator })
             })
         }
         setTimeout(() => {
             this.setState({ loading: false })
         }, 800);
-        this.setState({ character: this.props.route.params.character }, async () => {
-            if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null) {
+        this.setState({ character: startCharInfo }, async () => {
+            if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
                 const { operation, action } = levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
@@ -276,17 +297,23 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                         </View>
                                         <View style={{ flexDirection: "row" }}>
-                                            <View style={{ alignItems: "center", flex: .55 }}>
-                                                <AppText>Proficiency Bonus</AppText>
+                                            <View style={{ alignItems: "center", flex: .3 }}>
                                                 <View style={styles.triContainer}>
                                                     <AppText fontSize={25}>{`+${this.state.currentProficiency}`}</AppText>
                                                 </View>
+                                                <AppText textAlign={'center'}>Proficiency Bonus</AppText>
                                             </View>
-                                            <View style={{ alignItems: "center", flex: .40 }}>
-                                                <AppText>Current Hp</AppText>
+                                            <View style={{ alignItems: "center", flex: .3 }}>
+                                                <View style={styles.triContainer}>
+                                                    <AppText fontSize={25}>{this.state.character.equippedArmor.ac}</AppText>
+                                                </View>
+                                                <AppText>AC</AppText>
+                                            </View>
+                                            <View style={{ alignItems: "center", flex: .3 }}>
                                                 <TouchableOpacity onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: colors.black, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
                                                     <AppText fontSize={25}>{this.state.currentHp}</AppText>
                                                 </TouchableOpacity>
+                                                <AppText>Current Hp</AppText>
                                             </View>
                                             <Modal visible={this.state.setCurrentHpModal}>
                                                 <View style={{ flex: .9, alignItems: "center" }}>
@@ -369,6 +396,26 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={colors.black}>Features</AppText>
                                 </View>
                             </TouchableOpacity>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeats", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.strongOrange} name={"atlassian"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Feats</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.berries} name={"fire"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Spell Book</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.secRowIconContainer}>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.shadowBlue} name={"tshirt-crew"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Armor</AppText>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View>
                             <UniqueCharStats character={this.state.character} />
@@ -397,15 +444,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={{ justifyContent: "center", alignItems: "center", width: "65%" }}>
                                     <AppText fontSize={25}>Hit Dice</AppText>
                                     <AppText fontSize={25} color={colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
+                                    <AppText textAlign={'center'}>You add these bonuses to both your attack hit rolls and for your damage rolls with the proficient weapon.</AppText>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength} for melee weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength + this.state.currentProficiency} for melee weapons</AppText>
                                     </View>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity} for ranged weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity + this.state.currentProficiency} for ranged weapons</AppText>
                                     </View>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                         <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} for {this.state.character.characterClassId.weaponProficiencies.map(v => <AppText key={v}>{`\n`} - {v} - </AppText>)}</AppText>
                                     </View>
+                                    {this.state.character.addedWeaponProf.length > 0 &&
+                                        <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                            <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} for {this.state.character.addedWeaponProf.map(v => <AppText key={v}>{`\n`} - {v} - </AppText>)}</AppText>
+                                        </View>}
                                 </View>
                             </View>
                             <View style={[styles.list, { width: '100%' }]}>
@@ -449,9 +501,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View>
                             <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={30}>Magic</AppText>
-                            {this.state.character.characterClass === 'Barbarian' || this.state.character.characterClass === 'Fighter' || this.state.character.characterClass === 'Monk' || this.state.character.characterClass === 'Rogue'
-                                ? <AppText>The {this.state.character.characterClass} class does not possess magic</AppText> :
-                                <CharMagic character={this.state.character} currentProficiency={this.state.currentProficiency} />
+                            {this.state.character.magic ? <CharMagic character={this.state.character} currentProficiency={this.state.currentProficiency} /> :
+                                <AppText padding={15} fontSize={18} textAlign={'center'}>You do not posses magical abilities right now.</AppText>
                             }
                         </View>
                     </View>}

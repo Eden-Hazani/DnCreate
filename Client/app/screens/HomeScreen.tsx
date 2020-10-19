@@ -10,6 +10,8 @@ import { AppButton } from '../components/AppButton';
 import { Unsubscribe } from 'redux';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
+import userCharApi from '../api/userCharApi';
+import AuthContext from '../auth/context';
 
 
 interface HomeState {
@@ -17,6 +19,7 @@ interface HomeState {
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
     navigationSubscription: any;
+    static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
@@ -26,6 +29,10 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     componentWillUnmount() {
         this.UnsubscribeStore()
+    }
+    async componentDidMount() {
+        const characters = await userCharApi.getChars(this.context.user._id);
+        store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
     }
 
     onFocus = () => {

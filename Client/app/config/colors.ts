@@ -12,6 +12,8 @@ export default {
     totalWhite: "#FFFFFF",
     yellow: "#F8F4A6",
     orange: "#BB6B00",
-    shadowBlue: "#7284A8"
+    shadowBlue: "#7284A8",
+    strongOrange: "#BC2C1A",
+    berries: "#8C5383"
 }
 

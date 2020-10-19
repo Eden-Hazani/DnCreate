@@ -10,7 +10,11 @@ async function getCharacters(user_id) {
 }
 
 async function getChar(_id) {
-    return Character.findOne({ _id: { $eq: _id } }).populate('characterClassId').exec();;
+    return Character.findOne({ _id: { $eq: _id } }).populate('characterClassId').exec();
+}
+
+async function getCharForAdventure(_id) {
+    return Character.findOne({ _id: { $eq: _id } }).populate('user_id').exec();
 }
 
 function removeCharacter(char_id) {
@@ -34,4 +38,5 @@ module.exports = {
     removeCharacter,
     updateCharacter,
     validateChar,
+    getCharForAdventure
 }

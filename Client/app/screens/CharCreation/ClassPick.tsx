@@ -66,6 +66,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
     }
 
     getClasses = async () => {
+        AsyncStorage.removeItem('classList')
         this.setState({ loading: true })
         const cachedClasses = await AsyncStorage.getItem('classList');
         this.setState({ loading: true })

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList, Dimensions, Switch } from 'react-native';
 import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
@@ -16,6 +16,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { filterAlreadyPicked } from './helperFunctions/filterAlreadyPicked';
 import { eldritchInvocations } from "../../classFeatures/eldritchInvocations";
 import { highLightPicked } from './helperFunctions/highLightPicked';
+import { AppTextInput } from '../../components/forms/AppTextInput';
+import { FeatOptions } from './FeatOptions';
+import { setTotalKnownSpells } from './helperFunctions/setTotalKnownSpells';
 
 interface LevelUpOptionsState {
     beforeLevelUp: CharacterModel
@@ -42,15 +45,28 @@ interface LevelUpOptionsState {
     metaMagic: any[]
     metamagicClicked: boolean[]
     totalMetaMagicPoints: number
-    invocationsClicked: boolean[],
+    invocationsClicked: boolean[]
     invocations: any[]
     totalInvocationPoints: number
+    featsWindow: boolean
+    abilityWindow: boolean
+    weaponProfArray: any[]
+    armorProfArray: any[]
+    featName: string
+    featDescription: string
+
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
     constructor(props: any) {
         super(props)
         this.state = {
+            featName: '',
+            featDescription: '',
+            weaponProfArray: [],
+            armorProfArray: [],
+            featsWindow: false,
+            abilityWindow: false,
             beforeLevelUp: new CharacterModel,
             metamagicClicked: [],
             metaMagic: [],
@@ -93,6 +109,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             if (this.props.options.spellsKnown) {
                 character.spellsKnown = this.props.options.spellsKnown
+            }
+            if (!this.props.options.spellsKnown) {
+                const spellsKnown = setTotalKnownSpells(this.props.character);
+                character.spellsKnown = spellsKnown;
             }
             character.magic = new MagicModel()
             character.magic.cantrips = this.props.options.cantrips;
@@ -392,6 +412,17 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         return true;
     }
 
+    resetAbilityScoresToCurrentLevel = () => {
+        this.setState({
+            strength: this.props.character.strength,
+            dexterity: this.props.character.dexterity,
+            constitution: this.props.character.constitution,
+            intelligence: this.props.character.intelligence,
+            wisdom: this.props.character.wisdom,
+            charisma: this.props.character.charisma
+        })
+    }
+
 
     close = async () => {
         if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`)) {
@@ -404,10 +435,25 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             character.path = this.state.pathChosen;
         }
-        if (this.props.options.abilityPointIncrease) {
+        if (this.props.options.abilityPointIncrease && this.state.abilityWindow) {
             if (!this.addAbilityPoints()) {
                 return;
             }
+            character.strength = this.state.strength;
+            character.constitution = this.state.constitution;
+            character.dexterity = this.state.dexterity;
+            character.intelligence = this.state.intelligence;
+            character.charisma = this.state.charisma;
+            character.wisdom = this.state.wisdom;
+        }
+        if (this.props.options.abilityPointIncrease && this.state.featsWindow) {
+            if (this.state.featName === '' || this.state.featDescription === '') {
+                alert('You must provide a name and description for your feat.');
+                return;
+            }
+            this.state.weaponProfArray.forEach(item => { character.addedWeaponProf.push(item) });
+            this.state.armorProfArray.forEach(item => { character.addedArmorProf.push(item) });
+            character.feats.push({ name: this.state.featName, description: this.state.featDescription })
             character.strength = this.state.strength;
             character.constitution = this.state.constitution;
             character.dexterity = this.state.dexterity;
@@ -492,6 +538,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
                                     <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can pick a path</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>It is highly recommended to search the many guides online in order to find the path that suites you best.</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>As you level up the path you chose will provide you with spacial bonuses.</AppText>
                                 </View>
                                 <View style={{ flexDirection: "row", flexWrap: 'wrap' }}>
                                     {this.props.options.pathSelector.map((path: any, index: number) =>
@@ -505,28 +552,58 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                         {this.props.options.abilityPointIncrease ?
                             <View>
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
-                                    <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can increase your ability score.</AppText>
+                                    <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can choose between increasing your ability score and adopting a new feat.</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>You can either spend 2 points on one ability or spread your choice and put 1 point in two different abilities</AppText>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <View style={{ padding: 15 }}>
+                                            <AppButton fontSize={18} backgroundColor={this.state.featsWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Feats"} onPress={() => { this.setState({ character: this.props.character, featsWindow: true, abilityWindow: false }) }} />
+                                        </View>
+                                        <View style={{ padding: 15 }}>
+                                            <AppButton fontSize={18} backgroundColor={this.state.abilityWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Ability Score"} onPress={() => { this.setState({ character: this.props.character, featsWindow: false, abilityWindow: true }) }} />
+                                        </View>
+                                    </View>
                                 </View>
-                                <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
-                                    {this.listStats().map((item, index) =>
-                                        <View key={index} style={{ width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
-                                            <View style={{ flexDirection: 'row', position: 'absolute', alignSelf: 'center' }}>
-                                                <TouchableOpacity style={{ marginRight: 33 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
-                                                    <IconGen size={55} backgroundColor={colors.shadowBlue} name={'plus'} iconColor={colors.white} />
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={{ marginLeft: 33 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
-                                                    <IconGen size={55} backgroundColor={colors.orange} name={'minus'} iconColor={colors.white} />
-                                                </TouchableOpacity>
-                                            </View>
-                                            <View style={styles.innerModifier}>
-                                                <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
-                                                <View style={{ paddingTop: 10 }}>
-                                                    <AppText fontSize={25} textAlign={"center"}>{`${item[1]}`}</AppText>
+                                {this.state.abilityWindow &&
+                                    <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
+                                        {this.listStats().map((item, index) =>
+                                            <View key={index} style={{ width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
+                                                <View style={{ flexDirection: 'row', position: 'absolute', alignSelf: 'center' }}>
+                                                    <TouchableOpacity style={{ marginRight: 33 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
+                                                        <IconGen size={55} backgroundColor={colors.shadowBlue} name={'plus'} iconColor={colors.white} />
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={{ marginLeft: 33 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
+                                                        <IconGen size={55} backgroundColor={colors.orange} name={'minus'} iconColor={colors.white} />
+                                                    </TouchableOpacity>
                                                 </View>
-                                            </View>
-                                        </View>)}
-                                </View>
+                                                <View style={styles.innerModifier}>
+                                                    <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                                    <View style={{ paddingTop: 10 }}>
+                                                        <AppText fontSize={25} textAlign={"center"}>{`${item[1]}`}</AppText>
+                                                    </View>
+                                                </View>
+                                            </View>)}
+                                    </View>}
+                                {this.state.featsWindow &&
+                                    <View>
+                                        <FeatOptions character={this.state.character}
+                                            featName={(e: string) => { this.setState({ featName: e }) }}
+                                            featDescription={(e: string) => { this.setState({ featDescription: e }) }}
+                                            weaponsProfChange={(e: any) => {
+                                                let weaponProfArray = this.state.weaponProfArray;
+                                                weaponProfArray = e.split(',').filter((i: any) => i);
+                                                this.setState({ weaponProfArray }, () => {
+                                                })
+                                            }}
+                                            armorProfChange={(e: any) => {
+                                                let armorProfArray = this.state.armorProfArray;
+                                                armorProfArray = e.split(',').filter((i: any) => i);;
+                                                this.setState({ armorProfArray }, () => {
+                                                })
+                                            }}
+                                            attributePointsChange={(abilityName: string, ability: number) => { this.setState({ [abilityName]: ability } as any) }}
+                                            resetList={(listName: string) => { this.setState({ [listName]: [] } as any) }}
+                                            resetAbilityScore={() => { this.resetAbilityScoresToCurrentLevel() }} />
+                                    </View>}
                             </View>
                             :
                             null}
@@ -568,16 +645,16 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     :
                                     <View>
                                         <AppText fontSize={20}>You gain the following spell slots:</AppText>
-                                        <AppText fontSize={18}>- Cantrips: {this.state.character.magic.cantrips}</AppText>
-                                        <AppText fontSize={18}>- 1st level spells: {this.state.character.magic.firstLevelSpells} {this.checkSpellSlotImprove('cantrips')}</AppText>
-                                        <AppText fontSize={18}>- 2nd level spells: {this.state.character.magic.secondLevelSpells} {this.checkSpellSlotImprove('firstLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 3rd level spells: {this.state.character.magic.thirdLevelSpells} {this.checkSpellSlotImprove('secondLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 4th level spells: {this.state.character.magic.forthLevelSpells} {this.checkSpellSlotImprove('thirdLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 5th level spells: {this.state.character.magic.fifthLevelSpells} {this.checkSpellSlotImprove('forthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 6th level spells: {this.state.character.magic.sixthLevelSpells} {this.checkSpellSlotImprove('fifthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 7th level spells: {this.state.character.magic.seventhLevelSpells} {this.checkSpellSlotImprove('sixthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 8th level spells: {this.state.character.magic.eighthLevelSpells} {this.checkSpellSlotImprove('seventhLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 9th level spells: {this.state.character.magic.ninthLevelSpells} {this.checkSpellSlotImprove('eighthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- Cantrips: {this.state.character.magic.cantrips} {this.checkSpellSlotImprove('cantrips')}</AppText>
+                                        <AppText fontSize={18}>- 1st level spells: {this.state.character.magic.firstLevelSpells} {this.checkSpellSlotImprove('firstLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 2nd level spells: {this.state.character.magic.secondLevelSpells} {this.checkSpellSlotImprove('secondLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 3rd level spells: {this.state.character.magic.thirdLevelSpells} {this.checkSpellSlotImprove('thirdLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 4th level spells: {this.state.character.magic.forthLevelSpells} {this.checkSpellSlotImprove('forthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 5th level spells: {this.state.character.magic.fifthLevelSpells} {this.checkSpellSlotImprove('fifthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 6th level spells: {this.state.character.magic.sixthLevelSpells} {this.checkSpellSlotImprove('sixthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 7th level spells: {this.state.character.magic.seventhLevelSpells} {this.checkSpellSlotImprove('seventhLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 8th level spells: {this.state.character.magic.eighthLevelSpells} {this.checkSpellSlotImprove('eighthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 9th level spells: {this.state.character.magic.ninthLevelSpells} {this.checkSpellSlotImprove('ninthLevelSpells')}</AppText>
                                     </View>
                                 }
                             </View>

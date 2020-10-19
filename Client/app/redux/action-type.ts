@@ -13,5 +13,6 @@ export enum ActionType {
     DeleteAdventure,
     ClearParticipatingAdv,
     ClearLeadingAdv,
-    UpdateSingleAdventure
+    UpdateSingleAdventure,
+    currentOpenChar
 }

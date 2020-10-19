@@ -139,6 +139,22 @@ const CharacterSchema = mongoose.Schema({
     path: {
         type: String
     },
+    addedWeaponProf: {
+        type: Array
+    },
+    addedArmorProf: {
+        type: Array
+    },
+    feats: {
+        type: Array
+    },
+    equippedArmor: {
+        id: { type: String },
+        name: { type: String },
+        ac: { type: Number },
+        disadvantageStealth: { type: Boolean },
+        armorType: { type: String }
+    },
     currency: {
         gold: {
             type: Number

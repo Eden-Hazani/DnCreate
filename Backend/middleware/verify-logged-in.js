@@ -4,6 +4,7 @@ const hash = require("../utilities/hash")
 function verifiedLoggedIn(request, response, next) {
     if (!request.headers.authorization) {
         response.status(401).send("You are not logged in")
+        return;
     }
 
 

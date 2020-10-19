@@ -33,6 +33,10 @@ export function reduce(currentState: AppState, action: Action): AppState {
 
         case ActionType.Logout:
             newState.user = null;
+            newState.character = new CharacterModel();
+            newState.characters = [];
+            newState.leadingAdv = [];
+            newState.participatingAdv = [];
             storage.removeToken();
             break;
 

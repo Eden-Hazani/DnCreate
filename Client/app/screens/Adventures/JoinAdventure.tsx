@@ -31,6 +31,7 @@ interface JoinAdventureState {
 
 export class JoinAdventure extends Component<{ props: any, navigation: any }, JoinAdventureState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -39,6 +40,11 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
             pickedCharacter: new CharacterModel(),
             characters: []
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+    onFocus = () => {
+        const characters = store.getState().characters;
+        this.setState({ characters: characters })
     }
     async componentDidMount() {
         const characters = await userCharApi.getChars(this.context.user._id);
@@ -120,9 +126,11 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                             <AppPicker itemList={this.state.characters} selectedItemIcon={null} itemColor={colors.bitterSweetRed}
                                 selectedItem={this.state.pickedCharacter.name} selectItem={(pickedCharacter: any) => { this.setState({ pickedCharacter: pickedCharacter }) }}
                                 numColumns={3} placeholder={"Pick Character"} iconName={"apps"} />
-                            <View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20 }}>
                                 <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
                                     borderRadius={100} width={120} height={70} title={"Join Adventure!"} onPress={() => { this.joinAdventure() }} />
+                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
+                                    borderRadius={100} width={120} height={70} title={"Cancel"} onPress={() => { this.props.navigation.navigate('Adventures') }} />
 
                             </View>
                         </View>
