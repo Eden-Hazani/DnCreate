@@ -82,6 +82,7 @@ const CharacterSchema = mongoose.Schema({
     },
     charSpecials: {
         rageAmount: { type: Number },
+        rageDamage: { type: Number },
         fightingStyle: { type: Object },
         warlockPactBoon: { type: Object },
         kiPoints: { type: Number },

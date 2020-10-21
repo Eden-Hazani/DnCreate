@@ -31,6 +31,15 @@ export class UniqueCharStats extends Component<{ character: CharacterModel }> {
                     </View>
                     : null
                 }
+                {this.props.character.charSpecials.rageAmount ?
+                    <View style={styles.statContainer}>
+                        <AppText>Rage Amount:</AppText>
+                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.rageAmount}</AppText>
+                        <AppText>Rage bonus damage:</AppText>
+                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.rageDamage}</AppText>
+                    </View>
+                    : null
+                }
                 {this.props.character.charSpecials.martialPoints ?
                     <View>
                         {this.props.character.charSpecials.kiPoints ?

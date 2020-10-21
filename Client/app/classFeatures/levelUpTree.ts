@@ -5,79 +5,102 @@ const Barbarian = (level: number, character: CharacterModel) => {
     let LevelUpFunction: any;
     switch (true) {
         case level === 1:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 2, rageDamage: 2 }
+            }
             break;
         case level === 2:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 2, rageDamage: 2 }
+            }
             break;
         case level === 3:
             LevelUpFunction = {
-                operation: true, action: { pathSelector: paths }
+                operation: true, action: { pathSelector: paths, rageAmount: 3, rageDamage: 2 }
             }
             break;
         case level === 4:
             LevelUpFunction = {
-                operation: true, action: { abilityPointIncrease: true }
+                operation: true, action: { abilityPointIncrease: true, rageAmount: 3, rageDamage: 2 }
             }
             break;
         case level === 5:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 3, rageDamage: 2 }
+            }
             break;
         case level === 6:
             LevelUpFunction = {
-                operation: true, action: { pathFeature: true }
+                operation: true, action: { pathFeature: true, rageAmount: 4, rageDamage: 2 }
             }
             break;
         case level === 7:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 4, rageDamage: 2 }
+            }
             break;
         case level === 8:
             LevelUpFunction = {
-                operation: true, action: { abilityPointIncrease: true }
+                operation: true, action: { abilityPointIncrease: true, rageAmount: 4, rageDamage: 2 }
             }
             break;
         case level === 9:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 4, rageDamage: 3 }
+            }
             break;
         case level === 10:
             LevelUpFunction = {
-                operation: true, action: { pathFeature: true }
+                operation: true, action: { pathFeature: true, rageAmount: 4, rageDamage: 3 }
             }
             break;
         case level === 11:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 4, rageDamage: 3 }
+            }
             break;
         case level === 12:
             LevelUpFunction = {
-                operation: true, action: { abilityPointIncrease: true }
+                operation: true, action: { abilityPointIncrease: true, rageAmount: 5, rageDamage: 3 }
             }
             break;
         case level === 13:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 5, rageDamage: 3 }
+            }
             break;
         case level === 14:
             LevelUpFunction = {
-                operation: true, action: { pathFeature: true }
+                operation: true, action: { pathFeature: true, rageAmount: 5, rageDamage: 3 }
             }
+            break;
         case level === 15:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 5, rageDamage: 3 }
+            }
             break;
         case level === 16:
             LevelUpFunction = {
-                operation: true, action: { abilityPointIncrease: true }
+                operation: true, action: { abilityPointIncrease: true, rageAmount: 5, rageDamage: 4 }
             }
         case level === 17:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 6, rageDamage: 4 }
+            }
             break;
         case level === 18:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 6, rageDamage: 4 }
+            }
             break;
         case level === 19:
             LevelUpFunction = {
-                operation: true, action: { abilityPointIncrease: true }
+                operation: true, action: { abilityPointIncrease: true, rageAmount: 6, rageDamage: 4 }
             }
         case level === 20:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: true, action: { rageAmount: 99, rageDamage: 4 }
+            }
             break;
 
     }

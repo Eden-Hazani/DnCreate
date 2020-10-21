@@ -47,7 +47,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     onFocus = async () => {
-        console.log('ff')
         if (this.state.characters.length === 0) {
             const characters = store.getState().characters;
             this.setState({ characters: characters }, () => {
@@ -83,20 +82,25 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
 
     getParticipatingAdv = async () => {
         try {
+            console.log(this.state.participatingAdventures.length)
             if (this.state.participatingAdventures.length === 0) {
                 let charIds = [];
                 for (let character of this.state.characters) {
                     charIds.push(character._id)
                 }
                 const adventures = await adventureApi.getParticipationAdventures(charIds);
+                let participatingAdventures: any = []
                 if (!adventures.ok) {
                     errorHandler(adventures)
+                    return;
+                }
+                if (adventures.data.length === 0) {
+                    this.setState({ participatingAdventures })
                     return;
                 }
                 if (adventures.data[0] === undefined) {
                     return;
                 }
-                let participatingAdventures = []
                 for (let adventure of adventures.data) {
                     participatingAdventures.push(adventure[0])
                 }
@@ -110,6 +114,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     getLeadingFromServer = async () => {
+        console.log(this.state.participatingAdventures)
         const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
         this.setState({ leadingAdventures: leadingAdventures.data }, () => {
             store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })
@@ -124,14 +129,18 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 charIds.push(character._id)
             }
             const adventures = await adventureApi.getParticipationAdventures(charIds);
+            let participatingAdventures: any = []
             if (!adventures.ok) {
                 errorHandler(adventures)
+                return;
+            }
+            if (adventures.data.length === 0) {
+                this.setState({ participatingAdventures })
                 return;
             }
             if (adventures.data[0] === undefined) {
                 return;
             }
-            let participatingAdventures = []
             for (let adventure of adventures.data) {
                 if (adventure.length === 0) {
                     continue;
@@ -150,9 +159,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
         const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
         if (!response.ok) {
             errorHandler(response)
-            if (response.data === 'You are not part of this adventure') {
-
-            }
             this.getParticipatingFromServer();
             return;
         }

@@ -100,7 +100,6 @@ router.get("/userInAdv/:user_id/:adventureIdentifier", async (request, response)
             return;
         }
         const inAdv = adventure[0].participants_id.map(participant => user_id === participant.user_id.toString())
-        console.log(inAdv)
         if (adventure[0].participants_id.length === 0) {
             const isEmpty_idInAdv = await adventureLogic.findAdventure(adventureIdentifier)
             if (isEmpty_idInAdv.length > 0) {

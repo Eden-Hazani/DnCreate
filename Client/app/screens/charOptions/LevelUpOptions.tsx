@@ -482,6 +482,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 character.charSpecials.sorcererMetamagic.push(item)
             }
         }
+        if (this.props.options.rageAmount) {
+            character.charSpecials.rageAmount = this.props.options.rageAmount;
+            character.charSpecials.rageDamage = this.props.options.rageDamage;
+        }
         if (this.props.options.eldritchInvocations) {
             if (!this.addEldritchInvocations()) {
                 return;
@@ -549,6 +553,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             </View>
                             :
                             null}
+                        {this.props.options.rageAmount ?
+                            <View>
+                                <AppText>Your Rage amount is now - {this.props.options.rageAmount}</AppText>
+                                <AppText>Your Rage Damage bonus is now - {this.props.options.rageDamage}</AppText>
+                            </View>
+                            :
+                            <View></View>
+                        }
                         {this.props.options.abilityPointIncrease ?
                             <View>
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>

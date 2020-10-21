@@ -100,7 +100,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     componentDidMount() {
-        console.log(this.state.character)
         let startCharInfo: CharacterModel = null;
         if (this.state.isDm) {
             startCharInfo = this.props.route.params.character;
@@ -111,6 +110,10 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         if (!this.state.isDm) {
             startCharInfo = store.getState().character;
             this.props.navigation.addListener('beforeRemove', (e: any) => {
+                if (this.state.loading) {
+                    e.preventDefault();
+                    return;
+                }
                 this.setState({ loading: true })
                 store.dispatch({ type: ActionType.CleanCreator })
             })

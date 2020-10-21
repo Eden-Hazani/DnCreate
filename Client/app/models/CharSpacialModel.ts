@@ -1,6 +1,7 @@
 export class CharSpacialModel {
     public constructor(
         public rageAmount?: number,
+        public rageDamage?: number,
         public fightingStyle?: {
             name: string,
             description: string

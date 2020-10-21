@@ -64,10 +64,16 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             }
         }
         if (this.state.filterByClass) {
-            shownSpells = [];
-            const fullList = spellsJSON.filter(spell => spell.classes.includes(this.state.character.characterClass.toLowerCase()))
-            for (let item = 0; item < this.state.loadNumber; item++) {
-                shownSpells.push(fullList[item])
+            const searchedSpells = shownSpells;
+            if (this.state.search !== '') {
+                const fullList = searchedSpells.filter(spell => spell.classes.includes(this.state.character.characterClass.toLowerCase()))
+                shownSpells = fullList;
+            } else {
+                shownSpells = [];
+                const fullList = spellsJSON.filter(spell => spell.classes.includes(this.state.character.characterClass.toLowerCase()))
+                for (let item = 0; item < this.state.loadNumber; item++) {
+                    shownSpells.push(fullList[item])
+                }
             }
         }
         if (this.state.filterByLevel) {
@@ -144,7 +150,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         containerStyle={{ backgroundColor: colors.white }}
                         inputContainerStyle={{ backgroundColor: colors.white }}
                         lightTheme
-                        placeholder="Search For Race"
+                        placeholder="Search Spells"
                         onChangeText={this.updateSearch}
                         value={this.state.search}
                     />
@@ -192,7 +198,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 <FlatList
                     style={{ marginBottom: 120 }}
                     data={this.state.shownSpells}
-                    keyExtractor={(feats, index) => index.toString()}
+                    keyExtractor={(spells, index) => index.toString()}
                     onEndReached={() => {
                         if (this.state.flatListLoadPauseTimer) {
                             return;
@@ -222,25 +228,40 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 <Modal visible={this.state.pickSpellModal} >
                     {this.state.pickSpellModal &&
                         <ScrollView>
-                            <View>
-                                <AppText>{this.state.pickedSpell.name}</AppText>
-                                <AppText>{this.state.pickedSpell.description}</AppText>
+                            {this.state.character.magic ?
+                                <View>
+                                    <View>
+                                        <AppText>{this.state.pickedSpell.name}</AppText>
+                                        <AppText>{this.state.pickedSpell.description}</AppText>
 
-                                {addSpell(this.state.pickedSpell.type, this.state.character) ?
+                                        {addSpell(this.state.pickedSpell.type, this.state.character) ?
+                                            <View>
+                                                <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                    title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
+                                            </View>
+                                            :
+                                            <View>
+                                                <AppText fontSize={18} color={colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {this.state.pickedSpell.type}</AppText>
+                                            </View>
+                                        }
+                                    </View>
                                     <View>
                                         <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                            title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
+                                            title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
                                     </View>
-                                    :
+                                </View>
+
+                                :
+                                <View style={{ padding: 15 }}>
+                                    <AppText>{this.state.pickedSpell.name}</AppText>
+                                    <AppText>{this.state.pickedSpell.description}</AppText>
+                                    <AppText textAlign={'center'} fontSize={18} color={colors.bitterSweetRed}>Right now you do not possess magical abilities</AppText>
                                     <View>
-                                        <AppText fontSize={18} color={colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {this.state.pickedSpell.type}</AppText>
+                                        <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                            title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
                                     </View>
-                                }
-                            </View>
-                            <View>
-                                <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                    title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
-                            </View>
+                                </View>
+                            }
                         </ScrollView>
                     }
                 </Modal>
