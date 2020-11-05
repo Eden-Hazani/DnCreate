@@ -1,0 +1,326 @@
+{
+    "Paladin": {
+        "Oath of the Ancients": {
+            "3": {
+                "spellList": [
+                    "Ensnaring Strike",
+                    "Speak with Animals"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Moonbeam",
+                    "Misty Step"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Plant Growth",
+                    "Protection from Energy"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Ice Storm",
+                    "Stoneskin"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Commune with Nature",
+                    "Tree Stride"
+                ]
+            }
+        },
+        "Oath of Devotion": {
+            "3": {
+                "spellList": [
+                    "Protection from Evil and Good",
+                    "Sanctuary"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Lesser Restoration",
+                    "Zone of Truth"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Beacon of Hope",
+                    "Dispel Magic"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Freedom of Movement",
+                    "Guardian of Faith"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Commune",
+                    "Flame Strike"
+                ]
+            }
+        },
+        "Oath of Vengeance": {
+            "3": {
+                "spellList": [
+                    "Bane",
+                    "Hunter's Mark"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Hold Person",
+                    "Misty Step"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Haste",
+                    "Protection from Energy"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Banishment",
+                    "Dimension Door"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Hold Monster",
+                    "Scrying"
+                ]
+            }
+        }
+    },
+    "Cleric": {
+        "Knowledge Domain": {
+            "1": {
+                "spellList": [
+                    "Command",
+                    "Identify"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Augury",
+                    "Suggestion"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Nondetection",
+                    "Speak with Dead"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Arcane Eye",
+                    "Confusion"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Legend Lore",
+                    "Scrying"
+                ]
+            }
+        },
+        "Life Domain": {
+            "1": {
+                "spellList": [
+                    "Bless",
+                    "Cure Wounds"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Lesser Restoration",
+                    "Spiritual Weapon"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Beacon of Hope",
+                    "Revivify"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Death Ward",
+                    "Guardian of Faith"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Mass Cure Wounds",
+                    "Raise Dead"
+                ]
+            }
+        },
+        "Light Domain": {
+            "1": {
+                "spellList": [
+                    "Burning Hands",
+                    "Faerie Fire"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Flaming Sphere",
+                    "Scorching Ray"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Daylight",
+                    "Fireball"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Guardian of Faith",
+                    "Wall of Fire"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Flame Strike",
+                    "Scrying"
+                ]
+            }
+        },
+        "Nature Domain": {
+            "1": {
+                "spellList": [
+                    "Animal Friendship",
+                    "Speak with Animals"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Barkskin",
+                    "Spike Growth"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Plant Growth",
+                    "Wind Wall"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Dominate Beast",
+                    "Grasping Vine"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Insect Plague",
+                    "Tree Stride"
+                ]
+            }
+        },
+        "Tempest Domain": {
+            "1": {
+                "spellList": [
+                    "Fog Cloud",
+                    "Thunderwave"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Gust of Wind",
+                    "Shatter"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Call Lightning",
+                    "Sleet Storm"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Control Water",
+                    "Ice Storm"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Destructive Wave",
+                    "Insect Plague"
+                ]
+            }
+        },
+        "Trickery Domain": {
+            "1": {
+                "spellList": [
+                    "Charm Person",
+                    "Disguise Self"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Mirror Image",
+                    "Pass without Trace"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Blink",
+                    "Dispel Magic"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Dimension Door",
+                    "Polymorph"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Dominate Person",
+                    "Modify Memory"
+                ]
+            }
+        },
+        "War Domain": {
+            "1": {
+                "spellList": [
+                    "Divine Favor",
+                    "Shield of Faith"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Magic Weapon",
+                    "Spiritual Weapon"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Crusader's Mantle",
+                    "Spirit Guardians"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Freedom of Movement",
+                    "Stoneskin"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Flame Strike",
+                    "Hold Monster"
+                ]
+            }
+        }
+    }
+}

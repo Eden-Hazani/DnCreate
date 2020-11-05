@@ -5,6 +5,7 @@ const verifyLogged = require('../middleware/verify-logged-in');
 const validateCharInSystem = require('../middleware/validateCharInSystem');
 const Character = require("../models/characterModel");
 var multer = require('multer');
+const removeEmptySpecificObj = require("../middleware/removeEmptySpecificObj");
 var upload = multer({})
 
 
@@ -26,8 +27,8 @@ router.get("/validateChar/:charName/:user_id", verifyLogged, async (request, res
 
 router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, response) => {
     try {
-        const char = new Character(JSON.parse(request.body.charInfo));
-        console.log(char)
+        const cleanChar = removeEmptySpecificObj(JSON.parse(request.body.charInfo))
+        const char = new Character(cleanChar);
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)
@@ -45,6 +46,18 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
     try {
         console.log(JSON.parse(request.body.charInfo))
         const char = new Character(JSON.parse(request.body.charInfo));
+        char.magic = {
+            cantrips: null,
+            firstLevelSpells: null,
+            secondLevelSpells: null,
+            thirdLevelSpells: null,
+            forthLevelSpells: null,
+            fifthLevelSpells: null,
+            sixthLevelSpells: null,
+            seventhLevelSpells: null,
+            eighthLevelSpells: null,
+            ninthLevelSpells: null,
+        }
         char.level = 1;
         char.items = [];
         char.currency.gold = 0;

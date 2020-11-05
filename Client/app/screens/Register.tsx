@@ -28,7 +28,7 @@ interface RegisterState {
     confirmed: boolean
 }
 
-export class Register extends Component<{ props: any, navigation: any }, RegisterState>{
+export class Register extends Component<{ emailSent: any }, RegisterState>{
     static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -47,9 +47,7 @@ export class Register extends Component<{ props: any, navigation: any }, Registe
             const userInfo: any = result.data;
             this.setState({ loading: false }, () => {
                 alert(userInfo.message);
-                setTimeout(() => {
-                    this.props.navigation.navigate("Welcome")
-                }, 1000);
+                this.props.emailSent(true, values.username, values.password);
             });
         }).catch(err => {
             this.setState({ loading: false })

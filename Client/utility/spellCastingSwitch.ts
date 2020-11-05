@@ -3,9 +3,9 @@ import * as scoresJson from '../jsonDump/spellCastingScores.json'
 
 
 export function SpellCastingSwitch(character: CharacterModel, currentProficiency: number) {
-    const baseSpellSaveDc = scoresJson[character.characterClass].baseSpellSaveDc
-    const spellcastingAbility = scoresJson[character.characterClass].spellcastingAbility
-    const baseSpellAttackModifier = scoresJson[character.characterClass].spellAttackModifier
+    const baseSpellSaveDc = scoresJson[character.characterClass]?.baseSpellSaveDc || scoresJson[character.path?.name]?.baseSpellSaveDc
+    const spellcastingAbility = scoresJson[character.characterClass]?.spellcastingAbility || scoresJson[character.path?.name]?.spellcastingAbility
+    const baseSpellAttackModifier = scoresJson[character.characterClass]?.spellAttackModifier || scoresJson[character.path?.name]?.spellAttackModifier
     const modifiers = [['wisdom', character.modifiers.wisdom], ['strength', character.modifiers.strength],
     ['dexterity', character.modifiers.dexterity], ['constitution', character.modifiers.constitution], ['intelligence', character.modifiers.intelligence], ['charisma', character.modifiers.charisma]]
 

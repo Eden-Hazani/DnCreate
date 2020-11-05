@@ -19,5 +19,8 @@ export function setTotalKnownSpells(character: CharacterModel) {
             knownSpells = character.modifiers.wisdom + character.level;
             break;
     }
+    if (knownSpells < 1) {
+        knownSpells = 1
+    }
     return knownSpells
 }

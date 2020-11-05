@@ -51,8 +51,9 @@ const switchModifier = (score: number) => {
         case score === 30:
             modifier = 10;
             break;
+        default:
+            modifier = 0
     }
-
     return modifier;
 }
 

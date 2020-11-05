@@ -83,7 +83,7 @@ const CharacterSchema = mongoose.Schema({
     charSpecials: {
         rageAmount: { type: Number },
         rageDamage: { type: Number },
-        fightingStyle: { type: Object },
+        fightingStyle: { type: Array },
         warlockPactBoon: { type: Object },
         kiPoints: { type: Number },
         martialPoints: { type: Number },
@@ -91,10 +91,23 @@ const CharacterSchema = mongoose.Schema({
         sorceryPoints: { type: Number },
         sorcererMetamagic: { type: Array },
         eldritchInvocations: { type: Array },
-        warlockPatron: { type: String }
+        warlockPatron: { type: String },
+        battleMasterManeuvers: { type: Array },
+        druidCircle: { type: String },
+        monkElementsDisciplines: { type: Array },
+        companion: { type: Array },
+        warlockSpellSlotLevel: { type: String },
+        warlockSpellSlots: { type: Number }
     },
+    spellCastingClass: { type: String },
     spellsKnown: {
         type: String
+    },
+    unrestrictedKnownSpells: {
+        type: Number
+    },
+    differentClassSpellsToPick: {
+        type: Array
     },
     characterClass: {
         type: String,
@@ -128,6 +141,9 @@ const CharacterSchema = mongoose.Schema({
     skills: {
         type: Array
     },
+    nonClassAvailableSpells: {
+        type: Array
+    },
     tools: {
         type: Array
     },
@@ -138,7 +154,10 @@ const CharacterSchema = mongoose.Schema({
         type: Array
     },
     path: {
-        type: String
+        type: Object
+    },
+    pathFeatures: {
+        type: Array
     },
     addedWeaponProf: {
         type: Array
@@ -153,8 +172,13 @@ const CharacterSchema = mongoose.Schema({
         id: { type: String },
         name: { type: String },
         ac: { type: Number },
+        baseAc: { type: Number },
         disadvantageStealth: { type: Boolean },
-        armorType: { type: String }
+        armorType: { type: String },
+        armorBonusesCalculationType: { type: String }
+    },
+    languages: {
+        type: Array
     },
     currency: {
         gold: {

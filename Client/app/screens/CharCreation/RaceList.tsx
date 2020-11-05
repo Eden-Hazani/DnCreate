@@ -112,7 +112,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.intelligence = race.abilityBonus.intelligence;
         characterInfo.race = race.name;
         characterInfo.image = race.image;
-        characterInfo.user_id = this.state.userInfo._id;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
             store.dispatch({ type: ActionType.PickedRace, payload: race });

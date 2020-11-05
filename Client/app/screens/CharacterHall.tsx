@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Platform } from 'react-native';
 import { ListItem } from '../components/ListItem';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import ListItemDelete from '../components/ListItemDelete';
@@ -17,7 +17,7 @@ import { AppError } from '../components/AppError';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import { AdMobInterstitial } from 'expo-ads-admob'
 
 
 interface CharacterHallState {
@@ -25,35 +25,66 @@ interface CharacterHallState {
     userInfo: UserModel
     loading: boolean
     error: boolean
+    showAds: boolean
+    loadingAd: boolean
 }
 
 
 export class CharacterHall extends Component<{ props: any, navigation: any }, CharacterHallState> {
     navigationSubscription: any;
+    public interstitialAd: string;
+    public bannerAd: string;
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
+            loadingAd: false,
+            showAds: store.getState().firstLoginAd,
             error: false,
             loading: false,
             userInfo: this.context,
             characters: [],
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+        this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     }
+
+
+
     async componentDidMount() {
-        this.setState({ loading: true })
-        const response = await userCharApi.getChars(this.context.user._id);
-        this.setState({ loading: false })
-        const characters = response.data;
-        this.setState({ characters, error: errorHandler(response) });
+        try {
+            if (this.state.showAds) {
+                this.setState({ loading: true, loadingAd: true })
+                AdMobInterstitial.setAdUnitID(this.interstitialAd);
+                AdMobInterstitial.requestAdAsync().then(() => {
+                    AdMobInterstitial.showAdAsync().then(async () => {
+                        this.setState({ loading: false, loadingAd: false })
+                        const response = await userCharApi.getChars(this.context.user._id);
+                        const characters = response.data;
+                        this.setState({ characters, error: errorHandler(response) });
+                        store.dispatch({ type: ActionType.firstLoginAd });
+                    }).catch((err) => console.log(err))
+                }).catch((err) => console.log(err))
+            } else {
+                this.setState({ loading: true })
+                const response = await userCharApi.getChars(this.context.user._id);
+                this.setState({ loading: false })
+                const characters = response.data;
+                this.setState({ characters, error: errorHandler(response) });
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
+
     onFocus = async () => {
-        this.setState({ loading: true })
-        const response = await userCharApi.getChars(this.context.user._id);
-        this.setState({ loading: false })
-        const characters = response.data;
-        this.setState({ characters, error: errorHandler(response) });
+        if (!this.state.showAds) {
+            this.setState({ loading: true })
+            const response = await userCharApi.getChars(this.context.user._id);
+            this.setState({ loading: false })
+            const characters = response.data;
+            this.setState({ characters, error: errorHandler(response) });
+        }
     }
 
 
@@ -79,7 +110,17 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     render() {
         return (
             <View>
-                {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
+                {this.state.loading ?
+                    <View>
+                        <AppActivityIndicator visible={this.state.loading} />
+                        {this.state.loadingAd &&
+                            <View>
+                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}>Your one time session ad is loading</AppText>
+                                <AppText textAlign={'center'} color={colors.black} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
+                            </View>
+                        }
+                    </View>
+                    :
                     <View>
                         {this.state.error ? <AppError /> :
                             <View>

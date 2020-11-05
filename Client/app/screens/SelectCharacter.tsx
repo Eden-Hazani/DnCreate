@@ -26,6 +26,8 @@ import { getSpecialSaveThrows } from '../../utility/getSpecialSaveThrows';
 import { Unsubscribe } from 'redux';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
+import { AttackRollTutorial } from './charOptions/AttackRollTutorial';
+import { charHasMagic } from './charOptions/helperFunctions/charHasMagic';
 
 /**
  * 
@@ -33,6 +35,7 @@ import { ActionType } from '../redux/action-type';
  *   
  */
 interface SelectCharacterState {
+    attackRollTutorialModal: boolean
     currentHp: string
     levelUpFunctionActive: boolean
     levelUpFunction: any
@@ -53,6 +56,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            attackRollTutorialModal: false,
             setCurrentHpModal: false,
             currentHp: '',
             levelUpFunctionActive: false,
@@ -67,13 +71,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             isDm: this.props.route.params.isDm
         }
         this.UnsubscribeStore = store.subscribe(() => {
-            this.setState({ character: store.getState().character })
         })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
     componentWillUnmount() {
+        this.navigationSubscription()
         this.UnsubscribeStore()
+        this.setState({ loading: true })
     }
 
     refreshData = async () => {
@@ -91,32 +96,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     onFocus = async () => {
         this.setState({ loading: true })
-        setTimeout(() => {
-            this.setState({ loading: false })
-        }, 800);
         this.refreshData().then(() => {
             this.maxHpCheck();
+            this.setState({ loading: false })
         })
     }
+
 
     componentDidMount() {
         let startCharInfo: CharacterModel = null;
         if (this.state.isDm) {
             startCharInfo = this.props.route.params.character;
-            this.props.navigation.addListener('beforeRemove', (e: any) => {
-                this.props.navigation.navigate("Adventures")
-            })
         }
         if (!this.state.isDm) {
             startCharInfo = store.getState().character;
-            this.props.navigation.addListener('beforeRemove', (e: any) => {
-                if (this.state.loading) {
-                    e.preventDefault();
-                    return;
-                }
-                this.setState({ loading: true })
-                store.dispatch({ type: ActionType.CleanCreator })
-            })
         }
         setTimeout(() => {
             this.setState({ loading: false })
@@ -160,6 +153,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         validLevel = 1;
                     }
                     const character = await AsyncStorage.getItem(`current${this.state.character._id}level${level}`);
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: JSON.parse(character) })
                     this.setState({ character: JSON.parse(character), currentLevel: validLevel }, () => {
                         this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
                         userCharApi.updateChar(this.state.character).then(() => {
@@ -188,10 +182,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         this.setState({ character })
                         return;
                     }
-                    await AsyncStorage.setItem(`current${this.state.character._id}level${this.state.character.level}`, JSON.stringify(this.state.character));
                     const character = { ...this.state.character };
+                    if (!character.path) {
+                        character.path = null
+                    }
+                    await AsyncStorage.setItem(`current${this.state.character._id}level${this.state.character.level}`, JSON.stringify(character));
                     character.level = validLevel;
                     this.setState({ character, currentLevel: validLevel }, () => {
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
                         this.levelUp();
                         this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
                     })
@@ -216,6 +214,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
         let maxHp: number = this.state.character.maxHp;
         maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + this.state.character.modifiers.constitution;
+        if (this.state.character.path?.name === "Draconic Bloodline") {
+            maxHp = maxHp + 1
+        }
         character.maxHp = maxHp;
         this.setState({ character }, () => {
             userCharApi.updateChar(this.state.character)
@@ -234,6 +235,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         if (!this.state.character.maxHp) {
             const character = { ...this.state.character };
             let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
+            if (this.state.character.path?.name === "Draconic Bloodline") {
+                maxHp = maxHp + 1
+            }
             character.maxHp = maxHp;
             this.setState({ character }, async () => {
                 const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
@@ -414,14 +418,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View style={styles.secRowIconContainer}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.shadowBlue} name={"tshirt-crew"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={colors.paleGreen} name={"tshirt-crew"} iconColor={colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={colors.black}>Armor</AppText>
                                 </View>
                             </TouchableOpacity>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PathFeatures", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.metallicBlue} name={"chart-arc"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Path Features</AppText>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View>
-                            <UniqueCharStats character={this.state.character} />
+                            <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} />
                         </View>
                         <View>
                             <AppText textAlign={'center'}>Saving Throws</AppText>
@@ -434,8 +444,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View style={styles.infoContainer}>
                             <View style={{ flexDirection: 'row' }}>
-                                <View style={[styles.list, { width: '35%' }]}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Skills:</AppText>
+                                <View style={[styles.list, { width: '40%' }]}>
+                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
                                     {this.state.character.skills.map(skill =>
                                         <View key={skill} style={styles.skill}>
                                             <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
@@ -444,30 +454,52 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         </View>
                                     )}
                                 </View>
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "65%" }}>
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
                                     <AppText fontSize={25}>Hit Dice</AppText>
                                     <AppText fontSize={25} color={colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
-                                    <AppText textAlign={'center'}>You add these bonuses to both your attack hit rolls and for your damage rolls with the proficient weapon.</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength + this.state.currentProficiency} for melee weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength} for melee weapons</AppText>
                                     </View>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity + this.state.currentProficiency} for ranged weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity} for ranged weapons</AppText>
                                     </View>
+                                    <AppText textAlign={'center'} fontSize={18}>Proficient weapons {'\n'} (add to attack roll)</AppText>
                                     <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} for {this.state.character.characterClassId.weaponProficiencies.map(v => <AppText key={v}>{`\n`} - {v} - </AppText>)}</AppText>
+                                        <View style={{ borderWidth: 1, borderColor: colors.berries, borderRadius: 15, backgroundColor: colors.pinkishSilver }}>
+                                            <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
+                                        </View>
+                                        <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                     </View>
                                     {this.state.character.addedWeaponProf.length > 0 &&
                                         <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                            <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} for {this.state.character.addedWeaponProf.map(v => <AppText key={v}>{`\n`} - {v} - </AppText>)}</AppText>
+                                            <View style={{ borderWidth: 1, borderColor: colors.berries, borderRadius: 15, backgroundColor: colors.pinkishSilver }}>
+                                                <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
+                                            </View>
+                                            <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.addedWeaponProf.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                         </View>}
+                                    <View>
+                                        <AppButton backgroundColor={colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
+                                        <Modal visible={this.state.attackRollTutorialModal} animationType={'slide'}>
+                                            <AttackRollTutorial closeWindow={(boolean: boolean) => { this.setState({ attackRollTutorialModal: boolean }) }} />
+                                        </Modal>
+                                    </View>
                                 </View>
                             </View>
+                            {this.state.character.languages &&
+                                <View style={[styles.list, { width: '100%' }]}>
+                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
+                                    {this.state.character.languages.map(lang =>
+                                        <View key={lang} style={styles.tools}>
+                                            <AppText>{lang}</AppText>
+                                        </View>
+                                    )}
+                                </View>
+                            }
                             <View style={[styles.list, { width: '100%' }]}>
                                 <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
                                 {this.state.character.tools.map(tool =>
                                     <View key={tool} style={styles.tools}>
-                                        {}
                                         <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
                                     </View>
                                 )}
@@ -504,7 +536,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View>
                             <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={30}>Magic</AppText>
-                            {this.state.character.magic ? <CharMagic character={this.state.character} currentProficiency={this.state.currentProficiency} /> :
+                            {charHasMagic(this.state.character) ? <CharMagic reloadChar={() => {
+                                this.setState({ character: store.getState().character })
+                            }} character={this.state.character} currentProficiency={this.state.currentProficiency} /> :
                                 <AppText padding={15} fontSize={18} textAlign={'center'}>You do not posses magical abilities right now.</AppText>
                             }
                         </View>

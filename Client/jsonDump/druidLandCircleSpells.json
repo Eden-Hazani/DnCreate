@@ -1,0 +1,212 @@
+{
+    "druidCircleSpellLists": {
+        "Arctic": {
+            "3": {
+                "spellList": [
+                    "Hold Person",
+                    "Spike Growth"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Sleet Storm",
+                    "Slow"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Freedom of Movement",
+                    "Ice Storm"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Commune with Nature",
+                    "Cone of Cold"
+                ]
+            }
+        },
+        "Coast": {
+            "3": {
+                "spellList": [
+                    "Mirror Image",
+                    "Misty Step"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Water Breathing",
+                    "Water Walk"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Control Water",
+                    "Freedom of Movement"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Conjure Elemental",
+                    "Scrying"
+                ]
+            }
+        },
+        "Desert": {
+            "3": {
+                "spellList": [
+                    "Blur",
+                    "Silence"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Create Food and Water",
+                    "Protection from Energy"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Blight",
+                    "Hallucinatory Terrain"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Insect Plague",
+                    "Wall of Stone"
+                ]
+            }
+        },
+        "Forest": {
+            "3": {
+                "spellList": [
+                    "Barkskin",
+                    "Spider Climb"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Call Lightning",
+                    "Plant Growth"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Divination",
+                    "Freedom of Movement"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Commune with Nature",
+                    "Tree Stride"
+                ]
+            }
+        },
+        "Grassland": {
+            "3": {
+                "spellList": [
+                    "Invisibility",
+                    "Pass without Trace"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Daylight",
+                    "Haste"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Divination",
+                    "Freedom of Movement"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Dream",
+                    "Insect Plague"
+                ]
+            }
+        },
+        "Mountain": {
+            "3": {
+                "spellList": [
+                    "Spider Climb",
+                    "Spike Growth"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Lightning Bolt",
+                    "Meld into Stone"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Stone Shape",
+                    "Stoneskin"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Passwall",
+                    "Wall of Stone"
+                ]
+            }
+        },
+        "Swamp": {
+            "3": {
+                "spellList": [
+                    "Darkness",
+                    "Acid Arrow"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Water Walk",
+                    "Stinking Cloud"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Freedom of Movement",
+                    "Locate Creature"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Insect Plague",
+                    "Scrying"
+                ]
+            }
+        },
+        "Underdark": {
+            "3": {
+                "spellList": [
+                    "Spider Climb",
+                    "Web"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Gaseous Form",
+                    "Stinking Cloud"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Greater Invisibility",
+                    "Stone Shape"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Cloudkill",
+                    "Insect Plague"
+                ]
+            }
+        }
+    }
+}

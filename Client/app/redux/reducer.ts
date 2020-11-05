@@ -13,8 +13,29 @@ export function reduce(currentState: AppState, action: Action): AppState {
     const newState = { ...currentState }; // Duplicate the old state into a new state.
 
     switch (action.type) {
+        case ActionType.SetInfoBeforeRegisterChar:
+            newState.beforeRegisterChar = action.payload
+            break;
+        case ActionType.ClearInfoBeforeRegisterChar:
+            newState.beforeRegisterChar = new CharacterModel()
+        case ActionType.StartAsNonUser:
+            newState.nonUser = action.payload;
+            break;
         case ActionType.SetInfoToChar:
             newState.character = action.payload;
+            break;
+        case ActionType.ResetCharSkillsToLowerLevel:
+            const char = { ...newState.character };
+            for (let item of char.skills) {
+                if (item[1] === 4) {
+                    item[1] = 4
+                }
+                item[1] = 0
+            }
+            newState.character = char;
+            break;
+        case ActionType.firstLoginAd:
+            newState.firstLoginAd = false;
             break;
         case ActionType.SetCharacters:
             for (let character of action.payload) {

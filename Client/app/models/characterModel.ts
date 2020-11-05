@@ -37,7 +37,10 @@ export class CharacterModel {
         public maxHp?: number,
         public items?: any,
         public path?: any,
+        public pathFeatures?: any[],
         public spellsKnown?: any,
+        public unrestrictedKnownSpells?: number,
+        public differentClassSpellsToPick?: any[],
         public currency?: {
             gold: number,
             silver: number,
@@ -51,6 +54,9 @@ export class CharacterModel {
         public addedArmorProf?: any[],
         public feats?: any[],
         public equippedArmor?: EquippedArmorModel,
+        public languages?: any[],
+        public spellCastingClass?: string,
+        public nonClassAvailableSpells?: string[]
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();

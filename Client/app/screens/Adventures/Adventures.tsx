@@ -82,7 +82,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
 
     getParticipatingAdv = async () => {
         try {
-            console.log(this.state.participatingAdventures.length)
             if (this.state.participatingAdventures.length === 0) {
                 let charIds = [];
                 for (let character of this.state.characters) {
@@ -114,7 +113,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     getLeadingFromServer = async () => {
-        console.log(this.state.participatingAdventures)
         const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
         this.setState({ leadingAdventures: leadingAdventures.data }, () => {
             store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })

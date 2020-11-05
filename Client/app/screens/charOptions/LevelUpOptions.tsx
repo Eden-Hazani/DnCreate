@@ -19,14 +19,26 @@ import { highLightPicked } from './helperFunctions/highLightPicked';
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { FeatOptions } from './FeatOptions';
 import { setTotalKnownSpells } from './helperFunctions/setTotalKnownSpells';
+import { extraPathChoiceNumbers } from '../../../utility/extraPathChoiceNumbers';
+import { PathFeatureOrganizer } from './helperFunctions/PathFeatureOrganizer';
+import { AppExtraPathChoicePicker } from '../../components/AppExtraPathChoicePicker';
+import * as Path from "../../../jsonDump/paths.json"
+import { AppPathAdditionalApply } from './AppPathAdditionalApply';
+import errorHandler from '../../../utility/errorHander';
+import { AppActivityIndicator } from '../../components/AppActivityIndicator';
+import spellsJSON from '../../../jsonDump/spells.json'
+import { spellLevelChanger } from './helperFunctions/SpellLevelChanger';
+
 
 interface LevelUpOptionsState {
+    beforeAnyChanges: CharacterModel,
     beforeLevelUp: CharacterModel
-    skillsClicked: boolean[]
+    skillsClicked: any[]
     newSkills: any[]
     newTools: any[]
     pathClicked: boolean[]
-    pathChosen: string
+    extraPathChoiceClicked: boolean[]
+    pathChosen: any
     character: CharacterModel
     abilityClicked: number[]
     totalAbilityPoints: number
@@ -38,7 +50,7 @@ interface LevelUpOptionsState {
     charisma: number
     load: boolean
     spellSlots: number[]
-    fightingStyle: any
+    fightingStyle: any[]
     fightingStyleClicked: boolean[]
     pact: any
     pactClicked: boolean[]
@@ -54,13 +66,49 @@ interface LevelUpOptionsState {
     armorProfArray: any[]
     featName: string
     featDescription: string
-
+    extraPathChoice: boolean
+    extraPathChoiceValue: any[]
+    additionalSkillPicks: boolean
+    additionalToolPicks: boolean
+    reloadingSkills: boolean
+    maneuversToPick: boolean
+    ElementsToPick: boolean
+    maneuvers: any[]
+    elements: any[]
+    pathFightingStyle: boolean
+    pathPickDruidCircle: boolean
+    languageToPick: boolean
+    langHolder: string[]
+    pathInfoLoading: boolean
+    specificSpellToLoad: boolean,
+    specificSpell: string
+    armorToLoad: any
+    newSpellAvailabilityList: string[]
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
     constructor(props: any) {
         super(props)
         this.state = {
+            armorToLoad: null,
+            specificSpell: '',
+            specificSpellToLoad: false,
+            ElementsToPick: false,
+            pathInfoLoading: false,
+            langHolder: [],
+            languageToPick: false,
+            pathPickDruidCircle: false,
+            pathFightingStyle: false,
+            maneuvers: this.props.character.charSpecials.battleMasterManeuvers,
+            elements: this.props.character.charSpecials.monkElementsDisciplines,
+            maneuversToPick: false,
+            beforeAnyChanges: new CharacterModel,
+            reloadingSkills: false,
+            additionalToolPicks: false,
+            additionalSkillPicks: false,
+            extraPathChoiceValue: [],
+            extraPathChoiceClicked: [],
+            extraPathChoice: false,
             featName: '',
             featDescription: '',
             weaponProfArray: [],
@@ -72,7 +120,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             metaMagic: [],
             fightingStyleClicked: [],
             pactClicked: [],
-            fightingStyle: null,
+            fightingStyle: [],
             pact: null,
             skillsClicked: [],
             newTools: this.props.character.tools,
@@ -88,22 +136,33 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             totalAbilityPoints: null,
             abilityClicked: [0, 0, 0, 0, 0, 0],
             character: this.props.character,
-            pathChosen: '',
+            pathChosen: null,
             pathClicked: [],
             totalMetaMagicPoints: null,
             invocationsClicked: [],
             invocations: this.props.character.charSpecials.eldritchInvocations,
-            totalInvocationPoints: null
+            totalInvocationPoints: null,
+            newSpellAvailabilityList: []
         }
     }
+
     async componentDidMount() {
+        const character = { ...this.props.character }
         setTimeout(() => {
             this.setState({ load: false })
         }, 1000);
+        const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
         const beforeLevelUpString = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
-        this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString) });
+        character.magic = new MagicModel()
+        this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
         if (this.props.options.spells || this.props.options.spellsKnown) {
             const character = { ...this.props.character };
+            if (this.props.options.spellSlotLevel) {
+                character.charSpecials.warlockSpellSlotLevel = this.props.options.spellSlotLevel;
+            }
+            if (this.props.options.spellSlots) {
+                character.charSpecials.warlockSpellSlots = this.props.options.spellSlots;
+            }
             if (this.props.options.sorceryPoints) {
                 character.charSpecials.sorceryPoints = this.props.options.sorceryPoints;
             }
@@ -127,7 +186,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 character.magic.eighthLevelSpells = this.props.options.spells[7];
                 character.magic.ninthLevelSpells = this.props.options.spells[8];
             }
-            this.setState({ character }, () => {
+            const beforeAnyChanges = JSON.parse(JSON.stringify(character))
+            this.setState({ character, beforeAnyChanges }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
                 userCharApi.updateChar(this.state.character);
             })
         }
@@ -151,9 +212,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         }
     }
 
-    pickPath = (path: string, index: number) => {
+    pickPath = (path: any, index: number) => {
+        this.setState({ pathInfoLoading: true })
+        setTimeout(() => {
+            this.setState({ pathInfoLoading: false })
+        }, 800);
+        let character = { ...this.state.character };
         if (!this.state.pathClicked[index]) {
-            if (this.state.pathChosen.length > 1) {
+            if (this.state.pathChosen !== null) {
                 alert(`Can't pick more then one path`)
                 return
             }
@@ -162,10 +228,21 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             this.setState({ pathClicked, pathChosen: path });
         }
         else if (this.state.pathClicked[index]) {
+            character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
             const pathClicked = this.state.pathClicked;
             pathClicked[index] = false;
-            this.setState({ pathClicked, pathChosen: '' });
+            this.setState({ pathClicked, pathChosen: null, character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            });
         }
+    }
+
+    resetExpertiseSkills = async (skill: any) => {
+        store.dispatch({ type: ActionType.ResetCharSkillsToLowerLevel })
+        this.setState({ reloadingSkills: true, skillsClicked: [] })
+        setTimeout(() => {
+            this.setState({ reloadingSkills: false })
+        }, 500);
     }
 
     pickSkill = (skill: any, index: number) => {
@@ -177,7 +254,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             const newTools = this.state.newTools;
-            const newSkills = this.state.newSkills;
+            const newSkills = store.getState().character.skills;
             const skillsClicked = this.state.skillsClicked;
             newTools.filter((item, index) => {
                 if (item.includes(skill[0])) {
@@ -206,7 +283,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         }
         else if (this.state.skillsClicked[index]) {
             const skillsClicked = this.state.skillsClicked;
-            const newSkills = this.state.newSkills;
+            const newSkills = store.getState().character.skills;
             const newTools = this.state.newTools;
             newTools.filter((item, index) => {
                 if (item.includes(skill[0])) {
@@ -239,7 +316,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     }
 
     addPath = () => {
-        if (this.state.pathChosen === '') {
+        if (this.state.pathChosen === null) {
             alert(`Must Pick A path!`)
             return false
         }
@@ -294,20 +371,24 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         }
     }
 
-    pickFightingStyle = (style: object, index: number) => {
+    pickFightingStyle = (style: any, index: number) => {
         if (!this.state.fightingStyleClicked[index]) {
-            if (this.state.fightingStyle !== null) {
+            if (this.state.fightingStyle.length >= 1) {
                 alert('You can only pick one fighting style.')
                 return;
             }
             const fightingStyleClicked = this.state.fightingStyleClicked;
             fightingStyleClicked[index] = true;
-            this.setState({ fightingStyle: style, fightingStyleClicked })
+            const fightingStyle = this.state.fightingStyle;
+            fightingStyle.push(style);
+            this.setState({ fightingStyle, fightingStyleClicked })
         }
         else if (this.state.fightingStyleClicked[index]) {
             const fightingStyleClicked = this.state.fightingStyleClicked;
             fightingStyleClicked[index] = false;
-            this.setState({ fightingStyle: null, fightingStyleClicked })
+            let fightingStyle = this.state.fightingStyle;
+            fightingStyle = fightingStyle.filter((n: any) => n.name !== style.name)
+            this.setState({ fightingStyle, fightingStyleClicked })
         }
     }
 
@@ -422,7 +503,84 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             charisma: this.props.character.charisma
         })
     }
+    disableExtraPathChoice = () => {
+        if (!this.state.extraPathChoice) {
+            return;
+        }
+        this.setState({ extraPathChoice: false })
+    }
 
+    enableExtraPathChoice = () => {
+        if (this.state.extraPathChoice) {
+            return;
+        }
+        this.setState({ extraPathChoice: true })
+    }
+
+    applyExtraPathChoice = (choice: any, index: number) => {
+        if (!this.state.extraPathChoiceClicked[index]) {
+            const extraPathChoiceAmount = extraPathChoiceNumbers(this.state.character, this.state.character.level);
+            if (this.state.extraPathChoiceValue.length === extraPathChoiceAmount) {
+                alert(`You can only ${extraPathChoiceAmount} pick one choice.`)
+                return;
+            }
+            const extraPathChoiceValue = this.state.extraPathChoiceValue;
+            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+            extraPathChoiceClicked[index] = true;
+            extraPathChoiceValue.push(choice);
+            this.setState({ extraPathChoiceValue })
+
+        }
+        else if (this.state.extraPathChoiceClicked[index]) {
+            let extraPathChoiceValue = this.state.extraPathChoiceValue;
+            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+            extraPathChoiceClicked[index] = false;
+            extraPathChoiceValue = extraPathChoiceValue.filter((val: any) => choice.name !== val.name);
+            this.setState({ extraPathChoiceValue })
+        }
+    }
+
+    addArmor = async () => {
+        let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+        if (!armorList) {
+            const armorList = [this.state.armorToLoad]
+            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
+            return;
+        }
+        const newArmorList = JSON.parse(armorList)
+        newArmorList.push(this.state.armorToLoad)
+        AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
+    }
+
+    armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
+        let newArmorAc: number = null;
+        if (armorBonusesCalculationType === "Medium Armor") {
+            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
+        }
+        if (armorBonusesCalculationType === "Light Armor") {
+            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity)
+        }
+        if (armorBonusesCalculationType === "Heavy Armor") {
+            newArmorAc = +armorAc
+        }
+        if (armorBonusesCalculationType === "none") {
+            newArmorAc = 10 + +this.state.character.modifiers.dexterity
+        }
+        if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
+            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.constitution)
+        }
+        if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
+            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.wisdom)
+        }
+        if (this.state.character.pathFeatures.length > 0) {
+            this.state.character.pathFeatures.forEach(item => {
+                if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
+                    newArmorAc = (13 + +this.state.character.modifiers.dexterity)
+                }
+            })
+        }
+        return newArmorAc
+    }
 
     close = async () => {
         if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`)) {
@@ -433,7 +591,96 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.addPath()) {
                 return;
             }
+            if (this.state.additionalSkillPicks) {
+                alert('You have additional choices to pick from')
+                return;
+            }
+            if (this.state.pathFightingStyle) {
+                alert('You still have to pick a fighting style')
+                return;
+            }
+            if (this.state.additionalToolPicks) {
+                alert('You have additional tools to pick from')
+                return;
+            }
+            if (this.state.pathPickDruidCircle) {
+                alert('You Must pick a druid circle')
+                return;
+            }
+            if (this.state.languageToPick) {
+                alert('You must add languages.')
+                return;
+            }
+            if (this.state.extraPathChoice) {
+                if (this.state.extraPathChoiceValue.length !== extraPathChoiceNumbers(this.state.character, this.state.character.level)) {
+                    alert('You have additional choices to pick from')
+                    return;
+                }
+            }
+            if (this.state.maneuversToPick) {
+                alert('You have additional Maneuvers to pick from')
+                return;
+            }
+            if (this.state.ElementsToPick) {
+                alert('You have additional Elements to pick from')
+                return;
+            }
+            character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+            character.charSpecials.monkElementsDisciplines = this.state.elements;
             character.path = this.state.pathChosen;
+            const pathResult = PathFeatureOrganizer(Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level], this.state.extraPathChoiceValue)
+            for (let item of pathResult) {
+                character.pathFeatures.push(item)
+            }
+        }
+        if (this.props.options.pathFeature && !this.props.options.pathSelector) {
+            if (this.state.additionalSkillPicks) {
+                alert('You have additional choices to pick from')
+                return;
+            }
+            if (this.state.additionalToolPicks) {
+                alert('You have additional tools to pick from')
+                return;
+            }
+            if (this.state.pathFightingStyle) {
+                alert('You still have to pick a fighting style')
+                return;
+            }
+            if (this.state.languageToPick) {
+                alert('You must add languages.')
+                return;
+            }
+            if (this.state.extraPathChoice) {
+                if (this.state.extraPathChoiceValue.length !== extraPathChoiceNumbers(this.state.character, this.state.character.level)) {
+                    alert('You have additional choices to pick from')
+                    return;
+                }
+            }
+            if (this.state.maneuversToPick) {
+                alert('You have additional Maneuvers to pick from')
+                return;
+            }
+            if (this.state.ElementsToPick) {
+                alert('You have additional Elements to pick from')
+                return;
+            }
+            character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+            character.charSpecials.monkElementsDisciplines = this.state.elements;
+            const pathResult = PathFeatureOrganizer(Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level], this.state.extraPathChoiceValue)
+            for (let item of pathResult) {
+                character.pathFeatures.push(item)
+            }
+        }
+        if (this.props.options.extraSpells) {
+            for (let item of this.props.options.extraSpells) {
+                const spell = spellsJSON.find(spell => spell.name === item)
+                const spellLevel = spellLevelChanger(spell.level)
+                character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
+        }
+        if (this.props.options.abilityPointIncrease && !this.state.featsWindow && !this.state.abilityWindow) {
+            alert('Must pick Ability score increase or new feat.');
+            return;
         }
         if (this.props.options.abilityPointIncrease && this.state.abilityWindow) {
             if (!this.addAbilityPoints()) {
@@ -461,18 +708,30 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.charisma = this.state.charisma;
             character.wisdom = this.state.wisdom;
         }
+        if (this.state.specificSpellToLoad) {
+            const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell)
+            const spellLevel = spellLevelChanger(spell.level)
+            character.spells[spellLevel].push({ spell: spell, removable: false });
+        }
         if (this.props.options.expertise) {
             if (!this.addSkills()) {
                 return;
             }
-            character.skills = this.state.newSkills;
+            character.skills = store.getState().character.skills;
             character.tools = this.state.newTools
         }
         if (this.props.options.pickFightingStyle) {
             if (!this.addFightingStyle()) {
                 return;
             }
-            character.charSpecials.fightingStyle = this.state.fightingStyle;
+            for (let item of this.state.fightingStyle) {
+                character.charSpecials.fightingStyle.push(item)
+            }
+        }
+        if (this.state.langHolder.length > 0) {
+            for (let item of this.state.langHolder) {
+                character.languages.push(item)
+            }
         }
         if (this.props.options.metamagic) {
             if (!this.addMetaMagic()) {
@@ -492,12 +751,20 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             character.charSpecials.eldritchInvocations = this.state.invocations
         }
+        if (this.state.newSpellAvailabilityList.length > 0) {
+            for (let item of this.state.newSpellAvailabilityList) {
+                character.differentClassSpellsToPick.push(item)
+            }
+        }
         if (this.props.options.monkMartialArts) {
             character.charSpecials.kiPoints = this.props.options.kiPoints
             character.charSpecials.martialPoints = this.props.options.monkMartialArts
         }
         if (this.props.options.sneakAttackDie) {
             character.charSpecials.sneakAttackDie = this.props.options.sneakAttackDie
+        }
+        if (this.state.armorToLoad !== null) {
+            this.addArmor()
         }
         if (this.props.options.pactSelector) {
             if (!this.addWarlockPact()) {
@@ -506,6 +773,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.charSpecials.warlockPactBoon = this.state.pact;
         }
         this.setState({ character }, () => {
+            const character = { ...this.state.character };
             const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
             const modifiers = Object.values(this.state.character.modifiers);
             attributePoints.forEach((item: number, index: number) => {
@@ -517,6 +785,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.modifiers.intelligence = modifiers[3];
             character.modifiers.wisdom = modifiers[4];
             character.modifiers.charisma = modifiers[5];
+            if (character.equippedArmor) {
+                character.equippedArmor.ac = this.armorBonuses(character.equippedArmor.baseAc, character.equippedArmor.armorBonusesCalculationType)
+                this.setState({ character })
+            }
             userCharApi.updateChar(this.state.character).then(() => {
                 this.props.refresh()
                 this.props.close(false);
@@ -547,7 +819,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 <View style={{ flexDirection: "row", flexWrap: 'wrap' }}>
                                     {this.props.options.pathSelector.map((path: any, index: number) =>
                                         <TouchableOpacity key={index} onPress={() => this.pickPath(path, index)} style={[styles.item, { backgroundColor: this.state.pathClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                            <AppText>{path}</AppText>
+                                            <AppText color={this.state.pathClicked[index] ? colors.black : colors.bitterSweetRed} fontSize={22}>{path.name}</AppText>
+                                            <AppText fontSize={18}>{path.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                                         </TouchableOpacity>)}
                                 </View>
                             </View>
@@ -568,10 +841,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     <AppText fontSize={18} textAlign={'center'}>You can either spend 2 points on one ability or spread your choice and put 1 point in two different abilities</AppText>
                                     <View style={{ flexDirection: 'row' }}>
                                         <View style={{ padding: 15 }}>
-                                            <AppButton fontSize={18} backgroundColor={this.state.featsWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Feats"} onPress={() => { this.setState({ character: this.props.character, featsWindow: true, abilityWindow: false }) }} />
+                                            <AppButton fontSize={18} backgroundColor={this.state.featsWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Feats"} onPress={() => {
+                                                this.resetAbilityScoresToCurrentLevel()
+                                                this.setState({ featsWindow: true, abilityWindow: false, totalAbilityPoints: 2, abilityClicked: [0, 0, 0, 0, 0, 0] })
+                                            }} />
                                         </View>
                                         <View style={{ padding: 15 }}>
-                                            <AppButton fontSize={18} backgroundColor={this.state.abilityWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Ability Score"} onPress={() => { this.setState({ character: this.props.character, featsWindow: false, abilityWindow: true }) }} />
+                                            <AppButton fontSize={18} backgroundColor={this.state.abilityWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Ability Score"} onPress={() => { this.setState({ featsWindow: false, abilityWindow: true }) }} />
                                         </View>
                                     </View>
                                 </View>
@@ -620,28 +896,118 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             :
                             null}
                         {this.props.options.pathFeature ?
-                            <View>
-                                <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
-                                    <AppText fontSize={20} textAlign={'center'}>You have reached level {this.props.character.level}!</AppText>
-                                    <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={'center'}>New path features are now unlocked!</AppText>
+                            this.state.pathChosen || this.state.character.path ?
+                                <View>
+                                    {this.state.pathInfoLoading ?
+                                        <AppActivityIndicator visible={this.state.pathInfoLoading} />
+                                        :
+                                        <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
+                                            <AppText fontSize={25} textAlign={'center'}>Level {this.props.character.level} with the {this.state.pathChosen?.name || this.state.character.path.name}!</AppText>
+                                            {Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level]).map((item: any, index: number) =>
+                                                <View key={item.name}>
+                                                    <View style={item.description && styles.infoContainer}>
+                                                        <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={'center'}>
+                                                            {item.name}</AppText>
+                                                        <AppText color={colors.black} fontSize={18} textAlign={'center'}>
+                                                            {item.description && item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
+                                                    </View>
+                                                    {(item.armorProf || item.weaponProf || item.skillList || item.fightingStyles || item.additionCantrip || item.druidCircleSpellLists ||
+                                                        item.unrestrictedMagicPick || item.addMagicalAbilities || item.maneuvers || item.toolsToPick || item.learnLanguage ||
+                                                        item.levelOneSpells || item.specificCantrip || item.AddSpellsFromDifferentClass || item.addElementalAttunement ||
+                                                        item.elementList || item.spellsToBeAdded || item.toolsToBeAdded || item.addArmor ||
+                                                        item.increaseMaxHp || item.addSpellAvailability || item.pickSpecificSpellWithChoices) &&
+                                                        <AppPathAdditionalApply
+                                                            loadSpellPickAvailability={(val: any) => { this.setState({ newSpellAvailabilityList: val }) }}
+                                                            armorToLoad={(val: any) => { this.setState({ armorToLoad: val }) }}
+                                                            loadCharacter={(val: CharacterModel) => { this.setState({ character: val }) }}
+                                                            languagesToPick={(val: boolean) => { this.setState({ languageToPick: val }) }}
+                                                            pickDruidCircle={(val: boolean) => { this.setState({ pathPickDruidCircle: val }) }}
+                                                            fightingStylesToPick={(val: any) => { this.setState({ pathFightingStyle: val }) }}
+                                                            isAdditionalToolChoice={(val: boolean) => { this.setState({ additionalToolPicks: val }) }}
+                                                            pathChosen={this.state.pathChosen?.name || this.state.character.path.name}
+                                                            pathChosenObj={this.state.pathChosen || this.state.character.path}
+                                                            maneuversToPick={(val: boolean) => { this.setState({ maneuversToPick: val }) }}
+                                                            elementsToPick={(val: any) => { this.setState({ ElementsToPick: val }) }}
+                                                            loadElements={(val: any) => { this.setState({ elements: val }) }}
+                                                            loadManeuvers={(val: any) => { this.setState({ maneuvers: val }) }}
+                                                            loadUnrestrictedMagic={(magicNumber: number) => {
+                                                                const character = { ...this.state.character };
+                                                                character.unrestrictedKnownSpells = (character.unrestrictedKnownSpells ? character.unrestrictedKnownSpells : 0) + magicNumber;
+                                                                this.setState({ character })
+                                                            }}
+                                                            loadSpecificSpell={(val: string) => {
+                                                                this.setState({ specificSpellToLoad: true, specificSpell: val })
+                                                            }}
+                                                            loadLanguage={(languages: []) => {
+                                                                const langHolder: any[] = []
+                                                                languages.forEach((lang: any) => {
+                                                                    let index = langHolder.indexOf(lang.slice(0, -1)) || langHolder.indexOf(lang)
+                                                                    index > 0 ? langHolder[index] = lang : langHolder.push(lang)
+                                                                    this.setState({ langHolder }, () => {
+                                                                    })
+                                                                })
+
+                                                            }}
+
+                                                            loadWeapons={(weapons: any) => {
+                                                                const character = { ...this.state.character };
+                                                                for (let item of weapons) {
+                                                                    character.addedWeaponProf.push(item)
+                                                                }
+                                                                this.setState({ character })
+                                                            }}
+                                                            resetExpertiseSkills={(skill: any) => { this.resetExpertiseSkills(skill) }}
+                                                            loadArmors={(armors: any) => {
+                                                                const character = { ...this.state.character };
+                                                                for (let item of armors) {
+                                                                    character.addedArmorProf.push(item)
+                                                                }
+                                                                this.setState({ character })
+                                                            }}
+                                                            isAdditionalSkillChoice={(val: boolean) => { this.setState({ additionalSkillPicks: val }) }}
+                                                            character={this.state.character}
+                                                            pathItem={item}
+                                                            loadSkills={(val: any[]) => { this.setState({ character: store.getState().character }) }} />
+                                                    }
+                                                    {item.choice &&
+                                                        <AppExtraPathChoicePicker
+                                                            resetExpertiseSkills={(skill: any) => { this.resetExpertiseSkills(skill) }}
+                                                            character={this.state.character}
+                                                            isExtraChoice={(val: boolean) => { this.setState({ extraPathChoice: val }) }}
+                                                            applyExtraPathChoice={(item: any, index: number) => { this.applyExtraPathChoice(item, index) }}
+                                                            item={item}
+                                                            extraPathChoiceClicked={this.state.extraPathChoiceClicked}
+                                                            isAdditionalSkillChoice={(val: boolean) => { this.setState({ additionalSkillPicks: val }) }}
+                                                            loadSkills={(val: any[]) => {
+                                                                this.setState({ character: store.getState().character })
+                                                            }}
+                                                        />}
+                                                </View>)}
+                                        </View>
+                                    }
                                 </View>
-                            </View>
+                                :
+                                null
                             :
                             null}
                         {this.props.options.expertise ?
                             <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                <AppText color={colors.bitterSweetRed} fontSize={20}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
-                                <AppText textAlign={"center"}>You have the option to choose two of your skill proficiencies, your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.</AppText>
-                                {this.props.character.skills.map((skill, index) =>
-                                    <TouchableOpacity key={index} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { backgroundColor: this.state.skillsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                        <AppText>{skill[0]}</AppText>
-                                    </TouchableOpacity>)}
-                                {this.props.character.characterClass === 'Rogue' &&
-                                    this.props.character.tools.map((tool, index) =>
-                                        <TouchableOpacity key={index} onPress={() => this.pickSkill(tool, index + this.state.character.skills.length)}
-                                            style={[styles.item, { backgroundColor: this.state.skillsClicked[index + this.state.character.skills.length] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                            <AppText>{tool[0]}</AppText>
-                                        </TouchableOpacity>)}
+                                {this.state.reloadingSkills ? <AppActivityIndicator visible={this.state.reloadingSkills} /> :
+                                    <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                        <AppText color={colors.bitterSweetRed} fontSize={20}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                        <AppText textAlign={"center"}>You have the option to choose two of your skill proficiencies, your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.</AppText>
+                                        {store.getState().character.skills.map((skill, index) =>
+                                            <TouchableOpacity key={index} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
+                                                <AppText>{skill[0]}</AppText>
+                                            </TouchableOpacity>)}
+                                        {this.props.character.characterClass === 'Rogue' &&
+                                            this.props.character.tools.map((tool, index) =>
+                                                <TouchableOpacity key={index} onPress={() => this.pickSkill(tool, index + this.state.character.skills.length)}
+                                                    style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index + this.state.character.skills.length] ? colors.bitterSweetRed : colors.lightGray }]}>
+                                                    <AppText>{tool[0]}</AppText>
+                                                </TouchableOpacity>)}
+                                    </View>
+                                }
                             </View>
                             :
                             null}
@@ -652,7 +1018,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     <View>
                                         <AppText fontSize={18} textAlign={'center'}>You posses the following magical abilities</AppText>
                                         <AppText fontSize={18} textAlign={'center'}>You can now cast {this.state.character.magic.cantrips} cantrips</AppText>
-                                        <AppText fontSize={18} textAlign={'center'}>You can now cast {this.props.options.spellsKnown} spells at {this.props.options.spellSlotLevel}th Level</AppText>
+                                        <AppText fontSize={18} textAlign={'center'}>You can now cast {this.props.options.spellSlots} spells at {this.props.options.spellSlotLevel} Level</AppText>
                                     </View>
                                     :
                                     <View>
@@ -744,7 +1110,18 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     </TouchableOpacity>)}
                             </View>
                             : null}
-
+                        {this.props.options.extraSpells ?
+                            <View>
+                                <View style={{ justifyContent: "center", alignItems: "center", padding: 10, marginTop: 15 }}>
+                                    <AppText textAlign={'center'} fontSize={22}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.state.character.path.name} {this.state.character.charSpecials.druidCircle !== "false" ? `with the ${this.state.character.charSpecials.druidCircle} attribute` : null}</AppText>
+                                    <AppText color={colors.bitterSweetRed} fontSize={22}>You gain the following spells</AppText>
+                                </View>
+                                {this.props.options.extraSpells.map((spell: any, index: number) =>
+                                    <View style={{ justifyContent: "center", alignItems: "center" }} key={`${spell.name}${index}`}>
+                                        <AppText fontSize={18}>{spell}</AppText>
+                                    </View>)}
+                            </View>
+                            : null}
                         <View style={{ paddingTop: 15, paddingBottom: 15 }}>
                             <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Ok"} onPress={() => { this.close() }} />
                         </View>
@@ -763,7 +1140,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     item: {
-        width: 150,
+        width: '90%',
         justifyContent: "center",
         alignItems: "center",
         padding: 10,
@@ -794,6 +1171,13 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 15
 
+    }, infoContainer: {
+        marginTop: 10,
+        marginBottom: 5,
+        borderWidth: 1,
+        borderColor: colors.berries,
+        borderRadius: 15,
+        padding: 10
     }
 
 });

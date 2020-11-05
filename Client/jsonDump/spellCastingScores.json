@@ -38,5 +38,20 @@
         "spellcastingAbility": "intelligence",
         "baseSpellSaveDc": "8+proficiency+intelligence",
         "spellAttackModifier": "proficiency+intelligence"
+    },
+    "Eldritch Knight": {
+        "spellcastingAbility": "intelligence",
+        "baseSpellSaveDc": "8+proficiency+intelligence",
+        "spellAttackModifier": "proficiency+intelligence"
+    },
+    "Arcane Trickster": {
+        "spellcastingAbility": "intelligence",
+        "baseSpellSaveDc": "8+proficiency+intelligence",
+        "spellAttackModifier": "proficiency+intelligence"
+    },
+    "Way of the Shadow": {
+        "spellcastingAbility": "none",
+        "baseSpellSaveDc": "none",
+        "spellAttackModifier": "none"
     }
 }

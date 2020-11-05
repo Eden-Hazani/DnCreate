@@ -70,38 +70,33 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         }
         let armorName = values.armorName;
         let armorAc = values.armorAc;
-        if (this.state.mediumArmor) {
-            armorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
-        }
-        if (this.state.lightArmor) {
-            armorAc = +armorAc + (this.state.character.modifiers.dexterity)
-        }
         const armor: any = {
             id: armorName + Math.floor((Math.random() * 1000000) + 1),
             name: armorName,
             ac: armorAc,
+            baseAc: armorAc,
             disadvantageStealth: this.state.disadvantageStealth,
-            armorType: this.state.armorType
+            armorType: this.state.armorType,
+            armorBonusesCalculationType: this.state.armorType,
+            removable: true
         }
         let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
         if (!armorList) {
             const armorList = [armor]
             AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
-            this.setState({ armorList: armorList })
+            this.setState({ armorList: armorList, lightArmor: false, mediumArmor: false, heavyArmor: false, addArmor: false })
             return;
         }
         const newArmorList = JSON.parse(armorList)
         newArmorList.push(armor)
-        console.log(newArmorList)
         AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
-        this.setState({ armorList: newArmorList, lightArmor: false, mediumArmor: false, heavyArmor: false, addArmor: false });
+        this.setState({ addArmor: false, armorList: newArmorList, lightArmor: false, mediumArmor: false, heavyArmor: false });
 
     }
     removeSet = async (setId: string) => {
         let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
         let newArmorList = JSON.parse(armorList)
         newArmorList = newArmorList.filter((armor: any) => armor.id !== setId);
-        console.log(newArmorList)
         AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
         this.setState({ armorList: newArmorList });
     }
@@ -110,24 +105,54 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         character.equippedArmor = {
             id: '1',
             name: 'No Armor Equipped',
-            ac: 0,
+            ac: this.armorBonuses(10, 'none'),
+            baseAc: 10,
+            armorBonusesCalculationType: 'none',
             disadvantageStealth: false,
-            armorType: 'None'
+            armorType: 'none'
         }
         this.setState({ character }, () => {
-            console.log(this.state.character.equippedArmor)
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             userCharApi.updateChar(this.state.character)
         });
     }
 
-    equipSet = (set: any) => {
+    equipSet = (set: EquippedArmorModel) => {
+        const newSet = JSON.parse(JSON.stringify(set))
         const character = { ...this.state.character };
-        character.equippedArmor = set;
+        newSet.ac = this.armorBonuses(set.baseAc, set.armorBonusesCalculationType)
+        character.equippedArmor = newSet;
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             userCharApi.updateChar(this.state.character)
         });
+    }
+
+    armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
+        let newArmorAc: number = null;
+        if (armorBonusesCalculationType === "Medium Armor") {
+            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
+        }
+        if (armorBonusesCalculationType === "Light Armor") {
+            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity)
+        }
+        if (armorBonusesCalculationType === "Heavy Armor") {
+            newArmorAc = +armorAc
+        }
+        if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
+            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.constitution)
+        }
+        if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
+            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.wisdom)
+        }
+        if (this.state.character.pathFeatures.length > 0) {
+            this.state.character.pathFeatures.forEach(item => {
+                if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
+                    newArmorAc = (13 + this.state.character.modifiers.dexterity)
+                }
+            })
+        }
+        return newArmorAc
     }
     render() {
         return (
@@ -154,13 +179,29 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                         title={'Add Armor Set'} onPress={() => { this.setState({ addArmor: true }) }} />
                 </View>
                 <Modal visible={this.state.addArmor}>
-                    <View>
+                    <ScrollView>
                         <AppText textAlign={'center'} fontSize={30} color={colors.bitterSweetRed}>Add new armor to inventory</AppText>
                         <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                             title={'tutorial'} onPress={() => { this.setState({ tutorialOn: true }) }} />
-                        <View style={{ alignItems: "center", padding: 20 }}>
-                            <AppText fontSize={18} textAlign={'center'}>As a {this.state.character.characterClass} you have the following armor Proficiencies:</AppText>
-                            <AppText fontSize={18} textAlign={'center'}>{this.state.character.characterClassId.armorProficiencies}</AppText>
+                        <View style={{ justifyContent: "center", alignItems: "center", padding: 20 }}>
+                            <View style={{ marginBottom: 20 }}>
+                                <AppText fontSize={20} textAlign={'center'}>As a {this.state.character.characterClass} you have the following armor proficiencies:</AppText>
+                            </View>
+                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: colors.pinkishSilver, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                {this.state.character.characterClassId.armorProficiencies.map((item: any) =>
+                                    <View key={item} style={{ margin: 5, backgroundColor: colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                        <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
+                                    </View>)}
+                            </View>
+                            <View style={{ marginTop: 20, marginBottom: 20 }}>
+                                <AppText fontSize={20} textAlign={'center'}>You also gained the following armor proficiencies from your path or special events in your adventure:</AppText>
+                            </View>
+                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: colors.pinkishSilver, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                {this.state.character.addedArmorProf.map((item: any, index: number) =>
+                                    <View key={index} style={{ margin: 5, backgroundColor: colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                        <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
+                                    </View>)}
+                            </View>
                         </View>
                         <Modal visible={this.state.tutorialOn}>
                             <View style={{ alignItems: "center", padding: 20 }}>
@@ -173,8 +214,8 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                 <AppText textAlign={'center'} fontSize={15}>Made from supple and thin materials, Light Armor favors agile adventurers since it offers some Protection without sacrificing mobility.</AppText>
                                 <View style={{ marginTop: 20, alignItems: "center" }}>
                                     <AppText textAlign={'center'}>You can only ware armor types you are proficient with.</AppText>
-                                    <AppText textAlign={'center'}>You class, the {this.state.character.characterClass} offers the following armor proficiencies:</AppText>
-                                    <AppText fontSize={16}>{this.state.character.characterClassId.armorProficiencies}</AppText>
+                                    <AppText textAlign={'center'}>Your class, the {this.state.character.characterClass} offers the following armor proficiencies:</AppText>
+                                    <AppText fontSize={16}>{this.state.character.characterClassId.armorProficiencies} {this.state.character.addedArmorProf}</AppText>
                                 </View>
                                 <AppText padding={20} textAlign={'center'}>You can unlock new proficiencies with some class paths or your DM might give you spacial proficiencies during your adventure.</AppText>
                                 <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
@@ -222,7 +263,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                     title={'close'} onPress={() => { this.setState({ addArmor: false }) }} />
                             </View>
                         </AppForm>
-                    </View>
+                    </ScrollView>
                 </Modal>
                 {this.state.armorList &&
                     <View>
@@ -232,15 +273,21 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                     <AppButton backgroundColor={colors.bitterSweetRed} color={colors.totalWhite} width={80} height={50} borderRadius={25}
                                         title={'Equip Set'} onPress={() => { this.equipSet(armor) }} />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={{ position: 'absolute', right: 10, top: 70, zIndex: 1 }}>
-                                    <AppButton backgroundColor={colors.berries} color={colors.totalWhite} width={80} height={50} borderRadius={25}
-                                        title={'Delete Set'} onPress={() => { this.removeSet(armor.id) }} />
-                                </TouchableOpacity>
+                                {armor.removable ?
+                                    <TouchableOpacity style={{ position: 'absolute', right: 10, top: 70, zIndex: 1 }}>
+                                        <AppButton backgroundColor={colors.berries} color={colors.totalWhite} width={80} height={50} borderRadius={25}
+                                            title={'Delete Set'} onPress={() => { this.removeSet(armor.id) }} />
+                                    </TouchableOpacity>
+                                    :
+                                    <View>
+                                        <AppText color={colors.danger} fontSize={16}>This armor is not removable</AppText>
+                                    </View>
+                                }
                                 <View style={{ width: '65%' }}>
-                                    <AppText>Name: {armor.name}</AppText>
-                                    <AppText>AC: {armor.ac}</AppText>
-                                    <AppText>Type: {armor.armorType}</AppText>
-                                    <AppText>{armor.disadvantageStealth ? `This armor has stealth disadvantage` : `This armor does not have stealth disadvantage`}</AppText>
+                                    <AppText fontSize={16}>Name: {armor.name}</AppText>
+                                    <AppText fontSize={16}>AC: {this.armorBonuses(armor.baseAc, armor.armorBonusesCalculationType)}</AppText>
+                                    <AppText fontSize={16}>Type: {armor.armorType}</AppText>
+                                    <AppText fontSize={16} >{armor.disadvantageStealth ? `This armor has stealth disadvantage` : `This armor does not have stealth disadvantage`}</AppText>
                                 </View>
                             </View>)}
                     </View>

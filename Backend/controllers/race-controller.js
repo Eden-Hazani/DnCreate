@@ -4,7 +4,7 @@ const router = express.Router();
 const verifyLogged = require('../middleware/verify-logged-in');
 
 
-router.get("/raceList", verifyLogged, async (request, response) => {
+router.get("/raceList", async (request, response) => {
     try {
         const races = await raceLogic.getAllRaces();
         response.json(races);

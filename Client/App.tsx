@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar, View } from 'react-native';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image } from 'react-native';
 import 'react-native-gesture-handler';
 import * as Font from 'expo-font'
 import { NavigationContainer } from '@react-navigation/native'
@@ -20,12 +20,15 @@ import { Config } from './config';
 import authApi from './app/api/authApi';
 import errorHandler from './utility/errorHander';
 import AsyncStorage from '@react-native-community/async-storage';
+import { AppMainLoadingScreen } from './app/animations/AppMainLoadingScreen';
+import { set } from 'react-native-reanimated';
 
 
 interface AppState {
   fontsLoaded: boolean
   user: UserModel
   isReady: boolean
+  AppMainLoadAnimation: boolean
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
@@ -37,6 +40,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   constructor(props: any) {
     super(props)
     this.state = {
+      AppMainLoadAnimation: false,
       isReady: false,
       user: new UserModel(),
       fontsLoaded: false
@@ -49,31 +53,27 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   }
 
 
-  displayAds = async () => {
-    // AdMobInterstitial.setAdUnitID(this.interstitialAd);
-    // AdMobInterstitial.requestAdAsync().then(() => AdMobInterstitial.showAdAsync());
-  }
-
-
   async componentDidMount() {
     try {
-      this.displayAds().then(async () => {
-        store.dispatch({ type: ActionType.CleanCreator })
-        await TokenHandler().then(user => {
-          this.setState({ user }, async () => {
-            if (user !== null) {
-              const result = await authApi.isUserLogged();
-              if (!result.ok) {
-                errorHandler(result);
-                return;
-              }
+      store.dispatch({ type: ActionType.CleanCreator })
+      await TokenHandler().then(user => {
+        this.setState({ user }, async () => {
+          if (user !== null) {
+            const result = await authApi.isUserLogged();
+            if (!result.ok) {
+              errorHandler(result);
+              return;
             }
-          })
+          }
         });
         Font.loadAsync({
           'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
         }
-        ).then(() => this.setState({ fontsLoaded: true }))
+        ).then(() => this.setState({ fontsLoaded: true, AppMainLoadAnimation: true }, () => {
+          setTimeout(() => {
+            this.setState({ AppMainLoadAnimation: false })
+          }, 1800);
+        }))
       })
     } catch (err) {
       console.log(err.message)
@@ -87,6 +87,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   setUser = (user: UserModel) => {
     this.setState((prevState) => ({ user }))
   }
+
 
   isUserLogged = async () => {
     const result = await authApi.isUserLogged();
@@ -104,15 +105,24 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       <SafeAreaView style={styles.container}>
         {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
           <AuthContext.Provider value={{ user, setUser }}>
-            {!this.state.fontsLoaded ? <AppLoading /> :
-              <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
-                {user ? <AppNavigator /> : <AuthNavigator />}
-              </NavigationContainer>}
+            {this.state.AppMainLoadAnimation ?
+              <AppMainLoadingScreen />
+              :
+              !this.state.fontsLoaded ? <AppLoading /> :
+                <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
+                  {user && user.username ? <AppNavigator /> : <AuthNavigator />}
+                </NavigationContainer>
+            }
           </AuthContext.Provider>}
-        <AdMobBanner
-          bannerSize="banner"
-          adUnitID={this.bannerAd}
-          servePersonalizedAds={false} />
+        {this.state.AppMainLoadAnimation ?
+          null
+          :
+          <AdMobBanner
+            style={{ alignItems: "center" }}
+            bannerSize="banner"
+            adUnitID={this.bannerAd}
+            servePersonalizedAds={false} />
+        }
       </SafeAreaView>
     );
   }

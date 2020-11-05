@@ -23,12 +23,14 @@ interface NewCharInfoState {
 
 const ValidationSchema = Yup.object().shape({
     fullName: Yup.string().required().test('test-name', 'Cannot have the same same of an existing character', async function (value) {
+        if (store.getState().nonUser) { return true }
         const response = await userCharApi.validateCharName(value, this.parent.user_id);
         if (response.data) {
             return false
         } else {
             return true
         }
+
     }).label("Full Name"),
     eyes: Yup.string().required().label("Eye Color"),
     skin: Yup.string().required().label("Skin Color"),
@@ -89,7 +91,7 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
                         <View>
                             <AppText textAlign={'center'} fontSize={20} color={colors.black}>{this.state.characterInfo.race}</AppText>
                             <AppForm
-                                initialValues={{ fullName: store.getState().character.name, age: null, height: null, weight: null, eyes: '', skin: '', hair: '', user_id: this.context.user._id }}
+                                initialValues={{ fullName: store.getState().character.name, age: null, height: null, weight: null, eyes: '', skin: '', hair: '', user_id: store.getState().nonUser ? null : this.context.user._id }}
                                 onSubmit={(values: any) => this.setInfoAndContinue(values)}
                                 validationSchema={ValidationSchema}>
                                 <View >

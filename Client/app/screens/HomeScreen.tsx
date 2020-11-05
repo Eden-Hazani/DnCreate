@@ -12,9 +12,11 @@ import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
 import userCharApi from '../api/userCharApi';
 import AuthContext from '../auth/context';
+import { AppActivityIndicator } from '../components/AppActivityIndicator';
 
 
 interface HomeState {
+    loading: boolean
 }
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
@@ -23,6 +25,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
+        this.state = {
+            loading: true
+        }
         this.UnsubscribeStore = store.subscribe(() => { })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -31,8 +36,18 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         this.UnsubscribeStore()
     }
     async componentDidMount() {
+        if (store.getState().nonUser) {
+            this.setState({ loading: true }, () => {
+                setTimeout(() => {
+                    this.props.navigation.navigate("CharSkillPick");
+                    this.setState({ loading: false })
+                }, 1000);
+            })
+            return;
+        }
         const characters = await userCharApi.getChars(this.context.user._id);
         store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
+        this.setState({ loading: false });
     }
 
     onFocus = () => {
@@ -41,20 +56,26 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     render() {
         return (
             <View>
-                <AnimatedLogo></AnimatedLogo>
-                <View style={styles.container}>
-                    <AnimateContactUpwards>
-                        <View style={{ alignItems: "center", flex: .5, padding: 20 }}>
-                            <AppTextHeadline>DnCreate</AppTextHeadline>
-                            <AppText textAlign={'center'} color={colors.text}>Creating fifth edition characters has never been easier</AppText>
-                            <AppText color={colors.text}>Tap below to begin</AppText>
+                {this.state.loading ?
+                    <AppActivityIndicator visible={this.state.loading} />
+                    :
+                    <View>
+                        <AnimatedLogo></AnimatedLogo>
+                        <View style={styles.container}>
+                            <AnimateContactUpwards>
+                                <View style={{ alignItems: "center", flex: .5, padding: 20 }}>
+                                    <AppTextHeadline>DnCreate</AppTextHeadline>
+                                    <AppText textAlign={'center'} color={colors.text}>Creating fifth edition characters has never been easier</AppText>
+                                    <AppText color={colors.text}>Tap below to begin</AppText>
+                                </View>
+                                <View style={styles.buttonsView}>
+                                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
+                                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
+                                </View>
+                            </AnimateContactUpwards>
                         </View>
-                        <View style={styles.buttonsView}>
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
-                        </View>
-                    </AnimateContactUpwards>
-                </View>
+                    </View>
+                }
             </View>
         )
     }

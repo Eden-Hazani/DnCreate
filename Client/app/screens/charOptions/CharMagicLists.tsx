@@ -15,12 +15,14 @@ interface CharMagicListsState {
     spellDetailModal: boolean,
     pickedSpellDetail: any,
     character: CharacterModel
+    isRemovable: boolean
 }
 
-export class CharMagicLists extends Component<{ character: CharacterModel, spells: any, level: any }, CharMagicListsState> {
+export class CharMagicLists extends Component<{ reloadChar: any, character: CharacterModel, spells: any, level: any }, CharMagicListsState> {
     constructor(props: any) {
         super(props)
         this.state = {
+            isRemovable: true,
             spellDetailModal: false,
             pickedSpellDetail: null,
             character: this.props.character
@@ -30,9 +32,10 @@ export class CharMagicLists extends Component<{ character: CharacterModel, spell
     removeSpell = () => {
         const character = { ...this.state.character }
         const spellLevel = spellLevelChanger(this.state.pickedSpellDetail.level)
-        character.spells[spellLevel] = character.spells[spellLevel].filter((spell: any) => spell.name !== this.state.pickedSpellDetail.name)
+        character.spells[spellLevel] = character.spells[spellLevel].filter((item: any) => item.spell.name !== this.state.pickedSpellDetail.name)
         this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+            this.props.reloadChar()
             userCharApi.updateChar(this.state.character)
         })
     }
@@ -41,12 +44,12 @@ export class CharMagicLists extends Component<{ character: CharacterModel, spell
         return (
             <View style={styles.container}>
                 <View style={{ paddingLeft: 10 }}>
-                    {this.props?.level[0]?.level && <AppText fontSize={25} color={colors.bitterSweetRed}>{spellLevelReadingChanger(this.props.level[0].level)}</AppText>}
+                    {this.props?.level[0]?.spell.level && <AppText fontSize={25} color={colors.bitterSweetRed}>{spellLevelReadingChanger(this.props.level[0]?.spell.level)}</AppText>}
                 </View>
-                {this.props.spells.map((spell: any) =>
-                    <TouchableOpacity key={spell.name} style={styles.spell} onPress={() => { this.setState({ spellDetailModal: true, pickedSpellDetail: spell }) }}>
-                        <AppText fontSize={18}>{spell.name}</AppText>
-                        <AppText>{spell.description.substring(0, 80)}...</AppText>
+                {this.props.spells.map((item: any) =>
+                    <TouchableOpacity key={item.spell.name} style={styles.spell} onPress={() => { this.setState({ spellDetailModal: true, pickedSpellDetail: item.spell, isRemovable: item.removable }) }}>
+                        <AppText fontSize={18}>{item.spell.name}</AppText>
+                        <AppText>{item.spell.description.substring(0, 80)}...</AppText>
                     </TouchableOpacity>
                 )}
                 <Modal visible={this.state.spellDetailModal}>
@@ -65,46 +68,52 @@ export class CharMagicLists extends Component<{ character: CharacterModel, spell
                             <View>
                                 <AppButton fontSize={18} backgroundColor={colors.shadowBlue} borderRadius={100}
                                     width={100} height={100} title={"Close"} onPress={() => { this.setState({ pickedSpellDetail: false, spellDetailModal: null }) }} />
-                                {this.state.pickedSpellDetail.level === 'cantrip' ?
-                                    <View>
-                                        <View style={styles.delete}>
-                                            <AppText fontSize={20} color={colors.danger} textAlign={'center'}>Cantrips cannot be replaced after picking them!</AppText>
-                                            <AppText fontSize={18} textAlign={'center'}>If this is a special request by the DM you still have the option to remove cantrips and replace them</AppText>
-                                            <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
-                                                width={100} height={100} title={"Remove Spell"} onPress={() => {
-                                                    Alert.alert("Remove cantrip", "Are you sure you want to remove this cantrip?",
-                                                        [{
-                                                            text: 'Yes', onPress: () => {
-                                                                this.removeSpell()
-                                                            }
-                                                        },
-                                                        { text: 'No' }])
-                                                }} />
-                                        </View>
-                                    </View>
-                                    :
-                                    canReplaceSpells(this.props.character) ?
-                                        <View style={styles.delete}>
-                                            <AppText fontSize={18} textAlign={'center'}>As a {this.props.character.characterClass} you have the ability to replace your prepared spells every long rest.</AppText>
-                                            <AppText fontSize={18} textAlign={'center'}>If you wish to replace this spell, remove it from your prepared spells.</AppText>
-                                            <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
-                                                width={100} height={100} title={"Remove Spell"} onPress={() => { this.removeSpell() }} />
+                                {this.state.isRemovable ?
+                                    this.state.pickedSpellDetail.level === 'cantrip' ?
+                                        <View>
+                                            <View style={styles.delete}>
+                                                <AppText fontSize={20} color={colors.danger} textAlign={'center'}>Cantrips cannot be replaced after picking them!</AppText>
+                                                <AppText fontSize={18} textAlign={'center'}>If this is a special request by the DM you still have the option to remove cantrips and replace them</AppText>
+                                                <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
+                                                    width={100} height={100} title={"Remove Spell"} onPress={() => {
+                                                        Alert.alert("Remove cantrip", "Are you sure you want to remove this cantrip?",
+                                                            [{
+                                                                text: 'Yes', onPress: () => {
+                                                                    this.removeSpell()
+                                                                }
+                                                            },
+                                                            { text: 'No' }])
+                                                    }} />
+                                            </View>
                                         </View>
                                         :
-                                        <View style={styles.delete}>
-                                            <AppText fontSize={18} textAlign={'center'}>As a {this.props.character.characterClass} you can only replace spells the moment you level up.</AppText>
-                                            <AppText fontSize={18} textAlign={'center'}>If you just leveled up and wish to replace this spell, hit the remove button and replace it with a different spell.</AppText>
-                                            <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
-                                                width={100} height={100} title={"Remove Spell"} onPress={() => {
-                                                    Alert.alert("Remove spell", "Leveled up are want to remove spell in order to replace it?",
-                                                        [{
-                                                            text: 'Yes', onPress: () => {
-                                                                this.removeSpell()
-                                                            }
-                                                        },
-                                                        { text: 'No' }])
-                                                }} />
-                                        </View>
+                                        canReplaceSpells(this.props.character) ?
+                                            <View style={styles.delete}>
+                                                <AppText fontSize={18} textAlign={'center'}>As a {this.props.character.characterClass} you have the ability to replace your prepared spells every long rest.</AppText>
+                                                <AppText fontSize={18} textAlign={'center'}>If you wish to replace this spell, remove it from your prepared spells.</AppText>
+                                                <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
+                                                    width={100} height={100} title={"Remove Spell"} onPress={() => { this.removeSpell() }} />
+                                            </View>
+                                            :
+                                            <View style={styles.delete}>
+                                                <AppText fontSize={18} textAlign={'center'}>As a {this.props.character.characterClass} you can only replace spells the moment you level up.</AppText>
+                                                <AppText fontSize={18} textAlign={'center'}>If you just leveled up and wish to replace this spell, hit the remove button and replace it with a different spell.</AppText>
+                                                <AppButton fontSize={18} backgroundColor={colors.danger} borderRadius={100}
+                                                    width={100} height={100} title={"Remove Spell"} onPress={() => {
+                                                        Alert.alert("Remove spell", "Leveled up are want to remove spell in order to replace it?",
+                                                            [{
+                                                                text: 'Yes', onPress: () => {
+                                                                    this.removeSpell()
+                                                                }
+                                                            },
+                                                            { text: 'No' }])
+                                                    }} />
+                                            </View>
+                                    :
+                                    <View>
+                                        <AppText fontSize={22} color={colors.bitterSweetRed} textAlign={'center'}>NonRemovable</AppText>
+                                        <AppText fontSize={18} textAlign={'center'}>You know this spell as a result of the path you choose and this is why it is nonRemovable from your known spells.</AppText>
+                                    </View>
                                 }
                             </View>
                         </ScrollView>

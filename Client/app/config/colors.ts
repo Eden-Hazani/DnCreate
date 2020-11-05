@@ -14,6 +14,9 @@ export default {
     orange: "#BB6B00",
     shadowBlue: "#7284A8",
     strongOrange: "#BC2C1A",
-    berries: "#8C5383"
+    berries: "#8C5383",
+    paleGreen: "#9EBD6E",
+    metallicBlue: "#028090",
+    pinkishSilver: "#5ebff7"
 }
 

@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         height: 100,
         borderRadius: 100,
-        backgroundColor: colors.bitterSweetRed
+        backgroundColor: colors.bitterSweetRed,
+        marginBottom: 35
     }
 })

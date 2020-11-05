@@ -1,5 +1,7 @@
 export enum ActionType {
     SetInfoToChar,
+    SetInfoBeforeRegisterChar,
+    ClearInfoBeforeRegisterChar,
     SetUserInfo,
     SetUserInfoLoginRegister,
     Logout,
@@ -14,5 +16,8 @@ export enum ActionType {
     ClearParticipatingAdv,
     ClearLeadingAdv,
     UpdateSingleAdventure,
-    currentOpenChar
+    currentOpenChar,
+    ResetCharSkillsToLowerLevel,
+    firstLoginAd,
+    StartAsNonUser
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList, TouchableOpacity, Modal } from 'react-native';
 import { Unsubscribe } from 'redux';
 import skillSwitch from '../../../utility/skillsSwitch';
 import userCharApi from '../../api/userCharApi';
@@ -14,6 +14,12 @@ import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-community/async-storage';
 import { CharSpacialModel } from '../../models/CharSpacialModel';
 import { startingToolsSwitch } from '../../../utility/startingToolsSwitch';
+import { Register } from '../Register';
+import authApi from '../../api/authApi';
+import reduxToken from '../../auth/reduxToken';
+import errorHandler from '../../../utility/errorHander';
+import AuthContext from '../../auth/context';
+import { UserModel } from '../../models/userModel';
 
 
 interface CharSkillPickState {
@@ -24,20 +30,31 @@ interface CharSkillPickState {
     loading: boolean
     skillClicked: boolean[]
     confirmed: boolean
+    nonUserPauseModel: boolean
+    registrationEmailSent: boolean
+    username: string
+    userInfo: UserModel
+    password: string
 }
 
-export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickState> {
+export class CharSkillPick extends Component<{ navigation: any, route: any }, CharSkillPickState> {
     private UnsubscribeStore: Unsubscribe;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
+            userInfo: store.getState().user,
+            username: '',
+            password: '',
+            registrationEmailSent: false,
+            nonUserPauseModel: false,
             confirmed: false,
             skillClicked: [],
             loading: true,
             amountToPick: null,
             availableSkills: [],
             pickedSkills: [],
-            characterInfo: store.getState().character
+            characterInfo: store.getState().beforeRegisterChar.name ? store.getState().beforeRegisterChar : store.getState().character
         }
         this.UnsubscribeStore = store.subscribe(() => { });
     }
@@ -66,21 +83,45 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
             return;
         }
         characterInfo.skills = this.state.pickedSkills;
+        characterInfo.spellCastingClass = this.state.characterInfo.characterClass;
         characterInfo.tools = startingToolsSwitch(this.state.characterInfo.characterClass);
-        characterInfo.charSpecials = new CharSpacialModel();
         characterInfo.equippedArmor = {
             id: '1',
             name: 'No Armor Equipped',
-            ac: 0,
+            ac: (10 + +characterInfo.modifiers.dexterity),
+            baseAc: 10,
+            armorBonusesCalculationType: 'none',
             disadvantageStealth: false,
-            armorType: 'None'
+            armorType: 'none'
         }
+        characterInfo.charSpecials = new CharSpacialModel();
         Object.keys(characterInfo.charSpecials).forEach(v => {
             characterInfo.charSpecials[v] = false
             characterInfo.charSpecials.sorcererMetamagic = []
             characterInfo.charSpecials.eldritchInvocations = []
+            characterInfo.charSpecials.battleMasterManeuvers = []
+            characterInfo.charSpecials.fightingStyle = []
+            characterInfo.charSpecials.monkElementsDisciplines = []
+            characterInfo.charSpecials.companion = []
         })
+        if (store.getState().nonUser) {
+            if (this.context.user && this.context.user.username) {
+                this.sendInfo(characterInfo)
+                return;
+            }
+            this.setState({ nonUserPauseModel: true })
+            return;
+        }
+        this.sendInfo(characterInfo)
+    }
+
+    sendInfo = (characterInfo: CharacterModel) => {
+        characterInfo.user_id = this.state.userInfo._id;
         this.setState({ characterInfo }, () => {
+            if (store.getState().beforeRegisterChar.name) {
+                store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })
+                store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
+            }
             userCharApi.saveChar(this.state.characterInfo).then(result => {
                 let characterInfo: CharacterModel;
                 result.data === 'Character Already exists in system!' ? characterInfo = this.state.characterInfo : characterInfo = result.data;
@@ -121,6 +162,29 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
         }
     }
 
+    checkMailConfirm = async () => {
+        const values = {
+            username: this.state.username,
+            password: this.state.password
+        }
+        store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.state.characterInfo })
+        this.setState({ loading: true })
+        await authApi.login(values).then(result => {
+            const userInfo: any = result.data.token;
+            reduxToken.setToken(userInfo).then(validToken => {
+                const { user, setUser } = this.context
+                setUser(validToken);
+                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
+                this.setState({ nonUserPauseModel: false })
+                this.setState({ loading: false })
+            })
+        }).catch(err => {
+            this.setState({ loading: false })
+            errorHandler(err.request)
+        })
+
+    }
+
     render() {
         const character = this.state.characterInfo;
         return (
@@ -147,6 +211,28 @@ export class CharSkillPick extends Component<{ navigation: any }, CharSkillPickS
                                 </View>
                             </View>}
                     </View>}
+                <Modal visible={this.state.nonUserPauseModel}>
+                    {this.state.registrationEmailSent ?
+                        <View style={{ padding: 15, marginTop: 40, paddingBottom: 25, marginBottom: 30 }}>
+                            <AppText textAlign={'center'} fontSize={35} color={colors.berries}>Amazing!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Now all you need to do is confirm your mail address via the mail that was just sent to it.</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Once you do, just click below</AppText>
+                            <View style={{ marginTop: 45 }}>
+                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={25} width={150} height={70}
+                                    title={"Confirmed?"} onPress={() => { this.checkMailConfirm() }} />
+                            </View>
+                        </View>
+                        :
+                        <ScrollView style={{ padding: 15, paddingTop: 20, paddingBottom: 30 }}>
+                            <AppText textAlign={'center'} fontSize={35} color={colors.berries}>Hi!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>wasn't what fun?!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Exiting right?, lets do this!</AppText>
+                            <Register emailSent={(isSent: boolean, username: string, password: string) => { this.setState({ registrationEmailSent: isSent, username, password }) }} />
+                        </ScrollView>
+                    }
+                </Modal>
             </View>
 
         )

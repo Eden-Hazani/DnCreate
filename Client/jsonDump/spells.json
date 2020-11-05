@@ -10420,6 +10420,31 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V, S, M",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "A shimmering green arrow streaks toward a target within range and bursts in a spray of acid. Make a ranged spell attack against the target. On a hit, the target takes 4d4 acid damage immediately and 2d4 acid damage at the end of its next turn. On a miss, the arrow splashes the target with acid for half as much of the initial damage and no damage at the end of its next turn.",
+        "duration": "Instantaneous",
+        "higher_levels": "When you cast this spell using a spell slot of 3rd level or higher, the damage (both initial and later) increases by 1d4 for each slot level above 2nd.",
+        "level": "2",
+        "name": "Acid Arrow",
+        "range": "90 feet",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "wizard",
+            "level2"
+        ],
+        "type": "2nd-level evocation"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
             "druid",
             "ranger",
             "sorcerer",
