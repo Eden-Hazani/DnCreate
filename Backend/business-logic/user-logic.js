@@ -6,11 +6,11 @@ function addCharacter(character) {
     return character.save();
 }
 async function getCharacters(user_id) {
-    return Character.find({ user_id: { $eq: user_id } }).populate('characterClassId').exec();
+    return Character.find({ user_id: { $eq: user_id } }).populate('characterClassId').populate('raceId').exec();
 }
 
 async function getChar(_id) {
-    return Character.findOne({ _id: { $eq: _id } }).populate('characterClassId').exec();
+    return Character.findOne({ _id: { $eq: _id } }).populate('characterClassId').populate('raceId').exec();
 }
 
 async function getCharForAdventure(_id) {

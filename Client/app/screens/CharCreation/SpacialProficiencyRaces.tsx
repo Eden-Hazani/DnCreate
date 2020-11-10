@@ -7,6 +7,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import colors from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
+import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 
@@ -16,15 +17,17 @@ interface SpacialProficiencyRacesState {
     pickedAbilities: string[]
     abilityClicked: boolean[]
     loading: boolean
+    race: RaceModel
 }
 
 const abilities = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
 
-export class SpacialProficiencyRaces extends Component<{ navigation: any }, SpacialProficiencyRacesState>{
+export class SpacialProficiencyRaces extends Component<{ navigation: any, route: any }, SpacialProficiencyRacesState>{
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
+            race: this.props.route.params.race,
             loading: true,
             abilityClicked: [],
             pickedAbilities: [],
@@ -81,7 +84,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any }, Spac
         }
         this.setState({ characterInfo }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
-            this.props.navigation.navigate("NewCharInfo");
+            this.props.navigation.navigate("SpacialRaceBonuses", { race: this.state.race });
         })
     }
     render() {

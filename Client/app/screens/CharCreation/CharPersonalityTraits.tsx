@@ -105,8 +105,8 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
             characterInfo.personalityTraits = characterInfo.personalityTraits.filter(trait => { return trait !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                userCharApi.updateChar(this.state.characterInfo);
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                userCharApi.updateChar(this.state.characterInfo);
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
                 }, 800);

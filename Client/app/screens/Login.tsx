@@ -51,8 +51,12 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
 
 
     login = async (values: any) => {
+        const newValues = {
+            username: values.username.toLowerCase(),
+            password: values.password
+        }
         this.setState({ loading: true })
-        await authApi.login(values).then(result => {
+        await authApi.login(newValues).then(result => {
             const userInfo: any = result.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
                 const { user, setUser } = this.context
@@ -111,9 +115,9 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                     placeholder={"password..."} />
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18}
+                                <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18} marginBottom={1}
                                     color={colors.black} backgroundColor={colors.bitterSweetRed} title={"Forgot   Password?"} />
-                                <SubmitButton title={"Login"} />
+                                <SubmitButton title={"Login"} marginBottom={1} />
                             </View>
                         </AppForm>
                         <Modal visible={this.state.forgotPasswordModel}>

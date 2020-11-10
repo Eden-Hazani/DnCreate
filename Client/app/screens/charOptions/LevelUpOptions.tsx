@@ -10,13 +10,11 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import LottieView from 'lottie-react-native';
 import { MagicModel } from '../../models/magicModel';
-import { CharSpacialModel } from '../../models/CharSpacialModel';
 import switchModifier from '../../../utility/abillityModifierSwitch';
 import AsyncStorage from '@react-native-community/async-storage';
 import { filterAlreadyPicked } from './helperFunctions/filterAlreadyPicked';
 import { eldritchInvocations } from "../../classFeatures/eldritchInvocations";
 import { highLightPicked } from './helperFunctions/highLightPicked';
-import { AppTextInput } from '../../components/forms/AppTextInput';
 import { FeatOptions } from './FeatOptions';
 import { setTotalKnownSpells } from './helperFunctions/setTotalKnownSpells';
 import { extraPathChoiceNumbers } from '../../../utility/extraPathChoiceNumbers';
@@ -24,7 +22,6 @@ import { PathFeatureOrganizer } from './helperFunctions/PathFeatureOrganizer';
 import { AppExtraPathChoicePicker } from '../../components/AppExtraPathChoicePicker';
 import * as Path from "../../../jsonDump/paths.json"
 import { AppPathAdditionalApply } from './AppPathAdditionalApply';
-import errorHandler from '../../../utility/errorHander';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import spellsJSON from '../../../jsonDump/spells.json'
 import { spellLevelChanger } from './helperFunctions/SpellLevelChanger';
@@ -421,7 +418,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
 
     addFightingStyle = () => {
-        if (this.state.fightingStyle === null) {
+        if (this.state.fightingStyle.length === 0) {
             alert(`You must pick a fighting style`);
             return false;
         }
@@ -828,8 +825,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             null}
                         {this.props.options.rageAmount ?
                             <View>
-                                <AppText>Your Rage amount is now - {this.props.options.rageAmount}</AppText>
-                                <AppText>Your Rage Damage bonus is now - {this.props.options.rageDamage}</AppText>
+                                <AppText textAlign={'center'} fontSize={18}>Your Rage amount is now - {this.props.options.rageAmount}</AppText>
+                                <AppText textAlign={'center'} fontSize={18}>Your Rage Damage bonus is now - {this.props.options.rageDamage}</AppText>
                             </View>
                             :
                             <View></View>
@@ -1043,7 +1040,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             <View>
                                 <View style={{ justifyContent: 'center', alignItems: 'center', padding: 10 }}>
                                     <AppText color={colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
-                                    <AppText textAlign={'center'}>You can pick your fighting style, this choice will bring you benefits on your proffered way of combat:</AppText>
+                                    <AppText textAlign={'center'}>You can pick your fighting style, this choice will bring you benefits on your preferred way of combat:</AppText>
                                 </View>
                                 {this.props.options.pickFightingStyle.map((style: any, index: number) =>
                                     <TouchableOpacity key={index} onPress={() => { this.pickFightingStyle(style, index) }} style={[styles.longTextItem, { backgroundColor: this.state.fightingStyleClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>

@@ -90,38 +90,38 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
             <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View style={styles.container}>
-                        <AppActivityIndicator visible={this.state.loading} />
-                        {this.state.error ? <AppError /> :
-                            <View style={{ flex: 1 }}>
-                                <View style={{ flex: .15 }}>
-                                    <AppPicker itemList={this.state.classes} selectedItemIcon={this.state.pickedClass.icon} selectedItem={this.state.pickedClass.name} selectItem={(pickedClass: any) => { this.setState({ pickedClass: pickedClass }) }} numColumns={3} placeholder={"Pick Class"} iconName={"apps"} />
-                                </View>
-                                {this.state.pickedClass.name &&
-                                    <View style={styles.infoContainer}>
-                                        <View >
-                                            <AppText fontSize={30} textAlign={"center"} color={colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
-                                            <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description}</AppText>
-                                            <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo}</AppText>
-                                            <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
-                                                <View style={{ width: "50%", marginTop: 10 }}>
-                                                    <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Recommended Attributes</AppText>
-                                                    <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.recommendation}</AppText>
-                                                </View>
-                                                <View style={{ width: "50%" }}>
-                                                    <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Saving Throws</AppText>
-                                                    {this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
-                                                </View>
-                                                <View style={{ padding: 10 }}>
-                                                    <AppButton borderRadius={15} width={150} height={50} backgroundColor={colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL(this.state.pickedClass.information) }} />
+                        {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
+                            this.state.error ? <AppError /> :
+                                <View style={{ flex: 1 }}>
+                                    <View style={{ flex: .15 }}>
+                                        <AppPicker itemList={this.state.classes} selectedItemIcon={this.state.pickedClass.icon} selectedItem={this.state.pickedClass.name} selectItem={(pickedClass: any) => { this.setState({ pickedClass: pickedClass }) }} numColumns={3} placeholder={"Pick Class"} iconName={"apps"} />
+                                    </View>
+                                    {this.state.pickedClass.name &&
+                                        <View style={styles.infoContainer}>
+                                            <View >
+                                                <AppText fontSize={30} textAlign={"center"} color={colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
+                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description}</AppText>
+                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo}</AppText>
+                                                <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
+                                                    <View style={{ width: "50%", marginTop: 10 }}>
+                                                        <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Recommended Attributes</AppText>
+                                                        <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.recommendation}</AppText>
+                                                    </View>
+                                                    <View style={{ width: "50%" }}>
+                                                        <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Saving Throws</AppText>
+                                                        {this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
+                                                    </View>
+                                                    <View style={{ padding: 10 }}>
+                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL(this.state.pickedClass.information) }} />
+                                                    </View>
                                                 </View>
                                             </View>
+                                            <View>
+                                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                            </View>
                                         </View>
-                                        <View>
-                                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
-                                        </View>
-                                    </View>
-                                }
-                            </View>
+                                    }
+                                </View>
                         }
                     </View>}
             </ScrollView>

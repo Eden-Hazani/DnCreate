@@ -1,0 +1,54 @@
+{
+    "ancestry": [
+        {
+            "color": "Black",
+            "damageType": "Acid",
+            "breath": "5' by 30' line (DEX save)"
+        },
+        {
+            "color": "Blue",
+            "damageType": "Lightning",
+            "breath": "5' by 30' line (DEX save)"
+        },
+        {
+            "color": "Brass",
+            "damageType": "Fire",
+            "breath": "5' by 30' line (DEX save)"
+        },
+        {
+            "color": "Bronze",
+            "damageType": "Lightning",
+            "breath": "5' by 30' line (DEX save)"
+        },
+        {
+            "color": "Copper",
+            "damageType": "Acid",
+            "breath": "5' by 30' line (DEX save)"
+        },
+        {
+            "color": "Gold",
+            "damageType": "Fire",
+            "breath": "15' cone (DEX save)"
+        },
+        {
+            "color": "Green",
+            "damageType": "Poison",
+            "breath": "15' cone (CON save)"
+        },
+        {
+            "color": "Red",
+            "damageType": "Fire",
+            "breath": "15' cone (DEX save)"
+        },
+        {
+            "color": "Silver",
+            "damageType": "Cold",
+            "breath": "15' cone (CON save)"
+        },
+        {
+            "color": "White",
+            "damageType": "Cold",
+            "breath": "15' cone (CON save)"
+        }
+    ]
+}

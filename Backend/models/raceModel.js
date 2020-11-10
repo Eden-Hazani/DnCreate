@@ -13,6 +13,14 @@ const raceSchema = mongoose.Schema({
     },
     abilityBonus: {
         type: Object
+    },
+    raceAbilities: {
+        age: { type: String },
+        alignment: { type: String },
+        size: { type: String },
+        speed: { type: Number },
+        languages: { type: String },
+        uniqueAbilities: { type: Array }
     }
 
 }, {

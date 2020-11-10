@@ -97,7 +97,8 @@ const CharacterSchema = mongoose.Schema({
         monkElementsDisciplines: { type: Array },
         companion: { type: Array },
         warlockSpellSlotLevel: { type: String },
-        warlockSpellSlots: { type: Number }
+        warlockSpellSlots: { type: Number },
+        dragonBornAncestry: { type: Object }
     },
     spellCastingClass: { type: String },
     spellsKnown: {
@@ -115,6 +116,10 @@ const CharacterSchema = mongoose.Schema({
     characterClassId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "CharClass"
+    },
+    raceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Race"
     },
     image: {
         type: String
@@ -177,6 +182,11 @@ const CharacterSchema = mongoose.Schema({
         armorType: { type: String },
         armorBonusesCalculationType: { type: String }
     },
+    background: {
+        backgroundName: { type: String },
+        backgroundFeatureName: { type: String },
+        backgroundFeatureDescription: { type: String }
+    },
     languages: {
         type: Array
     },
@@ -208,6 +218,12 @@ CharacterSchema.virtual("users", {
 CharacterSchema.virtual("charClasses", {
     ref: "CharClass",
     localField: "characterClassId",
+    foreignField: "_id",
+    justOne: true
+})
+CharacterSchema.virtual("races", {
+    ref: "Race",
+    localField: "raceId",
     foreignField: "_id",
     justOne: true
 })

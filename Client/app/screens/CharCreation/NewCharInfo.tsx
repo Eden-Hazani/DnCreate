@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
@@ -96,21 +96,23 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
                                 validationSchema={ValidationSchema}>
                                 <View >
                                     <AppFormField
-                                        style={{ width: "150%" }}
+                                        style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"fullName"}
                                         name="fullName"
                                         iconName={"text-short"}
                                         placeholder={"Character Full Name..."} />
-                                    <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-around", paddingLeft: 50, paddingRight: 30 }}>
                                         <AppFormField
-                                            style={{ width: "50%" }}
+                                            internalWidth={200}
+                                            externalWidth={230}
                                             keyboardType={"numeric"}
                                             fieldName={"age"}
                                             name="age"
                                             iconName={"text-short"}
                                             placeholder={"Age..."} />
                                         <AppFormField
-                                            style={{ width: "50%" }}
+                                            internalWidth={200}
+                                            externalWidth={230}
                                             keyboardType={"numeric"}
                                             fieldName={"height"}
                                             name="height"
@@ -118,22 +120,26 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
                                             placeholder={"Height..."} />
                                     </View>
                                     <AppFormField
+                                        style={{ width: Dimensions.get('screen').width }}
                                         keyboardType={"numeric"}
                                         fieldName={"weight"}
                                         name="weight"
                                         iconName={"text-short"}
                                         placeholder={"Weight..."} />
                                     <AppFormField
+                                        style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"eyes"}
                                         name="eyes"
                                         iconName={"text-short"}
                                         placeholder={"Eye Color..."} />
                                     <AppFormField
+                                        style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"skin"}
                                         name="skin"
                                         iconName={"text-short"}
                                         placeholder={"Skin Color..."} />
                                     <AppFormField
+                                        style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"hair"}
                                         name="hair"
                                         iconName={"text-short"}

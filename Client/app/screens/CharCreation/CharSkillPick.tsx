@@ -35,6 +35,9 @@ interface CharSkillPickState {
     username: string
     userInfo: UserModel
     password: string
+    resendCountDown: boolean
+    countDownTimerVal: number,
+    alreadyPickedSkills: boolean[]
 }
 
 export class CharSkillPick extends Component<{ navigation: any, route: any }, CharSkillPickState> {
@@ -43,6 +46,9 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
     constructor(props: any) {
         super(props)
         this.state = {
+            alreadyPickedSkills: [],
+            countDownTimerVal: 60,
+            resendCountDown: false,
             userInfo: store.getState().user,
             username: '',
             password: '',
@@ -73,7 +79,15 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         for (let item of skillList) {
             skillClicked.push(false);
         }
-        this.setState({ availableSkills: skillList, amountToPick: amount, skillClicked })
+        this.setState({ availableSkills: skillList, amountToPick: amount, skillClicked }, () => {
+            for (let item of this.state.characterInfo.skills) {
+                if (this.state.availableSkills.includes(item[0])) {
+                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                    alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
+                    this.setState({ alreadyPickedSkills })
+                }
+            }
+        })
     }
 
     insertInfoAndContinue = () => {
@@ -82,9 +96,13 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             alert(`You still have ${this.state.amountToPick - this.state.pickedSkills.length} skills to pick`)
             return;
         }
-        characterInfo.skills = this.state.pickedSkills;
+        for (let skill of this.state.pickedSkills) {
+            characterInfo.skills.push(skill)
+        }
         characterInfo.spellCastingClass = this.state.characterInfo.characterClass;
-        characterInfo.tools = startingToolsSwitch(this.state.characterInfo.characterClass);
+        for (let item of startingToolsSwitch(this.state.characterInfo.characterClass)) {
+            characterInfo.tools.push(item)
+        }
         characterInfo.equippedArmor = {
             id: '1',
             name: 'No Armor Equipped',
@@ -103,6 +121,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             characterInfo.charSpecials.fightingStyle = []
             characterInfo.charSpecials.monkElementsDisciplines = []
             characterInfo.charSpecials.companion = []
+            characterInfo.charSpecials.dragonBornAncestry = store.getState().character.charSpecials.dragonBornAncestry
         })
         if (store.getState().nonUser) {
             if (this.context.user && this.context.user.username) {
@@ -180,9 +199,37 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             })
         }).catch(err => {
             this.setState({ loading: false })
-            errorHandler(err.request)
+            alert('Email has not been confirmed.')
         })
+    }
 
+    resendEmail = async () => {
+        try {
+            this.startResendCountDown()
+            const validValues = {
+                username: this.state.username,
+                password: this.state.password,
+                passwordConfirmation: this.state.password
+            }
+            await authApi.register(validValues).then(result => {
+                const userInfo: any = result.data;
+                this.setState({ loading: false }, () => {
+                    alert(userInfo.message);
+                });
+            })
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    startResendCountDown = () => {
+        this.setState({ countDownTimerVal: 60, resendCountDown: false })
+        setInterval(() => {
+            this.setState({ countDownTimerVal: this.state.countDownTimerVal - 1 })
+            if (this.state.countDownTimerVal === 0) {
+                this.setState({ resendCountDown: true })
+            }
+        }, 1000);
     }
 
     render() {
@@ -201,7 +248,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                                     keyExtractor={(stats: any, index) => index.toString()}
                                     numColumns={2}
                                     renderItem={({ item, index }) =>
-                                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.skillClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.alreadyPickedSkills[index] ? colors.berries : this.state.skillClicked[index] ? colors.bitterSweetRed : colors.lightGray }]} disabled={this.state.alreadyPickedSkills[index]}
                                             onPress={() => this.pickSkill(item, index)}>
                                             <AppText>{item}</AppText>
                                         </TouchableOpacity>
@@ -221,15 +268,24 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                                 <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={25} width={150} height={70}
                                     title={"Confirmed?"} onPress={() => { this.checkMailConfirm() }} />
                             </View>
+                            <View>
+                                <AppText textAlign={'center'} fontSize={20}>Please wait for a minute for the mail to arrive.</AppText>
+                                <AppButton fontSize={18} backgroundColor={colors.berries} borderRadius={25} width={150} height={70} disabled={!this.state.resendCountDown}
+                                    title={`${this.state.resendCountDown ? 'Resend' : this.state.countDownTimerVal}`} onPress={() => { this.resendEmail() }} />
+                            </View>
                         </View>
                         :
-                        <ScrollView style={{ padding: 15, paddingTop: 20, paddingBottom: 30 }}>
+                        <ScrollView keyboardShouldPersistTaps="always" style={{ padding: 15, paddingTop: 20, paddingBottom: 30 }}>
                             <AppText textAlign={'center'} fontSize={35} color={colors.berries}>Hi!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>wasn't what fun?!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>wasn't that fun?!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Exiting right?, lets do this!</AppText>
-                            <Register emailSent={(isSent: boolean, username: string, password: string) => { this.setState({ registrationEmailSent: isSent, username, password }) }} />
+                            <AppText textAlign={'center'} fontSize={20}>Plus use DnCreate's adventure mode with your fellow party members!</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Exciting right?, lets do this!</AppText>
+                            <Register emailSent={(isSent: boolean, username: string, password: string) => {
+                                this.startResendCountDown()
+                                this.setState({ registrationEmailSent: isSent, username, password })
+                            }} />
                         </ScrollView>
                     }
                 </Modal>

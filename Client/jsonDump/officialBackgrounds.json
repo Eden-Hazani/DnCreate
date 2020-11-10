@@ -1,0 +1,332 @@
+{
+    "Acolyte": {
+        "name": "Acolyte",
+        "skills": [
+            [
+                "Insight",
+                0
+            ],
+            [
+                "Religion",
+                0
+            ]
+        ],
+        "tools": [],
+        "languages": 2,
+        "featureName": "Shelter of the Faithful",
+        "featureDescription": "This feature simply allows you to get some extra considerations at temples and shrines to your deity and occasionally get the priests on your side. It’s situational at best, but there are some scenarios where getting sanctuary in the local church can come in handy."
+    },
+    "Urchin": {
+        "name": "Urchin",
+        "skills": [
+            [
+                "Sleight of Hand",
+                0
+            ],
+            [
+                "Stealth",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Disguise kit",
+                0
+            ],
+            [
+                "Thieves' tools",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "City Secrets",
+        "featureDescription": "You know the secret patterns and flow to cities and can find passages through the urban sprawl that others would miss. When you are not in combat, you (and companions you lead) can travel between any two locations in the city twice as fast as your speed would normally allow."
+    },
+    "Soldier": {
+        "name": "Soldier",
+        "skills": [
+            [
+                "Athletics",
+                0
+            ],
+            [
+                "Intimidation",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Gaming set",
+                0
+            ],
+            [
+                "Land Vehicles",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "Military Rank",
+        "featureDescription": "You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence, and they defer to you if they are of a lower rank. You can invoke your rank to exert influence over other soldiers and requisition simple equipment or horses for temporary use. You can also usually gain access to friendly military encampments and fortresses where your rank is recognized."
+    },
+    "Sailor": {
+        "name": "Sailor",
+        "skills": [
+            [
+                "Athletics",
+                0
+            ],
+            [
+                "Perception",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Navigator's tools",
+                0
+            ],
+            [
+                "Water Vehicles",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "Ship's Passage",
+        "featureDescription": "When you need to, you can secure free passage on a sailing ship for yourself and your adventuring companions. You might sail on the ship you served on, or another ship you have good relations with (perhaps one captained by a former crewmate). Because you're calling in a favor, you can't be certain of a schedule or route that will meet your every need. Your DM will determine how long it takes to get where you need to go. In return for your free passage, you and your companions are expected to assist the crew during the voyage."
+    },
+    "Pirate": {
+        "name": "Pirate",
+        "skills": [
+            [
+                "Athletics",
+                0
+            ],
+            [
+                "Perception",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Navigator's tools",
+                0
+            ],
+            [
+                "Water Vehicles",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "Bad Reputation",
+        "featureDescription": "You spent your youth under the sway of a dread pirate, a ruthless cutthroat who taught you how to survive in a world of sharks and savages. You've indulged in larceny on the high seas and sent more than one deserving soul to a briny grave. No matter where you go, people are afraid of you due to your reputation. When you are in a civilized settlement, you can get away with minor criminal offenses, such as refusing to pay for food at a tavern or breaking down doors at a local shop, since most people will not report your activity to the authorities."
+    },
+    "Sage": {
+        "name": "Sage",
+        "skills": [
+            [
+                "Arcana",
+                0
+            ],
+            [
+                "History",
+                0
+            ]
+        ],
+        "tools": [],
+        "languages": 2,
+        "featureName": "Researcher",
+        "featureDescription": "When you attempt to learn or recall a piece of lore, if you do not know that information, you often know where and from whom you can obtain it. Usually, this information comes from a library, scriptorium, university, or a sage or other learned person or creature. Your DM might rule that the knowledge you seek is secreted away in an almost inaccessible place, or that it simply cannot be found. Unearthing the deepest secrets of the multiverse can require an adventure or even a whole campaign."
+    },
+    "Outlander": {
+        "name": "Outlander",
+        "skills": [
+            [
+                "Athletics",
+                0
+            ],
+            [
+                "Survival",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Musical instrument",
+                0
+            ]
+        ],
+        "languages": 1,
+        "featureName": "Wanderer",
+        "featureDescription": "You have an excellent memory for maps and geography, and you can always recall the general layout of terrain, settlements, and other features around you. In addition, you can find food and fresh water for yourself and up to five other people each day, provided that the land offers berries, small game, water, and so forth."
+    },
+    "Noble": {
+        "name": "Noble",
+        "skills": [
+            [
+                "History",
+                0
+            ],
+            [
+                "Persuasion",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Gaming set",
+                0
+            ]
+        ],
+        "languages": 1,
+        "featureName": "Position of Privilege",
+        "featureDescription": "This feature essentially allows you to enjoy some privilege, get an in with nobility and it generally gives you an excuse to lord it over people. Use with caution, as your fellow players are unlikely to tolerate much snooty behavior."
+    },
+    "Hermit": {
+        "name": "Hermit",
+        "skills": [
+            [
+                "Medicine",
+                0
+            ],
+            [
+                "Religion",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Herbalism kit",
+                0
+            ]
+        ],
+        "languages": 1,
+        "featureName": "Discovery",
+        "featureDescription": "The quiet seclusion of your extended hermitage gave you access to a unique and powerful discovery. The exact nature of this revelation depends on the nature of your seclusion. It might be a great truth about the cosmos, the deities, the powerful beings of the outer planes, or the forces of nature. It could be a site that no one else has ever seen. You might have uncovered a fact that has long been forgotten, or unearthed some relic of the past that could rewrite history. It might be information that would be damaging to the people who or consigned you to exile, and hence the reason for your return to society. Work with your DM to determine the details of your discovery and its impact on the campaign."
+    },
+    "Guild Artisan": {
+        "name": "Guild Artisan",
+        "skills": [
+            [
+                "Insight",
+                0
+            ],
+            [
+                "Persuasion",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Artisan's tools",
+                0
+            ]
+        ],
+        "languages": 1,
+        "featureName": "Guild Membership",
+        "featureDescription": "it functions a lot like the folk hero feature with a bit more legal oomph. Your guild won’t hide you, but they might pay your bail or for a lawyer. This does come with a minor gold cost each month, but the payoff can be a lifesaver."
+    },
+    "Folk Hero": {
+        "name": "Folk Hero",
+        "skills": [
+            [
+                "Animal handling",
+                0
+            ],
+            [
+                "Survival",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Artisan's tools",
+                0
+            ],
+            [
+                "Land Vehicles",
+                0
+            ]
+        ],
+        "languages": 0,
+        "featureName": "Rustic Hospitality",
+        "featureDescription": "This is very similar to both the acolyte and entertainer features but is probably the most useful because it stipulates that people will be willing to hide you from the law. I’ve had more than one adventure saved by this feature as we hide from the cops in a friendly farmhouse."
+    },
+    "Entertainer": {
+        "name": "Entertainer",
+        "skills": [
+            [
+                "Acrobatics",
+                0
+            ],
+            [
+                "Performance",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Disguise kit",
+                0
+            ],
+            [
+                "Musical instrument",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "By Popular Demand",
+        "featureDescription": "This feature is like the acolyte feature in that you can usually leverage it into free room and board. You can also get somewhat popular and liked in places you perform. Usually a feature for bards, it’s situational at best, but very flavorful."
+    },
+    "Criminal": {
+        "name": "Criminal",
+        "skills": [
+            [
+                "Deception",
+                0
+            ],
+            [
+                "Stealth",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Gaming set",
+                0
+            ],
+            [
+                "Thieves' tools",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "Criminal Contact",
+        "featureDescription": "This feature lets you get the lay of the land in any criminal underworld. I think of all the background features, this is the one I see get the most actual use. If your campaign takes place primarily in a city or cities, this is the one to have."
+    },
+    "Charlatan": {
+        "name": "Charlatan",
+        "skills": [
+            [
+                "Deception",
+                0
+            ],
+            [
+                "Sleight of Hand",
+                0
+            ]
+        ],
+        "tools": [
+            [
+                "Disguise Kit",
+                0
+            ],
+            [
+                "Forgery Kit",
+                0
+            ]
+        ],
+        "languages": null,
+        "featureName": "False Identity",
+        "featureDescription": "This feature is basically a free license to accurately forge documents. If you can’t think of some nefarious applications of this, you’re not thinking hard enough."
+    }
+}

@@ -1,4 +1,5 @@
 import { ModifiersModel } from "./modifiersModel";
+import { RaceAbilityModel } from "./raceAbilityModal";
 
 export class RaceModel {
     public constructor(
@@ -6,11 +7,15 @@ export class RaceModel {
         public name?: string,
         public description?: string,
         public image?: string,
-        public abilityBonus?: ModifiersModel
+        public abilityBonus?: ModifiersModel,
+        public raceAbilities?: RaceAbilityModel
 
     ) {
         if (!abilityBonus) {
             this.abilityBonus = new ModifiersModel()
+        }
+        if (!raceAbilities) {
+            this.raceAbilities = new RaceAbilityModel()
         }
     }
 }

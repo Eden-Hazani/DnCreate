@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Unsubscribe } from 'redux';
+import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
@@ -104,6 +105,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
                 }, 800);

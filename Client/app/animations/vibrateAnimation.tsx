@@ -10,7 +10,7 @@ interface VibrateAnimationState {
 
 }
 
-export class VibrateAnimation extends Component<{ onPress: any, text: any, isOn: boolean }, VibrateAnimationState>{
+export class VibrateAnimation extends Component<{ onPress: any, text: any, isOn: boolean, colorCode: string }, VibrateAnimationState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -68,7 +68,7 @@ export class VibrateAnimation extends Component<{ onPress: any, text: any, isOn:
             <>
                 {this.props.isOn ? this.jiggle() : this.stopJiggle()}
                 <Animated.View style={this.state.jiggleAnimationVal.getLayout()}>
-                    <TouchableOpacity style={styles.attribute} onPress={this.props.onPress}>
+                    <TouchableOpacity style={[styles.attribute, { backgroundColor: this.props.colorCode }]} onPress={this.props.onPress}>
                         <AppText textAlign={"center"} >{this.props.text}</AppText>
                     </TouchableOpacity>
                 </Animated.View>
@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
         borderColor: colors.black,
         borderWidth: 2,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
     },
 })

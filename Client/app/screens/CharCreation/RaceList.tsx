@@ -110,6 +110,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.charisma = race.abilityBonus.charisma;
         characterInfo.wisdom = race.abilityBonus.wisdom;
         characterInfo.intelligence = race.abilityBonus.intelligence;
+        characterInfo.raceId = race._id as any;
         characterInfo.race = race.name;
         characterInfo.image = race.image;
         this.setState({ confirmed: true })
@@ -119,10 +120,10 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         })
         setTimeout(() => {
             if (characterInfo.race === 'Half Elf') {
-                this.props.navigation.navigate("SpacialProficiencyRaces");
+                this.props.navigation.navigate("SpacialProficiencyRaces", { race: race });
                 return;
             }
-            this.props.navigation.navigate("NewCharInfo");
+            this.props.navigation.navigate("SpacialRaceBonuses", { race: race });
         }, 800);
         setTimeout(() => {
             this.setState({ confirmed: false })

@@ -18,6 +18,7 @@ export class AppButton extends Component<any>{
                 <View style=
                     {[styles.button,
                     {
+                        marginBottom: this.props.marginBottom,
                         backgroundColor: this.props.backgroundColor, width: this.props.width, height: this.props.height,
                         borderRadius: this.props.borderRadius, display: this.props.display
                     }, this.props.disabled ? styles.disabled : null]}>

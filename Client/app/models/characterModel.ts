@@ -1,8 +1,10 @@
+import { BackgroundModal } from "./backgroundModal";
 import { CharSpacialModel } from "./CharSpacialModel";
 import { ClassModel } from "./classModel";
 import { EquippedArmorModel } from "./EquippedArmorModel";
 import { MagicModel } from "./magicModel";
 import { ModifiersModel } from "./modifiersModel";
+import { RaceModel } from "./raceModel";
 import { SpellsModel } from "./spellsModel";
 
 export class CharacterModel {
@@ -26,6 +28,7 @@ export class CharacterModel {
         public modifiers?: ModifiersModel,
         public characterClass?: any,
         public characterClassId?: ClassModel,
+        public raceId?: RaceModel,
         public image?: string,
         public backStory?: string,
         public flaws?: string[],
@@ -56,7 +59,8 @@ export class CharacterModel {
         public equippedArmor?: EquippedArmorModel,
         public languages?: any[],
         public spellCastingClass?: string,
-        public nonClassAvailableSpells?: string[]
+        public nonClassAvailableSpells?: string[],
+        public background?: BackgroundModal
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();
@@ -72,6 +76,9 @@ export class CharacterModel {
         }
         if (!equippedArmor) {
             this.equippedArmor = new EquippedArmorModel();
+        }
+        if (!background) {
+            this.background = new BackgroundModal();
         }
     }
 }

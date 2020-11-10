@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView, Switch } from 'react-native';
 import { Unsubscribe } from 'redux';
 import switchModifier from '../../../utility/abillityModifierSwitch';
+import { attributeColorCodedGuide } from '../../../utility/attributeColorCodedGuide';
 import { RollingDiceAnimation } from '../../animations/RollingDiceAnimation';
 import { VibrateAnimation } from '../../animations/vibrateAnimation';
 import userCharApi from '../../api/userCharApi';
@@ -32,6 +33,8 @@ interface AttributePickingState {
     pickedRace: RaceModel;
     rollDisabled: boolean[]
     confirmed: boolean
+    colorCodedGuide: boolean
+    colorCodedGuideArray: any[]
 }
 
 export class AttributePicking extends Component<{ props: any, navigation: any }, AttributePickingState> {
@@ -39,6 +42,8 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
     constructor(props: any) {
         super(props)
         this.state = {
+            colorCodedGuideArray: [],
+            colorCodedGuide: false,
             confirmed: false,
             rollDisabled: [
                 false,
@@ -65,6 +70,11 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
         })
+    }
+    componentDidMount() {
+        let colorCodedGuideArray = this.state.colorCodedGuideArray;
+        colorCodedGuideArray = attributeColorCodedGuide(this.state.characterInfo.characterClass);
+        this.setState({ colorCodedGuideArray })
     }
     componentWillUnmount() {
         this.unsubscribeStore()
@@ -162,7 +172,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
             this.setState({ confirmed: true })
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
             setTimeout(() => {
-                this.props.navigation.navigate("CharSkillPick");
+                this.props.navigation.navigate("CharBackground");
             }, 800);
             setTimeout(() => {
                 this.setState({ confirmed: false })
@@ -172,6 +182,19 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         }
     }
 
+    returnScores = (attribute: any) => {
+        const characterInfo = { ...this.state.characterInfo }
+        const rollDisabled = this.state.rollDisabled;
+        const diceScore = characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute];
+        characterInfo[attribute] = this.state.pickedRace.abilityBonus[attribute];
+        characterInfo.modifiers[attribute] = undefined;
+        console.log(this.state.dicePool.indexOf(diceScore))
+        console.log(rollDisabled[this.state.dicePool.indexOf(diceScore)])
+        rollDisabled[this.state.dicePool.indexOf(diceScore)] = false;
+        this.setState({ characterInfo, rollDisabled }, () => {
+            this.setState({ jiggleOn: false, sumOfDice: 0 })
+        })
+    }
 
     render() {
         return (
@@ -188,7 +211,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                             }}>
                                 <View style={styles.animationContainer}>
                                     <RollingDiceAnimation props />
-                                    <View style={{ marginLeft: 25, transform: [{ rotateX: '15deg' }, { rotateY: '30deg' }] }}>
+                                    <View style={{ width: '100%', marginLeft: 50, transform: [{ rotateX: '15deg' }, { rotateY: '30deg' }] }}>
                                         <AppText fontSize={50} color={colors.white}>Rolling Dice</AppText>
                                     </View>
                                 </View>
@@ -199,7 +222,14 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.strength}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null }} />
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[0] : null}
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.strength && this.state.sumOfDice === 0) {
+                                                    this.returnScores('strength');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.strength}</AppText>
@@ -210,8 +240,15 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <AppText>Constitution</AppText>
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.constitution}
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[1] : null}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null }} />
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.constitution && this.state.sumOfDice === 0) {
+                                                    this.returnScores('constitution');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.constitution}</AppText>
@@ -222,21 +259,34 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <AppText>Dexterity</AppText>
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.dexterity}
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[2] : null}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null }} />
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.dexterity && this.state.sumOfDice === 0) {
+                                                    this.returnScores('dexterity');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.dexterity}</AppText>
                                         </View>
                                     </View>
-
                                 </View>
                                 <View style={styles.attributeContainer}>
                                     <AppText>Intelligence</AppText>
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.intelligence}
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[3] : null}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null }} />
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.intelligence && this.state.sumOfDice === 0) {
+                                                    this.returnScores('intelligence');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.intelligence}</AppText>
@@ -247,8 +297,15 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <AppText>Wisdom</AppText>
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.wisdom}
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[4] : null}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null }} />
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.wisdom && this.state.sumOfDice === 0) {
+                                                    this.returnScores('wisdom');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.wisdom}</AppText>
@@ -259,8 +316,15 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <AppText>Charisma</AppText>
                                     <View style={styles.stat}>
                                         <VibrateAnimation text={this.state.characterInfo.charisma}
+                                            colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[5] : null}
                                             isOn={this.state.jiggleOn}
-                                            onPress={() => { this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null }} />
+                                            onPress={() => {
+                                                if (this.state.characterInfo.modifiers.charisma && this.state.sumOfDice === 0) {
+                                                    this.returnScores('charisma');
+                                                    return;
+                                                }
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null
+                                            }} />
                                         <View style={styles.modifierBox}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.charisma}</AppText>
@@ -268,9 +332,21 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                 </View>
                             </View>
+                            <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 25 }}>
+                                <AppText textAlign={'center'} color={colors.berries}>Activate color coded help</AppText>
+                                <AppText textAlign={'center'} color={colors.berries}>(recommended for new players)</AppText>
+                                <Switch value={this.state.colorCodedGuide} onValueChange={() => {
+                                    if (this.state.colorCodedGuide) {
+                                        this.setState({ colorCodedGuide: false })
+                                        return;
+                                    }
+                                    this.setState({ colorCodedGuide: true })
+                                    console.log(this.state.colorCodedGuideArray)
+                                }} />
+                            </View>
                             <View >
                                 <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} title={"Roll Dice!"} height={40}
+                                    <AppButton backgroundColor={colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
                                         width={150} fontSize={20} onPress={() => this.state.finishRolls ? alert("No rolls left!") : this.rollDice()} />
                                     <AttributeHelp />
                                 </View>

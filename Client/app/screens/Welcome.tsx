@@ -58,7 +58,12 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                 <View>
                                     <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={25}>Ready?</AppText>
                                 </View>
-                                <AppButton fontSize={20} color={colors.totalWhite} backgroundColor={colors.bitterSweetRed} onPress={() => this.nonUserStart()} borderRadius={100} width={100} height={100} title={"Press Here!"} />
+                                <View style={{ marginTop: 20 }}>
+                                    <AppButton fontSize={25} color={colors.totalWhite} backgroundColor={colors.bitterSweetRed} onPress={() => this.nonUserStart()} borderRadius={25} width={150} height={70} title={"Press Here!"} />
+                                </View>
+                                <View style={{ marginTop: 50 }}>
+                                    <AppButton fontSize={25} color={colors.totalWhite} backgroundColor={colors.berries} onPress={() => this.setState({ newUserModal: false })} borderRadius={25} width={250} height={70} title={"Wait! I'm already a user"} />
+                                </View>
                             </View>
                         </Modal>
                     </View>

@@ -22,6 +22,7 @@ export class CharSpacialModel {
         public druidCircle?: string,
         public companion?: CompanionModel[],
         public warlockSpellSlotLevel?: string,
-        public warlockSpellSlots?: number
+        public warlockSpellSlots?: number,
+        public dragonBornAncestry?: any
     ) { }
 }

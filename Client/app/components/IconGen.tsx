@@ -17,7 +17,7 @@ export class IconGen extends Component<any>{
                 width: this.props.size,
                 height: this.props.size,
                 borderRadius: this.props.size / 2,
-                backgroundColor: this.props.backgroundColor,
+                backgroundColor: this.props.backgroundColor ? this.props.backgroundColor : null,
                 justifyContent: "center",
                 alignItems: "center"
             }}>

@@ -16,7 +16,7 @@ export function SubmitButton({ ...props }: any) {
     const { handleSubmit } = useFormikContext();
     return (
         <TouchableOpacity activeOpacity={.8} style={styles.container} onPress={() => handleSubmit()}>
-            <View style={[styles.button, { width: props.width ? props.width : 100 }]}>
+            <View style={[styles.button, { width: props.width ? props.width : 100, marginBottom: props.marginBottom ? props.marginBottom : 35 }]}>
                 <AppText textAlign={props.textAlign} fontSize={20} padding={5} color={'white'}>{props.title}</AppText>
             </View>
         </TouchableOpacity>
@@ -36,6 +36,5 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 100,
         backgroundColor: colors.bitterSweetRed,
-        marginBottom: 35
     }
 })

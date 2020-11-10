@@ -342,18 +342,28 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </TouchableOpacity>
                             <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
-                                <View style={{ flex: .9, padding: 25 }}>
-                                    <AppText textAlign={"left"} fontSize={35} color={colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
-                                    <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
-                                </View>
-                                <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
-                                    <AppButton disabled={isDm} backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
-                                        this.setState({ backGroundStoryVisible: false }, () => {
-                                            this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
-                                        })
-                                    }} />
-                                </View>
+                                <ScrollView>
+                                    <View style={{ flex: .8, padding: 25 }}>
+                                        <AppText textAlign={"left"} fontSize={35} color={colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
+                                        <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
+                                    </View>
+                                    <View style={{ flex: .1, padding: 25 }}>
+                                        <AppText textAlign={"left"} fontSize={25}>{this.state.character.background.backgroundName}</AppText>
+                                        <View>
+                                            <AppText textAlign={"left"} fontSize={20} color={colors.berries}>Background feature</AppText>
+                                            <AppText textAlign={"left"} fontSize={20}>{this.state.character.background.backgroundFeatureName}</AppText>
+                                            <AppText textAlign={"left"} fontSize={17}>{this.state.character.background.backgroundFeatureDescription}</AppText>
+                                        </View>
+                                    </View>
+                                    <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
+                                        <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
+                                        <AppButton disabled={isDm} backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
+                                            this.setState({ backGroundStoryVisible: false }, () => {
+                                                this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
+                                            })
+                                        }} />
+                                    </View>
+                                </ScrollView>
                             </Modal>
 
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ statsVisible: true })}>
@@ -429,6 +439,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={colors.black}>Path Features</AppText>
                                 </View>
                             </TouchableOpacity>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("RaceFeatures", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={colors.pinkishSilver} name={"human-handsdown"} iconColor={colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Race Features</AppText>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View>
                             <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} />
@@ -450,7 +466,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         <View key={skill} style={styles.skill}>
                                             <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
                                             <AppText fontSize={20} color={colors.bitterSweetRed}
-                                                textAlign={'center'}>{`+${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
+                                                textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                         </View>
                                     )}
                                 </View>
@@ -489,8 +505,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             {this.state.character.languages &&
                                 <View style={[styles.list, { width: '100%' }]}>
                                     <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
-                                    {this.state.character.languages.map(lang =>
-                                        <View key={lang} style={styles.tools}>
+                                    {this.state.character.languages.map((lang, index) =>
+                                        <View key={index} style={styles.tools}>
                                             <AppText>{lang}</AppText>
                                         </View>
                                     )}
