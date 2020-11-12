@@ -288,7 +288,6 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                     minimumTrackTintColor={colors.bitterSweetRed}
                                     maximumTrackTintColor={colors.berries}
                                     onValueChange={(val) => {
-                                        console.log(val)
                                         this.setState({ sliderLevelVal: val })
                                     }}
                                     onSlidingComplete={() => {

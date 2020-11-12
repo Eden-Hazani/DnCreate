@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView, Switch } from 'react-native';
 import { Unsubscribe } from 'redux';
@@ -39,6 +40,7 @@ interface AttributePickingState {
 
 export class AttributePicking extends Component<{ props: any, navigation: any }, AttributePickingState> {
     private unsubscribeStore: Unsubscribe;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -70,11 +72,46 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
         })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
     componentDidMount() {
         let colorCodedGuideArray = this.state.colorCodedGuideArray;
         colorCodedGuideArray = attributeColorCodedGuide(this.state.characterInfo.characterClass);
         this.setState({ colorCodedGuideArray })
+    }
+    onFocus = async () => {
+        let attributes = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
+        console.log('ATTRIBUTE PAGE')
+        let characterInfo = { ...this.state.characterInfo };
+        let dicePool = this.state.dicePool;
+        const rollDisabled = this.state.rollDisabled;
+        const diceStorage = await AsyncStorage.getItem(`${this.state.characterInfo.name}DicePool`)
+        if (diceStorage) {
+            dicePool = JSON.parse(diceStorage)
+        }
+        const item = await AsyncStorage.getItem(`${this.state.characterInfo.name}AttributeStage`)
+        if (item) {
+            characterInfo = JSON.parse(item)
+        }
+        for (let att of attributes) {
+            if (characterInfo[att] !== this.state.pickedRace.abilityBonus[att]) {
+                let diceScore = characterInfo[att] - this.state.pickedRace.abilityBonus[att];
+                let indexes = dicePool.map((dice, i) => dice === diceScore ? i : -1)
+                    .filter(index => index !== -1);
+                for (let index of indexes) {
+                    if (rollDisabled[index] !== true) {
+                        console.log(index)
+                        rollDisabled[index] = true;
+                        break;
+                    }
+                }
+                rollDisabled[dicePool.indexOf(diceScore)] = true;
+            }
+        }
+        if (dicePool.length === 6) {
+            this.setState({ finishRolls: true })
+        }
+        this.setState({ characterInfo, dicePool, rollDisabled })
     }
     componentWillUnmount() {
         this.unsubscribeStore()
@@ -145,13 +182,16 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         characterInfo[attribute] = characterInfo[attribute] + this.state.sumOfDice;
         characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
         this.setState({ characterInfo }, () => {
+            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
             this.setState({ jiggleOn: false, sumOfDice: 0 })
         })
     }
     updatePool = () => {
         let dicePool = this.state.dicePool;
         dicePool.push(this.state.sumOfDice);
-        this.setState({ dicePool });
+        this.setState({ dicePool }, () => {
+            AsyncStorage.setItem(`${this.state.characterInfo.name}DicePool`, JSON.stringify(this.state.dicePool))
+        });
     }
     setSumAndDisableRoll = (sum: number, roll: number) => {
         let rollDisabled = this.state.rollDisabled;
@@ -171,6 +211,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         ) {
             this.setState({ confirmed: true })
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
             setTimeout(() => {
                 this.props.navigation.navigate("CharBackground");
             }, 800);
@@ -182,16 +223,24 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         }
     }
 
+
+
     returnScores = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
         const rollDisabled = this.state.rollDisabled;
         const diceScore = characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute];
         characterInfo[attribute] = this.state.pickedRace.abilityBonus[attribute];
         characterInfo.modifiers[attribute] = undefined;
-        console.log(this.state.dicePool.indexOf(diceScore))
-        console.log(rollDisabled[this.state.dicePool.indexOf(diceScore)])
-        rollDisabled[this.state.dicePool.indexOf(diceScore)] = false;
+        let indexes = this.state.dicePool.map((dice, i) => dice === diceScore ? i : -1)
+            .filter(index => index !== -1);
+        for (let index of indexes) {
+            if (rollDisabled[index] !== false) {
+                rollDisabled[index] = false;
+                break;
+            }
+        }
         this.setState({ characterInfo, rollDisabled }, () => {
+            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
             this.setState({ jiggleOn: false, sumOfDice: 0 })
         })
     }
@@ -341,7 +390,6 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                         return;
                                     }
                                     this.setState({ colorCodedGuide: true })
-                                    console.log(this.state.colorCodedGuideArray)
                                 }} />
                             </View>
                             <View >

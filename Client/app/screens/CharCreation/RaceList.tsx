@@ -50,7 +50,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         })
     }
     componentDidMount() {
-        this.getRaces();
+        this.getRacesFromServer();
     }
     componentWillUnmount() {
         this.unsubscribeStore()
@@ -119,7 +119,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
-            if (characterInfo.race === 'Half Elf') {
+            if (characterInfo.race === 'Half Elf' || characterInfo.race === 'Changeling') {
                 this.props.navigation.navigate("SpacialProficiencyRaces", { race: race });
                 return;
             }

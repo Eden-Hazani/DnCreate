@@ -24,6 +24,7 @@ const abilities = ["strength", "constitution", "dexterity", "intelligence", "wis
 
 export class SpacialProficiencyRaces extends Component<{ navigation: any, route: any }, SpacialProficiencyRacesState>{
     private UnsubscribeStore: Unsubscribe;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -35,6 +36,21 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
             characterInfo: store.getState().character
         }
         this.UnsubscribeStore = store.subscribe(() => { })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+
+    }
+
+    onFocus = () => {
+        const characterInfo = { ...this.state.characterInfo }
+        characterInfo.strength = this.state.race.abilityBonus.strength;
+        characterInfo.constitution = this.state.race.abilityBonus.constitution;
+        characterInfo.dexterity = this.state.race.abilityBonus.dexterity;
+        characterInfo.charisma = this.state.race.abilityBonus.charisma;
+        characterInfo.wisdom = this.state.race.abilityBonus.wisdom;
+        characterInfo.intelligence = this.state.race.abilityBonus.intelligence;
+        this.setState({ abilityClicked: [], pickedAbilities: [], characterInfo }, () => {
+            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
+        })
     }
 
     componentWillUnmount() {
@@ -93,7 +109,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View>
                         <View style={{ justifyContent: "center", alignItems: "center", padding: 25 }}>
-                            <AppText fontSize={18}>You Have picked the {this.state.characterInfo.race} race</AppText>
+                            <AppText textAlign={'center'} fontSize={18}>You Have picked the {this.state.characterInfo.race} race</AppText>
                             <AppText fontSize={16} textAlign={'center'}>As a {this.state.characterInfo.race} you have {this.state.totalPoints} points that you can add to an ability of your choice </AppText>
                         </View>
                         <View>

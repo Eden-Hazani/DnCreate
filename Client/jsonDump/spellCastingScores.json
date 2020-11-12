@@ -5,9 +5,9 @@
         "spellAttackModifier": "proficiency+wisdom"
     },
     "Bard": {
-        "spellcastingAbility": "wisdom",
-        "baseSpellSaveDc": "8+proficiency+wisdom",
-        "spellAttackModifier": "proficiency+wisdom"
+        "spellcastingAbility": "charisma",
+        "baseSpellSaveDc": "8+proficiency+charisma",
+        "spellAttackModifier": "proficiency+charisma"
     },
     "Cleric": {
         "spellcastingAbility": "wisdom",

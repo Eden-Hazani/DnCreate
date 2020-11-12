@@ -26,7 +26,6 @@ export class RaceFeatures extends Component<{ route: any }, RaceFeaturesState> {
         }, 800);
     }
     render() {
-        console.log(this.state.character.raceId.raceAbilities)
         return (
             <ScrollView style={styles.container}>
                 {this.state.loading ?

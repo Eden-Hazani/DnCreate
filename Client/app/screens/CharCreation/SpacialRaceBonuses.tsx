@@ -24,6 +24,7 @@ interface SpacialRaceBonusesState {
 }
 
 export class SpacialRaceBonuses extends Component<{ navigation: any, route: any }, SpacialRaceBonusesState>{
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -37,7 +38,20 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             extraLanguagesNumber: null,
             race: this.props.route.params.race
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+
+    onFocus = () => {
+        const character = { ...this.state.character };
+        character.languages = [];
+        character.skills = [];
+        character.addedWeaponProf = [];
+        character.tools = [];
+        this.setState({ character }, () => {
+            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+        })
+    }
+
     componentDidMount() {
         const character = { ...this.state.character };
         character.languages = [];
@@ -52,6 +66,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         }
         if (this.state.character.race === "Dwarf") {
             this.setState({ amountToPick: 1 })
+        }
+        if (this.state.character.race === "Kenku") {
+            this.setState({ amountToPick: 2 })
         }
         if (this.state.character.race === "Half Elf") {
             this.setState({ extraLanguagesNumber: 1 })
@@ -91,15 +108,13 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     insertInfoAndContinue = () => {
         const character = { ...this.state.character };
         if (this.state.character.race === "Changeling") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick 2 skills')
-                return
-            }
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You have another language to add')
-                return
-            }
             character.languages.push("Common")
+        }
+        if (this.state.character.race === "Goblin") {
+            character.languages.push("Common", "Goblin")
+        }
+        if (this.state.character.race === "Kenku") {
+            character.languages.push("Common", "Auran")
         }
         if (this.state.character.race === "DragonBorn") {
             if (this.state.amountToPick > this.state.itemPicked.length) {
@@ -165,8 +180,8 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
 
     render() {
-        const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"]
-        const changelingSkillList = [["Deception", 0], ["Insight", 0], ["Intimidation", 0], ["Persuasion", 0]]
+        const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"];
+        const kenkuSkills = [["Acrobatics", 0], ["Deception", 0], ["Stealth", 0], ["Sleight of Hand", 0]]
         return (
             <ScrollView style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
@@ -194,22 +209,17 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
                         {this.state.character.race === "Changeling" &&
                             <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Changeling you can read speak and write Common and 2 extra languages of your choice.</AppText>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[1] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
-                                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                                    {changelingSkillList.map((item, index) =>
+                                <AppText textAlign={'center'} fontSize={18}>As a Changeling you can read speak and write Common.</AppText>
+                            </View>
+                        }
+                        {this.state.character.race === "Kenku" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>As a Kenku You can read and write Common and Auran, but you can speak only by using your Mimicry trait.</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {kenkuSkills.map((item, index) =>
                                         <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
                                             onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item[0]}</AppText>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
                                         </TouchableOpacity>)}
                                 </View>
                             </View>

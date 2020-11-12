@@ -17,7 +17,6 @@ import { startingToolsSwitch } from '../../../utility/startingToolsSwitch';
 import { Register } from '../Register';
 import authApi from '../../api/authApi';
 import reduxToken from '../../auth/reduxToken';
-import errorHandler from '../../../utility/errorHander';
 import AuthContext from '../../auth/context';
 import { UserModel } from '../../models/userModel';
 
@@ -136,11 +135,14 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
 
     sendInfo = (characterInfo: CharacterModel) => {
         characterInfo.user_id = this.state.userInfo._id;
-        this.setState({ characterInfo }, () => {
+        this.setState({ characterInfo }, async () => {
             if (store.getState().beforeRegisterChar.name) {
                 store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })
                 store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
             }
+            await AsyncStorage.removeItem(`${this.state.characterInfo.name}AttributeStage`);
+            await AsyncStorage.removeItem(`${this.state.characterInfo.name}DicePool`);
+            await AsyncStorage.removeItem(`${this.state.characterInfo.name}BackstoryStage`);
             userCharApi.saveChar(this.state.characterInfo).then(result => {
                 let characterInfo: CharacterModel;
                 result.data === 'Character Already exists in system!' ? characterInfo = this.state.characterInfo : characterInfo = result.data;

@@ -16,6 +16,7 @@ import * as toolsJson from '../../../jsonDump/toolList.json'
 import backgroundsJson from '../../../jsonDump/officialBackgrounds.json'
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { BackgroundModal } from '../../models/backgroundModal';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const ValidationSchema = Yup.object().shape({
     backgroundName: Yup.string().required().label("Background Name"),
@@ -44,6 +45,7 @@ interface CharBackgroundState {
 
 
 export class CharBackground extends Component<{ navigation: any }, CharBackgroundState> {
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -63,6 +65,17 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             confirmed: false,
             characterInfo: store.getState().character
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+
+    onFocus = async () => {
+        console.log('BACKGROUNDS PAGE')
+        let characterInfo = { ...this.state.characterInfo }
+        const item = await AsyncStorage.getItem(`${this.state.characterInfo.name}BackstoryStage`)
+        if (item) {
+            characterInfo = JSON.parse(item)
+        }
+        this.setState({ characterInfo })
     }
 
     pickSkill = (skill: string, index: number) => {
@@ -105,7 +118,6 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             const pickedTools = oldPickedTools.filter(item => item[0] !== tool);
             this.setState({ toolsClicked, pickedTools });
         }
-        console.log(this.state.pickedTools)
     }
 
     verifyNonOfficial = () => {
@@ -142,6 +154,10 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     }
 
     verifyOfficial = () => {
+        if (this.state.pickedOfficial === null) {
+            alert('Must pick a background')
+            return false;
+        }
         if (this.state.pickedOfficial.languages === 1) {
             if (this.state.addedLanguages.length === 0 || this.state.addedLanguages[0] === "") {
                 alert('Must add known language')
@@ -162,8 +178,9 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     }
 
 
-    insertInfoAndContinue = (values: any) => {
+    insertInfoAndContinue = async (values: any) => {
         const characterInfo = { ...this.state.characterInfo };
+        await AsyncStorage.setItem(`${this.state.characterInfo.name}BackstoryStage`, JSON.stringify(this.state.characterInfo))
         if (this.state.officialWindow) {
             if (!this.verifyOfficial()) {
                 return;
@@ -369,9 +386,10 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                             </View>
                                             <View style={{ padding: 17 }}>
                                                 <AppText fontSize={25} textAlign={'center'} color={colors.black}>Tool Proficiency</AppText>
-                                                {this.state.pickedOfficial.tools.map((tool: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{tool[0]}</AppText></View>)}
+                                                {this.state.pickedOfficial.tools.length > 0 ? this.state.pickedOfficial.tools.map((tool: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{tool[0]}</AppText></View>)
+                                                    : <View><AppText fontSize={17} textAlign={'center'} color={colors.berries}>This background has no tool proficiencies</AppText></View>}
                                                 <AppText fontSize={25} textAlign={'center'} color={colors.black}>Skill Proficiency</AppText>
-                                                {this.state.pickedOfficial.tools.map((skill: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{skill[0]}</AppText></View>)}
+                                                {this.state.pickedOfficial.skills.map((skill: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{skill[0]}</AppText></View>)}
                                             </View>
                                             <View>
                                                 {backgroundsJson[this.state.pickedOfficial.name].languages === 1 &&

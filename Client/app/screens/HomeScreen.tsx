@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform } from 'react-native';
+import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions } from 'react-native';
 import colors from '../config/colors';
 import * as Font from 'expo-font';
 import { AppText } from '../components/AppText';
@@ -13,6 +13,8 @@ import { ActionType } from '../redux/action-type';
 import userCharApi from '../api/userCharApi';
 import AuthContext from '../auth/context';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
+import AsyncStorage from '@react-native-community/async-storage';
+import { CharacterModel } from '../models/characterModel';
 
 
 interface HomeState {
@@ -45,9 +47,19 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             })
             return;
         }
+        await AsyncStorage.clear()
         const characters = await userCharApi.getChars(this.context.user._id);
+        this.clearStorageJunk(characters.data)
         store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
         this.setState({ loading: false });
+    }
+
+    clearStorageJunk = async (characters: CharacterModel[]) => {
+        for (let char of characters) {
+            await AsyncStorage.removeItem(`${char.name}AttributeStage`);
+            await AsyncStorage.removeItem(`${char.name}DicePool`);
+            await AsyncStorage.removeItem(`${char.name}BackstoryStage`);
+        }
     }
 
     onFocus = () => {

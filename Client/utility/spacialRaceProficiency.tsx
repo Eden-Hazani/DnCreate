@@ -6,6 +6,9 @@ const spacialRaceProficiency = (race: string) => {
         case race === 'Half Elf':
             totalPoints = 2;
             break;
+        case race === 'Changeling':
+            totalPoints = 1;
+            break;
     }
 
     return totalPoints;

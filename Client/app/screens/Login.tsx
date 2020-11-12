@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, View } from 'react-native';
+import { Dimensions, Modal, View } from 'react-native';
 import { AppTextHeadline } from '../components/AppTextHeadline';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
 import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
@@ -94,7 +94,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
     }
     render() {
         return (
-            <View>
+            <View style={{ marginTop: 35 }}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <AnimateContactUpwards>
                         <AnimatedLogo />
@@ -103,12 +103,14 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                             initialValues={{ username: '', password: '' }}
                             onSubmit={(values: any) => this.login(values)}
                             validationSchema={ValidationSchema}>
-                            <View style={{ marginBottom: 40 }}>
+                            <View style={{ marginBottom: 40, justifyContent: "center", alignItems: "center" }}>
                                 <AppFormField
+                                    width={Dimensions.get('screen').width / 1.2}
                                     fieldName={"username"}
                                     iconName={"text-short"}
                                     placeholder={"username..."} />
                                 <AppFormField
+                                    width={Dimensions.get('screen').width / 1.2}
                                     secureTextEntry
                                     fieldName={"password"}
                                     iconName={"lock-outline"}

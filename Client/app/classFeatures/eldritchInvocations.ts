@@ -23,7 +23,6 @@ export function eldritchInvocations(level: number, character: CharacterModel) {
         flag && eldritchInvocationsArray.push(inv);
 
     })
-    eldritchInvocationsArray.forEach(v => console.log(v.prerequisites))
     return eldritchInvocationsArray;
 }
 
