@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-nat
 import { CharacterModel } from '../../models/characterModel';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { AppButton } from '../../components/AppButton';
 import { AppCompanion } from '../../components/AppCompanion';
 import { PickCompanion } from '../../components/PickCompanion';
@@ -40,41 +40,41 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                 {this.props.character.path ?
                     <View style={{ padding: 10 }}>
                         <AppText fontSize={22}>Path Chosen:</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.path.name}</AppText>
-                        <AppText fontSize={15} color={colors.black}>{this.props.character.path.description.replace(/\. /g, '.\n\n')}</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.path.name}</AppText>
+                        <AppText fontSize={15} color={Colors.whiteInDarkMode}>{this.props.character.path.description.replace(/\. /g, '.\n\n')}</AppText>
                     </View>
                     :
                     null}
                 {this.props.character.path?.name === "Wild Magic" &&
                     <View>
-                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Wild Magic Effects'}
+                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Wild Magic Effects'}
                             onPress={() => { this.setState({ wildMagicModal: true }) }} />
                         <Modal visible={this.state.wildMagicModal} animationType='slide'>
                             {this.state.wildMagicModal &&
-                                <ScrollView style={{ padding: 20 }}>
-                                    <AppText color={colors.berries} textAlign={'center'} fontSize={18}>List of Wild Magic Surge, roll result and effect</AppText>
+                                <ScrollView style={{ padding: 20, backgroundColor: Colors.pageBackground }}>
+                                    <AppText color={Colors.berries} textAlign={'center'} fontSize={18}>List of Wild Magic Surge, roll result and effect</AppText>
                                     {wildSurge.wildMagic.map((magic, index) =>
                                         <View key={index}>
-                                            <AppText fontSize={20} textAlign={'center'} color={colors.berries}>{magic.roll}</AppText>
-                                            <View style={{ padding: 10, backgroundColor: colors.pinkishSilver, borderWidth: 1, borderColor: colors.berries, borderRadius: 25 }}>
+                                            <AppText fontSize={20} textAlign={'center'} color={Colors.berries}>{magic.roll}</AppText>
+                                            <View style={{ padding: 10, backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 25 }}>
                                                 <AppText fontSize={16} textAlign={'center'}>{magic.effect}</AppText>
                                             </View>
                                         </View>)}
                                 </ScrollView>
                             }
                             <View>
-                                <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
+                                <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
                                     onPress={() => { this.setState({ wildMagicModal: false }) }} />
                             </View>
                         </Modal>
                     </View>
                 }
                 {this.props.character.charSpecials.fightingStyle.length > 0 ?
-                    <View style={styles.statContainer}>
+                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Fighting Style:</AppText>
                         {this.props.character.charSpecials.fightingStyle.map(fight =>
                             <View key={fight.name}>
-                                <AppText fontSize={20} color={colors.bitterSweetRed}>{fight.name}</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{fight.name}</AppText>
                                 <View style={{ paddingRight: 10 }}>
                                     <AppText>{fight.description}</AppText>
                                 </View>
@@ -83,25 +83,25 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                     : null
                 }
                 {this.props.character.charSpecials.battleMasterManeuvers.length > 0 ?
-                    <View style={[styles.statContainer, { marginTop: 15 }]}>
-                        <AppText textAlign={'left'} color={colors.bitterSweetRed} fontSize={22}>Maneuvers:</AppText>
+                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginTop: 15 }]}>
+                        <AppText textAlign={'left'} color={Colors.bitterSweetRed} fontSize={22}>Maneuvers:</AppText>
                         {this.props.character.charSpecials.battleMasterManeuvers.map(maneuver =>
-                            <TouchableOpacity key={maneuver.name} style={{ backgroundColor: colors.pinkishSilver, borderColor: colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
+                            <TouchableOpacity key={maneuver.name} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
                                 onPress={() => { this.setState({ maneuversModal: true, pickedManeuver: maneuver }) }}>
-                                <AppText fontSize={20} color={colors.bitterSweetRed}>{maneuver.name}</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{maneuver.name}</AppText>
                                 <View style={{ paddingRight: 10 }}>
                                     <AppText>{maneuver.description.substring(0, 80)}...</AppText>
                                 </View>
                             </TouchableOpacity>)}
                         <Modal visible={this.state.maneuversModal}>
                             {this.state.pickedManeuver &&
-                                <View style={{ flex: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                     <View style={{ padding: 20, flex: .8 }}>
-                                        <AppText textAlign={'center'} fontSize={25} color={colors.bitterSweetRed}>{this.state.pickedManeuver.name}</AppText>
+                                        <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>{this.state.pickedManeuver.name}</AppText>
                                         <AppText textAlign={'center'} fontSize={19}>{this.state.pickedManeuver.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                                     </View>
                                     <View style={{ flex: .2 }}>
-                                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ maneuversModal: false, pickedManeuver: null }) }} />
+                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ maneuversModal: false, pickedManeuver: null }) }} />
                                     </View>
                                 </View>
                             }
@@ -110,11 +110,11 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                     : null
                 }
                 {this.props.character.charSpecials.rageAmount ?
-                    <View style={styles.statContainer}>
+                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Rage Amount:</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.rageAmount}</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.rageAmount}</AppText>
                         <AppText>Rage bonus damage:</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.rageDamage}</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.rageDamage}</AppText>
                     </View>
                     : null
                 }
@@ -123,7 +123,7 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                         {this.props.character.charSpecials.kiPoints ?
                             <View style={{ flexDirection: 'row' }}>
                                 <AppText fontSize={20}>Your max ki points -</AppText>
-                                <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.kiPoints}</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.kiPoints}</AppText>
                             </View>
                             : null}
                         <View style={{ paddingRight: 10 }}>
@@ -133,24 +133,24 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                     : null}
                 {this.props.character.charSpecials.monkElementsDisciplines.length > 0 ?
                     <View>
-                        <AppText color={colors.bitterSweetRed} textAlign={'center'} fontSize={25}>Elements Disciplines:</AppText>
+                        <AppText color={Colors.bitterSweetRed} textAlign={'center'} fontSize={25}>Elements Disciplines:</AppText>
                         {this.props.character.charSpecials.monkElementsDisciplines.map(elements =>
                             <TouchableOpacity onPress={() => { this.setState({ monkElementModel: true, pickedMonkElement: elements }) }}
-                                key={elements.name} style={{ backgroundColor: colors.pinkishSilver, borderColor: colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}>
-                                <AppText fontSize={22} color={colors.totalWhite}>{elements.name}</AppText>
+                                key={elements.name} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}>
+                                <AppText fontSize={22} color={Colors.totalWhite}>{elements.name}</AppText>
                                 <View style={{ paddingRight: 10 }}>
                                     <AppText fontSize={17}>{elements.description.substring(0, 80)}...</AppText>
                                 </View>
                             </TouchableOpacity>)}
                         <Modal visible={this.state.monkElementModel}>
                             {this.state.pickedMonkElement &&
-                                <View style={{ flex: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                     <View style={{ padding: 20, flex: .8 }}>
-                                        <AppText textAlign={'center'} fontSize={25} color={colors.bitterSweetRed}>{this.state.pickedMonkElement.name}</AppText>
+                                        <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>{this.state.pickedMonkElement.name}</AppText>
                                         <AppText textAlign={'center'} fontSize={19}>{this.state.pickedMonkElement.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                                     </View>
                                     <View style={{ flex: .2 }}>
-                                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ monkElementModel: false, pickedMonkElement: null }) }} />
+                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ monkElementModel: false, pickedMonkElement: null }) }} />
                                     </View>
                                 </View>
                             }
@@ -160,36 +160,36 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                 {this.props.character.charSpecials.sneakAttackDie ?
                     <View style={{ flexDirection: 'row' }}>
                         <AppText fontSize={20}>Sneak Attack Die -</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.sneakAttackDie}D6</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.sneakAttackDie}D6</AppText>
                     </View>
                     : null}
                 {this.props.character.charSpecials.sorceryPoints ?
                     <View style={{ flexDirection: 'row' }}>
                         <AppText fontSize={20}>Your max sorcery points -</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.sorceryPoints}</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.sorceryPoints}</AppText>
                     </View>
                     : null}
                 {this.props.character.charSpecials.sorcererMetamagic.length > 0 ?
                     this.props.character.charSpecials.sorcererMetamagic.map((magic: any, index: number) =>
-                        <View key={index} style={[styles.statContainer, { marginBottom: 10 }]}>
+                        <View key={index} style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginBottom: 10 }]}>
                             <AppText fontSize={20}>{magic.name}</AppText>
                             <AppText>{magic.description}</AppText>
                         </View>)
                     : null}
                 {this.props.character.charSpecials.eldritchInvocations.length > 0 ?
                     <View>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>Eldritch Invocations</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>Eldritch Invocations</AppText>
                         {this.props.character.charSpecials.eldritchInvocations.map((invocation: any, index: number) =>
-                            <View key={index} style={[styles.statContainer, { marginBottom: 10 }]}>
+                            <View key={index} style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginBottom: 10 }]}>
                                 <AppText fontSize={20}>{invocation.name}</AppText>
                                 <AppText>{invocation.entries}</AppText>
                             </View>)}
                     </View>
                     : null}
                 {this.props.character.charSpecials.warlockPactBoon ?
-                    <View style={styles.statContainer}>
+                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Pact:</AppText>
-                        <AppText fontSize={20} color={colors.bitterSweetRed}>{this.props.character.charSpecials.warlockPactBoon.name}</AppText>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.warlockPactBoon.name}</AppText>
                         <View style={{ paddingRight: 10 }}>
                             <AppText fontSize={15}>{this.props.character.charSpecials.warlockPactBoon.description.replace(/\. /g, '.\n\n')}</AppText>
                         </View>
@@ -197,7 +197,7 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                     : null}
                 <View>
                     <View style={{ marginTop: 10, marginBottom: 10 }}>
-                        <AppButton fontSize={16} backgroundColor={colors.bitterSweetRed} width={120} height={50}
+                        <AppButton fontSize={16} backgroundColor={Colors.bitterSweetRed} width={120} height={50}
                             borderRadius={25} title={'Companions'} onPress={() => { this.setState({ companionModal: true }) }} />
                     </View>
                     <Modal animationType={"slide"} visible={this.state.companionModal}>
@@ -217,7 +217,6 @@ const styles = StyleSheet.create({
 
     },
     statContainer: {
-        borderColor: colors.black,
         borderWidth: 1,
         padding: 10,
         borderRadius: 15

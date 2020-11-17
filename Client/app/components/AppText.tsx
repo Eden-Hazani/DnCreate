@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 
 /**
  * 
@@ -31,7 +31,7 @@ export class AppText extends Component<any, any> {
                 padding: this.props.padding,
                 textAlign: this.props.textAlign,
                 fontFamily: "KumbhSans-Light",
-                color: this.props.color
+                color: this.props.color ? this.props.color : Colors.whiteInDarkMode
             }}>{this.props.children}</Text>
         )
     }

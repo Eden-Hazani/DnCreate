@@ -6,7 +6,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -84,33 +84,33 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
                     this.state.updateStory ?
                         <View>
                             <View style={{ paddingBottom: 15 }}>
-                                <AppText textAlign={"center"} color={colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>
+                                <AppText textAlign={"center"} color={Colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>
                                 <AppTextInput value={this.state.characterInfo.backStory} onChangeText={(backstory: string) => {
                                     const characterInfo = { ...this.state.characterInfo };
                                     characterInfo.backStory = backstory;
                                     this.setState({ characterInfo })
                                 }} padding={10} textAlignVertical={"top"} placeholder={`${character.name}'s backstory...`} width={"95%"} multiline={true} numberOfLines={10} />
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.updateInfo() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.updateInfo() }} />
                             </View>
                         </View>
                         :
                         <View style={styles.container}>
                             <View style={{ marginBottom: 50, padding: 15 }}>
-                                <AppText fontSize={25} textAlign={"center"} color={colors.bitterSweetRed}>BackStory, Personality Trait, Flaws, Ideals and Bonds </AppText>
+                                <AppText fontSize={25} textAlign={"center"} color={Colors.bitterSweetRed}>BackStory, Personality Trait, Flaws, Ideals and Bonds </AppText>
                                 <AppText textAlign={"center"} fontSize={18}>In the next section you will need to write and pick Personality Trait, Flaws, Ideals and Bonds that define your character.</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>Feel free to consult with your DM in order to write a good background story that fits the world of the current adventure.</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>From this point on your character has been saved and you can access it through the character hall.</AppText>
                             </View>
                             <View style={{ padding: 20 }}>
-                                <AppText fontSize={25} textAlign={"center"} color={colors.bitterSweetRed}>BackStory</AppText>
+                                <AppText fontSize={25} textAlign={"center"} color={Colors.bitterSweetRed}>BackStory</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>We heavily recommend that you check online guide sites such as DNDBeyond for searching the background that suites you.</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>Remember that the background story is yours to make and you can consult your DM in order to create unique buffs/debuffs that will fit the world.</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>Your background might give you special items or the knowledge of multiple languages depending on the one of your choosing.</AppText>
                             </View>
                             <View style={{ paddingBottom: 15 }}>
-                                <AppText textAlign={"center"} color={colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>
+                                <AppText textAlign={"center"} color={Colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>
                                 <AppTextInput onChangeText={(backstory: string) => { this.setState({ backstory }) }} padding={10} textAlignVertical={"top"} placeholder={`${character.name}'s backstory...`} width={"95%"} multiline={true} numberOfLines={10} />
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                             </View>
                         </View>}
             </ScrollView>

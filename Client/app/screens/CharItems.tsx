@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, Modal, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../api/userCharApi';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
@@ -151,28 +151,28 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
             <View style={styles.container}>
                 <View>
                     <View style={{ paddingTop: 10, paddingLeft: 25 }}>
-                        <AppText fontSize={35} color={colors.bitterSweetRed}>Currency</AppText>
+                        <AppText fontSize={35} color={Colors.bitterSweetRed}>Currency</AppText>
                         <TouchableOpacity style={styles.currency} onPress={() => { this.openCurrencyChange() }}>
                             <AppText fontSize={20}>{`Gold ${this.state.character.currency.gold} Silver ${this.state.character.currency.silver} Copper ${this.state.character.currency.copper}`}</AppText>
                         </TouchableOpacity>
                     </View>
                     <Modal visible={this.state.changeCurrencyModal}>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                             <View style={{ flex: .8, justifyContent: "center", paddingTop: 25, alignItems: "center" }}>
-                                <AppText fontSize={18} color={colors.bitterSweetRed}>Gold</AppText>
+                                <AppText fontSize={18} color={Colors.bitterSweetRed}>Gold</AppText>
                                 <AppTextInput keyboardType={'numeric'} iconName={"podium-gold"} value={`${this.state.newGold}`} placeholder={'Gold'} onChangeText={(amount: number) => { this.setState({ newGold: amount }) }} />
-                                <AppText fontSize={18} color={colors.bitterSweetRed}>Silver</AppText>
+                                <AppText fontSize={18} color={Colors.bitterSweetRed}>Silver</AppText>
                                 <AppTextInput keyboardType={'numeric'} iconName={"podium-silver"} value={`${this.state.newSilver}`} placeholder={'Silver'} onChangeText={(amount: number) => { this.setState({ newSilver: amount }) }} />
-                                <AppText fontSize={18} color={colors.bitterSweetRed}>Copper</AppText>
+                                <AppText fontSize={18} color={Colors.bitterSweetRed}>Copper</AppText>
                                 <AppTextInput keyboardType={'numeric'} iconName={"podium-bronze"} value={`${this.state.newCopper}`} placeholder={'Copper'} onChangeText={(amount: number) => { this.setState({ newCopper: amount }) }} />
                             </View>
                             <View style={{ flex: .2, flexDirection: 'row' }}>
                                 <View style={{ flex: .5 }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} width={100}
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} width={100}
                                         height={50} borderRadius={25} title={"Cancel"} onPress={() => { this.setState({ changeCurrencyModal: false }) }} />
                                 </View>
                                 <View style={{ flex: .5 }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} width={100}
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} width={100}
                                         height={50} borderRadius={25} title={"Change"} onPress={() => { this.changeCurrencyAmount() }} />
                                 </View>
                             </View>
@@ -181,38 +181,38 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                 </View>
                 <View style={{ flexDirection: "row", padding: 25 }}>
                     <View style={{ flex: .7 }}>
-                        <AppText fontSize={35} color={colors.bitterSweetRed}>Items</AppText>
+                        <AppText fontSize={35} color={Colors.bitterSweetRed}>Items</AppText>
                     </View>
                     <View style={{ flex: .2 }}>
-                        <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} width={100}
+                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} width={100}
                             height={50} borderRadius={25} title={"Add Item"} onPress={() => { this.setState({ addItemModal: true }) }} />
                     </View>
                 </View>
                 <Modal visible={this.state.addItemModal}>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                         <View style={{ flex: .8, justifyContent: "center", alignItems: "center" }}>
-                            <AppText color={colors.bitterSweetRed} fontSize={25}>Add Item</AppText>
+                            <AppText color={Colors.bitterSweetRed} fontSize={25}>Add Item</AppText>
                             <AppTextInput placeholder={'Item Name'} onChangeText={(item: string) => { this.setState({ newItem: item }) }} />
                             <AppTextInput keyboardType={"numeric"} placeholder={'Amount'} onChangeText={(amount: number) => { this.setState({ newAmount: amount }) }} />
                         </View>
                         <View style={{ flex: .4, flexDirection: "row" }}>
                             <View style={{ flex: .5 }}>
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100}
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
                                     height={100} title={"Add Item"} onPress={() => {
                                         this.addItem()
                                     }} />
                             </View>
                             <View style={{ flex: .5 }}>
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100}
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
                                     height={100} title={"Back"} onPress={() => { this.setState({ addItemModal: false }) }} />
                             </View>
                         </View>
                     </View>
                 </Modal>
                 <SearchBar
-                    containerStyle={{ backgroundColor: colors.white }}
-                    inputContainerStyle={{ backgroundColor: colors.white }}
-                    lightTheme
+                    containerStyle={{ backgroundColor: Colors.pageBackground }}
+                    inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
+                    lightTheme={Colors.pageBackground === "#121212" ? false : true}
                     placeholder="Search For Item"
                     onChangeText={this.updateSearch}
                     value={this.state.search}
@@ -226,7 +226,7 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                                 title={`Item - ${item[0]}`}
                                 subTitle={`Amount -  ${item[1]}`}
                                 direction={'row'}
-                                subColor={colors.bitterSweetRed}
+                                subColor={Colors.bitterSweetRed}
                                 headerFontSize={20}
                                 padding={20} width={60} height={60}
                                 headTextAlign={"left"}
@@ -253,7 +253,7 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                             renderItem={({ item }) => <ListItem
                                 title={`Item - ${item}`}
                                 direction={'row'}
-                                subColor={colors.bitterSweetRed}
+                                subColor={Colors.bitterSweetRed}
                                 headerFontSize={20}
                                 padding={20} width={60} height={60}
                                 headTextAlign={"left"}
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
         padding: 8,
         width: 260,
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
+        borderColor: Colors.bitterSweetRed,
         borderRadius: 25
     }
 });

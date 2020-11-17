@@ -2,7 +2,7 @@ import React, { Component, useState, useEffect } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native';
 import * as ImagePicker from 'expo-image-picker'
 import { AppButton } from './AppButton';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { IconGen } from './IconGen';
 
 
@@ -45,7 +45,7 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
     return (
         <TouchableWithoutFeedback onPress={() => handelPress()}>
             <View style={styles.container}>
-                {!imageUri && <IconGen name={"camera"} size={100} backgroundColor={colors.lightGray} iconColor={colors.white} />}
+                {!imageUri && <IconGen name={"camera"} size={100} backgroundColor={Colors.lightGray} iconColor={Colors.white} />}
                 {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
             </View>
         </TouchableWithoutFeedback>

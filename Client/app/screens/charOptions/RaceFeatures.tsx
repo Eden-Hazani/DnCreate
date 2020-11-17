@@ -4,7 +4,7 @@ import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppText } from '../../components/AppText';
 import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 
 interface RaceFeaturesState {
@@ -36,23 +36,23 @@ export class RaceFeatures extends Component<{ route: any }, RaceFeaturesState> {
                             <AppText fontSize={20}>{this.state.character.race} Path Features</AppText>
                         </View>
                         <View style={styles.featureItem}>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Age:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.age}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Alignment:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.alignment}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Languages:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.languages}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Size:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.size}</AppText>
-                            <AppText fontSize={18} padding={10} color={colors.berries} textAlign={'center'}>Speed: {this.state.character.raceId.raceAbilities.speed}ft</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Age:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.age}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Alignment:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.alignment}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Languages:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.languages}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Size:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.size}</AppText>
+                            <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.character.raceId.raceAbilities.speed}ft</AppText>
                         </View>
                         {this.state.character.charSpecials.dragonBornAncestry &&
                             <View style={styles.featureItem}>
-                                <AppText fontSize={22} padding={10} color={colors.black} textAlign={'center'}>Your Dragon ancestry feature</AppText>
-                                <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.color} dragon ancestry</AppText>
-                                <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.damageType} damage type</AppText>
-                                <AppText fontSize={20} padding={5} color={colors.black} textAlign={'center'}>Attack style</AppText>
-                                <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.breath}</AppText>
+                                <AppText fontSize={22} padding={10} color={Colors.black} textAlign={'center'}>Your Dragon ancestry feature</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.color} dragon ancestry</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.damageType} damage type</AppText>
+                                <AppText fontSize={20} padding={5} color={Colors.black} textAlign={'center'}>Attack style</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials.dragonBornAncestry.breath}</AppText>
                             </View>
                         }
                         {this.state.character.raceId.raceAbilities?.uniqueAbilities &&
@@ -80,15 +80,15 @@ const styles = StyleSheet.create({
         margin: 15,
         borderWidth: 1,
         borderRadius: 15,
-        borderColor: colors.berries,
-        backgroundColor: colors.pinkishSilver
+        borderColor: Colors.berries,
+        backgroundColor: Colors.pinkishSilver
     },
     featureItem: {
         padding: 15,
         margin: 15,
         borderWidth: 1,
         borderRadius: 15,
-        borderColor: colors.berries,
-        backgroundColor: colors.pinkishSilver
+        borderColor: Colors.berries,
+        backgroundColor: Colors.pinkishSilver
     }
 });

@@ -6,7 +6,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -132,7 +132,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>
-                            <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Bonds</AppText>
+                            <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Bonds</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Here you can write up to six of your characters Bonds.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Bonds represent a character’s connections to people, places, and events in the world. They tie you to things from your background.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>They can work very much like ideals, driving a character’s motivations and goals.</AppText>
@@ -146,11 +146,11 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateBonds ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateBonds() }} />
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateBonds() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
                                 </View>
                                 :
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                             }
                         </View>
                     </View>}

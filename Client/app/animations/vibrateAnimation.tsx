@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Animated, View, Image, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import colors from '../config/colors'
+import { Colors } from '../config/colors'
 import { Dimensions } from 'react-native';
 import { AppText } from '../components/AppText';
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     innerContainer: {
-        backgroundColor: colors.bitterSweetRed,
+        backgroundColor: Colors.bitterSweetRed,
         paddingTop: 5,
         borderWidth: 5,
         borderColor: "black",
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 15,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderWidth: 2,
         justifyContent: "center",
         alignItems: "center",

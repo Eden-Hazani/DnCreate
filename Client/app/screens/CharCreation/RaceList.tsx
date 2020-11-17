@@ -16,7 +16,7 @@ import { ModifiersModel } from '../../models/modifiersModel';
 import { RaceModel } from '../../models/raceModel';
 import { UserModel } from '../../models/userModel';
 import { AppConfirmation } from '../../components/AppConfirmation';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import AsyncStorage from '@react-native-community/async-storage';
 
 
@@ -140,9 +140,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                             </> :
                                 <View>
                                     <SearchBar
-                                        containerStyle={{ backgroundColor: colors.white }}
-                                        inputContainerStyle={{ backgroundColor: colors.white }}
-                                        lightTheme
+                                        containerStyle={{ backgroundColor: Colors.pageBackground }}
+                                        inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
+                                        lightTheme={Colors.pageBackground === "#121212" ? false : true}
                                         placeholder="Search For Race"
                                         onChangeText={this.updateSearch}
                                         value={this.state.search}

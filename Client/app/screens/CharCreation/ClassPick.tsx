@@ -10,7 +10,7 @@ import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppError } from '../../components/AppError';
 import { AppPicker } from '../../components/AppPicker';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
@@ -99,25 +99,25 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
                                     {this.state.pickedClass.name &&
                                         <View style={styles.infoContainer}>
                                             <View >
-                                                <AppText fontSize={30} textAlign={"center"} color={colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
+                                                <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
                                                 <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description}</AppText>
                                                 <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo}</AppText>
                                                 <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
                                                     <View style={{ width: "50%", marginTop: 10 }}>
-                                                        <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Recommended Attributes</AppText>
+                                                        <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
                                                         <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.recommendation}</AppText>
                                                     </View>
                                                     <View style={{ width: "50%" }}>
-                                                        <AppText textAlign={"center"} fontSize={18} color={colors.bitterSweetRed}>Saving Throws</AppText>
+                                                        <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Saving Throws</AppText>
                                                         {this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
                                                     </View>
                                                     <View style={{ padding: 10 }}>
-                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL(this.state.pickedClass.information) }} />
+                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL(this.state.pickedClass.information) }} />
                                                     </View>
                                                 </View>
                                             </View>
                                             <View>
-                                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                                             </View>
                                         </View>
                                     }

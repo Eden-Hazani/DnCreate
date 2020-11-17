@@ -10,13 +10,14 @@ import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ModifiersModel } from '../../models/modifiersModel';
 import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import { AttributeHelp } from './AttributeHelp';
+import { ManualAttribute } from './ManualAttribute';
 
 interface AttributePickingState {
     finishRolls: boolean
@@ -81,7 +82,6 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
     }
     onFocus = async () => {
         let attributes = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
-        console.log('ATTRIBUTE PAGE')
         let characterInfo = { ...this.state.characterInfo };
         let dicePool = this.state.dicePool;
         const rollDisabled = this.state.rollDisabled;
@@ -100,7 +100,6 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                     .filter(index => index !== -1);
                 for (let index of indexes) {
                     if (rollDisabled[index] !== true) {
-                        console.log(index)
                         rollDisabled[index] = true;
                         break;
                     }
@@ -111,6 +110,13 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         if (dicePool.length === 6) {
             this.setState({ finishRolls: true })
         }
+        if (this.state.characterInfo.modifiers.strength !== undefined
+            && this.state.characterInfo.modifiers.constitution !== undefined
+            && this.state.characterInfo.modifiers.dexterity !== undefined
+            && this.state.characterInfo.modifiers.intelligence !== undefined
+            && this.state.characterInfo.modifiers.wisdom !== undefined
+            && this.state.characterInfo.modifiers.charisma !== undefined
+        ) { this.setState({ finishRolls: true }) }
         this.setState({ characterInfo, dicePool, rollDisabled })
     }
     componentWillUnmount() {
@@ -247,10 +253,10 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
 
     render() {
         return (
-            <ScrollView keyboardShouldPersistTaps="always">
+            <ScrollView keyboardShouldPersistTaps="always" >
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
-                        <View style={[styles.rollingDice, { backgroundColor: this.state.rollingDice ? colors.softBlack : colors.totalWhite }]} pointerEvents={this.state.rollingDice ? "none" : "auto"}>
+                        <View style={[styles.rollingDice, { backgroundColor: this.state.rollingDice ? Colors.softBlack : Colors.pageBackground }]} pointerEvents={this.state.rollingDice ? "none" : "auto"}>
                             {this.state.rollingDice && <View style={{
                                 position: 'absolute', top: 0, left: 0,
                                 right: 0,
@@ -258,10 +264,10 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                                <View style={styles.animationContainer}>
+                                <View style={[styles.animationContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                                     <RollingDiceAnimation props />
                                     <View style={{ width: '100%', marginLeft: 50, transform: [{ rotateX: '15deg' }, { rotateY: '30deg' }] }}>
-                                        <AppText fontSize={50} color={colors.white}>Rolling Dice</AppText>
+                                        <AppText fontSize={50} color={Colors.whiteInDarkMode}>Rolling Dice</AppText>
                                     </View>
                                 </View>
                             </View>}
@@ -279,7 +285,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.strength}</AppText>
                                         </View>
@@ -298,7 +304,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.constitution}</AppText>
                                         </View>
@@ -317,7 +323,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.dexterity}</AppText>
                                         </View>
@@ -336,7 +342,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.intelligence}</AppText>
                                         </View>
@@ -355,7 +361,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.wisdom}</AppText>
                                         </View>
@@ -374,7 +380,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                                 }
                                                 this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null
                                             }} />
-                                        <View style={styles.modifierBox}>
+                                        <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
                                             <AppText textAlign="center">{this.state.characterInfo.modifiers?.charisma}</AppText>
                                         </View>
@@ -382,8 +388,8 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                 </View>
                             </View>
                             <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 25 }}>
-                                <AppText textAlign={'center'} color={colors.berries}>Activate color coded help</AppText>
-                                <AppText textAlign={'center'} color={colors.berries}>(recommended for new players)</AppText>
+                                <AppText textAlign={'center'} color={Colors.berries}>Activate color coded help</AppText>
+                                <AppText textAlign={'center'} color={Colors.berries}>(recommended for new players)</AppText>
                                 <Switch value={this.state.colorCodedGuide} onValueChange={() => {
                                     if (this.state.colorCodedGuide) {
                                         this.setState({ colorCodedGuide: false })
@@ -394,17 +400,19 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                             </View>
                             <View >
                                 <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
-                                        width={150} fontSize={20} onPress={() => this.state.finishRolls ? alert("No rolls left!") : this.rollDice()} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
+                                        width={Dimensions.get('screen').width / 3.2} fontSize={18} onPress={() => this.state.finishRolls ? alert("No rolls left!") : this.rollDice()} />
                                     <AttributeHelp />
+                                    <ManualAttribute character={this.state.characterInfo}
+                                        finishedRollsAndInsertInfo={(rolls: boolean, characterInfo: CharacterModel) => { this.setState({ finishRolls: rolls, characterInfo }) }} />
                                 </View>
                                 <View style={styles.dicePool}>
-                                    <AppText fontSize={25} color={colors.bitterSweetRed}>Dice Pool</AppText>
+                                    <AppText fontSize={25} color={Colors.bitterSweetRed}>Dice Pool</AppText>
                                     <View style={{ flexDirection: "row" }}>
                                         {this.state.dicePool.map((result, index) =>
                                             <View key={index} style={{ padding: 5 }}>
                                                 <AppButton disabled={this.state.rollDisabled[index] || !this.state.finishRolls || this.state.sumOfDice > 0}
-                                                    borderRadius={10} backgroundColor={colors.bitterSweetRed} title={result.toString()}
+                                                    borderRadius={10} backgroundColor={Colors.bitterSweetRed} title={result.toString()}
                                                     onPress={() => { this.setSumAndDisableRoll(result, index) }}
                                                     width={50} height={40} fontSize={15} key={result} />
                                             </View>
@@ -421,7 +429,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                 <View style={styles.container} pointerEvents={this.state.diceResults.length === 0 ? "none" : "auto"}>
                                     <View style={styles.rolledDiceContainer} >
                                         <AppText>Dice I</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceI ? colors.lightGray : colors.totalWhite }]}
+                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceI ? Colors.lightGray : Colors.pageBackground }]}
                                             disabled={!this.state.diceI && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[0], this.state.diceI);
@@ -432,7 +440,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice II</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceII ? colors.lightGray : colors.totalWhite }]}
+                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceII ? Colors.lightGray : Colors.pageBackground }]}
                                             disabled={!this.state.diceII && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[1], this.state.diceII);
@@ -444,7 +452,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice III</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIII ? colors.lightGray : colors.totalWhite }]}
+                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIII ? Colors.lightGray : Colors.pageBackground }]}
                                             disabled={!this.state.diceIII && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[2], this.state.diceIII);
@@ -456,7 +464,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice IV</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIV ? colors.lightGray : colors.totalWhite }]}
+                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIV ? Colors.lightGray : Colors.pageBackground }]}
                                             disabled={!this.state.diceIV && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[3], this.state.diceIV);
@@ -468,7 +476,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                 </View>
                                 <View style={{ marginTop: 20 }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} title={"Continue"} height={50} width={120} borderRadius={50} onPress={() => { this.insertInfoAndContinue() }} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} title={"Continue"} height={50} width={120} borderRadius={50} onPress={() => { this.insertInfoAndContinue() }} />
                                 </View>
                             </View>
                         </View>
@@ -495,30 +503,18 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     modifierBox: {
-        borderColor: colors.black,
         borderWidth: 1,
         borderRadius: 5
     },
-    attribute: {
-        marginTop: 5,
-        width: 50,
-        height: 50,
-        borderRadius: 15,
-        borderColor: colors.black,
-        borderWidth: 2,
-        justifyContent: "center",
-        alignItems: "center"
-    },
+
     rollingDice: {
         height: Dimensions.get('screen').height,
         width: Dimensions.get('screen').width,
-        backgroundColor: colors.softBlack,
     },
     rolledDice: {
         width: 80,
         height: 80,
         borderRadius: 25,
-        borderColor: colors.black,
         borderWidth: 2,
         justifyContent: "center",
         alignItems: "center"
@@ -541,7 +537,6 @@ const styles = StyleSheet.create({
         width: "33%"
     },
     animationContainer: {
-        backgroundColor: colors.bitterSweetRed,
         width: 200,
         justifyContent: "center",
         alignItems: "center",

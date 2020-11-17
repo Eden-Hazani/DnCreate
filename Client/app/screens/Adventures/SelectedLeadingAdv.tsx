@@ -7,7 +7,7 @@ import { AppText } from '../../components/AppText';
 import { ListItem } from '../../components/ListItem';
 import { ListItemDelete } from '../../components/ListItemDelete';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
 import errorHandler from '../../../utility/errorHander';
 import { store } from '../../redux/store';
@@ -84,7 +84,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                             <AppText fontSize={25} textAlign={'center'}>{adventure.adventureName}</AppText>
                             <AppText>Setting: {adventure.adventureSetting}</AppText>
                         </View>
-                        <AppText color={colors.bitterSweetRed} fontSize={20}>Participants</AppText>
+                        <AppText color={Colors.bitterSweetRed} fontSize={20}>Participants</AppText>
                         {adventure.participants_id.length === 0 ?
                             <View style={styles.main}>
                                 <AppText textAlign={'center'} fontSize={15}>No one is currently participating in this adventure.</AppText>
@@ -101,7 +101,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                         imageUrl={`${Config.serverUrl}/assets/${item.image}`}
                                         direction={'row'}
                                         headerFontSize={18}
-                                        headColor={colors.bitterSweetRed}
+                                        headColor={Colors.bitterSweetRed}
                                         subFontSize={15}
                                         padding={20} width={60} height={60}
                                         headTextAlign={"left"}
@@ -115,12 +115,12 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                         }
                         <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
                             <AppText fontSize={18}>Adventure identifier:</AppText>
-                            <AppText fontSize={20} color={colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
+                            <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                         </View>
                         <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.back() }}
+                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.back() }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
-                            <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
+                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
                         </View>
                     </View>

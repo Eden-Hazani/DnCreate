@@ -1,12 +1,12 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
-import { View, StyleSheet, Switch, Modal, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Switch, Modal, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { AppForm } from '../../components/forms/AppForm';
 import { AppFormField } from '../../components/forms/AppFormField';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import * as Yup from 'yup';
 import { SubmitButton } from '../../components/forms/SubmitButton';
@@ -158,12 +158,12 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         return (
             <ScrollView style={styles.container}>
                 <View style={{ alignItems: 'center', padding: 20, marginBottom: 20 }}>
-                    <AppText fontSize={18} color={colors.bitterSweetRed}>Equipped Armor Set</AppText>
+                    <AppText fontSize={18} color={Colors.bitterSweetRed}>Equipped Armor Set</AppText>
                     {this.state.character.equippedArmor &&
                         <View style={styles.equippedArmor}>
                             {this.state.character.equippedArmor.name === 'No Armor Equipped' ? null :
                                 <TouchableOpacity style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}>
-                                    <AppButton backgroundColor={colors.berries} color={colors.totalWhite} width={80} height={50} borderRadius={25}
+                                    <AppButton backgroundColor={Colors.berries} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
                                         title={'Remove Set'} onPress={() => { this.removeEquippedSet() }} />
                                 </TouchableOpacity>
                             }
@@ -175,36 +175,36 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                         </View>}
                 </View>
                 <View>
-                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                         title={'Add Armor Set'} onPress={() => { this.setState({ addArmor: true }) }} />
                 </View>
                 <Modal visible={this.state.addArmor}>
-                    <ScrollView>
-                        <AppText textAlign={'center'} fontSize={30} color={colors.bitterSweetRed}>Add new armor to inventory</AppText>
-                        <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                    <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                        <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Add new armor to inventory</AppText>
+                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                             title={'tutorial'} onPress={() => { this.setState({ tutorialOn: true }) }} />
                         <View style={{ justifyContent: "center", alignItems: "center", padding: 20 }}>
                             <View style={{ marginBottom: 20 }}>
                                 <AppText fontSize={20} textAlign={'center'}>As a {this.state.character.characterClass} you have the following armor proficiencies:</AppText>
                             </View>
-                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: colors.pinkishSilver, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                 {this.state.character.characterClassId.armorProficiencies.map((item: any) =>
-                                    <View key={item} style={{ margin: 5, backgroundColor: colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                    <View key={item} style={{ margin: 5, backgroundColor: Colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                         <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
                                     </View>)}
                             </View>
                             <View style={{ marginTop: 20, marginBottom: 20 }}>
                                 <AppText fontSize={20} textAlign={'center'}>You also gained the following armor proficiencies from your path or special events in your adventure:</AppText>
                             </View>
-                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: colors.pinkishSilver, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                            <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                 {this.state.character.addedArmorProf.map((item: any, index: number) =>
-                                    <View key={index} style={{ margin: 5, backgroundColor: colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: colors.berries, borderRadius: 15 }}>
+                                    <View key={index} style={{ margin: 5, backgroundColor: Colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                         <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
                                     </View>)}
                             </View>
                         </View>
-                        <Modal visible={this.state.tutorialOn}>
-                            <View style={{ alignItems: "center", padding: 20 }}>
+                        <Modal visible={this.state.tutorialOn} >
+                            <View style={{ alignItems: "center", padding: 20, backgroundColor: Colors.pageBackground }}>
                                 <AppText fontSize={18} textAlign={'center'}>There are three departments of armor</AppText>
                                 <AppText padding={17} fontSize={18}>Heavy Armor</AppText>
                                 <AppText textAlign={'center'} fontSize={15}>Of all the armor categories, Heavy Armor offers the best Protection. These suits of armor cover the entire body and are designed to stop a wide range of attacks.</AppText>
@@ -218,7 +218,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                     <AppText fontSize={16}>{this.state.character.characterClassId.armorProficiencies} {this.state.character.addedArmorProf}</AppText>
                                 </View>
                                 <AppText padding={20} textAlign={'center'}>You can unlock new proficiencies with some class paths or your DM might give you spacial proficiencies during your adventure.</AppText>
-                                <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                                     title={'close'} onPress={() => { this.setState({ tutorialOn: false }) }} />
                             </View>
                         </Modal>
@@ -226,12 +226,14 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                             initialValues={{ armorName: '', armorAc: null }}
                             onSubmit={(values: any) => this.addArmor(values)}
                             validationSchema={ValidationSchema}>
-                            <View style={{ marginBottom: 40 }}>
+                            <View style={{ marginBottom: 40, justifyContent: "center", alignItems: "center" }}>
                                 <AppFormField
+                                    style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     fieldName={"armorName"}
                                     iconName={"text-short"}
                                     placeholder={"Armor name..."} />
                                 <AppFormField
+                                    style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     keyboardType={'numeric'}
                                     fieldName={"armorAc"}
                                     iconName={"lock-outline"}
@@ -247,19 +249,19 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                     }} />
                                 </View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                                    <AppButton backgroundColor={this.state.heavyArmor ? colors.bitterSweetRed : colors.lightGray} width={100} height={50} borderRadius={25}
+                                    <AppButton backgroundColor={this.state.heavyArmor ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
                                         title={'Heavy Armor'} onPress={() => { this.setState({ armorType: 'Heavy Armor', heavyArmor: true, mediumArmor: false, lightArmor: false }) }} />
 
-                                    <AppButton backgroundColor={this.state.mediumArmor ? colors.bitterSweetRed : colors.lightGray} width={100} height={50} borderRadius={25}
+                                    <AppButton backgroundColor={this.state.mediumArmor ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
                                         title={'Medium Armor'} onPress={() => { this.setState({ armorType: 'Medium Armor', heavyArmor: false, mediumArmor: true, lightArmor: false }) }} />
 
-                                    <AppButton backgroundColor={this.state.lightArmor ? colors.bitterSweetRed : colors.lightGray} width={100} height={50} borderRadius={25}
+                                    <AppButton backgroundColor={this.state.lightArmor ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
                                         title={'Light Armor'} onPress={() => { this.setState({ armorType: 'Light Armor', heavyArmor: false, mediumArmor: false, lightArmor: true }) }} />
                                 </View>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <SubmitButton textAlign={'center'} title={"Add Armor"} />
-                                <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                                     title={'close'} onPress={() => { this.setState({ addArmor: false }) }} />
                             </View>
                         </AppForm>
@@ -270,17 +272,17 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                         {this.state.armorList.map(armor =>
                             <View key={armor.id} style={styles.armorUnit}>
                                 <TouchableOpacity style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} color={colors.totalWhite} width={80} height={50} borderRadius={25}
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
                                         title={'Equip Set'} onPress={() => { this.equipSet(armor) }} />
                                 </TouchableOpacity>
                                 {armor.removable ?
                                     <TouchableOpacity style={{ position: 'absolute', right: 10, top: 70, zIndex: 1 }}>
-                                        <AppButton backgroundColor={colors.berries} color={colors.totalWhite} width={80} height={50} borderRadius={25}
+                                        <AppButton backgroundColor={Colors.berries} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
                                             title={'Delete Set'} onPress={() => { this.removeSet(armor.id) }} />
                                     </TouchableOpacity>
                                     :
                                     <View>
-                                        <AppText color={colors.danger} fontSize={16}>This armor is not removable</AppText>
+                                        <AppText color={Colors.danger} fontSize={16}>This armor is not removable</AppText>
                                     </View>
                                 }
                                 <View style={{ width: '65%' }}>
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
         padding: 15,
         paddingBottom: 30,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderRadius: 25,
         margin: 20
     }, equippedArmor: {
@@ -314,7 +316,7 @@ const styles = StyleSheet.create({
         position: "relative",
         padding: 15,
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
+        borderColor: Colors.bitterSweetRed,
         borderRadius: 25,
         margin: 20
     }

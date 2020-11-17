@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AppText } from '../AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { IconGen } from '../IconGen';
 
@@ -9,8 +9,8 @@ export class ErrorMessage extends Component<any>{
         if (!this.props.error || !this.props.visible) return null
         return (
             <View style={styles.container}>
-                <IconGen name={"exclamation"} size={60} backgroundColor={'none'} iconColor={colors.danger} />
-                <AppText color={colors.danger}>{this.props.error}</AppText>
+                <IconGen name={"exclamation"} size={60} backgroundColor={'none'} iconColor={Colors.danger} />
+                <AppText color={Colors.danger}>{this.props.error}</AppText>
             </View>
         )
     }

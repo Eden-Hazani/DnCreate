@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppText } from './AppText';
 import { IconGen } from './IconGen';
 
@@ -20,7 +20,7 @@ export class AppPickerItem extends Component<any>{
             <TouchableOpacity onPress={this.props.onPress} style={{ width: "35%" }}>
                 <View style={styles.container}>
                     {this.props.iconName ?
-                        <IconGen size={Dimensions.get('screen').width / 5.5} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={colors.white} />
+                        <IconGen size={Dimensions.get('screen').width / 5.5} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={Colors.whiteInDarkMode} />
                         :
                         <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} source={{ uri: this.props.imageUrl }} />
                     }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import { AppText } from './AppText';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 
 
 /**
@@ -19,9 +19,9 @@ export class AppButton extends Component<any>{
                     {[styles.button,
                     {
                         marginBottom: this.props.marginBottom,
-                        backgroundColor: this.props.backgroundColor, width: this.props.width, height: this.props.height,
+                        backgroundColor: this.props.disabled ? Colors.lightGray : this.props.backgroundColor, width: this.props.width, height: this.props.height,
                         borderRadius: this.props.borderRadius, display: this.props.display
-                    }, this.props.disabled ? styles.disabled : null]}>
+                    }]}>
                     <AppText color={this.props.color} fontSize={this.props.fontSize}
                         textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppText>
                 </View>
@@ -44,6 +44,5 @@ const styles = StyleSheet.create({
         borderRadius: 25,
     },
     disabled: {
-        backgroundColor: colors.softBlack,
     }
 })

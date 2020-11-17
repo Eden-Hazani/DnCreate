@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import spellLists from '../../jsonDump/PathSpellAdditionLists.json'
 import spellsJSON from '../../jsonDump/spells.json'
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
@@ -40,7 +40,7 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ returnMagic: an
                 <AppText fontSize={22} textAlign={'center'}>You will gain the following spells </AppText>
                 {this.state.domainMagic.map((magic, index: number) =>
                     <View key={`${magic}${index}`} style={{ justifyContent: "center", alignItems: "center" }}>
-                        <AppText color={colors.bitterSweetRed} fontSize={18}>{magic}</AppText>
+                        <AppText color={Colors.bitterSweetRed} fontSize={18}>{magic}</AppText>
                     </View>)}
             </View>
         )

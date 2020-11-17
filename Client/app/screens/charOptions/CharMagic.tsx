@@ -1,14 +1,69 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Vibration } from 'react-native';
 import { SpellCastingSwitch } from '../../../utility/spellCastingSwitch';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { CharMagicLists } from './CharMagicLists';
 import { checkAvailableKnownSpells } from './helperFunctions/cheakSpellSlots';
 import * as SpellCastingJson from '../../../jsonDump/spellCastingScores.json'
+import AsyncStorage from '@react-native-community/async-storage';
+import { spellCharMagicRenaming } from './helperFunctions/spellCharMagicRenaming';
+import { hpColors } from '../../../utility/hpColors';
+import { AppButton } from '../../components/AppButton';
 
-export class CharMagic extends Component<{ character: CharacterModel, currentProficiency: number, reloadChar: any }> {
+interface CharMagicState {
+    availableMagic: number[]
+}
+
+export class CharMagic extends Component<{ character: CharacterModel, currentProficiency: number, reloadChar: any }, CharMagicState> {
+    constructor(props: any) {
+        super(props)
+        this.state = {
+            availableMagic: []
+        }
+    }
+
+    async componentDidMount() {
+        let availableMagic = await AsyncStorage.getItem(`${this.props.character._id}availableMagic`);
+        const totalMagic = Object.values(this.props.character.magic);
+        if (availableMagic) {
+            let availableMagicArray = JSON.parse(availableMagic);
+            availableMagicArray = availableMagicArray.filter((item: number) => item !== null);
+            this.setState({ availableMagic: availableMagicArray })
+        }
+        if (!availableMagic) {
+            const newAvailableMagic: number[] = [];
+            for (let item of totalMagic) {
+                newAvailableMagic.push(item)
+            }
+            this.setState({ availableMagic: newAvailableMagic })
+            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+        }
+    }
+
+    useSpellSlot = (index: number) => {
+        const availableMagic = this.state.availableMagic;
+        if (availableMagic[index] === 0) {
+            return;
+        }
+        availableMagic[index] = availableMagic[index] - 1;
+        this.setState({ availableMagic }, async () => {
+            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
+        })
+    }
+
+    renewSpellSlot = (index: number) => {
+        const totalMagic = Object.values(this.props.character.magic);
+        const availableMagic = this.state.availableMagic;
+        if (availableMagic[index] === totalMagic[index]) {
+            return;
+        }
+        availableMagic[index] = availableMagic[index] + 1;
+        this.setState({ availableMagic }, async () => {
+            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
+        })
+    }
 
     render() {
         const { spellcastingAbility, spellSaveDc, spellAttackModifier } = SpellCastingSwitch(this.props.character, this.props.currentProficiency)
@@ -24,20 +79,20 @@ export class CharMagic extends Component<{ character: CharacterModel, currentPro
                     <View>
                         <View style={{ alignItems: "center", width: '100%' }}>
                             <AppText>Spell Casting Ability</AppText>
-                            <View style={styles.triContainer}>
+                            <View style={[styles.triContainer, { borderColor: Colors.bitterSweetRed }]}>
                                 <AppText fontSize={15} >{spellcastingAbility}</AppText>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
                             <View style={{ alignItems: "center", width: '50%' }}>
                                 <AppText>Spell Save DC</AppText>
-                                <View style={styles.triContainer}>
+                                <View style={[styles.triContainer, { borderColor: Colors.bitterSweetRed }]}>
                                     <AppText fontSize={25} >{spellSaveDc}</AppText>
                                 </View>
                             </View>
                             <View style={{ alignItems: "center", width: '50%' }}>
                                 <AppText>Spell Attack Modifier</AppText>
-                                <View style={styles.triContainer}>
+                                <View style={[styles.triContainer, { borderColor: Colors.bitterSweetRed }]}>
                                     <AppText fontSize={25} >{spellAttackModifier}</AppText>
                                 </View>
                             </View>
@@ -62,7 +117,7 @@ export class CharMagic extends Component<{ character: CharacterModel, currentPro
                     }
                     {this.props.character.characterClass === 'Wizard' &&
                         <View style={{ marginTop: 5, marginBottom: 5 }}>
-                            <AppText color={colors.berries} textAlign={'center'} fontSize={18}>As a Wizard your known spells come from your personal spell book, you can add new spells to your spell book by buying them or learning them throughout your adventure.</AppText>
+                            <AppText color={Colors.berries} textAlign={'center'} fontSize={18}>As a Wizard your known spells come from your personal spell book, you can add new spells to your spell book by buying them or learning them throughout your adventure.</AppText>
                         </View>
                     }
                     <View>
@@ -81,49 +136,36 @@ export class CharMagic extends Component<{ character: CharacterModel, currentPro
                     :
                     <View>
                         <AppText textAlign={'center'} fontSize={20}>Available Spell Slots</AppText>
+                        <View>
+                            <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Tap a spell slot to use it.</AppText>
+                            <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Long tap a spell slot to restore it.</AppText>
+                            <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>press reset to reset all your used spells</AppText>
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
+                                borderRadius={100} width={60} height={60} title={"reset"} onPress={async () => {
+                                    const totalMagic = Object.values(this.props.character.magic);
+                                    const newAvailableMagic = []
+                                    for (let item of totalMagic) {
+                                        newAvailableMagic.push(item)
+                                    }
+                                    this.setState({ availableMagic: newAvailableMagic })
+                                    await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+                                }} />
+
+                        </View>
                         <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
-                            {this.props.character.magic.cantrips &&
-                                <View style={styles.spellSlot}>
-                                    <AppText textAlign={'center'} color={colors.totalWhite}>cantrips</AppText>
-                                    <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.cantrips}</AppText>
-                                </View>
-                            }
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>1st Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.firstLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>2nd Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.secondLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>3rd Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.thirdLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>4th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.forthLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>5th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.fifthLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>6th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.sixthLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>7th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.seventhLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>8th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.eighthLevelSpells}</AppText>
-                            </View>
-                            <View style={styles.spellSlot}>
-                                <AppText textAlign={'center'} color={colors.totalWhite}>9th Level</AppText>
-                                <AppText textAlign={'center'} color={colors.totalWhite} fontSize={20}>{this.props.character.magic.ninthLevelSpells}</AppText>
-                            </View>
+                            {Object.entries(this.props.character.magic).map((item, index) =>
+                                <TouchableOpacity key={index} style={[styles.spellSlot,
+                                { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
+                                    onLongPress={() => {
+                                        Vibration.vibrate(400)
+                                        this.renewSpellSlot(index)
+                                    }} onPress={() => {
+                                        this.useSpellSlot(index)
+                                    }}>
+                                    <AppText padding={5} textAlign={'left'} fontSize={18} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
+                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {item[1]}</AppText>
+                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[index]}</AppText>
+                                </TouchableOpacity>)}
                         </View>
                     </View>
                 }
@@ -141,18 +183,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
         borderRadius: 70,
         height: 100,
         width: 100
     },
     spellSlot: {
-        alignItems: "center",
         justifyContent: "center",
         margin: 5,
-        backgroundColor: colors.bitterSweetRed,
-        width: 100,
-        height: 70,
+        backgroundColor: Colors.bitterSweetRed,
+        width: 150,
+        height: 120,
         borderRadius: 25
     }
 });

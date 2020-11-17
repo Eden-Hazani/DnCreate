@@ -6,7 +6,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -133,7 +133,7 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>
-                            <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Personality Traits</AppText>
+                            <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Personality Traits</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Here you can write up to six of your characters personality traits, (the recommended number is two) </AppText>
                         </View>
                         <AppTextInput value={traits ? traits[0] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 0) }} padding={10} placeholder={"I idolize a particular hero of my faith and constantly refer to that person's deeds and example..."} width={"80%"} />
@@ -145,11 +145,11 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateTraits ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateTraits() }} />
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateTraits() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
                                 </View>
                                 :
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                             }
                         </View>
                     </View>}

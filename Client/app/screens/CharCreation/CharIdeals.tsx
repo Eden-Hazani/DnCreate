@@ -6,7 +6,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -128,7 +128,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>
-                            <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Ideals</AppText>
+                            <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Ideals</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Here you can write up to six of your characters Ideals, When writing these remember that your character will follow these ideals to their death</AppText>
                             <AppText fontSize={18} textAlign={"center"}>The DM can also use your ideals against you, be mindful yet innovative</AppText>
                         </View>
@@ -141,11 +141,11 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateIdeals ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateIdeals() }} />
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateIdeals() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
                                 </View>
                                 :
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                             }
                         </View>
                     </View>}

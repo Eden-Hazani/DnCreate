@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { Animated, View, Image, StyleSheet, Easing } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import colors from '../config/colors'
-import { Dimensions } from 'react-native';
-import { AppText } from '../components/AppText';
+
 
 interface AnimatedLogoState {
     jiggleAnimationVal: Animated.Value;

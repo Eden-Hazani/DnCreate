@@ -9,7 +9,7 @@ import userCharApi from '../api/userCharApi';
 import { UserModel } from '../models/userModel';
 import AuthContext from '../auth/context';
 import { AppText } from '../components/AppText';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { Config } from '../../config';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import errorHandler from '../../utility/errorHander';
@@ -115,8 +115,8 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                         <AppActivityIndicator visible={this.state.loading} />
                         {this.state.loadingAd &&
                             <View>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}>Your one time session ad is loading</AppText>
-                                <AppText textAlign={'center'} color={colors.black} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Your one time session ad is loading</AppText>
+                                <AppText textAlign={'center'} color={Colors.whiteInDarkMode} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
                             </View>
                         }
                     </View>
@@ -126,7 +126,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                             <View>
                                 {this.state.characters.length === 0 ?
                                     <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
                                     </View> :
                                     <FlatList
                                         data={this.state.characters}

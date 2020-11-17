@@ -1,6 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { HomeScreen } from '../screens/HomeScreen';
 import { RaceList } from '../screens/CharCreation/RaceList';
 import { NewCharInfo } from '../screens/CharCreation/NewCharInfo';
@@ -25,11 +24,24 @@ import { PathFeatures } from '../screens/charOptions/PathFeatures';
 import { CharBackground } from '../screens/CharCreation/CharBackground';
 import { RaceFeatures } from '../screens/charOptions/RaceFeatures';
 import { SpacialRaceBonuses } from '../screens/CharCreation/SpacialRaceBonuses';
+import { store } from '../redux/store';
+import React, { useEffect, useState } from 'react'
 
 const Stack = createStackNavigator();
 
+
+
+
 const CharNavigator = () => {
-    return <Stack.Navigator screenOptions={{ headerTransparent: true, headerStyle: { backgroundColor: colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center" }}>
+    const { subscribe } = store
+    let baseColor = Colors.pageBackground
+    useEffect(() => subscribe(
+        () => setColor(Colors.pageBackground))
+        , [])
+    const [newColor, setColor] = useState(baseColor)
+    return <Stack.Navigator screenOptions={{
+        headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
+    }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
         <Stack.Screen options={{ title: "Race List", headerTransparent: false }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />

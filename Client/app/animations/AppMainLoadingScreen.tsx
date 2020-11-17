@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Image, Dimensions } from 'react-native';
-import colors from '../config/colors';
 
 export class AppMainLoadingScreen extends Component {
     render() {
@@ -19,6 +18,6 @@ export class AppMainLoadingScreen extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: colors.bitterSweetRed
+        backgroundColor: "#F76C5E"
     }
 });

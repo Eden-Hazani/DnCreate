@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -19,7 +19,7 @@ export class AppPathAddSpellPickAvailability extends Component<{ spellList: stri
                 <View style={{ justifyContent: "center", alignItems: "center" }}>
                     {this.props.spellList.map(spell =>
                         <View key={spell}>
-                            <AppText textAlign={'center'} fontSize={20} color={colors.berries}>{spell}</AppText>
+                            <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>{spell}</AppText>
                         </View>)}
                 </View>
             </View>

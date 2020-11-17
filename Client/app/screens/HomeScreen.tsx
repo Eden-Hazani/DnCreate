@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
-import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions } from 'react-native';
-import colors from '../config/colors';
+import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions, Modal } from 'react-native';
+import { Colors } from '../config/colors';
 import * as Font from 'expo-font';
 import { AppText } from '../components/AppText';
 import { AppTextHeadline } from '../components/AppTextHeadline';
@@ -19,6 +19,8 @@ import { CharacterModel } from '../models/characterModel';
 
 interface HomeState {
     loading: boolean
+    colorModal: boolean
+    darkModeOn: boolean
 }
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
@@ -28,7 +30,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     constructor(props: any) {
         super(props)
         this.state = {
-            loading: true
+            loading: true,
+            colorModal: false,
+            darkModeOn: store.getState().colorScheme
         }
         this.UnsubscribeStore = store.subscribe(() => { })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
@@ -47,7 +51,10 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             })
             return;
         }
-        await AsyncStorage.clear()
+        const colorScheme = await AsyncStorage.getItem("colorScheme");
+        if (colorScheme === "firstUse") {
+            this.setState({ colorModal: true })
+        }
         const characters = await userCharApi.getChars(this.context.user._id);
         this.clearStorageJunk(characters.data)
         store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
@@ -67,7 +74,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
     render() {
         return (
-            <View>
+            <View style={{ backgroundColor: Colors.pageBackground }}>
                 {this.state.loading ?
                     <AppActivityIndicator visible={this.state.loading} />
                     :
@@ -76,14 +83,65 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                         <View style={styles.container}>
                             <AnimateContactUpwards>
                                 <View style={{ alignItems: "center", flex: .5, padding: 20 }}>
-                                    <AppTextHeadline>DnCreate</AppTextHeadline>
-                                    <AppText textAlign={'center'} color={colors.text}>Creating fifth edition characters has never been easier</AppText>
-                                    <AppText color={colors.text}>Tap below to begin</AppText>
+                                    <AppText color={Colors.whiteInDarkMode} fontSize={35}>DnCreate</AppText>
+                                    <AppText textAlign={'center'} color={Colors.whiteInDarkMode}>Creating fifth edition characters has never been easier</AppText>
+                                    <AppText color={Colors.whiteInDarkMode}>Tap below to begin</AppText>
                                 </View>
                                 <View style={styles.buttonsView}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
-                                    <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("RaceList")} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                                 </View>
+                                <Modal visible={this.state.colorModal}>
+                                    <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
+                                        <View style={{ flex: 0.1, paddingTop: 150 }}>
+                                            <AppText textAlign={'center'} fontSize={22} color={Colors.whiteInDarkMode}>Pick your style.</AppText>
+                                        </View>
+                                        <View style={{ flex: 0.2 }}>
+                                            <AppButton disabled={!this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                                this.setState({ darkModeOn: false, loading: true }, async () => {
+                                                    await AsyncStorage.setItem('colorScheme', "light").then(() => {
+                                                        Colors.InitializeAsync().then(() => {
+                                                            store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
+                                                            this.setState({ loading: false })
+                                                        })
+                                                    });
+                                                })
+                                            }}
+                                                borderRadius={25} width={250} height={100} title={"Let there be LIGHT!"} />
+                                        </View>
+                                        <View style={{ flex: 0.2 }}>
+                                            <AppButton disabled={this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                                this.setState({ darkModeOn: true, loading: true }, async () => {
+                                                    await AsyncStorage.setItem('colorScheme', "dark").then(() => {
+                                                        Colors.InitializeAsync().then(() => {
+                                                            store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
+                                                            this.setState({ loading: false })
+                                                        })
+                                                    });
+                                                })
+                                            }}
+                                                borderRadius={25} width={250} height={100} title={"To the darkness we descend..."} />
+                                        </View>
+                                        <View style={{ flex: 0.2 }}>
+                                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                                const colorScheme = await AsyncStorage.getItem("colorScheme");
+                                                if (colorScheme === "firstUse") {
+                                                    this.setState({ darkModeOn: false, loading: true }, async () => {
+                                                        await AsyncStorage.setItem('colorScheme', "light").then(() => {
+                                                            Colors.InitializeAsync().then(() => {
+                                                                store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
+                                                                this.setState({ loading: false, colorModal: false })
+                                                            })
+                                                        });
+                                                    })
+                                                    return;
+                                                }
+                                                this.setState({ colorModal: false })
+                                            }}
+                                                fontSize={18} borderRadius={70} width={70} height={70} title={"O.K"} />
+                                        </View>
+                                    </View>
+                                </Modal>
                             </AnimateContactUpwards>
                         </View>
                     </View>

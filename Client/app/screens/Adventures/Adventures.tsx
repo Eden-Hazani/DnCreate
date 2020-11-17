@@ -11,7 +11,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
@@ -167,12 +167,12 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
                         <View style={{ flex: .5 }}>
                             <View style={styles.participating}>
-                                <AppText fontSize={20} color={colors.bitterSweetRed}>Participating In:</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>Participating In:</AppText>
                             </View>
                             <FlatList
                                 style={{ marginBottom: 10 }}
@@ -185,7 +185,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                                     headTextAlign={"left"}
                                     subTextAlign={"left"}
                                     headerFontSize={19}
-                                    headColor={colors.bitterSweetRed}
+                                    headColor={Colors.bitterSweetRed}
                                     subFontSize={15}
                                     totalPadding={20}
                                     padding={10}
@@ -196,7 +196,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                         </View>
                         <View style={{ flex: .5 }}>
                             <View style={styles.leading}>
-                                <AppText fontSize={20} color={colors.bitterSweetRed}>Leading:</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>Leading:</AppText>
                             </View>
                             <FlatList
                                 data={this.state.leadingAdventures}
@@ -208,7 +208,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                                     headTextAlign={"left"}
                                     subTextAlign={"left"}
                                     headerFontSize={19}
-                                    headColor={colors.bitterSweetRed}
+                                    headColor={Colors.bitterSweetRed}
                                     subFontSize={15}
                                     totalPadding={20}
                                     padding={10}
@@ -218,9 +218,9 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                                 }} />
                         </View>
                         <View style={styles.buttons}>
-                            <AppButton backgroundColor={colors.bitterSweetRed}
+                            <AppButton backgroundColor={Colors.bitterSweetRed}
                                 onPress={() => { this.props.navigation.navigate("StartAdventure") }} fontSize={18} borderRadius={25} width={125} height={100} title={"Start Adventure"} />
-                            <AppButton backgroundColor={colors.bitterSweetRed}
+                            <AppButton backgroundColor={Colors.bitterSweetRed}
                                 onPress={() => { this.props.navigation.navigate("JoinAdventure") }} fontSize={18} borderRadius={25} width={125} height={100} title={"Join Adventure"} />
                         </View>
                     </View>}
@@ -241,11 +241,11 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly"
     },
     participating: {
-        backgroundColor: colors.softBlack,
+        backgroundColor: Colors.softBlack,
         padding: 10
     },
     leading: {
-        backgroundColor: colors.softBlack,
+        backgroundColor: Colors.softBlack,
         padding: 10
     }
 });

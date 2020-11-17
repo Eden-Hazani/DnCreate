@@ -5,7 +5,7 @@ import { ErrorMessage } from './ErrorMessage';
 import { useFormikContext } from 'formik';
 import { onChange } from 'react-native-reanimated';
 import { IconGen } from '../IconGen';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 
 /**
  * 
@@ -29,7 +29,7 @@ export function AppFormField({ ...props }: any) {
             </View>
             {touched[props.fieldName] &&
                 <View style={{ position: "absolute", right: 15 }}>
-                    <IconGen iconColor={!errors[props.fieldName] ? colors.paleGreen : colors.danger} size={70}
+                    <IconGen iconColor={!errors[props.fieldName] ? Colors.paleGreen : Colors.danger} size={70}
                         name={!errors[props.fieldName] ? "check" : "close"} />
                 </View>
             }

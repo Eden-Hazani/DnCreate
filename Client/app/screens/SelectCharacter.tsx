@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert, Vibration } from 'react-native';
 import { IconGen } from '../components/IconGen';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppText } from '../components/AppText';
 import { AppButton } from '../components/AppButton';
 import { CharacterModel } from '../models/characterModel';
@@ -231,6 +231,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
 
+
+
     maxHpCheck = async () => {
         if (!this.state.character.maxHp) {
             const character = { ...this.state.character };
@@ -267,7 +269,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
                         <Modal visible={this.state.levelUpFunctionActive} >
-                            <ScrollView>
+                            <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
                             </ScrollView>
                         </Modal>
@@ -276,57 +278,63 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={styles.upperContainer}>
                                     <View style={{ flexDirection: "column", paddingLeft: 2 }}>
                                         <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
-                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.name}</AppText>
-                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.race}</AppText>
-                                        <AppText textAlign="center" fontSize={15} color={colors.text}>{this.state.character.characterClass}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.race}</AppText>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.characterClass}</AppText>
                                     </View>
                                     <View style={{ flex: 1, marginLeft: 10 }}>
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Initiative</AppText>
-                                                <View style={styles.triContainer}>
-                                                    <AppText fontSize={25} >{this.state.character.modifiers.dexterity}</AppText>
+                                                <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25} >{this.state.character.modifiers.dexterity}</AppText>
                                                 </View>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Level</AppText>
-                                                <TouchableOpacity disabled={isDm} style={styles.triContainer}
-                                                    onPress={() => { this.setLevel(this.state.character.level + 1) }}
-                                                    onLongPress={() => { this.setLevel(this.state.character.level - 1) }}>
-                                                    <AppText fontSize={25}>{this.state.character.level}</AppText>
+                                                <TouchableOpacity disabled={isDm} style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}
+                                                    onPress={() => {
+                                                        Vibration.vibrate(400)
+                                                        this.setLevel(this.state.character.level + 1)
+                                                    }}
+                                                    onLongPress={() => {
+                                                        Vibration.vibrate(400)
+                                                        this.setLevel(this.state.character.level - 1)
+                                                    }}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.level}</AppText>
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Max HP</AppText>
-                                                <View style={styles.triContainer}>
-                                                    <AppText fontSize={25}>{`${this.state.character.maxHp}`}</AppText>
+                                                <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{`${this.state.character.maxHp}`}</AppText>
                                                 </View>
                                             </View>
                                         </View>
                                         <View style={{ flexDirection: "row" }}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
-                                                <View style={styles.triContainer}>
-                                                    <AppText fontSize={25}>{`+${this.state.currentProficiency}`}</AppText>
+                                                <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{`+${this.state.currentProficiency}`}</AppText>
                                                 </View>
                                                 <AppText textAlign={'center'}>Proficiency Bonus</AppText>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
-                                                <View style={styles.triContainer}>
-                                                    <AppText fontSize={25}>{this.state.character.equippedArmor.ac}</AppText>
+                                                <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.equippedArmor.ac}</AppText>
                                                 </View>
                                                 <AppText>AC</AppText>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
-                                                <TouchableOpacity onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: colors.black, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
-                                                    <AppText fontSize={25}>{this.state.currentHp}</AppText>
+                                                <TouchableOpacity onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: Colors.whiteInDarkMode, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.currentHp}</AppText>
                                                 </TouchableOpacity>
                                                 <AppText>Current Hp</AppText>
                                             </View>
                                             <Modal visible={this.state.setCurrentHpModal}>
-                                                <View style={{ flex: .9, alignItems: "center" }}>
-                                                    <AppText color={colors.bitterSweetRed} fontSize={35}>Insert Current Hp</AppText>
+                                                <View style={{ flex: 1, alignItems: "center", backgroundColor: Colors.pageBackground }}>
+                                                    <AppText color={Colors.bitterSweetRed} fontSize={35}>Insert Current Hp</AppText>
                                                     <AppTextInput keyboardType={'numeric'} iconName={'plus'} onChangeText={(hp: string) => { this.setState({ currentHp: hp }) }} />
-                                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Ok'} onPress={() => { this.setCurrentHp() }} />
+                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Ok'} onPress={() => { this.setCurrentHp() }} />
                                                 </View>
                                             </Modal>
                                         </View>
@@ -336,28 +344,28 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View style={styles.iconContainer}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
-                                <IconGen size={80} backgroundColor={colors.primary} name={"book-open-page-variant"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.primary} name={"book-open-page-variant"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Background Story</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Background Story</AppText>
                                 </View>
                             </TouchableOpacity>
                             <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
-                                <ScrollView>
+                                <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                                     <View style={{ flex: .8, padding: 25 }}>
-                                        <AppText textAlign={"left"} fontSize={35} color={colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
+                                        <AppText textAlign={"left"} fontSize={35} color={Colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
                                         <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
                                     </View>
                                     <View style={{ flex: .1, padding: 25 }}>
                                         <AppText textAlign={"left"} fontSize={25}>{this.state.character.background.backgroundName}</AppText>
                                         <View>
-                                            <AppText textAlign={"left"} fontSize={20} color={colors.berries}>Background feature</AppText>
+                                            <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
                                             <AppText textAlign={"left"} fontSize={20}>{this.state.character.background.backgroundFeatureName}</AppText>
                                             <AppText textAlign={"left"} fontSize={17}>{this.state.character.background.backgroundFeatureDescription}</AppText>
                                         </View>
                                     </View>
                                     <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
-                                        <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
-                                        <AppButton disabled={isDm} backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
+                                        <AppButton disabled={isDm} backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
                                             this.setState({ backGroundStoryVisible: false }, () => {
                                                 this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
                                             })
@@ -367,14 +375,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </Modal>
 
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ statsVisible: true })}>
-                                <IconGen size={80} backgroundColor={colors.bitterSweetRed} name={"sword"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.bitterSweetRed} name={"sword"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Ability Score &amp; Modifiers</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Ability Score &amp; Modifiers</AppText>
                                 </View>
                             </TouchableOpacity>
                             <Modal visible={this.state.statsVisible} animationType="slide">
-                                <View style={{ flex: .9, alignItems: "center" }}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={35}>Stats</AppText>
+                                <View style={{ flex: .9, alignItems: "center", backgroundColor: Colors.pageBackground }}>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={35}>Stats</AppText>
                                     <AppText fontSize={30} >{`${this.state.character.race} ${this.state.character.characterClass}`}</AppText>
                                     <FlatList
                                         data={this.listStats()}
@@ -382,8 +390,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         numColumns={2}
                                         renderItem={({ item }) =>
                                             <View style={styles.modifier}>
-                                                <View style={styles.innerModifier}>
-                                                    <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                                <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
                                                     <View style={{ paddingTop: 10 }}>
                                                         <AppText textAlign={"center"}>{`Attribute score ${item[2]}`}</AppText>
                                                     </View>
@@ -395,54 +403,54 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                         } />
                                 </View>
-                                <View style={{ flex: .1 }}>
-                                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
+                                <View style={{ flex: .1, backgroundColor: Colors.pageBackground }}>
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
                                 </View>
                             </Modal>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems") }}>
-                                <IconGen size={80} backgroundColor={colors.danger} name={"sack"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.danger} name={"sack"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Items And Currency</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Items And Currency</AppText>
                                 </View>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.secRowIconContainer}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.shadowBlue} name={"pentagon"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.shadowBlue} name={"pentagon"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Features</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Features</AppText>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeats", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.strongOrange} name={"atlassian"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.orange} name={"atlassian"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Feats</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Feats</AppText>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.berries} name={"fire"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.berries} name={"fire"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Spell Book</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Spell Book</AppText>
                                 </View>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.secRowIconContainer}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.paleGreen} name={"tshirt-crew"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.paleGreen} name={"tshirt-crew"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Armor</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Armor</AppText>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PathFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.metallicBlue} name={"chart-arc"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.metallicBlue} name={"chart-arc"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Path Features</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Path Features</AppText>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("RaceFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={colors.pinkishSilver} name={"human-handsdown"} iconColor={colors.white} />
+                                <IconGen size={80} backgroundColor={Colors.pinkishSilver} name={"human-handsdown"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={colors.black}>Race Features</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Race Features</AppText>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -453,7 +461,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <AppText textAlign={'center'}>Saving Throws</AppText>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
                                 {getSpecialSaveThrows(this.state.character).map(saveThrow =>
-                                    <View style={{ borderColor: colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5 }} key={saveThrow}>
+                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5 }} key={saveThrow}>
                                         <AppText fontSize={18}>{saveThrow} </AppText>
                                     </View>)}
                             </View>
@@ -461,41 +469,41 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         <View style={styles.infoContainer}>
                             <View style={{ flexDirection: 'row' }}>
                                 <View style={[styles.list, { width: '40%' }]}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
                                     {this.state.character.skills.map(skill =>
-                                        <View key={skill} style={styles.skill}>
+                                        <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
                                             <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
-                                            <AppText fontSize={20} color={colors.bitterSweetRed}
+                                            <AppText fontSize={20} color={Colors.bitterSweetRed}
                                                 textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                         </View>
                                     )}
                                 </View>
                                 <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
                                     <AppText fontSize={25}>Hit Dice</AppText>
-                                    <AppText fontSize={25} color={colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
+                                    <AppText fontSize={25} color={Colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
                                     <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
-                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                         <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength} for melee weapons</AppText>
                                     </View>
-                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                         <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity} for ranged weapons</AppText>
                                     </View>
                                     <AppText textAlign={'center'} fontSize={18}>Proficient weapons {'\n'} (add to attack roll)</AppText>
-                                    <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <View style={{ borderWidth: 1, borderColor: colors.berries, borderRadius: 15, backgroundColor: colors.pinkishSilver }}>
+                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                        <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
                                             <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
                                         </View>
                                         <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                     </View>
                                     {this.state.character.addedWeaponProf.length > 0 &&
-                                        <View style={{ borderColor: colors.black, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                            <View style={{ borderWidth: 1, borderColor: colors.berries, borderRadius: 15, backgroundColor: colors.pinkishSilver }}>
+                                        <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                            <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
                                                 <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
                                             </View>
                                             <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.addedWeaponProf.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                         </View>}
                                     <View>
-                                        <AppButton backgroundColor={colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
                                         <Modal visible={this.state.attackRollTutorialModal} animationType={'slide'}>
                                             <AttackRollTutorial closeWindow={(boolean: boolean) => { this.setState({ attackRollTutorialModal: boolean }) }} />
                                         </Modal>
@@ -504,18 +512,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </View>
                             {this.state.character.languages &&
                                 <View style={[styles.list, { width: '100%' }]}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
                                     {this.state.character.languages.map((lang, index) =>
-                                        <View key={index} style={styles.tools}>
+                                        <View key={index} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
                                             <AppText>{lang}</AppText>
                                         </View>
                                     )}
                                 </View>
                             }
                             <View style={[styles.list, { width: '100%' }]}>
-                                <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
+                                <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
                                 {this.state.character.tools.map(tool =>
-                                    <View key={tool} style={styles.tools}>
+                                    <View key={tool} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
                                         <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
                                     </View>
                                 )}
@@ -526,32 +534,32 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
                                     </TouchableOpacity>
                                     {this.state.character.personalityTraits.map((trait, index) => <AppText key={index}>{`${index + 1}. ${trait}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharIdeals", { updateIdeals: true, character: this.state.character }) }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
                                     </TouchableOpacity>
                                     {this.state.character.ideals.map((ideal, index) => <AppText key={index}>{`${index + 1}. ${ideal}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharFlaws", { updateFlaws: true, character: this.state.character }) }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
                                         {this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharBonds", { updateBonds: true, character: this.state.character }) }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
                                         {this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         </View>
                         <View>
-                            <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={30}>Magic</AppText>
+                            <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={30}>Magic</AppText>
                             {charHasMagic(this.state.character) ? <CharMagic reloadChar={() => {
                                 this.setState({ character: store.getState().character })
                             }} character={this.state.character} currentProficiency={this.state.currentProficiency} /> :
@@ -609,7 +617,6 @@ const styles = StyleSheet.create({
     innerModifier: {
         width: 150,
         height: 150,
-        backgroundColor: colors.bitterSweetRed,
         borderRadius: 110,
         justifyContent: "center"
     },
@@ -632,7 +639,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
         borderRadius: 70,
         height: 70,
         width: 70
@@ -640,7 +646,6 @@ const styles = StyleSheet.create({
     skill: {
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
         width: 100,
         padding: 5,
         marginVertical: 2
@@ -648,7 +653,6 @@ const styles = StyleSheet.create({
     tools: {
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: colors.bitterSweetRed,
         width: 200,
         padding: 5,
         marginVertical: 2

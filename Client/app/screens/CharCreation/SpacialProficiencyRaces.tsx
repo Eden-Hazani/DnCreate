@@ -5,7 +5,7 @@ import spacialRaceProficiency from '../../../utility/spacialRaceProficiency';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
@@ -118,14 +118,14 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
                                 keyExtractor={(stats: any, index) => index.toString()}
                                 numColumns={2}
                                 renderItem={({ item, index }) =>
-                                    <TouchableOpacity style={[styles.item, { backgroundColor: this.state.abilityClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                    <TouchableOpacity style={[styles.item, { backgroundColor: this.state.abilityClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                         onPress={() => this.pickAbility(item, index)}>
                                         <AppText>{item}</AppText>
                                     </TouchableOpacity>
                                 } />
                         </View>
                         <View>
-                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                         </View>
                     </View>}
             </View>
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     }
 });

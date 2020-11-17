@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
@@ -74,7 +74,7 @@ export class AppToolPicker extends Component<{
             <View style={styles.container}>
                 {this.props.itemList.map((tool: any, index: number) =>
                     <TouchableOpacity key={index} onPress={() => this.pickTool(tool, index)}
-                        style={[styles.item, { backgroundColor: this.state.toolsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
+                        style={[styles.item, { backgroundColor: this.state.toolsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                         <AppText textAlign={'center'}>{tool}</AppText>
                     </TouchableOpacity>)}
             </View>
@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.berries
+        borderColor: Colors.berries
     }
 });

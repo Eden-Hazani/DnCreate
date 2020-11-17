@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppText } from './AppText';
 
 export class AppPathArmorAdding extends Component<{ armorList: any, loadArmors: any }>{
@@ -14,7 +14,7 @@ export class AppPathArmorAdding extends Component<{ armorList: any, loadArmors: 
                 <AppText textAlign={'center'} fontSize={22}>Armor proficiencies added:</AppText>
                 {this.props.armorList.map((armor: any, index: number) =>
                     <View key={index}>
-                        <AppText fontSize={20} color={colors.totalWhite}>{armor}</AppText>
+                        <AppText fontSize={20} color={Colors.totalWhite}>{armor}</AppText>
                     </View>)}
             </View>
         )
@@ -26,9 +26,9 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.pinkishSilver,
+        backgroundColor: Colors.pinkishSilver,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderRadius: 15,
         padding: 15,
         margin: 5

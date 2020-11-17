@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'reac
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -40,6 +40,8 @@ interface CharBackgroundState {
     maxTools: number
     pickedOfficial: any
     officialClicked: boolean[]
+    alreadyPickedSkills: any[]
+    availableSkills: any[]
 }
 
 
@@ -49,6 +51,8 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     constructor(props: any) {
         super(props)
         this.state = {
+            availableSkills: [],
+            alreadyPickedSkills: [],
             officialClicked: [],
             pickedOfficial: null,
             maxTools: null,
@@ -68,8 +72,19 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+    componentDidMount() {
+        this.setState({ availableSkills: skillJson.skillList }, () => {
+            for (let item of this.state.characterInfo.skills) {
+                if (this.state.availableSkills.includes(item[0])) {
+                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                    alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
+                    this.setState({ alreadyPickedSkills })
+                }
+            }
+        })
+    }
+
     onFocus = async () => {
-        console.log('BACKGROUNDS PAGE')
         let characterInfo = { ...this.state.characterInfo }
         const item = await AsyncStorage.getItem(`${this.state.characterInfo.name}BackstoryStage`)
         if (item) {
@@ -180,6 +195,9 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
 
     insertInfoAndContinue = async (values: any) => {
         const characterInfo = { ...this.state.characterInfo };
+        let existingCharSkills: any = [];
+        let additionSkills: any = [];
+        let newSkills: any = [];
         await AsyncStorage.setItem(`${this.state.characterInfo.name}BackstoryStage`, JSON.stringify(this.state.characterInfo))
         if (this.state.officialWindow) {
             if (!this.verifyOfficial()) {
@@ -192,9 +210,16 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             for (let language of this.state.addedLanguages) {
                 characterInfo.languages.push(language)
             }
-            for (let skill of this.state.pickedOfficial.skills) {
-                characterInfo.skills.push(skill)
+            for (let skill of this.state.characterInfo.skills) {
+                existingCharSkills.push(skill[0])
             }
+            for (let skill of this.state.pickedOfficial.skills) {
+                additionSkills.push(skill[0])
+            }
+            for (let item of existingCharSkills.concat(additionSkills.filter((item: any) => existingCharSkills.indexOf(item) < 0))) {
+                newSkills.push([item, 0])
+            }
+            characterInfo.skills = newSkills;
             for (let tool of this.state.pickedOfficial.tools) {
                 characterInfo.tools.push(tool)
             }
@@ -203,7 +228,6 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             if (!this.verifyNonOfficial()) {
                 return;
             }
-            characterInfo.skills = [];
             characterInfo.tools = [];
             characterInfo.background = new BackgroundModal();
             characterInfo.background.backgroundName = values.backgroundName;
@@ -231,27 +255,28 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     }
 
 
+
     render() {
         return (
             <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={{ padding: 10 }}>
-                            <AppText fontSize={22} textAlign={'center'} color={colors.berries}>You need to pick your characters background</AppText>
-                            <AppText fontSize={18} textAlign={'center'} color={colors.black}>You can either pick an official background or make your own (with your Dm's approval)</AppText>
+                            <AppText fontSize={22} textAlign={'center'} color={Colors.berries}>You need to pick your characters background</AppText>
+                            <AppText fontSize={18} textAlign={'center'} color={Colors.whiteInDarkMode}>You can either pick an official background or make your own (with your Dm's approval)</AppText>
                             <View style={{ flexDirection: 'row', justifyContent: "space-evenly", marginTop: 20 }}>
-                                <AppButton fontSize={18} backgroundColor={this.state.makeYourOwnWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={25} width={150} height={70}
+                                <AppButton fontSize={18} backgroundColor={this.state.makeYourOwnWindow ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={25} width={150} height={70}
                                     title={"Make your own?"} onPress={() => { this.setState({ makeYourOwnWindow: true, officialWindow: false }) }} />
-                                <AppButton fontSize={18} backgroundColor={this.state.officialWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={25} width={150} height={70}
+                                <AppButton fontSize={18} backgroundColor={this.state.officialWindow ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={25} width={150} height={70}
                                     title={"Pick official?"} onPress={() => { this.setState({ makeYourOwnWindow: false, officialWindow: true }) }} />
                             </View>
                         </View>
                         {this.state.makeYourOwnWindow &&
                             <View style={{ marginTop: 20 }}>
                                 <View style={{ padding: 10 }}>
-                                    <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Enter your Background information below</AppText>
-                                    <AppText fontSize={18} textAlign={'center'} color={colors.black}>Your background feature should reflect the background itself and make sense woven into your actual background story.</AppText>
-                                    <AppText fontSize={18} textAlign={'center'} color={colors.berries}>You can take examples from official fifth edition backgrounds.</AppText>
+                                    <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Enter your Background information below</AppText>
+                                    <AppText fontSize={18} textAlign={'center'} color={Colors.whiteInDarkMode}>Your background feature should reflect the background itself and make sense woven into your actual background story.</AppText>
+                                    <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>You can take examples from official fifth edition backgrounds.</AppText>
                                 </View>
                                 <AppForm
                                     initialValues={{
@@ -259,21 +284,21 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                     }}
                                     onSubmit={(values: any) => { this.insertInfoAndContinue(values) }}
                                     validationSchema={ValidationSchema}>
-                                    <View >
+                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
                                         <AppFormField
-                                            width={Dimensions.get('screen').width / 1.2}
+                                            style={{ width: Dimensions.get('screen').width }}
                                             fieldName={"backgroundName"}
                                             name="backgroundName"
                                             iconName={"text-short"}
                                             placeholder={"Background Name..."} />
                                         <AppFormField
-                                            width={Dimensions.get('screen').width / 1.2}
+                                            style={{ width: Dimensions.get('screen').width }}
                                             fieldName={"featureName"}
                                             name="featureName"
                                             iconName={"text-short"}
                                             placeholder={"Feature Name..."} />
                                         <AppFormField
-                                            width={Dimensions.get('screen').width / 1.2}
+                                            style={{ width: Dimensions.get('screen').width }}
                                             fieldName={"featureDescription"}
                                             name="featureDescription"
                                             iconName={"text-short"}
@@ -281,10 +306,11 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                         <View>
                                             <View style={{ marginBottom: 15, flexDirection: 'row', flexWrap: 'wrap' }}>
                                                 <View style={{ padding: 10 }}>
-                                                    <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Pick two skills that your character knows from its background (this should reflect the characters background story)</AppText>
+                                                    <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Pick two skills that your character knows from its background (this should reflect the characters background story)</AppText>
                                                 </View>
                                                 {skillJson.skillList.map((skill, index) =>
-                                                    <TouchableOpacity key={index} style={[styles.skill, { backgroundColor: this.state.skillClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                                    <TouchableOpacity key={index} disabled={this.state.alreadyPickedSkills[index]}
+                                                        style={[styles.skill, { backgroundColor: this.state.alreadyPickedSkills[index] ? Colors.berries : this.state.skillClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                                         onPress={() => this.pickSkill(skill, index)}>
                                                         <AppText>{skill}</AppText>
                                                     </TouchableOpacity>
@@ -292,19 +318,19 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                             </View>
                                             <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flexWrap: "wrap" }}>
                                                 <View style={{ margin: 10 }}>
-                                                    <AppButton fontSize={18} backgroundColor={this.state.oneToolOneLanguageChoice ? colors.bitterSweetRed : colors.lightGray} borderRadius={25} width={150} height={70}
+                                                    <AppButton fontSize={18} backgroundColor={this.state.oneToolOneLanguageChoice ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={25} width={150} height={70}
                                                         title={"One Tool One Language?"} onPress={() => {
                                                             this.setState({ maxTools: 1, oneToolOneLanguageChoice: true, twoLanguageChoice: false, twoToolChoice: false, toolsClicked: [], pickedTools: [], addedLanguages: [] })
                                                         }} />
                                                 </View>
                                                 <View style={{ margin: 10 }}>
-                                                    <AppButton fontSize={18} backgroundColor={this.state.twoToolChoice ? colors.bitterSweetRed : colors.lightGray} borderRadius={25} width={150} height={70}
+                                                    <AppButton fontSize={18} backgroundColor={this.state.twoToolChoice ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={25} width={150} height={70}
                                                         title={"Two Tools?"} onPress={() => {
                                                             this.setState({ maxTools: 2, oneToolOneLanguageChoice: false, twoLanguageChoice: false, twoToolChoice: true, toolsClicked: [], pickedTools: [], addedLanguages: [] })
                                                         }} />
                                                 </View>
                                                 <View style={{ margin: 10 }}>
-                                                    <AppButton fontSize={18} backgroundColor={this.state.twoLanguageChoice ? colors.bitterSweetRed : colors.lightGray} borderRadius={25} width={150} height={70}
+                                                    <AppButton fontSize={18} backgroundColor={this.state.twoLanguageChoice ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={25} width={150} height={70}
                                                         title={"Two Languages?"} onPress={() => {
                                                             this.setState({ maxTools: 0, oneToolOneLanguageChoice: false, twoLanguageChoice: true, twoToolChoice: false, toolsClicked: [], pickedTools: [], addedLanguages: [] })
                                                         }} />
@@ -313,16 +339,16 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                             <View>
                                                 {this.state.oneToolOneLanguageChoice &&
                                                     <View>
-                                                        <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Please insert your extra known language</AppText>
+                                                        <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra known language</AppText>
                                                         <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
                                                             addedLanguages[0] = txt;
                                                             this.setState({ addedLanguages })
                                                         }} />
-                                                        <AppText fontSize={18} textAlign={'center'} color={colors.berries}>You can pick 1 tool Proficiency</AppText>
+                                                        <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>You can pick 1 tool Proficiency</AppText>
                                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                                                             {toolsJson.tools.map((tool, index) =>
-                                                                <TouchableOpacity key={index} style={[styles.skill, { backgroundColor: this.state.toolsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                                                <TouchableOpacity key={index} style={[styles.skill, { backgroundColor: this.state.toolsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                                                     onPress={() => this.pickTool(tool, index)}>
                                                                     <AppText>{tool}</AppText>
                                                                 </TouchableOpacity>
@@ -331,10 +357,10 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                     </View>}
                                                 {this.state.twoToolChoice &&
                                                     <View>
-                                                        <AppText fontSize={18} textAlign={'center'} color={colors.berries}>You can pick 2 tool proficiencies</AppText>
+                                                        <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>You can pick 2 tool proficiencies</AppText>
                                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                                                             {toolsJson.tools.map((tool, index) =>
-                                                                <TouchableOpacity key={index} style={[styles.skill, { backgroundColor: this.state.toolsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                                                <TouchableOpacity key={index} style={[styles.skill, { backgroundColor: this.state.toolsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                                                     onPress={() => this.pickTool(tool, index)}>
                                                                     <AppText>{tool}</AppText>
                                                                 </TouchableOpacity>
@@ -343,7 +369,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                     </View>}
                                                 {this.state.twoLanguageChoice &&
                                                     <View>
-                                                        <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Please insert your extra 2 known language</AppText>
+                                                        <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 2 known language</AppText>
                                                         <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
                                                             addedLanguages[0] = txt;
@@ -365,14 +391,13 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                             <View>
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                                     {Object.values(backgroundsJson).map((item: any, index: number) =>
-                                        <TouchableOpacity style={[styles.skill, { backgroundColor: this.state.officialClicked[index] ? colors.bitterSweetRed : colors.lightGray }]} key={index}
+                                        <TouchableOpacity style={[styles.skill, { backgroundColor: this.state.officialClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]} key={index}
                                             onPress={() => {
                                                 let officialClicked = this.state.officialClicked;
                                                 officialClicked = [];
                                                 officialClicked[index] = true;
                                                 this.setState({ pickedOfficial: item, officialClicked })
                                             }}>
-                                            {console.log(item.name === undefined)}
                                             <AppText>{item.name}</AppText>
                                         </TouchableOpacity>)}
                                 </View>
@@ -380,22 +405,22 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                     {this.state.pickedOfficial !== null &&
                                         <View>
                                             <View style={{ padding: 17 }}>
-                                                <AppText fontSize={25} textAlign={'center'} color={colors.berries}>{this.state.pickedOfficial.name}</AppText>
-                                                <AppText fontSize={22} textAlign={'center'} color={colors.black}>Feature: {this.state.pickedOfficial.featureName}</AppText>
-                                                <AppText fontSize={20} textAlign={'center'} color={colors.berries}>{this.state.pickedOfficial.featureDescription}</AppText>
+                                                <AppText fontSize={25} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.name}</AppText>
+                                                <AppText fontSize={22} textAlign={'center'} color={Colors.whiteInDarkMode}>Feature: {this.state.pickedOfficial.featureName}</AppText>
+                                                <AppText fontSize={20} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.featureDescription}</AppText>
                                             </View>
                                             <View style={{ padding: 17 }}>
-                                                <AppText fontSize={25} textAlign={'center'} color={colors.black}>Tool Proficiency</AppText>
-                                                {this.state.pickedOfficial.tools.length > 0 ? this.state.pickedOfficial.tools.map((tool: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{tool[0]}</AppText></View>)
-                                                    : <View><AppText fontSize={17} textAlign={'center'} color={colors.berries}>This background has no tool proficiencies</AppText></View>}
-                                                <AppText fontSize={25} textAlign={'center'} color={colors.black}>Skill Proficiency</AppText>
-                                                {this.state.pickedOfficial.skills.map((skill: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={colors.berries}>{skill[0]}</AppText></View>)}
+                                                <AppText fontSize={25} textAlign={'center'} color={Colors.whiteInDarkMode}>Tool Proficiency</AppText>
+                                                {this.state.pickedOfficial.tools.length > 0 ? this.state.pickedOfficial.tools.map((tool: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={Colors.berries}>{tool[0]}</AppText></View>)
+                                                    : <View><AppText fontSize={17} textAlign={'center'} color={Colors.berries}>This background has no tool proficiencies</AppText></View>}
+                                                <AppText fontSize={25} textAlign={'center'} color={Colors.whiteInDarkMode}>Skill Proficiency</AppText>
+                                                {this.state.pickedOfficial.skills.map((skill: any, index: number) => <View key={index}><AppText fontSize={17} textAlign={'center'} color={Colors.berries}>{skill[0]}</AppText></View>)}
                                             </View>
                                             <View>
                                                 {backgroundsJson[this.state.pickedOfficial.name].languages === 1 &&
                                                     <View>
                                                         <View style={{ padding: 17 }}>
-                                                            <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Please insert your extra 1 known language</AppText>
+                                                            <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 1 known language</AppText>
                                                         </View>
                                                         <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
@@ -407,7 +432,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                 {backgroundsJson[this.state.pickedOfficial.name].languages === 2 &&
                                                     <View>
                                                         <View style={{ padding: 17 }}>
-                                                            <AppText fontSize={18} textAlign={'center'} color={colors.berries}>Please insert your extra 2 known languages</AppText>
+                                                            <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 2 known languages</AppText>
                                                         </View>
                                                         <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
@@ -426,7 +451,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                     }
                                 </View>
                                 <View style={{ paddingBottom: 25 }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100}
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
                                         height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue(null) }} />
                                 </View>
                             </View>}
@@ -448,7 +473,7 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     }
 });

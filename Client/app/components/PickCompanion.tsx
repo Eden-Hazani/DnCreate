@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, Modal } from 'react-native';
 import userCharApi from '../api/userCharApi';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { CompanionModel } from '../models/companionModel';
 import { store } from '../redux/store';
@@ -31,10 +31,10 @@ export class PickCompanion extends Component<{ character: CharacterModel, profic
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                 <View style={{ flex: .8 }}>
                     <View style={{ marginTop: 25, marginBottom: 15 }}>
-                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50}
+                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                             borderRadius={25} title={'New Companion'} onPress={() => {
                                 this.setState({ chosenCompanion: this.state.character.charSpecials.companion.length, companionModal: true })
                             }} />
@@ -45,7 +45,7 @@ export class PickCompanion extends Component<{ character: CharacterModel, profic
                         <AppText textAlign={'center'} fontSize={17}>Also, your DM can give you an ability (or magical item) that enables you to use a companion</AppText>
                         <AppText textAlign={'center'} fontSize={17}>You cannot add a companion without a companion related ability, either from your chosen path or from your DM</AppText>
                     </View>
-                    <AppText textAlign={'center'} fontSize={22} color={colors.berries}>Pick companion</AppText>
+                    <AppText textAlign={'center'} fontSize={22} color={Colors.berries}>Pick companion</AppText>
                     {store.getState().character.charSpecials.companion.length > 0 &&
                         <FlatList
                             data={store.getState().character.charSpecials.companion}
@@ -65,7 +65,7 @@ export class PickCompanion extends Component<{ character: CharacterModel, profic
                     }
                 </View>
                 <View style={{ marginBottom: 15, flex: .2 }}>
-                    <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50}
+                    <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                         borderRadius={25} title={'Close'} onPress={() => { this.props.closeModal(false) }} />
                 </View>
                 <Modal visible={this.state.companionModal}>

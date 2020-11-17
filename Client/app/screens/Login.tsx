@@ -15,7 +15,7 @@ import errorHandler from '../../utility/errorHander';
 import reduxToken from '../auth/reduxToken';
 import AuthContext from '../auth/context';
 import { AppButton } from '../components/AppButton';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppText } from '../components/AppText';
 import { AppTextInput } from '../components/forms/AppTextInput';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
@@ -80,7 +80,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
             return;
         }
         this.setState({ loading: true })
-        await authApi.sendResetEmail(this.state.resetPassEmail).then(confirmation => {
+        await authApi.sendResetEmail(this.state.resetPassEmail.toLowerCase()).then(confirmation => {
             this.setState({ loading: false, forgotPasswordModel: false })
             if (confirmation.data.message === 'Email Has been sent In order to reset password.') {
                 alert('Email Has been sent In order to reset password.');
@@ -98,7 +98,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <AnimateContactUpwards>
                         <AnimatedLogo />
-                        <AppTextHeadline>Login</AppTextHeadline>
+                        <AppText fontSize={27} textAlign={'center'}>Login</AppText>
                         <AppForm
                             initialValues={{ username: '', password: '' }}
                             onSubmit={(values: any) => this.login(values)}
@@ -118,12 +118,12 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18} marginBottom={1}
-                                    color={colors.black} backgroundColor={colors.bitterSweetRed} title={"Forgot   Password?"} />
+                                    color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"Forgot   Password?"} />
                                 <SubmitButton title={"Login"} marginBottom={1} />
                             </View>
                         </AppForm>
                         <Modal visible={this.state.forgotPasswordModel}>
-                            <View style={{ paddingTop: 150 }}>
+                            <View style={{ flex: 1, paddingTop: 150, backgroundColor: Colors.pageBackground }}>
                                 <View style={{ padding: 20 }}>
                                     <AppText textAlign={'center'} fontSize={18}>Please Enter your email below in order to reset your password</AppText>
                                 </View>
@@ -131,11 +131,11 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                     <View>
                                         <AppButton onPress={() => { this.sendEmail() }} width={100} height={100} borderRadius={100} fontSize={20}
-                                            color={colors.black} backgroundColor={colors.bitterSweetRed} title={"Send Email"} />
+                                            color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"Send Email"} />
                                     </View>
                                     <View>
                                         <AppButton onPress={() => { this.setState({ forgotPasswordModel: false }) }} width={100} height={100} borderRadius={100} fontSize={20}
-                                            color={colors.black} backgroundColor={colors.bitterSweetRed} title={"Cancel"} />
+                                            color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"Cancel"} />
                                     </View>
                                 </View>
                             </View>

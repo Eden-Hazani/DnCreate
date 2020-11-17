@@ -5,7 +5,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { AppForm } from '../../components/forms/AppForm';
 import { AppFormField } from '../../components/forms/AppFormField';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -89,7 +89,7 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
                 <View style={styles.container}>
                     {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                         <View>
-                            <AppText textAlign={'center'} fontSize={20} color={colors.black}>{this.state.characterInfo.race}</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>{this.state.characterInfo.race}</AppText>
                             <AppForm
                                 initialValues={{ fullName: store.getState().character.name, age: null, height: null, weight: null, eyes: '', skin: '', hair: '', user_id: store.getState().nonUser ? null : this.context.user._id }}
                                 onSubmit={(values: any) => this.setInfoAndContinue(values)}

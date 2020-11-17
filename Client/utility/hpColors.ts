@@ -1,3 +1,4 @@
+import { Colors } from "../app/config/colors";
 
 
 export function hpColors(hp: number, maxHp: number) {
@@ -37,6 +38,11 @@ export function hpColors(hp: number, maxHp: number) {
         case percentage >= 10:
             color = "#CB4335";
             break;
+        case hp === 0 && maxHp !== 0:
+            color = Colors.danger
+            break;
+        default:
+            color = Colors.lightGray
     }
     return color;
 }

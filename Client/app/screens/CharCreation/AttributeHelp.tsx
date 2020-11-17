@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, Modal } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { Dimensions } from 'react-native';
 
 
@@ -20,11 +20,11 @@ export class AttributeHelp extends Component<{}, AttributeHelpState> {
     render() {
         return (
             <View style={styles.container}>
-                <AppButton backgroundColor={colors.bitterSweetRed} title={"Help"} height={50} borderRadius={25} width={150} fontSize={20} onPress={() => this.setState({ visible: true })} />
+                <AppButton backgroundColor={Colors.bitterSweetRed} title={"Help"} height={50} borderRadius={25} width={Dimensions.get('screen').width / 3.2} fontSize={20} onPress={() => this.setState({ visible: true })} />
                 <Modal visible={this.state.visible} animationType="slide">
-                    <View style={styles.modalContainer}>
+                    <View style={[styles.modalContainer, { backgroundColor: Colors.pageBackground }]}>
                         <View style={styles.textBox}>
-                            <AppText textAlign={'center'} fontSize={25} color={colors.bitterSweetRed}>Welcome to the Attribute Dice Roll!</AppText>
+                            <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>Welcome to the Attribute Dice Roll!</AppText>
                             <AppText fontSize={18} textAlign={'center'}>In order to create your character you first need to roll for attribute points.</AppText>
                             <AppText fontSize={18} textAlign={'center'}>Each class has its beneficial scores, for example while a barbarian will benefit from strength and constitution</AppText>
                             <AppText fontSize={18} textAlign={'center'}>A wizard will benefit greatly from intelligence and dexterity</AppText>
@@ -32,10 +32,10 @@ export class AttributeHelp extends Component<{}, AttributeHelpState> {
                             <AppText fontSize={18} textAlign={'center'}>Please take the time to read one of the many guides available online in order to visualize your character and spend the points accordingly.</AppText>
                         </View>
                         <View style={styles.button}>
-                            <AppButton backgroundColor={colors.bitterSweetRed} title={"close"} height={40} width={150} fontSize={20} onPress={() => this.setState({ visible: false })} />
+                            <AppButton backgroundColor={Colors.bitterSweetRed} title={"close"} height={40} width={150} fontSize={20} onPress={() => this.setState({ visible: false })} />
                         </View>
                         <View style={[styles.textBox]}>
-                            <AppText textAlign={'center'} fontSize={25} color={colors.bitterSweetRed}>The Dice Roller!</AppText>
+                            <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>The Dice Roller!</AppText>
                             <AppText fontSize={18} textAlign={'center'}>The roller will throw 4 D6 dice each time you hit the Roll! button</AppText>
                             <AppText fontSize={18} textAlign={'center'}>Once the results are in pick the 3 highest rolls out of the four and they will be added to your dice pool</AppText>
                             <AppText fontSize={18} textAlign={'center'}>Once You have completed 6 rolls the roll results will become press-able.</AppText>
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 30,
     },
     textBox: {
         height: Dimensions.get('screen').height / 2.1,

@@ -4,7 +4,7 @@ import { CharacterModel } from '../models/characterModel';
 import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 
 
 interface AppPathAddSpellsListState {
@@ -29,9 +29,9 @@ export class AppPathAddSpellsList extends Component<{ loadSpells: any, path: str
     render() {
         return (
             <View style={styles.container}>
-                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={20}>As a {this.props.path} {this.props.character.characterClass} You gain the following spells.</AppText>
+                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={20}>As a {this.props.path} {this.props.character.characterClass} You gain the following spells.</AppText>
                 {this.props.spellList.map((spell, index) =>
-                    <View key={index} style={{ backgroundColor: colors.pinkishSilver, borderColor: colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}>
+                    <View key={index} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}>
                         <AppText textAlign={'center'} fontSize={18}>{spell}</AppText>
                     </View>)}
             </View>

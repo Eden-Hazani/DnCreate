@@ -4,7 +4,7 @@ import { CharacterModel } from '../models/characterModel';
 import * as features from '../classFeatures/features';
 import { cos } from 'react-native-reanimated';
 import { ListItem } from '../components/ListItem';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { AppText } from '../components/AppText';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
@@ -48,8 +48,8 @@ export class CharFeatures extends Component<{ route: any }, CharFeaturesState> {
                                 title={item.name}
                                 subTitle={item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}
                                 direction={'row'}
-                                headColor={colors.bitterSweetRed}
-                                subColor={colors.black}
+                                headColor={Colors.bitterSweetRed}
+                                subColor={Colors.whiteInDarkMode}
                                 headerFontSize={20}
                                 subFontSize={16}
                                 padding={20} width={60} height={60}

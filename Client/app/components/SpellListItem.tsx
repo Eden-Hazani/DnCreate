@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { AppText } from './AppText';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 
 
 /**
@@ -39,12 +39,12 @@ export class SpellListItem extends Component<any>{
                                 : null}
                         </View>
                         <View style={{ paddingLeft: this.props.textDistanceFromImg }}>
-                            <AppText textAlign={this.props.headTextAlign} fontSize={this.props.headerFontSize} color={this.props.headColor ? this.props.headColor : colors.black}>{this.props.title}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : colors.black}>{this.props.subTitle}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : colors.black}>{this.props.classes}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : colors.black}>{this.props.duration}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : colors.black}>{this.props.range}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : colors.black}>{this.props.type}</AppText>
+                            <AppText textAlign={this.props.headTextAlign} fontSize={this.props.headerFontSize} color={this.props.headColor ? this.props.headColor : Colors.black}>{this.props.title}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.subTitle}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.classes}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.duration}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.range}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.type}</AppText>
                         </View>
                     </View>
                 </TouchableOpacity>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Animated, View, Image, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import colors from '../config/colors'
+import { Colors } from '../config/colors'
 import { Dimensions } from 'react-native';
 
 interface AnimatedLogoState {
@@ -57,7 +57,7 @@ export class AnimatedLogo extends Component<any, AnimatedLogoState>{
     render() {
         return (
             <TouchableOpacity style={styles.logoContainer} onPress={this.jiggle}>
-                <View style={styles.innerContainer}>
+                <View style={[styles.innerContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                     <Animated.View style={this.state.jiggleAnimationVal.getLayout()}>
                         <Image style={styles.icon} source={require('../../assets/logo.png')} />
                     </Animated.View>
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     innerContainer: {
-        backgroundColor: colors.bitterSweetRed,
         paddingTop: 5,
         borderWidth: 5,
         borderColor: "black",

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import colors from '../config/colors'
+import { Colors } from '../config/colors'
 
 export class ListItemSeparator extends Component {
     render() {
@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
     separator: {
         width: '70%',
         height: 1,
-        backgroundColor: colors.borderLight,
+        backgroundColor: Colors.borderLight,
     }
 })

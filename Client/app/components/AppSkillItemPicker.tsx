@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Unsubscribe } from 'redux';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
@@ -82,7 +82,7 @@ export class AppSkillItemPicker extends Component<{
         return (
             <View style={styles.container}>
                 {this.props.itemList.map((skill: any, index: number) =>
-                    <TouchableOpacity key={`${skill}${index}`} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { backgroundColor: this.state.skillsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
+                    <TouchableOpacity key={`${skill}${index}`} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { backgroundColor: this.state.skillsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                         <AppText textAlign={'center'}>{skill}</AppText>
                     </TouchableOpacity>)}
             </View>
@@ -101,6 +101,6 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.berries
+        borderColor: Colors.berries
     }
 });

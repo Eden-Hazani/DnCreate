@@ -6,7 +6,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -132,7 +132,7 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
                         <View style={styles.textContainer}>
-                            <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Flaws</AppText>
+                            <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Flaws</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Here you can write up to six of your characters Flaws.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Anyone has flaws even your character, Try to fit your flaws towards the playstyle you want to take.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Flaws can be dangerous... especially with a cunning DM, be cautious.</AppText>
@@ -146,11 +146,11 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateFlaws ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateFlaws() }} />
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Update"} onPress={() => { this.updateFlaws() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Cancel"} onPress={() => { this.cancelUpdate() }} />
                                 </View>
                                 :
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                             }
                         </View>
                     </View>}

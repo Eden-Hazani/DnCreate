@@ -4,7 +4,7 @@ import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppActivityIndicator } from './AppActivityIndicator';
 import { store } from '../redux/store';
 
@@ -80,9 +80,9 @@ export class AppDruidSpellPicker extends Component<{ pickDruidCircle: any, chara
     render() {
         return (
             <View style={styles.container}>
-                <AppText color={colors.bitterSweetRed} fontSize={22} textAlign={'center'}>As a level {this.state.character.level} {this.props.path.name} You have the choice to pick your Circle background.</AppText>
+                <AppText color={Colors.bitterSweetRed} fontSize={22} textAlign={'center'}>As a level {this.state.character.level} {this.props.path.name} You have the choice to pick your Circle background.</AppText>
                 {this.props.items.map((group: any, index: number) =>
-                    <TouchableOpacity style={[styles.pickable, { backgroundColor: this.state.circleClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                    <TouchableOpacity style={[styles.pickable, { backgroundColor: this.state.circleClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                         key={group.name} onPress={() => { this.pickCircle(group, index) }}>
                         <AppText fontSize={20}>{group.name}</AppText>
                     </TouchableOpacity>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 15,
         margin: 15,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderWidth: 1,
         borderRadius: 15
     }

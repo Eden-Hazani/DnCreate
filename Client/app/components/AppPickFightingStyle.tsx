@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -68,8 +68,8 @@ export class AppPickFightingStyle extends Component<{ itemList: [], character: C
             <View style={styles.container}>
                 {this.props.itemList.map((style: any, index: number) =>
                     <TouchableOpacity key={index} onPress={() => { this.pickFightingStyle(style, index) }} style={[styles.longTextItem,
-                    { backgroundColor: this.state.fightingStyleClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                        <AppText fontSize={20} color={this.state.fightingStyleClicked[index] ? colors.black : colors.bitterSweetRed}>{style.name}</AppText>
+                    { backgroundColor: this.state.fightingStyleClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                        <AppText fontSize={20} color={this.state.fightingStyleClicked[index] ? Colors.black : Colors.bitterSweetRed}>{style.name}</AppText>
                         <AppText>{style.description}</AppText>
                     </TouchableOpacity>)}
             </View>

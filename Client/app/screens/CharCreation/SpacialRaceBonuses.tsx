@@ -5,7 +5,7 @@ import { CharacterModel } from '../../models/characterModel';
 import { store } from '../../redux/store';
 import dragonAncestry from '../../../jsonDump/dragonAncestry.json'
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { ActionType } from '../../redux/action-type';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppTextInput } from '../../components/forms/AppTextInput';
@@ -71,7 +71,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             this.setState({ amountToPick: 2 })
         }
         if (this.state.character.race === "Half Elf") {
-            this.setState({ extraLanguagesNumber: 1 })
+            this.setState({ extraLanguagesNumber: 1, amountToPick: 2 })
         }
         if (this.state.character.race === "Changeling") {
             this.setState({ extraLanguagesNumber: 2, amountToPick: 2 })
@@ -114,6 +114,13 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             character.languages.push("Common", "Goblin")
         }
         if (this.state.character.race === "Kenku") {
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('Must pick 2 skills from the list')
+                return;
+            }
+            for (let item of this.state.itemPicked) {
+                character.skills.push([item, 0])
+            }
             character.languages.push("Common", "Auran")
         }
         if (this.state.character.race === "DragonBorn") {
@@ -156,7 +163,14 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                 alert('You have another language to add')
                 return
             }
-            character.languages.push("Common,Elven")
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('Must pick 2 skills from the list')
+                return;
+            }
+            for (let item of this.state.itemPicked) {
+                character.skills.push([item, 0])
+            }
+            character.languages.push("Common", "Elven")
         }
         if (this.state.character.race === "Halfling") {
             character.languages.push("Common", "Halfling")
@@ -181,7 +195,10 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
     render() {
         const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"];
-        const kenkuSkills = [["Acrobatics", 0], ["Deception", 0], ["Stealth", 0], ["Sleight of Hand", 0]]
+        const kenkuSkills = ["Acrobatics", "Deception", "Stealth", "Sleight of Hand"]
+        const fullSkillList = ['Athletics', 'Acrobatics', 'Sleight of Hand', 'Stealth', 'Arcana', 'History', 'Investigation',
+            'Nature', 'Religion', 'Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival', 'Deception',
+            'Intimidation', 'Performance', 'Persuasion']
         return (
             <ScrollView style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
@@ -189,22 +206,22 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         <View style={{ padding: 15 }}>
                             <AppText textAlign={'center'} fontSize={22}>As a {this.state.character.race} you get the following features.</AppText>
                         </View>
-                        <View style={styles.featureItem}>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Age:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.age}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Alignment:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.alignment}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Languages:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.languages}</AppText>
-                            <AppText fontSize={20} padding={10} color={colors.black} textAlign={'left'}>Size:</AppText>
-                            <AppText fontSize={18} padding={5} color={colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.size}</AppText>
-                            <AppText fontSize={18} padding={10} color={colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities.speed}ft</AppText>
+                        <View style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
+                            <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Age:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.age}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Alignment:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.alignment}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Languages:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.languages}</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Size:</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.size}</AppText>
+                            <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities.speed}ft</AppText>
                         </View>
                         {this.state.race.raceAbilities?.uniqueAbilities &&
                             Object.values(this.state.race.raceAbilities.uniqueAbilities)
-                                .map((item, index) => <View key={index} style={styles.featureItem}>
+                                .map((item, index) => <View key={index} style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
                                     <AppText fontSize={22}>{item.name}</AppText>
-                                    <AppText fontSize={17}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
+                                    <AppText fontSize={17} color={Colors.berries}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                                 </View>)}
 
                         {this.state.character.race === "Changeling" &&
@@ -215,9 +232,10 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         {this.state.character.race === "Kenku" &&
                             <View style={{ padding: 15 }}>
                                 <AppText textAlign={'center'} fontSize={18}>As a Kenku You can read and write Common and Auran, but you can speak only by using your Mimicry trait.</AppText>
+                                <AppText textAlign={'center'} fontSize={18}>You also gain proficiency in two skills of your choice</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
                                     {kenkuSkills.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                             onPress={() => this.pickItem(item, index)}>
                                             <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
                                         </TouchableOpacity>)}
@@ -233,7 +251,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 <AppText textAlign={'center'} fontSize={18}>Pick your Draconic ancestry</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                                     {dragonAncestry.ancestry.map((ancestry, index) =>
-                                        <TouchableOpacity key={index} style={[styles.largeItem, { backgroundColor: this.state.itemClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                        <TouchableOpacity key={index} style={[styles.largeItem, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray, borderColor: Colors.whiteInDarkMode }]}
                                             onPress={() => this.pickItem(ancestry, index)}>
                                             <AppText textAlign={'center'} fontSize={18}>Dragon color: {ancestry.color}</AppText>
                                             <AppText textAlign={'center'} fontSize={18}>Damage type: {ancestry.damageType}</AppText>
@@ -259,7 +277,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
                                     {dwarfTools.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                             onPress={() => this.pickItem(item, index)}>
                                             <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
                                         </TouchableOpacity>)}
@@ -269,6 +287,14 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         {this.state.character.race === "Half Elf" &&
                             <View style={{ padding: 15 }}>
                                 <AppText textAlign={'center'} fontSize={18}>As a Half Elf you can read speak and write Common, Elven and another extra language of your choice.</AppText>
+                                <AppText textAlign={'center'} fontSize={18}> You also gain proficiency in two skills of your choice.</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {fullSkillList.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray, borderColor: Colors.whiteInDarkMode }]}
+                                            onPress={() => this.pickItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
                                 <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
                                     const extraLanguages = this.state.extraLanguages;
                                     extraLanguages[0] = txt;
@@ -277,7 +303,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             </View>
                         }
                         <View style={{ paddingBottom: 25 }}>
-                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                         </View>
                     </View>
                 }
@@ -298,7 +324,6 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 5,
         borderWidth: 1,
-        borderColor: colors.black,
         borderRadius: 25
     },
     item: {
@@ -308,7 +333,6 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 5,
         borderWidth: 1,
-        borderColor: colors.black,
         borderRadius: 25
     },
     featureItem: {
@@ -316,7 +340,6 @@ const styles = StyleSheet.create({
         margin: 15,
         borderWidth: 1,
         borderRadius: 15,
-        borderColor: colors.berries,
-        backgroundColor: colors.pinkishSilver
+
     }
 });

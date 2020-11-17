@@ -4,7 +4,7 @@ import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { IconGen } from '../../components/IconGen';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -185,6 +185,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             const beforeAnyChanges = JSON.parse(JSON.stringify(character))
             this.setState({ character, beforeAnyChanges }, () => {
+                this.setAvailableMagicSlots()
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
                 userCharApi.updateChar(this.state.character);
             })
@@ -207,6 +208,15 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 pathClicked.push(false)
             }
         }
+    }
+
+    setAvailableMagicSlots = async () => {
+        const totalMagic = Object.values(this.state.character.magic);
+        const newAvailableMagic = []
+        for (let item of totalMagic) {
+            newAvailableMagic.push(item)
+        }
+        await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
     }
 
     pickPath = (path: any, index: number) => {
@@ -799,7 +809,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 {this.state.load ?
                     <View>
                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 100 }}>
-                            <AppText fontSize={35} color={colors.bitterSweetRed}>Congratulations!</AppText>
+                            <AppText fontSize={35} color={Colors.bitterSweetRed}>Congratulations!</AppText>
                             <AppText textAlign={'center'} fontSize={30}>You have reached level {this.state.character.level}</AppText>
                         </View>
                         <LottieView style={{ zIndex: 1, width: "100%" }} autoPlay source={require('../../../assets/lottieAnimations/confeetiAnimation.json')} />
@@ -815,8 +825,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 </View>
                                 <View style={{ flexDirection: "row", flexWrap: 'wrap' }}>
                                     {this.props.options.pathSelector.map((path: any, index: number) =>
-                                        <TouchableOpacity key={index} onPress={() => this.pickPath(path, index)} style={[styles.item, { backgroundColor: this.state.pathClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                            <AppText color={this.state.pathClicked[index] ? colors.black : colors.bitterSweetRed} fontSize={22}>{path.name}</AppText>
+                                        <TouchableOpacity key={index} onPress={() => this.pickPath(path, index)} style={[styles.item, { backgroundColor: this.state.pathClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                            <AppText color={this.state.pathClicked[index] ? Colors.black : Colors.bitterSweetRed} fontSize={22}>{path.name}</AppText>
                                             <AppText fontSize={18}>{path.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                                         </TouchableOpacity>)}
                                 </View>
@@ -838,13 +848,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     <AppText fontSize={18} textAlign={'center'}>You can either spend 2 points on one ability or spread your choice and put 1 point in two different abilities</AppText>
                                     <View style={{ flexDirection: 'row' }}>
                                         <View style={{ padding: 15 }}>
-                                            <AppButton fontSize={18} backgroundColor={this.state.featsWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Feats"} onPress={() => {
+                                            <AppButton fontSize={18} backgroundColor={this.state.featsWindow ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={100} width={100} height={100} title={"Feats"} onPress={() => {
                                                 this.resetAbilityScoresToCurrentLevel()
                                                 this.setState({ featsWindow: true, abilityWindow: false, totalAbilityPoints: 2, abilityClicked: [0, 0, 0, 0, 0, 0] })
                                             }} />
                                         </View>
                                         <View style={{ padding: 15 }}>
-                                            <AppButton fontSize={18} backgroundColor={this.state.abilityWindow ? colors.bitterSweetRed : colors.lightGray} borderRadius={100} width={100} height={100} title={"Ability Score"} onPress={() => { this.setState({ featsWindow: false, abilityWindow: true }) }} />
+                                            <AppButton fontSize={18} backgroundColor={this.state.abilityWindow ? Colors.bitterSweetRed : Colors.lightGray} borderRadius={100} width={100} height={100} title={"Ability Score"} onPress={() => { this.setState({ featsWindow: false, abilityWindow: true }) }} />
                                         </View>
                                     </View>
                                 </View>
@@ -854,14 +864,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                             <View key={index} style={{ width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
                                                 <View style={{ flexDirection: 'row', position: 'absolute', alignSelf: 'center' }}>
                                                     <TouchableOpacity style={{ marginRight: 33 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
-                                                        <IconGen size={55} backgroundColor={colors.shadowBlue} name={'plus'} iconColor={colors.white} />
+                                                        <IconGen size={55} backgroundColor={Colors.shadowBlue} name={'plus'} iconColor={Colors.white} />
                                                     </TouchableOpacity>
                                                     <TouchableOpacity style={{ marginLeft: 33 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
-                                                        <IconGen size={55} backgroundColor={colors.orange} name={'minus'} iconColor={colors.white} />
+                                                        <IconGen size={55} backgroundColor={Colors.orange} name={'minus'} iconColor={Colors.white} />
                                                     </TouchableOpacity>
                                                 </View>
-                                                <View style={styles.innerModifier}>
-                                                    <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                                <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                    <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
                                                     <View style={{ paddingTop: 10 }}>
                                                         <AppText fontSize={25} textAlign={"center"}>{`${item[1]}`}</AppText>
                                                     </View>
@@ -903,9 +913,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                             {Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level]).map((item: any, index: number) =>
                                                 <View key={item.name}>
                                                     <View style={item.description && styles.infoContainer}>
-                                                        <AppText color={colors.bitterSweetRed} fontSize={25} textAlign={'center'}>
+                                                        <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={'center'}>
                                                             {item.name}</AppText>
-                                                        <AppText color={colors.black} fontSize={18} textAlign={'center'}>
+                                                        <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>
                                                             {item.description && item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                                                     </View>
                                                     {(item.armorProf || item.weaponProf || item.skillList || item.fightingStyles || item.additionCantrip || item.druidCircleSpellLists ||
@@ -991,16 +1001,16 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             <View style={{ alignItems: "center", justifyContent: "center" }}>
                                 {this.state.reloadingSkills ? <AppActivityIndicator visible={this.state.reloadingSkills} /> :
                                     <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                        <AppText color={colors.bitterSweetRed} fontSize={20}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                         <AppText textAlign={"center"}>You have the option to choose two of your skill proficiencies, your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.</AppText>
                                         {store.getState().character.skills.map((skill, index) =>
-                                            <TouchableOpacity key={index} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
+                                            <TouchableOpacity key={index} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                                 <AppText>{skill[0]}</AppText>
                                             </TouchableOpacity>)}
                                         {this.props.character.characterClass === 'Rogue' &&
                                             this.props.character.tools.map((tool, index) =>
                                                 <TouchableOpacity key={index} onPress={() => this.pickSkill(tool, index + this.state.character.skills.length)}
-                                                    style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index + this.state.character.skills.length] ? colors.bitterSweetRed : colors.lightGray }]}>
+                                                    style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index + this.state.character.skills.length] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                                     <AppText>{tool[0]}</AppText>
                                                 </TouchableOpacity>)}
                                     </View>
@@ -1010,7 +1020,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             null}
                         {this.props.options.cantrips ?
                             <View style={styles.magic}>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 {this.props.character.characterClass === "Warlock" ?
                                     <View>
                                         <AppText fontSize={18} textAlign={'center'}>You posses the following magical abilities</AppText>
@@ -1039,12 +1049,12 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                         {this.props.options.pickFightingStyle ?
                             <View>
                                 <View style={{ justifyContent: 'center', alignItems: 'center', padding: 10 }}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                     <AppText textAlign={'center'}>You can pick your fighting style, this choice will bring you benefits on your preferred way of combat:</AppText>
                                 </View>
                                 {this.props.options.pickFightingStyle.map((style: any, index: number) =>
-                                    <TouchableOpacity key={index} onPress={() => { this.pickFightingStyle(style, index) }} style={[styles.longTextItem, { backgroundColor: this.state.fightingStyleClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                        <AppText fontSize={20} color={this.state.fightingStyleClicked[index] ? colors.black : colors.bitterSweetRed}>{style.name}</AppText>
+                                    <TouchableOpacity key={index} onPress={() => { this.pickFightingStyle(style, index) }} style={[styles.longTextItem, { backgroundColor: this.state.fightingStyleClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                        <AppText fontSize={20} color={this.state.fightingStyleClicked[index] ? Colors.black : Colors.bitterSweetRed}>{style.name}</AppText>
                                         <AppText>{style.description}</AppText>
                                     </TouchableOpacity>)}
                             </View>
@@ -1053,7 +1063,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                         {this.props.options.monkMartialArts ?
                             <View>
                                 <View style={{ justifyContent: 'center', alignItems: 'center', padding: 10 }}>
-                                    <AppText color={colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                     <AppText textAlign={'center'}>You now possess {this.props.options.kiPoints} Ki points.</AppText>
                                     <AppText textAlign={'center'}>Your martial arts hit die is now {this.props.options.monkMartialArts}</AppText>
                                 </View>
@@ -1061,18 +1071,18 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             : null}
                         {this.props.options.sneakAttackDie ?
                             <View>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 <AppText textAlign={'center'}>You can now roll {this.props.options.sneakAttackDie}D6 for a sneak attack.</AppText>
                             </View>
                             : null}
                         {this.props.options.metamagic ?
                             <View>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 <AppText textAlign={'center'}>You now gain the ability to twist your spells to suit your needs.</AppText>
                                 <AppText textAlign={'center'}>You gain two of the following Metamagic options of your choice. You gain another one at 10th and 17th level.</AppText>
                                 {filterAlreadyPicked(this.props.options.metamagic.value, this.state.character.charSpecials.sorcererMetamagic).map((magic: any, index: number) =>
-                                    <TouchableOpacity key={index} onPress={() => { this.pickMetaMagic(magic, index) }} style={[styles.longTextItem, { backgroundColor: this.state.metamagicClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                        <AppText fontSize={20} color={this.state.metamagicClicked[index] ? colors.black : colors.bitterSweetRed}>{magic.name}</AppText>
+                                    <TouchableOpacity key={index} onPress={() => { this.pickMetaMagic(magic, index) }} style={[styles.longTextItem, { backgroundColor: this.state.metamagicClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                        <AppText fontSize={20} color={this.state.metamagicClicked[index] ? Colors.black : Colors.bitterSweetRed}>{magic.name}</AppText>
                                         <AppText>{magic.description}</AppText>
                                     </TouchableOpacity>)}
                             </View>
@@ -1083,26 +1093,26 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
                         {this.props.options.eldritchInvocations ?
                             <View>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 <AppText textAlign={'center'}>You now gain the ability to use Eldritch Invocations, these are powerful abilities you will unlock throughout leveling up</AppText>
                                 <AppText textAlign={'center'}>Remember that every time you level up you can choose to replace old invocations with new ones to suit your needs.</AppText>
                                 <AppText textAlign={'center'} fontSize={18}>You have a total of {this.state.totalInvocationPoints} Invocations.</AppText>
                                 {eldritchInvocations(this.props.character.level, this.props.character).map((invocation: any, index: number) =>
-                                    <TouchableOpacity key={index} onPress={() => { this.pickEldritchInvocations(invocation, index) }} style={[styles.longTextItem, { backgroundColor: this.state.invocationsClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                        <AppText fontSize={20} color={this.state.invocationsClicked[index] ? colors.black : colors.bitterSweetRed}>{invocation.name}</AppText>
+                                    <TouchableOpacity key={index} onPress={() => { this.pickEldritchInvocations(invocation, index) }} style={[styles.longTextItem, { backgroundColor: this.state.invocationsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                        <AppText fontSize={20} color={this.state.invocationsClicked[index] ? Colors.black : Colors.bitterSweetRed}>{invocation.name}</AppText>
                                         <AppText>{invocation.entries}</AppText>
                                     </TouchableOpacity>)}
                             </View>
                             : null}
                         {this.props.options.pactSelector ?
                             <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} color={colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 <AppText fontSize={17} textAlign={'center'}>You can now pick one of three pacts, these pacts will unlock powerful Eldritch Invocations at later levels</AppText>
                                 <AppText fontSize={17} textAlign={'center'}>Remember, you can only choose one pact and you cannot change it.</AppText>
                                 <AppText fontSize={17} textAlign={'center'}>Once you pick a pact new Eldritch Invocations will be unlocked, scroll up and see if you find something you fancy!</AppText>
                                 {this.props.options.pactSelector.map((pact: any, index: number) =>
-                                    <TouchableOpacity key={index} onPress={() => { this.pickWarlockPact(pact, index) }} style={[styles.longTextItem, { backgroundColor: this.state.pactClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}>
-                                        <AppText fontSize={20} color={this.state.pactClicked[index] ? colors.black : colors.bitterSweetRed}>{pact.name}</AppText>
+                                    <TouchableOpacity key={index} onPress={() => { this.pickWarlockPact(pact, index) }} style={[styles.longTextItem, { backgroundColor: this.state.pactClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                        <AppText fontSize={20} color={this.state.pactClicked[index] ? Colors.black : Colors.bitterSweetRed}>{pact.name}</AppText>
                                         <AppText>{pact.description}</AppText>
                                     </TouchableOpacity>)}
                             </View>
@@ -1111,7 +1121,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             <View>
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 10, marginTop: 15 }}>
                                     <AppText textAlign={'center'} fontSize={22}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.state.character.path.name} {this.state.character.charSpecials.druidCircle !== "false" ? `with the ${this.state.character.charSpecials.druidCircle} attribute` : null}</AppText>
-                                    <AppText color={colors.bitterSweetRed} fontSize={22}>You gain the following spells</AppText>
+                                    <AppText color={Colors.bitterSweetRed} fontSize={22}>You gain the following spells</AppText>
                                 </View>
                                 {this.props.options.extraSpells.map((spell: any, index: number) =>
                                     <View style={{ justifyContent: "center", alignItems: "center" }} key={`${spell.name}${index}`}>
@@ -1120,7 +1130,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             </View>
                             : null}
                         <View style={{ paddingTop: 15, paddingBottom: 15 }}>
-                            <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Ok"} onPress={() => { this.close() }} />
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Ok"} onPress={() => { this.close() }} />
                         </View>
                     </View>}
             </View>
@@ -1143,7 +1153,7 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     },
     modifier: {
@@ -1157,7 +1167,6 @@ const styles = StyleSheet.create({
     innerModifier: {
         width: 120,
         height: 120,
-        backgroundColor: colors.bitterSweetRed,
         borderRadius: 120,
         justifyContent: "center"
     },
@@ -1172,7 +1181,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 5,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderRadius: 15,
         padding: 10
     }

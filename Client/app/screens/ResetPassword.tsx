@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { AppForm } from '../components/forms/AppForm';
 import * as Yup from 'yup';
 import { AppFormField } from '../components/forms/AppFormField';
@@ -11,10 +11,11 @@ import authApi from '../api/authApi';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import { AppRegisterDone } from '../components/AppRegisterDone';
 import errorHandler from '../../utility/errorHander';
+import { AppText } from '../components/AppText';
 
 
 const ValidationSchema = Yup.object().shape({
-    password: Yup.string().length(8).required().label("Password"),
+    password: Yup.string().matches(/^.{5,16}$/, "Must be 5-16 Characters").required().label("Password"),
     passwordConfirmation: Yup.string().oneOf([Yup.ref('password')], 'passwords Must match').required(),
 })
 
@@ -62,32 +63,40 @@ export class ResetPassword extends Component<{ props: any, navigation: any }, Re
             <View style={styles.container}>
                 {this.state.completed ? <AppRegisterDone visible={this.state.completed} /> :
                     this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                        <AppForm
-                            initialValues={{ password: '', validationCode: '' }}
-                            onSubmit={(values: any) => this.resetPassword(values)}
-                            validationSchema={ValidationSchema}>
-                            <View style={{ marginBottom: 40 }}>
-                                <AppFormField
-                                    fieldName={"validationCode"}
-                                    name="validationCode"
-                                    iconName={"lock-outline"}
-                                    placeholder={"Validation Code..."} />
-                                <AppFormField
-                                    secureTextEntry
-                                    fieldName={"password"}
-                                    name="password"
-                                    iconName={"lock-outline"}
-                                    placeholder={"password..."} />
-                                <AppFormField
-                                    secureTextEntry
-                                    fieldName={"passwordConfirmation"}
-                                    name="confirmPassword"
-                                    iconName={"lock-outline"}
-                                    placeholder={"repeat Password..."} />
+                        <View>
+                            <View style={{ paddingTop: 60 }}>
+                                <AppText fontSize={18} textAlign={'center'}>Please enter the validation code provided in the email that was sent to you in the field below</AppText>
                             </View>
-                            <SubmitButton title={"Reset"} />
-                        </AppForm>}
-
+                            <AppForm
+                                initialValues={{ password: '', validationCode: '' }}
+                                onSubmit={(values: any) => this.resetPassword(values)}
+                                validationSchema={ValidationSchema}>
+                                <View style={{ marginBottom: 40 }}>
+                                    <AppFormField
+                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        fieldName={"validationCode"}
+                                        name="validationCode"
+                                        iconName={"lock-outline"}
+                                        placeholder={"Validation Code..."} />
+                                    <AppFormField
+                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        secureTextEntry
+                                        fieldName={"password"}
+                                        name="password"
+                                        iconName={"lock-outline"}
+                                        placeholder={"password..."} />
+                                    <AppFormField
+                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        secureTextEntry
+                                        fieldName={"passwordConfirmation"}
+                                        name="confirmPassword"
+                                        iconName={"lock-outline"}
+                                        placeholder={"repeat Password..."} />
+                                </View>
+                                <SubmitButton title={"Reset"} />
+                            </AppForm>
+                        </View>
+                }
             </View>
         )
     }

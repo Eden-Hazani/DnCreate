@@ -13,6 +13,9 @@ export function reduce(currentState: AppState, action: Action): AppState {
     const newState = { ...currentState }; // Duplicate the old state into a new state.
 
     switch (action.type) {
+        case ActionType.colorScheme:
+            newState.colorScheme = action.payload;
+            break;
         case ActionType.SetInfoBeforeRegisterChar:
             newState.beforeRegisterChar = action.payload
             break;

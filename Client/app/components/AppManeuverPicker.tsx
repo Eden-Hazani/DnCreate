@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
 import { AppText } from './AppText';
@@ -122,10 +122,10 @@ export class AppManeuverPicker extends Component<{
             <View style={styles.container}>
                 {this.props.item.map((item: any, index: number) =>
                     <View key={item.name}>
-                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.ManeuverClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.ManeuverClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                             onPress={() => { this.setManeuvers(item, index) }}>
-                            <AppText color={colors.black} fontSize={18} textAlign={'center'}>{item.name}</AppText>
-                            <AppText color={colors.black} fontSize={15} textAlign={'center'}>{item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
+                            <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>{item.name}</AppText>
+                            <AppText color={Colors.whiteInDarkMode} fontSize={15} textAlign={'center'}>{item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     },
 });

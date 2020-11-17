@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { AppText } from '../../components/AppText';
 import LottieView from 'lottie-react-native';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { Unsubscribe } from 'redux';
 import { store } from '../../redux/store';
@@ -43,11 +43,11 @@ export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterS
         return (
             <View style={styles.container}>
                 <View style={styles.main}>
-                    <AppText fontSize={35} color={colors.bitterSweetRed}>Congratulations!</AppText>
+                    <AppText fontSize={35} color={Colors.bitterSweetRed}>Congratulations!</AppText>
                     <AppText textAlign={'center'} fontSize={20} >Your Character has been saved!</AppText>
                     <AppText textAlign={'center'} fontSize={20} >You can access it through the Character Hall</AppText>
                     <View style={{ paddingTop: 30 }}>
-                        <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.home() }} />
+                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.home() }} />
                     </View>
                 </View>
                 <View style={styles.lottie}>

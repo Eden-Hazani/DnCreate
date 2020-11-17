@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { AppText } from '../../components/AppText';
 import { AppForm } from '../../components/forms/AppForm';
 import * as Yup from 'yup';
@@ -9,6 +9,7 @@ import AuthContext from '../../auth/context';
 import adventureApi from '../../api/adventureApi';
 import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -28,21 +29,22 @@ export class StartAdventure extends Component<{ navigation: any }> {
 
     render() {
         return (
-            <View style={styles.container}>
-                <AppText></AppText>
+            <ScrollView style={styles.container}>
                 <AppForm
                     initialValues={{ adventureName: '', adventureSetting: '', leader_id: this.context.user._id }}
                     onSubmit={(values: any) => this.startAdventure(values)}
                     validationSchema={ValidationSchema}>
-                    <View >
+                    <View style={{ justifyContent: "center", alignItems: "center" }}>
                         <AppText fontSize={18} textAlign={'center'}>Adventure Name</AppText>
                         <AppFormField
+                            style={{ width: Dimensions.get('screen').width }}
                             fieldName={"adventureName"}
                             name="adventureName"
                             iconName={"text-short"}
                             placeholder={"Adventure Name...."} />
                         <AppText fontSize={18} textAlign={'center'}>Adventure Setting</AppText>
                         <AppFormField
+                            style={{ width: Dimensions.get('screen').width }}
                             multiline={true}
                             numberOfLines={10}
                             textAlignVertical={"top"}
@@ -53,7 +55,7 @@ export class StartAdventure extends Component<{ navigation: any }> {
                     </View>
                     <SubmitButton width={250} title={"Start Adventure"} />
                 </AppForm>
-            </View>
+            </ScrollView>
         )
     }
 }

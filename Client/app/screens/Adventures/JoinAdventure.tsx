@@ -9,7 +9,7 @@ import { AppPicker } from '../../components/AppPicker';
 import { CharacterModel } from '../../models/characterModel';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import adventureApi from '../../api/adventureApi';
 import { AdventureModel } from '../../models/AdventureModel';
 import errorHandler from '../../../utility/errorHander';
@@ -97,9 +97,10 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                             onSubmit={(values: any) => this.findAdventure(values)}
                             validationSchema={ValidationSchema}>
                             <View style={{ flex: 1 }}>
-                                <View style={{ height: Dimensions.get('screen').height / 5, paddingTop: 35 }}>
+                                <View style={{ alignItems: "center", height: Dimensions.get('screen').height / 5, paddingTop: 35 }}>
                                     <AppText fontSize={18} textAlign={'center'}>Adventure Identifier</AppText>
                                     <AppFormField
+                                        style={{ width: Dimensions.get('screen').width }}
                                         keyboardType={'numeric'}
                                         fieldName={"adventureIdentifier"}
                                         name="adventureIdentifier"
@@ -110,7 +111,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                                     <SubmitButton width={250} title={"Find Adventure"} />
                                 </View>
                                 <View style={{ height: Dimensions.get('screen').height / 5 }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
                                         borderRadius={100} width={250} height={100} title={"Cancel"} onPress={() => { this.props.navigation.navigate('Adventures') }} />
                                 </View>
                             </View>
@@ -118,18 +119,18 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                         :
                         <View>
                             <View style={styles.adventure}>
-                                <AppText fontSize={25} color={colors.bitterSweetRed}>Adventure name - {this.state.confirmedAdventure.adventureName}</AppText>
+                                <AppText fontSize={25} color={Colors.bitterSweetRed}>Adventure name - {this.state.confirmedAdventure.adventureName}</AppText>
                                 <AppText fontSize={16}>Setting:</AppText>
                                 <AppText fontSize={16}>{this.state.confirmedAdventure.adventureSetting}</AppText>
                             </View>
                             <AppText fontSize={18} textAlign={'center'}>Pick Character</AppText>
-                            <AppPicker itemList={this.state.characters} selectedItemIcon={null} itemColor={colors.bitterSweetRed}
+                            <AppPicker itemList={this.state.characters} selectedItemIcon={null} itemColor={Colors.bitterSweetRed}
                                 selectedItem={this.state.pickedCharacter.name} selectItem={(pickedCharacter: any) => { this.setState({ pickedCharacter: pickedCharacter }) }}
                                 numColumns={3} placeholder={"Pick Character"} iconName={"apps"} />
                             <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20 }}>
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
                                     borderRadius={100} width={120} height={70} title={"Join Adventure!"} onPress={() => { this.joinAdventure() }} />
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed}
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
                                     borderRadius={100} width={120} height={70} title={"Cancel"} onPress={() => { this.props.navigation.navigate('Adventures') }} />
 
                             </View>

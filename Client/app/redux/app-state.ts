@@ -12,9 +12,11 @@ export class AppState {
     public race: RaceModel;
     public participatingAdv: AdventureModel[];
     public leadingAdv: AdventureModel[];
-    firstLoginAd: boolean
+    public firstLoginAd: boolean
+    public colorScheme: boolean
     public constructor() {
-        this.nonUser = false;
+        this.colorScheme = false,
+            this.nonUser = false;
         this.beforeRegisterChar = new CharacterModel();
         this.character = new CharacterModel();
         this.characters = [];

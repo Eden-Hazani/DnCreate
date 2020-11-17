@@ -4,7 +4,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import errorHandler from '../../utility/errorHander';
 import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
 import userCharApi from '../api/userCharApi';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
 import { AppActivityIndicator } from './AppActivityIndicator';
@@ -42,10 +42,10 @@ export class AppExtraPathChoicePicker extends Component<{
             <View style={styles.container}>
                 {this.props.item.choice.map((item: any, index: number) =>
                     <View key={item.name}>
-                        <TouchableOpacity style={[styles.item, { backgroundColor: this.props.extraPathChoiceClicked[index] ? colors.bitterSweetRed : colors.lightGray }]}
+                        <TouchableOpacity style={[styles.item, { backgroundColor: this.props.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                             onPress={() => { this.props.applyExtraPathChoice(item, index) }}>
-                            <AppText color={colors.black} fontSize={18} textAlign={'center'}>{item.name}</AppText>
-                            <AppText color={colors.black} fontSize={15} textAlign={'center'}>{item.description}</AppText>
+                            <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>{item.name}</AppText>
+                            <AppText color={Colors.whiteInDarkMode} fontSize={15} textAlign={'center'}>{item.description}</AppText>
                         </TouchableOpacity>
                         {item.skillList && this.props.extraPathChoiceClicked[index] &&
                             <AppSkillItemPicker skillsStartAsExpertise={this.props.item.skillsStartAsExpertise} resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character}
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     },
 });

@@ -3,7 +3,7 @@ import { TouchableOpacity } from 'react-native';
 import { View, StyleSheet } from 'react-native';
 import { AppText } from '../AppText';
 import { useFormikContext } from 'formik';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 
 
 /**
@@ -16,7 +16,7 @@ export function SubmitButton({ ...props }: any) {
     const { handleSubmit } = useFormikContext();
     return (
         <TouchableOpacity activeOpacity={.8} style={styles.container} onPress={() => handleSubmit()}>
-            <View style={[styles.button, { width: props.width ? props.width : 100, marginBottom: props.marginBottom ? props.marginBottom : 35 }]}>
+            <View style={[styles.button, { backgroundColor: Colors.bitterSweetRed, width: props.width ? props.width : 100, marginBottom: props.marginBottom ? props.marginBottom : 35 }]}>
                 <AppText textAlign={props.textAlign} fontSize={20} padding={5} color={'white'}>{props.title}</AppText>
             </View>
         </TouchableOpacity>
@@ -35,6 +35,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         height: 100,
         borderRadius: 100,
-        backgroundColor: colors.bitterSweetRed,
     }
 })

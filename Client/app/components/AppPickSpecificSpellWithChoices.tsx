@@ -4,7 +4,7 @@ import { CharacterModel } from '../models/characterModel';
 import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 
 
 interface AppPickSpecificSpellWithChoicesState {
@@ -52,7 +52,7 @@ export class AppPickSpecificSpellWithChoices extends Component<{ character: Char
                     :
                     <View>
                         <AppText textAlign={'center'} fontSize={20}>You have gain the following spell:</AppText>
-                        <AppText color={colors.berries} textAlign={'center'} fontSize={20}>{this.props.spell.name}</AppText>
+                        <AppText color={Colors.berries} textAlign={'center'} fontSize={20}>{this.props.spell.name}</AppText>
                         {(!this.props.spell.countAgainstKnown && this.props.spell.cantrip) && <AppText textAlign={'center'} fontSize={18}>This spell does not count against the number of your known cantrips</AppText>}
                     </View>
                 }

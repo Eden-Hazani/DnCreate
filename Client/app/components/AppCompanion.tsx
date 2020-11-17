@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Platfo
 import switchModifier from '../../utility/abillityModifierSwitch';
 import skillModifier from '../../utility/skillModifier';
 import userCharApi from '../api/userCharApi';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { CompanionModel } from '../models/companionModel';
 import { ModifiersModel } from '../models/modifiersModel';
@@ -171,23 +171,23 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
     render() {
         const companion = this.state.character.charSpecials.companion[this.props.pickedIndex];
         return (
-            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={[styles.container, { backgroundColor: Colors.pageBackground }]} >
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} />
                     :
                     <View>
                         <View style={{ marginBottom: 15, marginTop: 10 }}>
-                            <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50}
+                            <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                                 borderRadius={25} title={'Close'} onPress={() => { this.props.closeModal(false) }} />
                         </View>
                         <AppText padding={5} fontSize={16}>*click on any prop to edit it.</AppText>
                         <View style={{ justifyContent: "space-evenly", flexDirection: 'row', marginVertical: 10 }}>
-                            <TouchableOpacity style={{ backgroundColor: colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'animalType' }) }}>
+                            <TouchableOpacity style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'animalType' }) }}>
                                 <AppText fontSize={18}>Animal Type</AppText>
-                                <AppText fontSize={20} color={colors.berries} textAlign={'center'}>{companion.animalType}</AppText>
+                                <AppText fontSize={20} color={Colors.berries} textAlign={'center'}>{companion.animalType}</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ backgroundColor: colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'name' }) }}>
+                            <TouchableOpacity style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'name' }) }}>
                                 <AppText fontSize={18} >Companion Name</AppText>
-                                <AppText fontSize={20} color={colors.berries} textAlign={'center'}>{companion.name}</AppText>
+                                <AppText fontSize={20} color={Colors.berries} textAlign={'center'}>{companion.name}</AppText>
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity onPress={() => { this.setState({ textModal: true, textInEdit: 'maxHp' }) }}>
@@ -195,8 +195,8 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         </TouchableOpacity>
                         <View>
                             <View>
-                                <AppText textAlign={'center'} fontSize={18} color={colors.berries}>Proficiency bonus +{this.props.proficiency}</AppText>
-                                <AppText textAlign={'center'} fontSize={18} color={colors.berries}>Your companion is proficient in all saving throws</AppText>
+                                <AppText textAlign={'center'} fontSize={18} color={Colors.berries}>Proficiency bonus +{this.props.proficiency}</AppText>
+                                <AppText textAlign={'center'} fontSize={18} color={Colors.berries}>Your companion is proficient in all saving throws</AppText>
                             </View>
                         </View>
                         <View>
@@ -211,20 +211,20 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                     <View style={{ flexDirection: 'row' }}>
                                         <View style={{ flex: .5 }}>
                                             {companion.skills.map((skill, index) =>
-                                                <View>
-                                                    <AppText fontSize={20} color={colors.berries}>{skill[0]} {((this.skillCheck(skill) + this.props.proficiency) <= 0 ? "" : "+")} {(this.skillCheck(skill) + this.props.proficiency)}</AppText>
+                                                <View key={index}>
+                                                    <AppText fontSize={20} color={Colors.berries}>{skill[0]} {((this.skillCheck(skill) + this.props.proficiency) <= 0 ? "" : "+")} {(this.skillCheck(skill) + this.props.proficiency)}</AppText>
                                                 </View>)}
                                         </View>
                                         <View style={{ flex: .4 }}>
-                                            <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={80} height={80}
+                                            <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={80} height={80}
                                                 borderRadius={25} title={'Edit skills'} onPress={() => { this.setState({ skillPickModal: true }) }} />
                                         </View>
                                     </View>
                                 </View>
                             }
                             <Modal visible={this.state.skillPickModal}>
-                                <ScrollView>
-                                    <AppText textAlign={'center'} fontSize={18} color={colors.berries}>Pick up to 2 skills for your companion:</AppText>
+                                <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                    <AppText textAlign={'center'} fontSize={18} color={Colors.berries}>Pick up to 2 skills for your companion:</AppText>
                                     <View style={{ flexDirection: 'row', flexWrap: "wrap" }}>
                                         {skillList.map((skill, index) =>
                                             <TouchableOpacity style={{
@@ -232,16 +232,16 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                                 width: '43%',
                                                 margin: 10,
                                                 borderRadius: 25,
-                                                borderColor: colors.berries,
+                                                borderColor: Colors.berries,
                                                 borderWidth: 1,
-                                                backgroundColor: this.state.clickedSkills[index] ? colors.bitterSweetRed : colors.lightGray
+                                                backgroundColor: this.state.clickedSkills[index] ? Colors.bitterSweetRed : Colors.lightGray
                                             }}
                                                 key={skill} onPress={() => { this.addSkill(skill, index) }}>
                                                 <AppText>{skill}</AppText>
                                             </TouchableOpacity>)}
                                     </View>
                                     <View style={{ marginBottom: 15 }}>
-                                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50}
+                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                                             borderRadius={25} title={'Close'} onPress={() => { this.setState({ skillPickModal: false }) }} />
                                     </View>
                                 </ScrollView>
@@ -250,11 +250,11 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <TouchableOpacity style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'trait' }) }}>
                                 <AppText fontSize={18}>Trait</AppText>
-                                <AppText fontSize={16} color={colors.berries} textAlign={'center'}>{companion.trait}</AppText>
+                                <AppText fontSize={16} color={Colors.berries} textAlign={'center'}>{companion.trait}</AppText>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'flaw' }) }}>
                                 <AppText fontSize={18} >Flaw</AppText>
-                                <AppText fontSize={16} color={colors.berries} textAlign={'center'}>{companion.flaw}</AppText>
+                                <AppText fontSize={16} color={Colors.berries} textAlign={'center'}>{companion.flaw}</AppText>
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: "row", flexWrap: "wrap", marginHorizontal: 5 }}>
@@ -262,7 +262,7 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                 <View key={index}>
                                     <TouchableOpacity style={styles.modifier} onPress={() => { this.setState({ textModal: true, textInEdit: `${item[0]}` }) }}>
                                         <View style={styles.innerModifier}>
-                                            <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                            <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
                                             <View style={{ paddingTop: 10 }}>
                                                 <AppText textAlign={"center"}>{`Attribute score ${item[2]}`}</AppText>
                                             </View>
@@ -276,7 +276,7 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         </View>
                         <Modal visible={this.state.textModal}>
                             {this.state.textModal &&
-                                <View>
+                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                     <View style={{ marginTop: 35, padding: 25 }}>
                                         <AppText textAlign={'center'} fontSize={20}>Change your companions</AppText>
                                         <AppText textAlign={'center'} fontSize={20}>{this.state.textInEdit.replace(/([A-Z])/g, ' $1').trim().toLocaleLowerCase()}</AppText>
@@ -311,9 +311,9 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                             }} />
                                     </View>
                                     <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
-                                        <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={100} height={100}
+                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={100} height={100}
                                             borderRadius={100} title={'Cancel'} onPress={() => { this.setState({ textValue: '', textModal: false, textInEdit: '' }) }} />
-                                        <AppButton fontSize={20} backgroundColor={colors.metallicBlue} width={100} height={100}
+                                        <AppButton fontSize={20} backgroundColor={Colors.metallicBlue} width={100} height={100}
                                             borderRadius={100} title={'O.K'} onPress={() => {
                                                 if (!this.state.textValue || this.state.textValue.length === 0) {
                                                     alert('Cannot leave field empty!')
@@ -334,11 +334,11 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                 }
 
                 <View style={{ marginBottom: 15 }}>
-                    <AppButton fontSize={20} backgroundColor={colors.bitterSweetRed} width={180} height={50}
+                    <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                         borderRadius={25} title={'Close'} onPress={() => { this.props.closeModal(false) }} />
                 </View>
                 <View style={{ marginBottom: 15 }}>
-                    <AppButton fontSize={20} backgroundColor={colors.danger} width={180} height={50}
+                    <AppButton fontSize={20} backgroundColor={Colors.danger} width={180} height={50}
                         borderRadius={25} title={'Delete Companion'} onPress={() => { this.handleDelete() }} />
                 </View>
             </ScrollView>
@@ -360,15 +360,15 @@ const styles = StyleSheet.create({
     innerModifier: {
         width: 150,
         height: 150,
-        backgroundColor: colors.bitterSweetRed,
+        backgroundColor: Colors.bitterSweetRed,
         borderRadius: 110,
         justifyContent: "center"
     },
     traitFlawCont: {
-        backgroundColor: colors.pinkishSilver,
+        backgroundColor: Colors.pinkishSilver,
         borderRadius: 15,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         padding: 20,
         margin: 15
     }

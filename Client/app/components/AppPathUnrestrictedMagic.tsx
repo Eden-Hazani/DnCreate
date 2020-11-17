@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -23,9 +23,9 @@ const styles = StyleSheet.create({
     container: {
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.pinkishSilver,
+        backgroundColor: Colors.pinkishSilver,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderRadius: 15,
         padding: 15,
         margin: 5

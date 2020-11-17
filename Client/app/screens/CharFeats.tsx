@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { AppText } from '../components/AppText';
 import { ListItem } from '../components/ListItem';
 import { ListItemSeparator } from '../components/ListItemSeparator';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 
 export class CharFeats extends Component<{ navigation: any, route: any }> {
@@ -12,7 +12,7 @@ export class CharFeats extends Component<{ navigation: any, route: any }> {
         return (
             <View>
                 <View style={{ alignItems: "center", paddingTop: 15 }}>
-                    <AppText fontSize={25} color={colors.bitterSweetRed}>{character.name}'s Feats</AppText>
+                    <AppText fontSize={25} color={Colors.bitterSweetRed}>{character.name}'s Feats</AppText>
                 </View>
                 <View style={styles.container}>
                     <FlatList
@@ -23,8 +23,8 @@ export class CharFeats extends Component<{ navigation: any, route: any }> {
                             title={`Feat: ${item.name}`}
                             subTitle={item.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}
                             direction={'row'}
-                            headColor={colors.bitterSweetRed}
-                            subColor={colors.black}
+                            headColor={Colors.bitterSweetRed}
+                            subColor={Colors.whiteInDarkMode}
                             headerFontSize={20}
                             subFontSize={16}
                             padding={20} width={60} height={60}

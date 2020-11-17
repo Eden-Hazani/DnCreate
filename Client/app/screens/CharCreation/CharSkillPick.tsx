@@ -7,7 +7,7 @@ import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
@@ -242,7 +242,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                     <View>
                         {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                             <View style={{ alignItems: "center" }}>
-                                <AppText fontSize={30} color={colors.bitterSweetRed}>Skill Picking</AppText>
+                                <AppText fontSize={30} color={Colors.bitterSweetRed}>Skill Picking</AppText>
                                 <AppText>As a {this.state.characterInfo.characterClass} you can pick up to {this.state.amountToPick} skills</AppText>
                                 <AppText textAlign={"center"}>Talk with your fellow adventurers before this stage and try to build a versatile team with different skills.</AppText>
                                 <FlatList
@@ -250,41 +250,41 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                                     keyExtractor={(stats: any, index) => index.toString()}
                                     numColumns={2}
                                     renderItem={({ item, index }) =>
-                                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.alreadyPickedSkills[index] ? colors.berries : this.state.skillClicked[index] ? colors.bitterSweetRed : colors.lightGray }]} disabled={this.state.alreadyPickedSkills[index]}
+                                        <TouchableOpacity style={[styles.item, { backgroundColor: this.state.alreadyPickedSkills[index] ? Colors.berries : this.state.skillClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]} disabled={this.state.alreadyPickedSkills[index]}
                                             onPress={() => this.pickSkill(item, index)}>
                                             <AppText>{item}</AppText>
                                         </TouchableOpacity>
                                     } />
                                 <View style={{ paddingBottom: 25 }}>
-                                    <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                                 </View>
                             </View>}
                     </View>}
                 <Modal visible={this.state.nonUserPauseModel}>
                     {this.state.registrationEmailSent ?
-                        <View style={{ padding: 15, marginTop: 40, paddingBottom: 25, marginBottom: 30 }}>
-                            <AppText textAlign={'center'} fontSize={35} color={colors.berries}>Amazing!</AppText>
+                        <View style={{ padding: 15, marginTop: 40, paddingBottom: 25, marginBottom: 30, backgroundColor: Colors.pageBackground }}>
+                            <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Amazing!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Now all you need to do is confirm your mail address via the mail that was just sent to it.</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Once you do, just click below</AppText>
                             <View style={{ marginTop: 45 }}>
-                                <AppButton fontSize={18} backgroundColor={colors.bitterSweetRed} borderRadius={25} width={150} height={70}
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={25} width={150} height={70}
                                     title={"Confirmed?"} onPress={() => { this.checkMailConfirm() }} />
                             </View>
                             <View>
                                 <AppText textAlign={'center'} fontSize={20}>Please wait for a minute for the mail to arrive.</AppText>
-                                <AppButton fontSize={18} backgroundColor={colors.berries} borderRadius={25} width={150} height={70} disabled={!this.state.resendCountDown}
+                                <AppButton fontSize={18} backgroundColor={Colors.berries} borderRadius={25} width={150} height={70} disabled={!this.state.resendCountDown}
                                     title={`${this.state.resendCountDown ? 'Resend' : this.state.countDownTimerVal}`} onPress={() => { this.resendEmail() }} />
                             </View>
                         </View>
                         :
                         <ScrollView keyboardShouldPersistTaps="always" style={{ padding: 15, paddingTop: 20, paddingBottom: 30 }}>
-                            <AppText textAlign={'center'} fontSize={35} color={colors.berries}>Hi!</AppText>
+                            <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Hi!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>wasn't that fun?!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Plus use DnCreate's adventure mode with your fellow party members!</AppText>
                             <AppText textAlign={'center'} fontSize={20}>Exciting right?, lets do this!</AppText>
-                            <Register emailSent={(isSent: boolean, username: string, password: string) => {
+                            <Register navigation route emailSent={(isSent: boolean, username: string, password: string) => {
                                 this.startResendCountDown()
                                 this.setState({ registrationEmailSent: isSent, username, password })
                             }} />
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
         padding: 15,
         margin: 15,
         borderWidth: 1,
-        borderColor: colors.black,
+        borderColor: Colors.black,
         borderRadius: 25
     }
 });

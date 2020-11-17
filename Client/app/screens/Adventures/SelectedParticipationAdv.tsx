@@ -5,7 +5,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 
 export class SelectedParticipationAdv extends Component<{ navigation: any, route: any }> {
 
@@ -14,7 +14,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
         return (
             <View style={styles.container}>
                 <View style={styles.textContainer}>
-                    <AppText color={colors.bitterSweetRed} fontSize={25}>{adventure.adventureName}</AppText>
+                    <AppText color={Colors.bitterSweetRed} fontSize={25}>{adventure.adventureName}</AppText>
                     <AppText> - World Setting - </AppText>
                     <AppText>{adventure.adventureSetting}</AppText>
                     <View style={{ paddingTop: 25 }}>
@@ -31,7 +31,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                             imageUrl={`${Config.serverUrl}/assets/${item.image}`}
                             direction={'row'}
                             headerFontSize={18}
-                            headColor={colors.bitterSweetRed}
+                            headColor={Colors.bitterSweetRed}
                             subFontSize={15}
                             padding={20} width={60} height={60}
                             headTextAlign={"left"}
@@ -39,7 +39,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                             justifyContent={"flex-start"} textDistanceFromImg={10} />}
                         ItemSeparatorComponent={ListItemSeparator} />
                 </View>
-                <AppButton backgroundColor={colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
+                <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
                     fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
             </View>
         )

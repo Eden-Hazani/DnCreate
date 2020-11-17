@@ -15,7 +15,7 @@ import errorHandler from '../../utility/errorHander';
 import AuthContext from '../auth/context';
 import { AppRegisterDone } from '../components/AppRegisterDone';
 import { IconGen } from '../components/IconGen';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { AppButton } from '../components/AppButton';
 import { AppText } from '../components/AppText';
 
@@ -35,7 +35,7 @@ interface RegisterState {
     confirmPassOk: boolean
 }
 
-export class Register extends Component<{ emailSent: any }, RegisterState>{
+export class Register extends Component<{ emailSent: any, navigation: any, route: any }, RegisterState>{
     static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -62,6 +62,10 @@ export class Register extends Component<{ emailSent: any }, RegisterState>{
             const userInfo: any = result.data;
             this.setState({ loading: false }, () => {
                 alert(userInfo.message);
+                if (this.props.route.params.jumpToHome) {
+                    this.props.navigation.navigate("Welcome");
+                    return;
+                }
                 this.props.emailSent(true, values.username, values.password);
             });
         }).catch(err => {
@@ -77,11 +81,11 @@ export class Register extends Component<{ emailSent: any }, RegisterState>{
         return (
             <View>
                 {this.state.confirmed ? <AppRegisterDone visible={this.state.confirmed} /> :
-                    <View>
+                    <View style={{ paddingTop: 25 }}>
                         {!this.state.loading ? <View>
                             <AnimateContactUpwards>
                                 <AnimatedLogo />
-                                <AppTextHeadline>Register</AppTextHeadline>
+                                <AppText fontSize={27} textAlign={'center'}>Register</AppText>
                                 <AppForm
                                     initialValues={{
                                         username: '', password: '', passwordConfirmation: ''
@@ -92,17 +96,17 @@ export class Register extends Component<{ emailSent: any }, RegisterState>{
                                     <View >
                                         <View >
                                             <AppFormField
-                                                width={Dimensions.get('screen').width / 1.4}
+                                                width={Dimensions.get('screen').width / 1.2}
                                                 fieldName={"username"}
                                                 name="username"
                                                 iconName={"text-short"}
                                                 placeholder={"Username (Email address)..."} />
                                         </View>
                                         <TouchableOpacity style={{ alignItems: "center", position: 'absolute', right: -15 }} onPress={() => { this.setState({ questionModal: true }) }}>
-                                            <IconGen size={70} name={"account-question-outline"} />
+                                            <IconGen size={70} name={"account-question-outline"} iconColor={Colors.whiteInDarkMode} />
                                         </TouchableOpacity>
                                         <AppFormField
-                                            width={Dimensions.get('screen').width / 1.4}
+                                            width={Dimensions.get('screen').width / 1.2}
                                             secureTextEntry
                                             fieldName={"password"}
                                             name="password"
@@ -110,7 +114,7 @@ export class Register extends Component<{ emailSent: any }, RegisterState>{
                                             placeholder={"password..."} />
 
                                         <AppFormField
-                                            width={Dimensions.get('screen').width / 1.4}
+                                            width={Dimensions.get('screen').width / 1.2}
                                             secureTextEntry
                                             fieldName={"passwordConfirmation"}
                                             name="confirmPassword"
@@ -121,15 +125,15 @@ export class Register extends Component<{ emailSent: any }, RegisterState>{
                                     <SubmitButton title={"Register"} />
                                 </AppForm>
                                 <Modal visible={this.state.questionModal} animationType={'slide'}>
-                                    <View style={{ marginTop: 100, padding: 15 }}>
-                                        <AppText textAlign={'center'} color={colors.berries} fontSize={25}>Why my Email address?</AppText>
+                                    <View style={{ marginTop: 100, padding: 15, backgroundColor: Colors.pageBackground }}>
+                                        <AppText textAlign={'center'} color={Colors.berries} fontSize={25}>Why my Email address?</AppText>
                                         <View style={{ marginTop: 20 }}>
                                             <AppText textAlign={'center'} fontSize={18}>DnCreate uses your email only for its adventure system or in case you forgot your password.</AppText>
                                             <AppText textAlign={'center'} fontSize={18}>No other use will be done with your email address{`\n`} (especially annoying spam...)</AppText>
                                         </View>
                                     </View>
                                     <View>
-                                        <AppButton fontSize={18} backgroundColor={colors.berries} borderRadius={25} width={150} height={70}
+                                        <AppButton fontSize={18} backgroundColor={Colors.berries} borderRadius={25} width={150} height={70}
                                             title={'Close'} onPress={() => { this.setState({ questionModal: false }) }} />
                                     </View>
                                 </Modal>

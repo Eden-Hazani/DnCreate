@@ -4,7 +4,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { IconGen } from '../../components/IconGen';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 
 interface FeatOptionsState {
@@ -158,14 +158,14 @@ export class FeatOptions extends Component<{ featName: any, featDescription: any
                             <View key={index} style={{ width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
                                 <View style={{ flexDirection: 'row', position: 'absolute', alignSelf: 'center' }}>
                                     <TouchableOpacity style={{ marginRight: 33 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
-                                        <IconGen size={55} backgroundColor={colors.shadowBlue} name={'plus'} iconColor={colors.white} />
+                                        <IconGen size={55} backgroundColor={Colors.shadowBlue} name={'plus'} iconColor={Colors.white} />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={{ marginLeft: 33 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
-                                        <IconGen size={55} backgroundColor={colors.orange} name={'minus'} iconColor={colors.white} />
+                                        <IconGen size={55} backgroundColor={Colors.orange} name={'minus'} iconColor={Colors.white} />
                                     </TouchableOpacity>
                                 </View>
-                                <View style={styles.innerModifier}>
-                                    <AppText fontSize={18} color={colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
+                                    <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
                                     <View style={{ paddingTop: 10 }}>
                                         <AppText fontSize={25} textAlign={"center"}>{`${item[1]}`}</AppText>
                                     </View>
@@ -185,7 +185,6 @@ const styles = StyleSheet.create({
     innerModifier: {
         width: 120,
         height: 120,
-        backgroundColor: colors.bitterSweetRed,
         borderRadius: 120,
         justifyContent: "center"
     },

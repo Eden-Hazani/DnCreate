@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
-import colors from '../config/colors';
+import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -32,7 +32,7 @@ export class AppAddSpecificTools extends Component<{ tools: [], character: Chara
                 <View style={{ justifyContent: "center", alignItems: "center" }}>
                     {this.props.tools.map(tool =>
                         <View key={tool}>
-                            <AppText fontSize={17} color={colors.berries}>{tool}</AppText>
+                            <AppText fontSize={17} color={Colors.berries}>{tool}</AppText>
                         </View>)}
                 </View>
             </View>

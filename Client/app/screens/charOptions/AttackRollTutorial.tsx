@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
-import colors from '../../config/colors';
+import { Colors } from '../../config/colors';
 
 export class AttackRollTutorial extends Component<{ closeWindow: any }> {
     render() {
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ margin: 20 }}>
                     <AppText textAlign={'center'} fontSize={25}>Attack Roll Tutorial</AppText>
                 </View>
@@ -16,7 +16,7 @@ export class AttackRollTutorial extends Component<{ closeWindow: any }> {
                     <AppText textAlign={'center'} fontSize={18} >Proficiency with a weapon allows you to add your Proficiency Bonus to the Attack roll for any Attack you make with that weapon. {'\n'} If you make an Attack roll using a weapon with which you lack proficiency, you do not add your Proficiency Bonus to the Attack roll.</AppText>
                 </View>
                 <View style={styles.item}>
-                    <AppText textAlign={'center'} fontSize={25} color={colors.totalWhite}>Example:</AppText>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.totalWhite}>Example:</AppText>
                     <AppText textAlign={'center'} fontSize={18}>Say you have a +3 to strength, and a proficiency bonus of +2</AppText>
                     <AppText textAlign={'center'} fontSize={18}>In this example the character is not proficient with martial weapons but is proficient with simple weapons.</AppText>
                     <AppText textAlign={'center'} fontSize={18}>If the character attacks with a long sword (categorized as a martial weapon) the attack roll will NOT include the proficiency bonus and will just be +3 (from the strength modifier).</AppText>
@@ -32,7 +32,7 @@ export class AttackRollTutorial extends Component<{ closeWindow: any }> {
                     <AppText textAlign={'center'} fontSize={18}>Attacks with melee weapons usually use your STR modifier.</AppText>
                 </View>
                 <View style={{ margin: 10 }}>
-                    <AppButton backgroundColor={colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => { this.props.closeWindow(false) }} />
+                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => { this.props.closeWindow(false) }} />
                 </View>
             </ScrollView>
         )
@@ -46,9 +46,9 @@ const styles = StyleSheet.create({
     }, item: {
         padding: 5,
         margin: 10,
-        backgroundColor: colors.pinkishSilver,
+        backgroundColor: Colors.pinkishSilver,
         borderWidth: 1,
-        borderColor: colors.berries,
+        borderColor: Colors.berries,
         borderRadius: 15
     }
 });
