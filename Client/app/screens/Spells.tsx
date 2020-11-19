@@ -153,6 +153,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             }
             character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
             character.unrestrictedKnownSpells = character.unrestrictedKnownSpells - 1;
+            character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString();
             this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
                 alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)

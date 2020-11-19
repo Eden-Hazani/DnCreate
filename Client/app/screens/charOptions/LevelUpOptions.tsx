@@ -861,12 +861,12 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 {this.state.abilityWindow &&
                                     <View style={{ flexWrap: 'wrap', flexDirection: 'row' }}>
                                         {this.listStats().map((item, index) =>
-                                            <View key={index} style={{ width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
+                                            <View key={index} style={{ flexDirection: 'row', width: Dimensions.get('screen').width / 2, paddingHorizontal: Dimensions.get('screen').width / 12 }}>
                                                 <View style={{ flexDirection: 'row', position: 'absolute', alignSelf: 'center' }}>
-                                                    <TouchableOpacity style={{ marginRight: 33 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
+                                                    <TouchableOpacity style={{ marginRight: Dimensions.get("screen").width / 17, bottom: Dimensions.get("screen").height / 15 }} onPress={() => { this.pickAbilityPoints(item[0], index) }}>
                                                         <IconGen size={55} backgroundColor={Colors.shadowBlue} name={'plus'} iconColor={Colors.white} />
                                                     </TouchableOpacity>
-                                                    <TouchableOpacity style={{ marginLeft: 33 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
+                                                    <TouchableOpacity style={{ marginLeft: Dimensions.get("screen").width / 7.5, bottom: Dimensions.get("screen").height / 15 }} onPress={() => { this.removeAbilityPoints(item[0], index) }}>
                                                         <IconGen size={55} backgroundColor={Colors.orange} name={'minus'} iconColor={Colors.white} />
                                                     </TouchableOpacity>
                                                 </View>

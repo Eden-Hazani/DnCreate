@@ -1,5 +1,5 @@
 import React, { Component, useContext } from 'react';
-import { Dimensions, Modal, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
 import { AppTextHeadline } from '../components/AppTextHeadline';
@@ -18,6 +18,8 @@ import { IconGen } from '../components/IconGen';
 import { Colors } from '../config/colors';
 import { AppButton } from '../components/AppButton';
 import { AppText } from '../components/AppText';
+import reduxToken from '../auth/reduxToken';
+import { ActionType } from '../redux/action-type';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -35,7 +37,7 @@ interface RegisterState {
     confirmPassOk: boolean
 }
 
-export class Register extends Component<{ emailSent: any, navigation: any, route: any }, RegisterState>{
+export class Register extends Component<{ navigation: any, route: any, isTutorial: any, turnOffTutorialModel: any }, RegisterState>{
     static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -58,15 +60,16 @@ export class Register extends Component<{ emailSent: any, navigation: any, route
             password: values.password,
             passwordConfirmation: values.passwordConfirmation
         }
+        const loginValues = {
+            username: values.username.toLowerCase().trim(),
+            password: values.password
+        }
         await authApi.register(validValues).then(result => {
             const userInfo: any = result.data;
             this.setState({ loading: false }, () => {
-                alert(userInfo.message);
-                if (this.props.route.params.jumpToHome) {
-                    this.props.navigation.navigate("Welcome");
-                    return;
-                }
-                this.props.emailSent(true, values.username, values.password);
+                alert(userInfo.message)
+                this.login(loginValues)
+
             });
         }).catch(err => {
             this.setState({ loading: false })
@@ -77,9 +80,34 @@ export class Register extends Component<{ emailSent: any, navigation: any, route
         this.UnsubscribeStore()
     }
 
+    login = async (values: any) => {
+        const newValues = {
+            username: values.username.toLowerCase(),
+            password: values.password
+        }
+        this.setState({ loading: true })
+        await authApi.login(newValues).then(result => {
+            const userInfo: any = result.data.token;
+            reduxToken.setToken(userInfo).then(validToken => {
+                const { user, setUser } = this.context
+                setUser(validToken);
+                if (this.props.isTutorial) {
+                    this.props.turnOffTutorialModel(false);
+                    store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.props.isTutorial })
+                }
+                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
+                this.setState({ loading: false })
+            })
+        }).catch(err => {
+            this.setState({ loading: false })
+            errorHandler(err.request)
+        })
+
+    }
+
     render() {
         return (
-            <View>
+            <ScrollView>
                 {this.state.confirmed ? <AppRegisterDone visible={this.state.confirmed} /> :
                     <View style={{ paddingTop: 25 }}>
                         {!this.state.loading ? <View>
@@ -125,14 +153,14 @@ export class Register extends Component<{ emailSent: any, navigation: any, route
                                     <SubmitButton title={"Register"} />
                                 </AppForm>
                                 <Modal visible={this.state.questionModal} animationType={'slide'}>
-                                    <View style={{ marginTop: 100, padding: 15, backgroundColor: Colors.pageBackground }}>
+                                    <View style={{ flex: 1, paddingTop: 100, padding: 15, backgroundColor: Colors.pageBackground }}>
                                         <AppText textAlign={'center'} color={Colors.berries} fontSize={25}>Why my Email address?</AppText>
-                                        <View style={{ marginTop: 20 }}>
+                                        <View style={{ paddingTop: 20 }}>
                                             <AppText textAlign={'center'} fontSize={18}>DnCreate uses your email only for its adventure system or in case you forgot your password.</AppText>
                                             <AppText textAlign={'center'} fontSize={18}>No other use will be done with your email address{`\n`} (especially annoying spam...)</AppText>
                                         </View>
                                     </View>
-                                    <View>
+                                    <View style={{ backgroundColor: Colors.pageBackground }}>
                                         <AppButton fontSize={18} backgroundColor={Colors.berries} borderRadius={25} width={150} height={70}
                                             title={'Close'} onPress={() => { this.setState({ questionModal: false }) }} />
                                     </View>
@@ -142,7 +170,7 @@ export class Register extends Component<{ emailSent: any, navigation: any, route
                             : <AppActivityIndicator visible={this.state.loading} />
                         }
                     </View>}
-            </View>
+            </ScrollView>
         )
     }
 }

@@ -325,8 +325,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 <AppText>AC</AppText>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
-                                                <TouchableOpacity onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: Colors.whiteInDarkMode, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
-                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.currentHp}</AppText>
+                                                <TouchableOpacity disabled={this.state.isDm} onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: Colors.whiteInDarkMode, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
+                                                    <AppText color={Colors.black} fontSize={25}>{this.state.currentHp}</AppText>
                                                 </TouchableOpacity>
                                                 <AppText>Current Hp</AppText>
                                             </View>
@@ -407,7 +407,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
                                 </View>
                             </Modal>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems") }}>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems", { isDm: this.state.isDm ? this.props.route.params.character : null }) }}>
                                 <IconGen size={80} backgroundColor={Colors.danger} name={"sack"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Items And Currency</AppText>
@@ -427,7 +427,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Feats</AppText>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
                                 <IconGen size={80} backgroundColor={Colors.berries} name={"fire"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Spell Book</AppText>
@@ -435,7 +435,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </TouchableOpacity>
                         </View>
                         <View style={styles.secRowIconContainer}>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character }) }}>
+                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character, isDm: this.state.isDm }) }}>
                                 <IconGen size={80} backgroundColor={Colors.paleGreen} name={"tshirt-crew"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Armor</AppText>
@@ -455,7 +455,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </TouchableOpacity>
                         </View>
                         <View>
-                            <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} />
+                            <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
                         </View>
                         <View>
                             <AppText textAlign={'center'}>Saving Throws</AppText>
@@ -522,8 +522,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             }
                             <View style={[styles.list, { width: '100%' }]}>
                                 <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
-                                {this.state.character.tools.map(tool =>
-                                    <View key={tool} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
+                                {this.state.character.tools.map((tool, index) =>
+                                    <View key={index} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
                                         <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
                                     </View>
                                 )}
@@ -560,7 +560,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         </View>
                         <View>
                             <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={30}>Magic</AppText>
-                            {charHasMagic(this.state.character) ? <CharMagic reloadChar={() => {
+                            {charHasMagic(this.state.character) ? <CharMagic isDm={this.state.isDm} reloadChar={() => {
                                 this.setState({ character: store.getState().character })
                             }} character={this.state.character} currentProficiency={this.state.currentProficiency} /> :
                                 <AppText padding={15} fontSize={18} textAlign={'center'}>You do not posses magical abilities right now.</AppText>

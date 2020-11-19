@@ -22,6 +22,10 @@ import errorHandler from './utility/errorHander';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppMainLoadingScreen } from './app/animations/AppMainLoadingScreen';
 import { Colors } from './app/config/colors';
+import { I18nManager } from "react-native";
+I18nManager.forceRTL(false);
+I18nManager.allowRTL(false);
+
 
 interface AppState {
   fontsLoaded: boolean
@@ -87,6 +91,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     if (colorScheme === null || colorScheme === "firstUse") {
       await AsyncStorage.setItem("colorScheme", "firstUse")
       colorScheme = "firstUse"
+      Colors.InitializeAsync()
       store.dispatch({ type: ActionType.colorScheme, payload: false })
       return
     }

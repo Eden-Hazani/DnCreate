@@ -32,11 +32,17 @@ function removeAdventure(adventureIdentifier) {
     return Adventure.deleteOne({ adventureIdentifier: { $eq: adventureIdentifier } }).exec()
 }
 
+async function getSingleLeadingAdventure(user_id, adventureIdentifier) {
+    const adventure = Adventure.find({ leader_id: { $eq: user_id }, adventureIdentifier: { $eq: adventureIdentifier } }).populate('participants_id').exec();
+    return adventure
+}
+
 module.exports = {
     getParticipatingAdventures,
     createAdventure,
     getLeadingAdventures,
     updateAdventure,
     findAdventure,
-    removeAdventure
+    removeAdventure,
+    getSingleLeadingAdventure
 }

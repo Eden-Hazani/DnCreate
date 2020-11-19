@@ -5,7 +5,6 @@ import { store } from '../redux/store';
 export class AppConfirmation extends Component<{ visible: boolean }>{
 
     render() {
-        console.log(store.getState().colorScheme)
         if (!this.props.visible) return null;
         if (!store.getState().colorScheme) {
             return <LottieView style={{

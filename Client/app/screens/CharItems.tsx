@@ -28,21 +28,23 @@ interface CharItemsState {
     newCopper: number
     search: string
     searchedItems: any
+    isDm: boolean
 }
 
-export class CharItems extends Component<{ navigation: any }, CharItemsState> {
+export class CharItems extends Component<{ navigation: any, route: any }, CharItemsState> {
     private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
-            newGold: store.getState().character.currency.gold,
-            newSilver: store.getState().character.currency.silver,
-            newCopper: store.getState().character.currency.copper,
+            isDm: this.props.route.params.isDm ? true : false,
+            newGold: this.props.route.params.isDm ? this.props.route.params.isDm.currency.gold : store.getState().character.currency.gold,
+            newSilver: this.props.route.params.isDm ? this.props.route.params.isDm.currency.silver : store.getState().character.currency.silver,
+            newCopper: this.props.route.params.isDm ? this.props.route.params.isDm.currency.copper : store.getState().character.currency.copper,
             changeCurrencyModal: false,
             newAmount: null,
             newItem: '',
             addItemModal: false,
-            character: store.getState().character,
+            character: this.props.route.params.isDm ? this.props.route.params.isDm : store.getState().character,
             search: '',
             searchedItems: []
         }
@@ -138,7 +140,7 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
         const character = { ...this.state.character };
         this.setState({ search })
         if (search.trim() === "") {
-            this.setState({ character: store.getState().character })
+            this.setState({ character: this.state.isDm ? this.props.route.params.isDm : store.getState().character })
             return;
         }
         const items = this.state.character.items.filter((item: any) => { return item[0].includes(search) });
@@ -152,7 +154,7 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                 <View>
                     <View style={{ paddingTop: 10, paddingLeft: 25 }}>
                         <AppText fontSize={35} color={Colors.bitterSweetRed}>Currency</AppText>
-                        <TouchableOpacity style={styles.currency} onPress={() => { this.openCurrencyChange() }}>
+                        <TouchableOpacity style={styles.currency} onPress={() => { this.openCurrencyChange() }} disabled={this.state.isDm}>
                             <AppText fontSize={20}>{`Gold ${this.state.character.currency.gold} Silver ${this.state.character.currency.silver} Copper ${this.state.character.currency.copper}`}</AppText>
                         </TouchableOpacity>
                     </View>
@@ -184,7 +186,7 @@ export class CharItems extends Component<{ navigation: any }, CharItemsState> {
                         <AppText fontSize={35} color={Colors.bitterSweetRed}>Items</AppText>
                     </View>
                     <View style={{ flex: .2 }}>
-                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} width={100}
+                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} width={100} disabled={this.state.isDm}
                             height={50} borderRadius={25} title={"Add Item"} onPress={() => { this.setState({ addItemModal: true }) }} />
                     </View>
                 </View>

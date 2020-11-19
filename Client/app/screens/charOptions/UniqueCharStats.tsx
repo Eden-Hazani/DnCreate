@@ -19,7 +19,7 @@ interface UniqueCharStatsState {
 }
 
 
-export class UniqueCharStats extends Component<{ character: CharacterModel, proficiency: any }, UniqueCharStatsState> {
+export class UniqueCharStats extends Component<{ isDm: boolean, character: CharacterModel, proficiency: any }, UniqueCharStatsState> {
     constructor(props: any) {
         super(props)
         this.state = {
@@ -201,7 +201,7 @@ export class UniqueCharStats extends Component<{ character: CharacterModel, prof
                             borderRadius={25} title={'Companions'} onPress={() => { this.setState({ companionModal: true }) }} />
                     </View>
                     <Modal animationType={"slide"} visible={this.state.companionModal}>
-                        <PickCompanion proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
+                        <PickCompanion isDm={this.props.isDm} proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
                     </Modal>
                 </View>
             </View>

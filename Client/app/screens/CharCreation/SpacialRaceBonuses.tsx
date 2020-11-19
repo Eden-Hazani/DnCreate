@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { CharacterModel } from '../../models/characterModel';
 import { store } from '../../redux/store';
@@ -200,21 +200,27 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             'Nature', 'Religion', 'Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival', 'Deception',
             'Intimidation', 'Performance', 'Persuasion']
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
+                        <View style={{ padding: 15, justifyContent: "center", alignItems: 'center' }}>
+                            <Image style={{ width: 150, height: 150 }} source={require("../../../assets/raceDragon.png")} />
+
+                            <AppText textAlign={'center'} fontSize={22}>Below is the information related to your chosen race.</AppText>
+                            <AppText textAlign={'center'} fontSize={22}>Take the time to read about your unique abilities.</AppText>
+                        </View>
                         <View style={{ padding: 15 }}>
                             <AppText textAlign={'center'} fontSize={22}>As a {this.state.character.race} you get the following features.</AppText>
                         </View>
                         <View style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Age:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.age}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.age.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Alignment:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.alignment}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.alignment.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Languages:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.languages}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.languages.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Size:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.size}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.size.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities.speed}ft</AppText>
                         </View>
                         {this.state.race.raceAbilities?.uniqueAbilities &&

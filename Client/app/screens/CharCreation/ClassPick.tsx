@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Linking } from 'react-native';
+import { View, StyleSheet, Linking, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
@@ -16,7 +16,6 @@ import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-community/async-storage';
-
 interface ClassPickState {
     loading: boolean
     classes: ClassModel[] | undefined
@@ -28,6 +27,7 @@ interface ClassPickState {
 
 export class ClassPick extends Component<{ props: any, placeholder: string, navigation: any }, ClassPickState>{
     private UnsubscribeStore: Unsubscribe;
+    private dragonClasses: any
     constructor(props: any) {
         super(props)
         this.state = {
@@ -41,6 +41,20 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
         this.UnsubscribeStore = store.subscribe(() => {
             store.getState().character
         })
+        this.dragonClasses = {
+            Barbarian: { icon: require('../../../assets/barbarianDragon.png') },
+            Bard: { icon: require('../../../assets/bardDragon.png') },
+            Fighter: { icon: require('../../../assets/fighterDragon.png') },
+            Druid: { icon: require('../../../assets/druidDragon.png') },
+            Cleric: { icon: require('../../../assets/clericDragon.png') },
+            Monk: { icon: require('../../../assets/monkDragon.png') },
+            Paladin: { icon: require('../../../assets/paladinDragon.png') },
+            Ranger: { icon: require('../../../assets/rangerDragon.png') },
+            Rogue: { icon: require('../../../assets/rogueDragon.png') },
+            Sorcerer: { icon: require('../../../assets/sorcererDragon.png') },
+            Warlock: { icon: require('../../../assets/warlockDragon.png') },
+            Wizard: { icon: require('../../../assets/wizardDragon.png') },
+        }
     }
     componentWillUnmount() {
         this.UnsubscribeStore()
@@ -93,15 +107,22 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
                         {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                             this.state.error ? <AppError /> :
                                 <View style={{ flex: 1 }}>
+                                    <View style={{ paddingTop: 50, padding: 10, paddingBottom: 0 }}>
+                                        <AppText textAlign={"center"} fontSize={20}>In this section you will need to pick your characters class.</AppText>
+                                        <AppText textAlign={"center"} fontSize={18}>Each class has it's own benefits and weaknesses, work with your team to create a versatile party!</AppText>
+                                    </View>
                                     <View style={{ flex: .15 }}>
                                         <AppPicker itemList={this.state.classes} selectedItemIcon={this.state.pickedClass.icon} selectedItem={this.state.pickedClass.name} selectItem={(pickedClass: any) => { this.setState({ pickedClass: pickedClass }) }} numColumns={3} placeholder={"Pick Class"} iconName={"apps"} />
                                     </View>
                                     {this.state.pickedClass.name &&
                                         <View style={styles.infoContainer}>
                                             <View >
+                                                <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                                    <Image style={{ width: 150, height: 150 }} source={this.dragonClasses[this.state.pickedClass.name].icon} />
+                                                </View>
                                                 <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
-                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description}</AppText>
-                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo}</AppText>
+                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description.replace(/\. /g, '.\n\n')}</AppText>
+                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo.replace(/\. /g, '.\n\n')}</AppText>
                                                 <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
                                                     <View style={{ width: "50%", marginTop: 10 }}>
                                                         <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>

@@ -17,6 +17,9 @@ const userSchema = mongoose.Schema({
     },
     resetLink: {
         type: String
+    },
+    activated: {
+        type: Boolean
     }
 
 }, {

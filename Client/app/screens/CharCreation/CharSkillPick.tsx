@@ -87,6 +87,9 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 }
             }
         })
+        if (this.props.route?.params?.nonUser) {
+            this.insertInfoAndContinue()
+        }
     }
 
     insertInfoAndContinue = () => {
@@ -183,56 +186,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         }
     }
 
-    checkMailConfirm = async () => {
-        const values = {
-            username: this.state.username,
-            password: this.state.password
-        }
-        store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.state.characterInfo })
-        this.setState({ loading: true })
-        await authApi.login(values).then(result => {
-            const userInfo: any = result.data.token;
-            reduxToken.setToken(userInfo).then(validToken => {
-                const { user, setUser } = this.context
-                setUser(validToken);
-                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
-                this.setState({ nonUserPauseModel: false })
-                this.setState({ loading: false })
-            })
-        }).catch(err => {
-            this.setState({ loading: false })
-            alert('Email has not been confirmed.')
-        })
-    }
 
-    resendEmail = async () => {
-        try {
-            this.startResendCountDown()
-            const validValues = {
-                username: this.state.username,
-                password: this.state.password,
-                passwordConfirmation: this.state.password
-            }
-            await authApi.register(validValues).then(result => {
-                const userInfo: any = result.data;
-                this.setState({ loading: false }, () => {
-                    alert(userInfo.message);
-                });
-            })
-        } catch (err) {
-            console.log(err.message)
-        }
-    }
-
-    startResendCountDown = () => {
-        this.setState({ countDownTimerVal: 60, resendCountDown: false })
-        setInterval(() => {
-            this.setState({ countDownTimerVal: this.state.countDownTimerVal - 1 })
-            if (this.state.countDownTimerVal === 0) {
-                this.setState({ resendCountDown: true })
-            }
-        }, 1000);
-    }
 
     render() {
         const character = this.state.characterInfo;
@@ -261,35 +215,15 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                             </View>}
                     </View>}
                 <Modal visible={this.state.nonUserPauseModel}>
-                    {this.state.registrationEmailSent ?
-                        <View style={{ padding: 15, marginTop: 40, paddingBottom: 25, marginBottom: 30, backgroundColor: Colors.pageBackground }}>
-                            <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Amazing!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Now all you need to do is confirm your mail address via the mail that was just sent to it.</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Once you do, just click below</AppText>
-                            <View style={{ marginTop: 45 }}>
-                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={25} width={150} height={70}
-                                    title={"Confirmed?"} onPress={() => { this.checkMailConfirm() }} />
-                            </View>
-                            <View>
-                                <AppText textAlign={'center'} fontSize={20}>Please wait for a minute for the mail to arrive.</AppText>
-                                <AppButton fontSize={18} backgroundColor={Colors.berries} borderRadius={25} width={150} height={70} disabled={!this.state.resendCountDown}
-                                    title={`${this.state.resendCountDown ? 'Resend' : this.state.countDownTimerVal}`} onPress={() => { this.resendEmail() }} />
-                            </View>
-                        </View>
-                        :
-                        <ScrollView keyboardShouldPersistTaps="always" style={{ padding: 15, paddingTop: 20, paddingBottom: 30 }}>
-                            <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Hi!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>wasn't that fun?!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Plus use DnCreate's adventure mode with your fellow party members!</AppText>
-                            <AppText textAlign={'center'} fontSize={20}>Exciting right?, lets do this!</AppText>
-                            <Register navigation route emailSent={(isSent: boolean, username: string, password: string) => {
-                                this.startResendCountDown()
-                                this.setState({ registrationEmailSent: isSent, username, password })
-                            }} />
-                        </ScrollView>
-                    }
+                    <ScrollView keyboardShouldPersistTaps="always" style={{ backgroundColor: Colors.pageBackground, padding: 15, paddingTop: 20, paddingBottom: 30 }}>
+                        <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Hi!</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>wasn't that fun?!</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>Plus use DnCreate's adventure mode with your fellow party members!</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>Exciting right?, lets do this!</AppText>
+                        <Register navigation route isTutorial={this.state.characterInfo} turnOffTutorialModel={(val: boolean) => { this.setState({ nonUserPauseModel: val }) }} />
+                    </ScrollView>
                 </Modal>
             </View>
 

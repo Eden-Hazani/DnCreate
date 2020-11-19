@@ -175,7 +175,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                         </View>}
                 </View>
                 <View>
-                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} disabled={this.props.route.params.isDm}
                         title={'Add Armor Set'} onPress={() => { this.setState({ addArmor: true }) }} />
                 </View>
                 <Modal visible={this.state.addArmor}>

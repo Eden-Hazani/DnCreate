@@ -89,7 +89,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         if (diceStorage) {
             dicePool = JSON.parse(diceStorage)
         }
-        const item = await AsyncStorage.getItem(`${this.state.characterInfo.name}AttributeStage`)
+        const item = await AsyncStorage.getItem(`AttributeStage`)
         if (item) {
             characterInfo = JSON.parse(item)
         }
@@ -152,17 +152,10 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                     }
                 })
             }
-
         }
     }
     resetRoll = () => {
-        this.setState({ numberOfPickedDice: 0 })
-        this.setState({ diceResults: [] })
-        this.setState({ sumOfDice: 0 })
-        this.setState({ diceI: false })
-        this.setState({ diceII: false })
-        this.setState({ diceIII: false })
-        this.setState({ diceIV: false })
+        this.setState({ numberOfPickedDice: 0, diceResults: [], sumOfDice: 0, diceI: false, diceII: false, diceIII: false, diceIV: false })
     }
 
     rollDice = () => {
@@ -188,7 +181,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         characterInfo[attribute] = characterInfo[attribute] + this.state.sumOfDice;
         characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
         this.setState({ characterInfo }, () => {
-            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
+            AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
             this.setState({ jiggleOn: false, sumOfDice: 0 })
         })
     }
@@ -217,7 +210,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         ) {
             this.setState({ confirmed: true })
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
+            AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
             setTimeout(() => {
                 this.props.navigation.navigate("CharBackground");
             }, 800);
@@ -246,7 +239,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
             }
         }
         this.setState({ characterInfo, rollDisabled }, () => {
-            AsyncStorage.setItem(`${this.state.characterInfo.name}AttributeStage`, JSON.stringify(this.state.characterInfo))
+            AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
             this.setState({ jiggleOn: false, sumOfDice: 0 })
         })
     }
@@ -429,7 +422,11 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                 <View style={styles.container} pointerEvents={this.state.diceResults.length === 0 ? "none" : "auto"}>
                                     <View style={styles.rolledDiceContainer} >
                                         <AppText>Dice I</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceI ? Colors.lightGray : Colors.pageBackground }]}
+                                        <TouchableOpacity style={[styles.rolledDice, {
+                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                            backgroundColor: this.state.diceI ? Colors.berries : Colors.pageBackground
+                                        }]}
                                             disabled={!this.state.diceI && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[0], this.state.diceI);
@@ -440,7 +437,11 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice II</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceII ? Colors.lightGray : Colors.pageBackground }]}
+                                        <TouchableOpacity style={[styles.rolledDice, {
+                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                            backgroundColor: this.state.diceII ? Colors.berries : Colors.pageBackground
+                                        }]}
                                             disabled={!this.state.diceII && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[1], this.state.diceII);
@@ -452,7 +453,11 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice III</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIII ? Colors.lightGray : Colors.pageBackground }]}
+                                        <TouchableOpacity style={[styles.rolledDice, {
+                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                            backgroundColor: this.state.diceIII ? Colors.berries : Colors.pageBackground
+                                        }]}
                                             disabled={!this.state.diceIII && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[2], this.state.diceIII);
@@ -464,7 +469,11 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     </View>
                                     <View style={styles.rolledDiceContainer}>
                                         <AppText>Dice IV</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, { backgroundColor: this.state.diceIV ? Colors.lightGray : Colors.pageBackground }]}
+                                        <TouchableOpacity style={[styles.rolledDice, {
+                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                            backgroundColor: this.state.diceIV ? Colors.berries : Colors.pageBackground
+                                        }]}
                                             disabled={!this.state.diceIV && this.state.numberOfPickedDice === 3 ? true : false}
                                             onPress={() => {
                                                 this.addDice(this.state.diceResults[3], this.state.diceIV);

@@ -20,7 +20,7 @@ export class AppPickerItem extends Component<any>{
             <TouchableOpacity onPress={this.props.onPress} style={{ width: "35%" }}>
                 <View style={styles.container}>
                     {this.props.iconName ?
-                        <IconGen size={Dimensions.get('screen').width / 5.5} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={Colors.whiteInDarkMode} />
+                        <IconGen size={Dimensions.get('screen').width / 5.5} backgroundColor={this.props.iconBackgroundColor} name={this.props.iconName} iconColor={Colors.totalWhite} />
                         :
                         <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} source={{ uri: this.props.imageUrl }} />
                     }

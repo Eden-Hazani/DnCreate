@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, Platform } from 'react-native';
+import { View, FlatList, Platform, Alert } from 'react-native';
 import { ListItem } from '../components/ListItem';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import ListItemDelete from '../components/ListItemDelete';
@@ -141,7 +141,8 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                                             subTextAlign={"left"}
                                             justifyContent={"flex-start"} textDistanceFromImg={10}
                                             renderRightActions={() =>
-                                                <ListItemDelete onPress={() => this.handleDelete(item)} />}
+                                                <ListItemDelete onPress={() =>
+                                                    Alert.alert("Delete", "Are you sure you want to delete this character? (this action is irreversible)", [{ text: 'Yes', onPress: () => this.handleDelete(item) }, { text: 'No' }])} />}
                                             onPress={() => this.characterWindow(item)} />}
                                         ItemSeparatorComponent={ListItemSeparator} />}
                             </View>}

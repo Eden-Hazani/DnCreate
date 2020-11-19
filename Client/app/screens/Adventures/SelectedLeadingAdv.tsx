@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import { Config } from '../../../config';
 import adventureApi from '../../api/adventureApi';
 import { AppButton } from '../../components/AppButton';
@@ -14,18 +14,22 @@ import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import userCharApi from '../../api/userCharApi';
+import AuthContext from '../../auth/context';
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
     loading: boolean
+    refreshing: boolean
 }
 
 export class SelectedLeadingAdv extends Component<{ navigation: any, route: any }, SelectedLeadingAdvState> {
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
             adventure: this.props.route.params.adventure,
-            loading: false
+            loading: false,
+            refreshing: false,
         }
     }
     componentDidMount() {
@@ -73,6 +77,18 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         this.back();
     }
 
+    reloadAdventure = async (adventureIdentifier: string) => {
+        this.setState({ loading: true })
+        await adventureApi.getSingleLeadingAdventure(this.context.user._id, adventureIdentifier).then(confirmedAdventure => {
+            if (!confirmedAdventure.ok) {
+                this.setState({ loading: false })
+                alert(confirmedAdventure.data);
+                return;
+            }
+            this.setState({ adventure: confirmedAdventure.data[0], loading: false })
+        })
+    }
+
     render() {
         const adventure = this.state.adventure;
         return (
@@ -110,7 +126,11 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                         renderRightActions={() =>
                                             <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
                                         onPress={() => this.characterWindow(item)} />}
-                                    ItemSeparatorComponent={ListItemSeparator} />
+                                    ItemSeparatorComponent={ListItemSeparator}
+                                    refreshing={this.state.refreshing}
+                                    onRefresh={() => {
+                                        this.reloadAdventure(adventure.adventureIdentifier)
+                                    }} />
                             </View>
                         }
                         <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
@@ -120,7 +140,9 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                         <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
                             <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.back() }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
-                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.deleteAdventure() }}
+                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
+                                Alert.alert("Delete", "Are you sure you want to delete this adventure?", [{ text: 'Yes', onPress: () => this.deleteAdventure() }, { text: 'No' }])
+                            }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
                         </View>
                     </View>

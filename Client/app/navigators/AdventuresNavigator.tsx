@@ -22,7 +22,7 @@ const AdventuresNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="StartAdventure" component={StartAdventure} />
         <Stack.Screen options={{ title: "" }} name="JoinAdventure" component={JoinAdventure} />
         <Stack.Screen options={{ title: "" }} name="SelectedParticipationAdv" component={SelectedParticipationAdv} />
-        <Stack.Screen options={{ title: "" }} name="SelectedLeadingAdv" component={SelectedLeadingAdv} />
+        <Stack.Screen options={{ title: "", headerShown: false }} name="SelectedLeadingAdv" component={SelectedLeadingAdv} />
     </Stack.Navigator>
 }
 

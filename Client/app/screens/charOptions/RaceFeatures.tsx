@@ -33,9 +33,9 @@ export class RaceFeatures extends Component<{ route: any }, RaceFeaturesState> {
                     :
                     <View>
                         <View style={{ justifyContent: "center", alignItems: "center" }}>
-                            <AppText fontSize={20}>{this.state.character.race} Path Features</AppText>
+                            <AppText fontSize={20}>{this.state.character.race} Race Features</AppText>
                         </View>
-                        <View style={styles.featureItem}>
+                        <View style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver }]}>
                             <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Age:</AppText>
                             <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.raceId.raceAbilities.age}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.black} textAlign={'left'}>Alignment:</AppText>
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 15,
         borderColor: Colors.berries,
-        backgroundColor: Colors.pinkishSilver
     },
     featureItem: {
         padding: 15,

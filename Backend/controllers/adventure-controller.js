@@ -48,6 +48,16 @@ router.get("/getLeadingAdventures/:user_id", upload.none(), async (request, resp
         response.status(500).send(err.message);
     }
 });
+router.get("/getSingleLeadingAdventure/:user_id/:adventureIdentifier", upload.none(), async (request, response) => {
+    try {
+        const user_id = request.params.user_id;
+        const adventureIdentifier = request.params.adventureIdentifier;
+        const adventure = await adventureLogic.getSingleLeadingAdventure(user_id, adventureIdentifier);
+        response.json(adventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
 
 router.post("/getParticipatingAdventures", verifyLogged, upload.none(), async (request, response) => {
     try {

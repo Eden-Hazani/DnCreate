@@ -131,11 +131,13 @@ router.get('/activate/:token', async (request, response) => {
                     return response.status(400).json({ error: err.message })
                 }
                 const verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
-                if (verify) {
+                console.log(verify)
+                if (verify.activated) {
                     return response.status(403).send('User has already been activated')
                 }
-                const newUser = new User(JSON.parse(decodedToken.userInfo));
-                const user = await authLogic.register(newUser);
+                const newUser = verify;
+                newUser.activated = true;
+                await authLogic.updateUser(newUser);
                 return response.redirect('https://dncreate.herokuapp.com/index.html')
             });
         } else {
@@ -159,7 +161,7 @@ router.post("/register", upload.none(), verifyInSystem, async (request, response
             return;
         }
         const userInfo = request.body.userInfo;
-        const token = jwt.sign({ userInfo }, config.jwt.secretKey, { expiresIn: "1h" })
+        const token = jwt.sign({ userInfo }, config.jwt.secretKey, { expiresIn: "12h" })
         const data = {
             from: 'noreplay@DncCreate.com',
             to: newUser.username,
@@ -188,14 +190,17 @@ router.post("/register", upload.none(), verifyInSystem, async (request, response
                 </center>
             `
         };
-        mg.messages().send(data, function (error, body) {
+        mg.messages().send(data, async function (error, body) {
             if (error) {
                 console.log(error.message)
                 return response.json({
                     message: error.message
                 })
             }
-            return response.json({ message: 'Email Has been sent, please activate your account.' })
+            newUser.activated = false;
+            const user = await authLogic.register(newUser);
+            return response.json({ message: "An Email has been sent to your email address, in order to unlock DnCreate's full features please use the activation link to activated your account.", user: user })
+
         });
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));

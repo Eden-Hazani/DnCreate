@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Platform, Dimensions } from 'react-native';
 import switchModifier from '../../utility/abillityModifierSwitch';
 import skillModifier from '../../utility/skillModifier';
 import userCharApi from '../api/userCharApi';
@@ -27,7 +27,7 @@ interface AppCompanionState {
 const skillList: string[] = ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival', 'Acrobatics', 'Sleight of Hand'
     , 'Stealth', 'Arcana', 'History', 'Investigation', 'Religion', 'Insight', 'Medicine', 'Deception', 'Performance', 'Persuasion'];
 
-export class AppCompanion extends Component<{ closeModal: any, character: CharacterModel, proficiency: any, pickedIndex: number }, AppCompanionState> {
+export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, character: CharacterModel, proficiency: any, pickedIndex: number }, AppCompanionState> {
     constructor(props: any) {
         super(props)
         this.state = {
@@ -181,16 +181,16 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         </View>
                         <AppText padding={5} fontSize={16}>*click on any prop to edit it.</AppText>
                         <View style={{ justifyContent: "space-evenly", flexDirection: 'row', marginVertical: 10 }}>
-                            <TouchableOpacity style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'animalType' }) }}>
+                            <TouchableOpacity disabled={this.props.isDm} style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'animalType' }) }}>
                                 <AppText fontSize={18}>Animal Type</AppText>
                                 <AppText fontSize={20} color={Colors.berries} textAlign={'center'}>{companion.animalType}</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'name' }) }}>
+                            <TouchableOpacity disabled={this.props.isDm} style={{ backgroundColor: Colors.pinkishSilver, padding: 10, borderRadius: 25 }} onPress={() => { this.setState({ textModal: true, textInEdit: 'name' }) }}>
                                 <AppText fontSize={18} >Companion Name</AppText>
                                 <AppText fontSize={20} color={Colors.berries} textAlign={'center'}>{companion.name}</AppText>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity onPress={() => { this.setState({ textModal: true, textInEdit: 'maxHp' }) }}>
+                        <TouchableOpacity disabled={this.props.isDm} onPress={() => { this.setState({ textModal: true, textInEdit: 'maxHp' }) }}>
                             <AppText fontSize={25} textAlign={'center'}>Max HP {companion.maxHp}</AppText>
                         </TouchableOpacity>
                         <View>
@@ -201,7 +201,7 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         </View>
                         <View>
                             {companion?.skills.length === 0 ?
-                                <TouchableOpacity style={{ justifyContent: "center", alignItems: "center", padding: 15 }} onPress={() => { this.setState({ skillPickModal: true }) }}>
+                                <TouchableOpacity disabled={this.props.isDm} style={{ justifyContent: "center", alignItems: "center", padding: 15 }} onPress={() => { this.setState({ skillPickModal: true }) }}>
                                     <AppText fontSize={22} textAlign={'center'}>Your companion has no skills, you can pick up to 2 skills.</AppText>
                                     <AppText fontSize={22} textAlign={'center'}>Click here to pick</AppText>
                                 </TouchableOpacity>
@@ -216,7 +216,7 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                                 </View>)}
                                         </View>
                                         <View style={{ flex: .4 }}>
-                                            <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={80} height={80}
+                                            <AppButton disabled={this.props.isDm} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={80} height={80}
                                                 borderRadius={25} title={'Edit skills'} onPress={() => { this.setState({ skillPickModal: true }) }} />
                                         </View>
                                     </View>
@@ -248,20 +248,20 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                             </Modal>
                         </View>
                         <View style={{ alignItems: "center", justifyContent: "center" }}>
-                            <TouchableOpacity style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'trait' }) }}>
+                            <TouchableOpacity disabled={this.props.isDm} style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'trait' }) }}>
                                 <AppText fontSize={18}>Trait</AppText>
                                 <AppText fontSize={16} color={Colors.berries} textAlign={'center'}>{companion.trait}</AppText>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'flaw' }) }}>
+                            <TouchableOpacity disabled={this.props.isDm} style={styles.traitFlawCont} onPress={() => { this.setState({ textModal: true, textInEdit: 'flaw' }) }}>
                                 <AppText fontSize={18} >Flaw</AppText>
                                 <AppText fontSize={16} color={Colors.berries} textAlign={'center'}>{companion.flaw}</AppText>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ flexDirection: "row", flexWrap: "wrap", marginHorizontal: 5 }}>
+                        <View style={{ justifyContent: "center", flexDirection: "row", flexWrap: "wrap", marginHorizontal: Dimensions.get('screen').width / 50 }}>
                             {this.listStats().map((item, index) =>
                                 <View key={index}>
-                                    <TouchableOpacity style={styles.modifier} onPress={() => { this.setState({ textModal: true, textInEdit: `${item[0]}` }) }}>
-                                        <View style={styles.innerModifier}>
+                                    <TouchableOpacity disabled={this.props.isDm} style={styles.modifier} onPress={() => { this.setState({ textModal: true, textInEdit: `${item[0]}` }) }}>
+                                        <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
                                             <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
                                             <View style={{ paddingTop: 10 }}>
                                                 <AppText textAlign={"center"}>{`Attribute score ${item[2]}`}</AppText>
@@ -311,9 +311,9 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                                             }} />
                                     </View>
                                     <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
-                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={100} height={100}
+                                        <AppButton disabled={this.props.isDm} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={100} height={100}
                                             borderRadius={100} title={'Cancel'} onPress={() => { this.setState({ textValue: '', textModal: false, textInEdit: '' }) }} />
-                                        <AppButton fontSize={20} backgroundColor={Colors.metallicBlue} width={100} height={100}
+                                        <AppButton disabled={this.props.isDm} fontSize={20} backgroundColor={Colors.metallicBlue} width={100} height={100}
                                             borderRadius={100} title={'O.K'} onPress={() => {
                                                 if (!this.state.textValue || this.state.textValue.length === 0) {
                                                     alert('Cannot leave field empty!')
@@ -338,7 +338,7 @@ export class AppCompanion extends Component<{ closeModal: any, character: Charac
                         borderRadius={25} title={'Close'} onPress={() => { this.props.closeModal(false) }} />
                 </View>
                 <View style={{ marginBottom: 15 }}>
-                    <AppButton fontSize={20} backgroundColor={Colors.danger} width={180} height={50}
+                    <AppButton disabled={this.props.isDm} fontSize={20} backgroundColor={Colors.danger} width={180} height={50}
                         borderRadius={25} title={'Delete Companion'} onPress={() => { this.handleDelete() }} />
                 </View>
             </ScrollView>
@@ -360,7 +360,6 @@ const styles = StyleSheet.create({
     innerModifier: {
         width: 150,
         height: 150,
-        backgroundColor: Colors.bitterSweetRed,
         borderRadius: 110,
         justifyContent: "center"
     },

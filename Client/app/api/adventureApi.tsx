@@ -18,6 +18,8 @@ const updateAdventure = (adventure: AdventureModel) => {
 
 const getLeadingAdventures = (user_id: string) => client.get<AdventureModel[]>(`${endpoint}/getLeadingAdventures/${user_id}`);
 
+const getSingleLeadingAdventure = (user_id: string, adventureIdentifier: string) => client.get<AdventureModel>(`${endpoint}/getSingleLeadingAdventure/${user_id}/${adventureIdentifier}`);
+
 const getParticipationAdventures = (characters: string[]) => {
     let formData = new FormData();
     formData.append("characters", JSON.stringify(characters));
@@ -46,5 +48,6 @@ export default {
     getParticipationAdventures,
     leaveAdventure,
     deleteAdventure,
-    userInAdv
+    userInAdv,
+    getSingleLeadingAdventure
 }
