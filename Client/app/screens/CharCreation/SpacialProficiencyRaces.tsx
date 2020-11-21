@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import spacialRaceProficiency from '../../../utility/spacialRaceProficiency';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
@@ -112,7 +112,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
                             <AppText textAlign={'center'} fontSize={18}>You Have picked the {this.state.characterInfo.race} race</AppText>
                             <AppText fontSize={16} textAlign={'center'}>As a {this.state.characterInfo.race} you have {this.state.totalPoints} points that you can add to an ability of your choice </AppText>
                         </View>
-                        <View>
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
                             <FlatList
                                 data={abilities}
                                 keyExtractor={(stats: any, index) => index.toString()}
@@ -125,7 +125,8 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
                                 } />
                         </View>
                         <View>
-                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100}
+                                width={110} height={110} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                         </View>
                     </View>}
             </View>
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
 
     },
     item: {
-        width: 150,
+        width: Dimensions.get('screen').width / 2.5,
         justifyContent: "center",
         alignItems: "center",
         padding: 15,

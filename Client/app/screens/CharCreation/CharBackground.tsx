@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
@@ -20,8 +20,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const ValidationSchema = Yup.object().shape({
     backgroundName: Yup.string().required().label("Background Name"),
-    featureName: Yup.string().required().label("Feature Name"),
-    featureDescription: Yup.string().required().label("Feature description"),
+    featureName: Yup.string().label("Feature Name"),
+    featureDescription: Yup.string().label("Feature description"),
 })
 
 interface CharBackgroundState {
@@ -48,6 +48,7 @@ interface CharBackgroundState {
 
 export class CharBackground extends Component<{ navigation: any }, CharBackgroundState> {
     navigationSubscription: any;
+    backgroundDragon: any
     constructor(props: any) {
         super(props)
         this.state = {
@@ -68,6 +69,23 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             makeYourOwnWindow: false,
             confirmed: false,
             characterInfo: store.getState().character
+        }
+        this.backgroundDragon = {
+            Acolyte: { icon: require("../../../assets/backgroundDragons/acolyteDragon.png") },
+            Urchin: { icon: require("../../../assets/backgroundDragons/urchinDragon.png") },
+            Soldier: { icon: require("../../../assets/backgroundDragons/soldierDragon.png") },
+            Sailor: { icon: require("../../../assets/backgroundDragons/sailorDragon.png") },
+            Pirate: { icon: require("../../../assets/backgroundDragons/pirateDragon.png") },
+            Sage: { icon: require("../../../assets/backgroundDragons/sageDragon.png") },
+            Outlander: { icon: require("../../../assets/backgroundDragons/outlanderDragon.png") },
+            Noble: { icon: require("../../../assets/backgroundDragons/nobleDragon.png") },
+            Hermit: { icon: require("../../../assets/backgroundDragons/hermitDragon.png") },
+            "Guild Artisan": { icon: require("../../../assets/backgroundDragons/guildArtisanDragon.png") },
+            "Folk Hero": { icon: require("../../../assets/backgroundDragons/folkHeroDragon.png") },
+            Entertainer: { icon: require("../../../assets/backgroundDragons/entertainerDragon.png") },
+            Criminal: { icon: require("../../../assets/backgroundDragons/criminalDragon.png") },
+            Charlatan: { icon: require("../../../assets/backgroundDragons/charlatanDragon.png") },
+
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -404,10 +422,13 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                 <View>
                                     {this.state.pickedOfficial !== null &&
                                         <View>
+                                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                                <Image style={{ width: 150, height: 150 }} source={this.backgroundDragon[this.state.pickedOfficial.name].icon} />
+                                            </View>
                                             <View style={{ padding: 17 }}>
                                                 <AppText fontSize={25} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.name}</AppText>
                                                 <AppText fontSize={22} textAlign={'center'} color={Colors.whiteInDarkMode}>Feature: {this.state.pickedOfficial.featureName}</AppText>
-                                                <AppText fontSize={20} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.featureDescription}</AppText>
+                                                <AppText fontSize={20} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.featureDescription.replace(/\. /g, '.\n\n')}</AppText>
                                             </View>
                                             <View style={{ padding: 17 }}>
                                                 <AppText fontSize={25} textAlign={'center'} color={Colors.whiteInDarkMode}>Tool Proficiency</AppText>

@@ -46,7 +46,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
             }
             break;
         case ActionType.SetUserInfo:
-            const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg)
+            const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated)
             newState.user = user;
             break;
 

@@ -358,9 +358,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <View style={{ flex: .1, padding: 25 }}>
                                         <AppText textAlign={"left"} fontSize={25}>{this.state.character.background.backgroundName}</AppText>
                                         <View>
-                                            <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
-                                            <AppText textAlign={"left"} fontSize={20}>{this.state.character.background.backgroundFeatureName}</AppText>
-                                            <AppText textAlign={"left"} fontSize={17}>{this.state.character.background.backgroundFeatureDescription}</AppText>
+                                            {this.state.character.background.backgroundFeatureName === '' ?
+                                                <View>
+                                                    <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>No background feature.</AppText>
+                                                </View>
+                                                :
+                                                <View>
+                                                    <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
+                                                    <AppText textAlign={"left"} fontSize={20}>{this.state.character.background.backgroundFeatureName}</AppText>
+                                                    <AppText textAlign={"left"} fontSize={17}>{this.state.character.background.backgroundFeatureDescription}</AppText>
+                                                </View>
+                                            }
                                         </View>
                                     </View>
                                     <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "DnCreate",
     "slug": "DnCreate",
-    "version": "1.7.72",
+    "version": "1.7.73",
     "orientation": "portrait",
     "icon": "./assets/appicon.png",
     "splash": {
@@ -28,7 +28,7 @@
         "CAMERA",
         "VIBRATE"
       ],
-      "versionCode": 20,
+      "versionCode": 21,
       "enableDangerousExperimentalLeanBuilds": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5186238714913357~1441201925"

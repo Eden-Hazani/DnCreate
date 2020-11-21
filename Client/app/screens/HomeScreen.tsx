@@ -88,7 +88,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             this.clearStorageJunk(characters.data)
             store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
             this.setState({ loading: false, characters: characters.data });
-            console.log(this.context.user)
             this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
         } catch (err) {
             errorHandler(err)
