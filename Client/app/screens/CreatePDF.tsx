@@ -30,6 +30,10 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
         }
     }
 
+    componentDidMount() {
+        this.maxHpCheck()
+    }
+
     skillCheck = (skill: string) => {
         const modifiers = Object.entries(this.state.character.modifiers)
         const skillGroup = skillModifier(skill);
@@ -80,16 +84,16 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
         let html: string = '';
         let hightIndex: number = 690;
         for (let item of this.state.character.raceId.raceAbilities.uniqueAbilities) {
-            fullList.push([item.name, item.description.slice(0, 65)])
+            fullList.push([item.name, item.description.slice(0, 50)])
         }
         for (let item of this.state.character.feats) {
-            fullList.push([item.name, item.description.slice(0, 65)])
+            fullList.push([item.name, item.description.slice(0, 50)])
         }
         for (let item of features.featurePicker(this.props.route.params.char.level, this.props.route.params.char.characterClass).features) {
-            fullList.push([item.name, item.description.slice(0, 65)])
+            fullList.push([item.name, item.description.slice(0, 50)])
         }
         for (let item of this.state.character.pathFeatures) {
-            fullList.push([item.name, item.description.slice(0, 65)])
+            fullList.push([item.name, item.description.slice(0, 50)])
         }
         for (let item of fullList) {
             if (hightIndex > 1350) {
@@ -99,6 +103,21 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
             hightIndex = hightIndex + 40
         }
         return html
+    }
+
+    maxHpCheck = () => {
+        if (!this.state.character.maxHp) {
+            const character = { ...this.state.character };
+            let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
+            if (this.state.character.path?.name === "Draconic Bloodline") {
+                maxHp = maxHp + 1
+            }
+            character.maxHp = maxHp;
+            this.setState({ character }, () => {
+                return this.state.character.maxHp
+            })
+        }
+        return this.state.character.maxHp;
     }
 
     createPDF = async () => {
@@ -141,7 +160,7 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
                 ${this.state.character.characterClassId.savingThrows.includes("Dexterity") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 374px;">&#9679 </p>  <p style="font-size: 22px; position: absolute; left: 240px; top: 375px;">${this.state.character.modifiers.dexterity}</p>` : '<p style="display: none;"></p>'}                      
                 ${this.state.character.characterClassId.savingThrows.includes("Constitution") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 399px;"">&#9679 </p>  <p style="font-size: 22px; position: absolute; left: 240px; top: 400px;">${this.state.character.modifiers.constitution}</p>` : '<p style="display: none;"></p>'}               
                 ${this.state.character.characterClassId.savingThrows.includes("Intelligence") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 424px;">&#9679 </p> <p style="font-size: 22px; position: absolute; left: 240px; top: 425px;">${this.state.character.modifiers.intelligence}</p>` : '<p style="display: none;"></p>'}                             
-                ${this.state.character.characterClassId.savingThrows.includes("Wisdom") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 398.5px;">&#9679 </p> <p style="font-size: 22px; position: absolute; left: 240px; top: 450px;">${this.state.character.modifiers.wisdom}</p>` : '<p style="display: none;"></p>'}                        
+                ${this.state.character.characterClassId.savingThrows.includes("Wisdom") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 450.5px;">&#9679 </p> <p style="font-size: 22px; position: absolute; left: 240px; top: 450px;">${this.state.character.modifiers.wisdom}</p>` : '<p style="display: none;"></p>'}                        
                 ${this.state.character.characterClassId.savingThrows.includes("Charisma") ? `<p style="font-size: 22px;font-weight: 800; position: absolute; left: 214px; top: 473.5px;">&#9679 </p> <p style="font-size: 22px; position: absolute; left: 240px; top: 475px;">${this.state.character.modifiers.charisma}</p>` : '<p style="display: none;"></p>'}
                 
                 ${this.createSkillList()}
