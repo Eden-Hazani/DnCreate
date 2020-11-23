@@ -29,7 +29,6 @@
         "VIBRATE"
       ],
       "versionCode": 22,
-      "enableDangerousExperimentalLeanBuilds": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5186238714913357~1441201925"
       }
