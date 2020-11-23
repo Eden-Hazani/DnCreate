@@ -462,6 +462,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </TouchableOpacity>
                         </View>
+                        <View style={styles.secRowIconContainer}>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CreatePDF", { char: this.state.character, proficiency: this.state.currentProficiency }) }}>
+                                <IconGen size={80} backgroundColor={Colors.burgundy} name={"file-pdf-box"} iconColor={Colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Generate Pdf</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                         <View>
                             <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
                         </View>

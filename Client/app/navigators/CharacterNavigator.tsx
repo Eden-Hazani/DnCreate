@@ -26,6 +26,7 @@ import { RaceFeatures } from '../screens/charOptions/RaceFeatures';
 import { SpacialRaceBonuses } from '../screens/CharCreation/SpacialRaceBonuses';
 import { store } from '../redux/store';
 import React, { useEffect, useState } from 'react'
+import { CreatePDF } from '../screens/CreatePDF';
 
 const Stack = createStackNavigator();
 
@@ -66,6 +67,7 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="RaceFeatures" component={RaceFeatures} />
         <Stack.Screen options={{ title: "" }} name="PathFeatures" component={PathFeatures} />
         <Stack.Screen options={{ title: "" }} name="SpacialRaceBonuses" component={SpacialRaceBonuses} />
+        <Stack.Screen options={{ title: "" }} name="CreatePDF" component={CreatePDF} />
 
     </Stack.Navigator>
 }
