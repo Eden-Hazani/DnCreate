@@ -3,23 +3,23 @@
 DnCreate is a React Native app made with a Nodejs server and MongoDB.
 It features a complete full D&D 5e character maker together with a responsive and updateable Character sheet.
 
-![welcome](https://user-images.githubusercontent.com/51079923/94253461-06730080-ff2e-11ea-9a13-0d6840655014.jpg)
+![darkmode1](https://user-images.githubusercontent.com/51079923/99977478-5eeb4080-2dad-11eb-9f41-1fb0b879fe23.jpg)
 
 Dncreate is desingned towards new and veteran D&D players, with a foces on simplicity and fluidity the app aims to give you the abillity to create new
 Characters in minuets 
 
 
-![dice](https://user-images.githubusercontent.com/51079923/94675504-84664b80-0322-11eb-8807-e7369942fbaf.jpg)
+![characterSheet](https://user-images.githubusercontent.com/51079923/99977497-64488b00-2dad-11eb-8199-eecaf19ebb43.jpg)
 
 
 Level up your character inapp and watch your stats update accordingly, No book searching needed.
 
-![char](https://user-images.githubusercontent.com/51079923/94675488-7ca6a700-0322-11eb-942a-283184bd4033.jpg)
+![pdf2](https://user-images.githubusercontent.com/51079923/99977552-79251e80-2dad-11eb-91d3-76da9a2b9288.jpg)
 
 
 Add Items and change currency with ease.
 
-![items](https://user-images.githubusercontent.com/51079923/94675527-8a5c2c80-0322-11eb-9fd4-21ba8f1b0fa2.jpg)
+![classInfo](https://user-images.githubusercontent.com/51079923/99977573-804c2c80-2dad-11eb-971d-c820e975209a.jpg)
 
 
 Complete the character making process in a few minutes.
