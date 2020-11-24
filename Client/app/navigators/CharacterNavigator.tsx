@@ -1,4 +1,4 @@
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets, CardStyleInterpolators } from '@react-navigation/stack';
 import { Colors } from '../config/colors';
 import { HomeScreen } from '../screens/HomeScreen';
 import { RaceList } from '../screens/CharCreation/RaceList';
@@ -31,6 +31,12 @@ import { CreatePDF } from '../screens/CreatePDF';
 const Stack = createStackNavigator();
 
 
+const forFade = ({ current }: any) => ({
+    cardStyle: {
+        opacity: current.progress,
+    },
+});
+
 
 
 const CharNavigator = () => {
@@ -41,6 +47,8 @@ const CharNavigator = () => {
         , [])
     const [newColor, setColor] = useState(baseColor)
     return <Stack.Navigator screenOptions={{
+        cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
+
         headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
     }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />

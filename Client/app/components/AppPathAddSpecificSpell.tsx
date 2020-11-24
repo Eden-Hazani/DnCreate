@@ -21,7 +21,8 @@ export class AppPathAddSpecificSpell extends Component<{ character: CharacterMod
         }
     }
     componentDidMount() {
-        const spell = spellsJSON.find((spell: any) => spell.name === spell)
+        const spell = spellsJSON.find((spell: any) => spell.name === this.props.spell)
+        console.log(spell)
         const spellLevel = spellLevelChanger(spell.level)
         for (let item of this.state.character.spells[spellLevel]) {
             if (item.spell.name === spell.name) {
