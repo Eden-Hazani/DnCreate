@@ -48,7 +48,6 @@ const CharNavigator = () => {
     const [newColor, setColor] = useState(baseColor)
     return <Stack.Navigator screenOptions={{
         cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
-
         headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
     }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
