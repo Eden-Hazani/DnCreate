@@ -18,7 +18,7 @@
     "@types/react-native-snap-carousel": "^3.8.2",
     "@types/yup": "^0.29.6",
     "apisauce": "^1.1.2",
-    "expo": "~38.0.8",
+    "expo": "^39.0.0",
     "expo-ads-admob": "~8.3.0",
     "expo-image-manipulator": "~8.3.0",
     "expo-image-picker": "~9.1.1",
@@ -41,7 +41,8 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-web": "~0.13.7",
     "redux": "^4.0.5",
-    "yup": "^0.29.3"
+    "yup": "^0.29.3",
+    "expo-notifications": "~0.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
