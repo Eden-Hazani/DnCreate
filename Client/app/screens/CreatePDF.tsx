@@ -181,20 +181,7 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
     };
 
 
-    maxHpCheck = () => {
-        if (!this.state.character.maxHp) {
-            const character = { ...this.state.character };
-            let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
-            if (this.state.character.path?.name === "Draconic Bloodline") {
-                maxHp = maxHp + 1
-            }
-            character.maxHp = maxHp;
-            this.setState({ character }, () => {
-                return this.state.character.maxHp
-            })
-        }
-        return this.state.character.maxHp;
-    }
+
 
 
     render() {
