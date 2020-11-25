@@ -16,7 +16,7 @@ export function eldritchInvocations(level: number, character: CharacterModel) {
             if (inv.prerequisites.patron && character.charSpecials.warlockPatron !== inv.prerequisites.patron) {
                 flag = false;
             }
-            if (inv.prerequisites.spell && !character.spells.cantrips.find(spell => spell.name === inv.prerequisites.spell)) {
+            if (inv.prerequisites.spell && !character.spells.cantrips.find(spell => spell.spell.name === inv.prerequisites.spell)) {
                 flag = false;
             }
         }

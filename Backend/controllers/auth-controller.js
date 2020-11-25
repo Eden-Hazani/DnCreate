@@ -14,6 +14,7 @@ const fs = require('fs');
 
 const mailgun = require("mailgun-js");
 const { response } = require("express");
+const validateUserInSystem = require("../middleware/validateUserInSystem");
 const mg = mailgun({ apiKey: config.mailGun_API.api, domain: config.mailGun_API.domain });
 
 const storage = multer.diskStorage({
@@ -130,8 +131,8 @@ router.get('/activate/:token', async (request, response) => {
                     }
                     return response.status(400).json({ error: err.message })
                 }
-                const verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
-                console.log(verify)
+                console.log(decodedToken.userInfo)
+                const verify = await authLogic.validateRegister(decodedToken.userInfo.username);
                 if (verify.activated) {
                     return response.status(403).send('User has already been activated')
                 }
@@ -146,6 +147,58 @@ router.get('/activate/:token', async (request, response) => {
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));
 
+    }
+})
+
+router.post("/resendActivationEmail", upload.none(), async (request, response) => {
+    try {
+        const newUser = new User(request.body)
+        const validation = await authLogic.validateRegister(newUser.username);
+        if (!validation) {
+            response.status(403).send({ message: "No user in system" });
+            return;
+        }
+        const userInfo = request.body;
+        const token = jwt.sign({ userInfo }, config.jwt.secretKey, { expiresIn: "12h" })
+        const data = {
+            from: 'noreplay@DncCreate.com',
+            to: validation.username,
+            subject: 'Account Activation Link',
+            html: `
+                <h2> Please click on the following link to activate your account</h2>
+                <br><br>
+                <center>
+                    <table align="center" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                        <td align="center" style="padding: 10px;">
+                        <table border="0" class="mobile-button" cellspacing="0" cellpadding="0">
+                            <tr>
+                            <td align="center" bgcolor="#37882f" style="background-color: #37882f; margin: auto; max-width: 600px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 15px 20px; " width="100%">
+                            <!--[if mso]>&nbsp;<![endif]-->
+                                <a href="${config.baseUrl}/api/auth/activate/${token}" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #37882f; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
+                                    <span style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; line-height:1.5em; text-align:center;">Activate</span>
+                                </a>
+                            <!--[if mso]>&nbsp;<![endif]-->
+                            </td>
+                            </tr>
+                        </table>
+                        </td>
+                    </tr>
+                    </table>
+                </center>
+            `
+        };
+        mg.messages().send(data, async function (error, body) {
+            if (error) {
+                console.log(error.message)
+                return response.json({
+                    message: error.message
+                })
+            }
+            return response.json({ message: "The activation email has been sent to your email address." })
+        });
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
     }
 })
 

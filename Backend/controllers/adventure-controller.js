@@ -19,6 +19,18 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
     }
 });
 
+router.post("/getUsersProfilePic", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        console.log('ff')
+        const userList = JSON.parse(request.body.userList);
+        const picList = await adventureLogic.getUsersProfilePicture(userList)
+        response.json({ list: picList });
+
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 router.patch("/updateAdventure", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
     try {
         const adventure = new Adventure(JSON.parse(request.body.adventure))

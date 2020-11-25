@@ -105,7 +105,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                             <View style={{ flex: .5 }}>
                                                 <FormImagePicker name="profileImg" />
                                             </View>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                                            <View>
                                                 <SubmitButton title={"Update"} />
                                                 <AppButton title="Cancel" onPress={() => this.setState({ changeProfileModal: false })}
                                                     fontSize={18} backgroundColor={Colors.bitterSweetRed} height={100} width={100} borderRadius={100} paddingBottom={20} />

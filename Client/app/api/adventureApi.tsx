@@ -40,6 +40,12 @@ const deleteAdventure = (adventureIdentifier: string, leader_id: string) =>
 
 const userInAdv = (adventureIdentifier: string, user_id: string) => client.get(`${endpoint}/userInAdv/${user_id}/${adventureIdentifier}`)
 
+const getUserProfileImages = (userList: string[]) => {
+    let formData = new FormData();
+    formData.append("userList", JSON.stringify(userList));
+    return client.post(`${endpoint}/getUsersProfilePic`, formData);
+}
+
 export default {
     saveAdventure,
     getLeadingAdventures,
@@ -49,5 +55,6 @@ export default {
     leaveAdventure,
     deleteAdventure,
     userInAdv,
-    getSingleLeadingAdventure
+    getSingleLeadingAdventure,
+    getUserProfileImages
 }

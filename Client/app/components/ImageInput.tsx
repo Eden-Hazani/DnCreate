@@ -14,6 +14,9 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
 
     const requestPermission = async () => {
         const result = await ImagePicker.requestCameraRollPermissionsAsync();
+        if (result.granted) {
+            setAllowed(true)
+        }
         if (!result.granted) {
             alert("Must enable permissions");
             setAllowed(false)
@@ -21,6 +24,7 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
     }
     const handelPress = async () => {
         if (!allowed) {
+            requestPermission()
             alert("Must enable permissions");
             return;
         }

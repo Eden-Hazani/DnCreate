@@ -20,6 +20,7 @@ interface SelectedLeadingAdvState {
     adventure: AdventureModel
     loading: boolean
     refreshing: boolean
+    profilePicList: any[]
 }
 
 export class SelectedLeadingAdv extends Component<{ navigation: any, route: any }, SelectedLeadingAdvState> {
@@ -27,12 +28,22 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     constructor(props: any) {
         super(props)
         this.state = {
+            profilePicList: [],
             adventure: this.props.route.params.adventure,
-            loading: false,
+            loading: true,
             refreshing: false,
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
+        let userArray: string[] = []
+        for (let item of this.state.adventure.participants_id) {
+            userArray.push(item.user_id)
+        }
+        const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+        const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+        this.setState({ profilePicList: picList }, () => {
+            this.setState({ loading: false })
+        })
         this.props.navigation.addListener('beforeRemove', (e: any) => {
             e.preventDefault();
         })
@@ -81,11 +92,20 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         this.setState({ loading: true })
         await adventureApi.getSingleLeadingAdventure(this.context.user._id, adventureIdentifier).then(confirmedAdventure => {
             if (!confirmedAdventure.ok) {
-                this.setState({ loading: false })
                 alert(confirmedAdventure.data);
                 return;
             }
-            this.setState({ adventure: confirmedAdventure.data[0], loading: false })
+            this.setState({ adventure: confirmedAdventure.data[0] }, async () => {
+                let userArray: string[] = []
+                for (let item of this.state.adventure.participants_id) {
+                    userArray.push(item.user_id)
+                }
+                const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+                const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+                console.log(picList)
+                console.log(this.state.adventure.participants_id.length)
+                this.setState({ profilePicList: picList, loading: false })
+            })
         })
     }
 
@@ -111,10 +131,10 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 <FlatList
                                     data={adventure.participants_id}
                                     keyExtractor={(currentParticipants, index) => index.toString()}
-                                    renderItem={({ item }) => <ListItem
+                                    renderItem={({ item, index }) => <ListItem
                                         title={item.name}
                                         subTitle={item.characterClass}
-                                        imageUrl={`${Config.serverUrl}/assets/${item.image}`}
+                                        imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
                                         direction={'row'}
                                         headerFontSize={18}
                                         headColor={Colors.bitterSweetRed}

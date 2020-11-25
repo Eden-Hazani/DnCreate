@@ -55,6 +55,9 @@ const deleteAccount = (user_id: string) => {
     return client.setHeader('content-type', 'multipart/form-data').delete<any>(`${endpoint}/deleteAccount/${user_id}`)
 }
 
+const resendActivationEmail = (userInfo: UserModel) => { return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/resendActivationEmail`, userInfo) }
+
+
 const isUserLogged = () => client.get(`${endpoint}/isUserLogged`)
 
 export default {
@@ -64,5 +67,6 @@ export default {
     resetPass,
     sendResetEmail,
     deleteAccount,
-    isUserLogged
+    isUserLogged,
+    resendActivationEmail
 }

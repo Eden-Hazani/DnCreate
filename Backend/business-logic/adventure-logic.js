@@ -1,5 +1,6 @@
 const Adventure = require("../models/AdventureModel");
 const Character = require("../models/characterModel");
+const User = require("../models/userModel");
 
 
 
@@ -37,6 +38,18 @@ async function getSingleLeadingAdventure(user_id, adventureIdentifier) {
     return adventure
 }
 
+async function getUsersProfilePicture(user_idArray) {
+    let _idArray = [];
+    let picArray = [];
+    for (let _id of user_idArray) {
+        _idArray.push(await User.findOne({ _id: _id.toString() }))
+    }
+    for (let item of _idArray) {
+        picArray.push(item.profileImg)
+    }
+    return picArray
+}
+
 module.exports = {
     getParticipatingAdventures,
     createAdventure,
@@ -44,5 +57,6 @@ module.exports = {
     updateAdventure,
     findAdventure,
     removeAdventure,
-    getSingleLeadingAdventure
+    getSingleLeadingAdventure,
+    getUsersProfilePicture
 }

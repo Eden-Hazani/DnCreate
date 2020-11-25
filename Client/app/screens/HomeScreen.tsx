@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { CharacterModel } from '../models/characterModel';
 import errorHandler from '../../utility/errorHander';
 import Carousel from 'react-native-snap-carousel';
+import authApi from '../api/authApi';
 
 
 interface HomeState {
@@ -28,6 +29,7 @@ interface HomeState {
     carouselItems: any[]
     test: any
     activated: boolean
+    emailSentTimer: number
 }
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
@@ -37,6 +39,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     constructor(props: any) {
         super(props)
         this.state = {
+            emailSentTimer: 0,
             activated: false,
             test: Colors.pageBackground,
             characters: [],
@@ -129,6 +132,21 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         )
     }
 
+
+    resendEmail = async () => {
+        try {
+            this.setState({ emailSentTimer: 60 })
+            const result = await authApi.resendActivationEmail(this.context.user);
+            alert(result.data.message)
+            const timer = setInterval(() => {
+                this.setState({ emailSentTimer: this.state.emailSentTimer - 1 })
+                if (this.state.emailSentTimer === 0) clearInterval(timer)
+            }, 1000);
+        } catch (err) {
+            errorHandler(err)
+        }
+    }
+
     render() {
         return (
             <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
@@ -159,16 +177,25 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                                 </View>
                                 <Modal visible={this.state.errorModal}>
-                                    <View style={{ flex: .8, backgroundColor: Colors.pageBackground, justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ flex: .6, backgroundColor: Colors.pageBackground, justifyContent: "center", alignItems: "center" }}>
                                         <Image style={{ width: 200, height: 200 }} source={require("../../assets/errorDragon.png")} />
                                         <AppText color={Colors.berries} fontSize={27} textAlign={'center'}>Oops...</AppText>
                                         <AppText fontSize={18} textAlign={'center'}>If you wish to create more characters you need to confirm your email address
                                             {'\n'} via the email that was sent when you signed up.</AppText>
                                     </View>
-                                    <View style={{ flex: .2, backgroundColor: Colors.pageBackground }}>
+                                    <View style={{ flex: .4, backgroundColor: Colors.pageBackground }}>
+                                        {this.state.emailSentTimer > 0 ?
+                                            <AppText fontSize={18} textAlign={'center'}>Email was sent, if it didn't reach you press to send again after the timer.</AppText>
+                                            :
+                                            <AppText fontSize={18} textAlign={'center'}>Need us to resend the activation email?
+                                            {'\n'} No worries, just click</AppText>
+                                        }
+                                        <AppButton padding={10} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.resendEmail() }} disabled={this.state.emailSentTimer > 0}
+                                            fontSize={18} borderRadius={100} width={100} height={100} title={this.state.emailSentTimer > 0 ? this.state.emailSentTimer.toString() : "Here"} />
+                                    </View>
+                                    <View style={{ flex: .3, backgroundColor: Colors.pageBackground }}>
                                         <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.setState({ errorModal: false })}
                                             fontSize={18} borderRadius={100} width={120} height={120} title={"Ok"} />
-
                                     </View>
                                 </Modal>
                                 <Modal visible={this.state.colorModal}>

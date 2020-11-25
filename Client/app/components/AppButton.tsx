@@ -14,7 +14,7 @@ import { Colors } from '../config/colors';
 export class AppButton extends Component<any>{
     render() {
         return (
-            <TouchableOpacity disabled={this.props.disabled} activeOpacity={.8} style={styles.container} onPress={this.props.onPress}>
+            <TouchableOpacity disabled={this.props.disabled} activeOpacity={.8} style={[styles.container, { padding: this.props.padding ? this.props.padding : 0 }]} onPress={this.props.onPress}>
                 <View style=
                     {[styles.button,
                     {

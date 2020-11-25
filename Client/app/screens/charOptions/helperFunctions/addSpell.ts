@@ -4,37 +4,60 @@ import { CharacterModel } from "../../../models/characterModel";
 
 export function addSpell(spellLevel: string, character: CharacterModel) {
     if (character.characterClass === "Warlock") {
+        let slots = [];
+        const warSlotLevel = parseInt(character.charSpecials.warlockSpellSlotLevel.substring(0));
+        for (let i = 1; i < warSlotLevel; i++) {
+            slots.push(i);
+        }
         let result: boolean = false
         switch (true) {
             case character.magic.cantrips && spellLevel.includes('cantrip'):
                 result = true;
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '1st' && spellLevel.includes('1st-level'):
-                result = true;
+            case spellLevel.includes('1st-level'):
+                for (let item of slots) {
+                    if (item >= 1) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '2nd' && spellLevel.includes('2nd-level'):
-                result = true;
+            case spellLevel.includes('2nd-level'):
+                for (let item of slots) {
+                    if (item >= 2) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '3rd' && spellLevel.includes('3rd-level'):
-                result = true;
+            case spellLevel.includes('3rd-level'):
+                for (let item of slots) {
+                    if (item >= 3) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '4th' && spellLevel.includes('4th-level'):
-                result = true;
+            case spellLevel.includes('4th-level'):
+                for (let item of slots) {
+                    if (item >= 4) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '5th' && spellLevel.includes('5th-level'):
-                result = true;
+            case spellLevel.includes('5th-level'):
+                for (let item of slots) {
+                    if (item >= 5) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '6th' && spellLevel.includes('6th-level'):
-                result = true;
+            case spellLevel.includes('6th-level'):
+                for (let item of slots) {
+                    if (item >= 6) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '7th' && spellLevel.includes('7th-level'):
-                result = true;
+            case spellLevel.includes('7th-level'):
+                for (let item of slots) {
+                    if (item >= 7) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '8th' && spellLevel.includes('8th-level'):
-                result = true;
+            case spellLevel.includes('8th-level'):
+                for (let item of slots) {
+                    if (item >= 8) result = true;
+                }
                 break;
-            case character.charSpecials.warlockSpellSlotLevel === '9th' && spellLevel.includes('9th-level'):
-                result = true;
+            case spellLevel.includes('9th-level'):
+                for (let item of slots) {
+                    if (item >= 9) result = true;
+                }
                 break;
         }
         return result

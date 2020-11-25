@@ -8,6 +8,8 @@ import { AppButton } from '../../components/AppButton';
 import { AppCompanion } from '../../components/AppCompanion';
 import { PickCompanion } from '../../components/PickCompanion';
 import wildSurge from '../../../jsonDump/wildMagicList.json'
+import { PaladinLayOnHandsCounter } from '../../components/uniqueCharComponents/PaladinLayOnHandsCounter';
+import { BarbarianRageCounter } from '../../components/uniqueCharComponents/BarbarianRageCounter';
 
 interface UniqueCharStatsState {
     monkElementModel: boolean
@@ -110,14 +112,12 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     : null
                 }
                 {this.props.character.charSpecials.rageAmount ?
-                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
-                        <AppText>Rage Amount:</AppText>
-                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.rageAmount}</AppText>
-                        <AppText>Rage bonus damage:</AppText>
-                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.rageDamage}</AppText>
-                    </View>
+                    <BarbarianRageCounter character={this.props.character} />
                     : null
                 }
+                {this.props.character.characterClass === "Paladin" ?
+                    <PaladinLayOnHandsCounter character={this.props.character} />
+                    : null}
                 {this.props.character.charSpecials.martialPoints ?
                     <View>
                         {this.props.character.charSpecials.kiPoints ?

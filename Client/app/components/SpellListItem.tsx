@@ -40,11 +40,13 @@ export class SpellListItem extends Component<any>{
                         </View>
                         <View style={{ paddingLeft: this.props.textDistanceFromImg }}>
                             <AppText textAlign={this.props.headTextAlign} fontSize={this.props.headerFontSize} color={this.props.headColor ? this.props.headColor : Colors.black}>{this.props.title}</AppText>
+                            <AppText textAlign={this.props.subTextAlign} fontSize={18} color={Colors.bitterSweetRed}>{this.props.type}</AppText>
                             <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.subTitle}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.classes}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.duration}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.range}</AppText>
-                            <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.type}</AppText>
+                            <View style={{ paddingTop: 5 }}>
+                                <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.classes}</AppText>
+                                <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.duration}</AppText>
+                                <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.range}</AppText>
+                            </View>
                         </View>
                     </View>
                 </TouchableOpacity>

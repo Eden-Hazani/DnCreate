@@ -133,7 +133,9 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 return;
             }
             if (adventures.data.length === 0) {
-                this.setState({ participatingAdventures })
+                this.setState({ participatingAdventures }, () => {
+                    store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
+                })
                 return;
             }
             if (adventures.data[0] === undefined) {

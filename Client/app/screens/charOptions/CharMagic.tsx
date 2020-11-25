@@ -158,10 +158,15 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                     :
                     <View>
                         {this.props.character.characterClass === "Warlock" ?
-                            <View style={{ marginBottom: 20, padding: 15 }}>
-                                <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
-                                <AppText fontSize={18} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
-                                <AppText fontSize={18} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
+                            <View>
+                                <View style={{ marginBottom: 5, padding: 15, paddingBottom: 5 }}>
+                                    <AppText fontSize={18} textAlign={'center'}>You currently have a total of {this.props.character.magic.cantrips} Available</AppText>
+                                </View>
+                                <View style={{ marginBottom: 20, padding: 15 }}>
+                                    <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
+                                </View>
                             </View>
                             :
                             <View>
@@ -184,18 +189,27 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                                 </View>
                                 <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
                                     {Object.entries(this.props.character.magic).map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.spellSlot,
-                                        { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
-                                            onLongPress={() => {
-                                                Vibration.vibrate(400)
-                                                this.renewSpellSlot(index)
-                                            }} onPress={() => {
-                                                this.useSpellSlot(index)
-                                            }}>
-                                            <AppText padding={5} textAlign={'left'} fontSize={18} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
-                                            <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {item[1]}</AppText>
-                                            <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[index]}</AppText>
-                                        </TouchableOpacity>)}
+                                        <View key={index}>
+                                            {item[0] === "cantrips" ?
+                                                <View style={[styles.spellSlot, { backgroundColor: Colors.metallicBlue }]}>
+                                                    <AppText padding={5} textAlign={'left'} fontSize={22} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
+                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={20}>Cantrips have unlimited uses</AppText>
+                                                </View>
+                                                :
+                                                <TouchableOpacity style={[styles.spellSlot,
+                                                { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
+                                                    onLongPress={() => {
+                                                        Vibration.vibrate(400)
+                                                        this.renewSpellSlot(index)
+                                                    }} onPress={() => {
+                                                        this.useSpellSlot(index)
+                                                    }}>
+                                                    <AppText padding={5} textAlign={'left'} fontSize={18} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
+                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {item[1]}</AppText>
+                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[index]}</AppText>
+                                                </TouchableOpacity>
+                                            }
+                                        </View>)}
                                 </View>
                             </View>
                         }
