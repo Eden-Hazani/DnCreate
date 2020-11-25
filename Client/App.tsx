@@ -20,9 +20,9 @@ import { Config } from './config';
 import authApi from './app/api/authApi';
 import errorHandler from './utility/errorHander';
 import AsyncStorage from '@react-native-community/async-storage';
-import { AppMainLoadingScreen } from './app/animations/AppMainLoadingScreen';
 import { Colors } from './app/config/colors';
 import { I18nManager } from "react-native";
+import { StartAnimation } from './app/animations/StartAnimation';
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
@@ -77,7 +77,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           }).then(() => this.setState({ fontsLoaded: true, AppMainLoadAnimation: true }, () => {
             setTimeout(() => {
               this.setState({ AppMainLoadAnimation: false })
-            }, 1800);
+            }, 2300);
           }))
         })
       })
@@ -124,7 +124,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
         {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
           <AuthContext.Provider value={{ user, setUser }}>
             {this.state.AppMainLoadAnimation ?
-              <AppMainLoadingScreen />
+              <StartAnimation />
               :
               !this.state.fontsLoaded ? <AppLoading /> :
                 <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
