@@ -25,6 +25,7 @@ export class AppText extends Component<any, any> {
     render() {
         return (
             <Text numberOfLines={this.props.numberOfLines} style={{
+                fontWeight: this.props.fontWeight,
                 width: this.props.width,
                 flex: this.props.flex,
                 fontSize: this.props.fontSize,

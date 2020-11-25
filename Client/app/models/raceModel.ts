@@ -8,8 +8,8 @@ export class RaceModel {
         public description?: string,
         public image?: string,
         public abilityBonus?: ModifiersModel,
-        public raceAbilities?: RaceAbilityModel
-
+        public raceAbilities?: RaceAbilityModel,
+        public raceColor?: string
     ) {
         if (!abilityBonus) {
             this.abilityBonus = new ModifiersModel()

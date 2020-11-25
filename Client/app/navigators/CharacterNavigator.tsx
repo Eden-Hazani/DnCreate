@@ -51,7 +51,7 @@ const CharNavigator = () => {
         headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
     }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen options={{ title: "Race List", headerTransparent: false }} name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ title: "", headerTintColor: Colors.black }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick} />

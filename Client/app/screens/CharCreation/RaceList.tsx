@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, View } from 'react-native';
+import { Dimensions, FlatList, View, Animated, Image, TouchableOpacity } from 'react-native';
 import { ListItem } from '../../components/ListItem';
 import { SearchBar } from 'react-native-elements';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
@@ -18,6 +18,9 @@ import { UserModel } from '../../models/userModel';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { Colors } from '../../config/colors';
 import AsyncStorage from '@react-native-community/async-storage';
+import { AppText } from '../../components/AppText';
+import { AnimatedHorizontalList } from '../../components/AnimatedHorizontalList';
+const { width, height } = Dimensions.get('screen');
 
 
 interface RaceListState {
@@ -29,16 +32,21 @@ interface RaceListState {
     error: boolean
     loading: boolean
     confirmed: boolean
+    raceColors: string[]
+    searchColor: string
 }
+
 
 export class RaceList extends Component<{ props: any, navigation: any }, RaceListState> {
     private unsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
+            searchColor: Colors.pageBackground,
+            raceColors: [],
             confirmed: false,
             search: '',
-            loading: false,
+            loading: true,
             races: [],
             userInfo: store.getState().user,
             characterInfo: store.getState().character,
@@ -47,6 +55,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         }
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
+            this.setState({ searchColor: Colors.pageBackground })
         })
     }
     componentDidMount() {
@@ -78,12 +87,16 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     }
 
     getRacesFromServer = async () => {
-        this.setState({ loading: true })
+        let raceColors = [];
         const result = await racesApi.getRaceList();
         await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
-        this.setState({ loading: false })
-        const races = result.data;
-        this.setState({ races, error: errorHandler(result) })
+        const races: any = result.data;
+        for (let item of races) {
+            raceColors.push(item.raceColors)
+        }
+        this.setState({ races, error: errorHandler(result), raceColors }, () => {
+            this.setState({ loading: false })
+        })
     }
 
     updateSearch = async (search: string) => {
@@ -131,7 +144,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     }
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                         <View>
@@ -139,29 +152,25 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                 <AppError onPress={() => { this.getRaces() }} />
                             </> :
                                 <View>
-                                    <SearchBar
-                                        containerStyle={{ backgroundColor: Colors.pageBackground }}
-                                        inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
-                                        lightTheme={Colors.pageBackground === "#121212" ? false : true}
-                                        placeholder="Search For Race"
-                                        onChangeText={this.updateSearch}
-                                        value={this.state.search}
-                                    />
-                                    <View style={{ marginBottom: Dimensions.get('screen').height / 5 }}>
-                                        <FlatList
-                                            data={this.state.races}
-                                            keyExtractor={races => races._id.toString()}
-                                            renderItem={({ item }) => <ListItem
-                                                title={item.name}
-                                                subTitle={item.description}
-                                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
-                                                headTextAlign={"center"}
-                                                subTextAlign={"center"}
-                                                padding={80} width={100} height={100}
-                                                direction={'column'} onPress={() => this.pickRace(item)} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
-                                            onRefresh={() => {
-                                                this.getRacesFromServer()
-                                            }} />
+                                    <View style={{
+                                        width: width / 2, position: "absolute", zIndex: 10,
+                                        alignSelf: 'center',
+                                        top: '1%',
+                                    }}>
+                                        <SearchBar
+                                            searchIcon={false}
+                                            containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
+                                            inputContainerStyle={{ backgroundColor: this.state.searchColor }}
+                                            lightTheme={this.state.searchColor === "#121212" ? false : true}
+                                            placeholder="Search For Race"
+                                            onChangeText={this.updateSearch}
+                                            value={this.state.search}
+                                        />
+                                    </View>
+                                    <View>
+                                        {console.log(this.state.raceColors)}
+                                        <AnimatedHorizontalList data={this.state.races} backDropColors={this.state.raceColors}
+                                            onPress={(val: any) => { this.pickRace(val) }} />
                                     </View>
                                 </View>}
                         </View>}
@@ -169,4 +178,3 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         )
     }
 }
-
