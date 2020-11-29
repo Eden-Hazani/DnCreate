@@ -11,6 +11,7 @@ interface AppToolPickerState {
     tools: any[]
     amountToPick: number
     character: CharacterModel
+    alreadyPickedTools: boolean[]
 }
 
 
@@ -21,6 +22,7 @@ export class AppToolPicker extends Component<{
     constructor(props: any) {
         super(props)
         this.state = {
+            alreadyPickedTools: [],
             tools: [],
             amountToPick: this.props.amount,
             toolsClicked: [],
@@ -28,6 +30,13 @@ export class AppToolPicker extends Component<{
         }
     }
     componentDidMount() {
+        for (let item of this.state.character.tools) {
+            if (this.props.itemList.includes(item[0])) {
+                const alreadyPickedTools = this.state.alreadyPickedTools;
+                alreadyPickedTools[this.props.itemList.indexOf(item[0])] = true;
+                this.setState({ alreadyPickedTools })
+            }
+        }
         this.props.setAdditionalToolPicks(true)
     }
     componentWillUnmount() {
@@ -73,7 +82,7 @@ export class AppToolPicker extends Component<{
         return (
             <View style={styles.container}>
                 {this.props.itemList.map((tool: any, index: number) =>
-                    <TouchableOpacity key={index} onPress={() => this.pickTool(tool, index)}
+                    <TouchableOpacity disabled={this.state.alreadyPickedTools[index]} key={index} onPress={() => this.pickTool(tool, index)}
                         style={[styles.item, { backgroundColor: this.state.toolsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                         <AppText textAlign={'center'}>{tool}</AppText>
                     </TouchableOpacity>)}

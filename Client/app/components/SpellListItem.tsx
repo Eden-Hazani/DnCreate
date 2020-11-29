@@ -46,6 +46,7 @@ export class SpellListItem extends Component<any>{
                                 <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.classes}</AppText>
                                 <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.duration}</AppText>
                                 <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.range}</AppText>
+                                {this.props.higher_levels && <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.black}>{this.props.higher_levels}</AppText>}
                             </View>
                         </View>
                     </View>

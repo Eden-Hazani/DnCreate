@@ -85,7 +85,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         let characterInfo = { ...this.state.characterInfo };
         let dicePool = this.state.dicePool;
         const rollDisabled = this.state.rollDisabled;
-        const diceStorage = await AsyncStorage.getItem(`${this.state.characterInfo.name}DicePool`)
+        const diceStorage = await AsyncStorage.getItem(`DicePool`)
         if (diceStorage) {
             dicePool = JSON.parse(diceStorage)
         }
@@ -189,7 +189,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
         let dicePool = this.state.dicePool;
         dicePool.push(this.state.sumOfDice);
         this.setState({ dicePool }, () => {
-            AsyncStorage.setItem(`${this.state.characterInfo.name}DicePool`, JSON.stringify(this.state.dicePool))
+            AsyncStorage.setItem(`DicePool`, JSON.stringify(this.state.dicePool))
         });
     }
     setSumAndDisableRoll = (sum: number, roll: number) => {

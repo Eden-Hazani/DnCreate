@@ -331,6 +331,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         classes={`Classes: ${item.classes}`}
                         duration={`Duration: ${item.duration}`}
                         range={`Range: ${item.range}`}
+                        higher_levels={`Higher Levels: ${item.higher_levels}`}
                         direction={'row'}
                         headColor={Colors.bitterSweetRed}
                         subColor={Colors.whiteInDarkMode}
@@ -356,8 +357,13 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                     {this.state.character.magic ?
                                         <View style={{ backgroundColor: Colors.pageBackground }}>
                                             <View style={{ padding: 10, backgroundColor: Colors.pageBackground }}>
-                                                <AppText fontSize={25} color={Colors.berries} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
-                                                <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description}</AppText>
+                                                <AppText fontSize={25} padding={15} color={Colors.berries} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
+                                                <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description.replace(/\. /g, '.\n\n')}</AppText>
+                                                {this.state.pickedSpell?.higher_levels &&
+                                                    <View>
+                                                        <AppText fontSize={22} color={Colors.berries} textAlign={'center'}>Higher Levels</AppText>
+                                                        <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.higher_levels.replace(/\. /g, '.\n\n')}</AppText>
+                                                    </View>}
                                                 <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
                                                 <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
                                                 <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>

@@ -56,8 +56,14 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
                     {this.state.pickedSpellDetail &&
                         <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                             <View style={{ alignItems: "center", padding: 15 }}>
-                                <AppText fontSize={25}>{this.state.pickedSpellDetail.name}</AppText>
-                                <AppText fontSize={18} textAlign={'center'}>{this.state.pickedSpellDetail.description}</AppText>
+                                <AppText fontSize={25} color={Colors.berries}>{this.state.pickedSpellDetail.name}</AppText>
+                                <AppText fontSize={18} textAlign={'center'}>{this.state.pickedSpellDetail.description.replace(/\. /g, '.\n\n')}</AppText>
+                                {this.state.pickedSpellDetail.higher_levels &&
+                                    <View>
+                                        <AppText fontSize={25} color={Colors.berries} textAlign={'center'}>Higher levels</AppText>
+                                        <AppText fontSize={18} textAlign={'center'}>{this.state.pickedSpellDetail.higher_levels.replace(/\. /g, '.\n\n')}</AppText>
+                                    </View>
+                                }
                                 <View style={{ marginTop: 10 }}>
                                     <AppText fontSize={20}>Range: {this.state.pickedSpellDetail.range}</AppText>
                                 </View>

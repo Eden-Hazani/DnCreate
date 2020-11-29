@@ -4,7 +4,7 @@ export function startingToolsSwitch(charClass: string) {
     let tools: any[] = [];
     switch (true) {
         case charClass === 'Rogue':
-            tools.push(["Thieves’ tools", 0])
+            tools.push(["Thieves' tools", 0])
             break;
         case charClass === 'Bard':
             tools.push(["Three musical instruments of your choice", 0])

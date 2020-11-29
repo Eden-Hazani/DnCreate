@@ -25,9 +25,12 @@ import { AppPathAdditionalApply } from './AppPathAdditionalApply';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import spellsJSON from '../../../jsonDump/spells.json'
 import { spellLevelChanger } from './helperFunctions/SpellLevelChanger';
+import { AppChangePathChoiceAtLevelUp } from '../../components/AppChangePathChoiceAtLevelUp';
+import { allowedChangingPaths, pathChoiceChangePicker } from '../../classFeatures/pathChoiceChnagePicker';
 
 
 interface LevelUpOptionsState {
+    customPathComplete: any
     beforeAnyChanges: CharacterModel,
     beforeLevelUp: CharacterModel
     skillsClicked: any[]
@@ -65,7 +68,7 @@ interface LevelUpOptionsState {
     featDescription: string
     extraPathChoice: boolean
     extraPathChoiceValue: any[]
-    additionalSkillPicks: boolean
+    additionalSkillPicks: number
     additionalToolPicks: boolean
     reloadingSkills: boolean
     maneuversToPick: boolean
@@ -78,17 +81,19 @@ interface LevelUpOptionsState {
     langHolder: string[]
     pathInfoLoading: boolean
     specificSpellToLoad: boolean,
-    specificSpell: string
+    specificSpell: any
     armorToLoad: any
     newSpellAvailabilityList: string[]
+    newPathChoice: any
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
     constructor(props: any) {
         super(props)
         this.state = {
+            customPathComplete: true,
             armorToLoad: null,
-            specificSpell: '',
+            specificSpell: null,
             specificSpellToLoad: false,
             ElementsToPick: false,
             pathInfoLoading: false,
@@ -102,7 +107,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             beforeAnyChanges: new CharacterModel,
             reloadingSkills: false,
             additionalToolPicks: false,
-            additionalSkillPicks: false,
+            additionalSkillPicks: 0,
             extraPathChoiceValue: [],
             extraPathChoiceClicked: [],
             extraPathChoice: false,
@@ -139,7 +144,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             invocationsClicked: [],
             invocations: this.props.character.charSpecials.eldritchInvocations,
             totalInvocationPoints: null,
-            newSpellAvailabilityList: []
+            newSpellAvailabilityList: [],
+            newPathChoice: null
         }
     }
 
@@ -598,7 +604,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.addPath()) {
                 return;
             }
-            if (this.state.additionalSkillPicks) {
+            if (this.state.additionalSkillPicks > 0) {
                 alert('You have additional choices to pick from')
                 return;
             }
@@ -639,9 +645,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             for (let item of pathResult) {
                 character.pathFeatures.push(item)
             }
+
         }
         if (this.props.options.pathFeature && !this.props.options.pathSelector) {
-            if (this.state.additionalSkillPicks) {
+            if (this.state.additionalSkillPicks > 0) {
                 alert('You have additional choices to pick from')
                 return;
             }
@@ -677,6 +684,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             for (let item of pathResult) {
                 character.pathFeatures.push(item)
             }
+
         }
         if (this.props.options.extraSpells) {
             for (let item of this.props.options.extraSpells) {
@@ -716,7 +724,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.wisdom = this.state.wisdom;
         }
         if (this.state.specificSpellToLoad) {
-            const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell)
+            if (this.state.specificSpell.notCountAgainstKnownCantrips) {
+                character.magic.cantrips = character.magic.cantrips + 1;
+            }
+            const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell.name)
             const spellLevel = spellLevelChanger(spell.level)
             character.spells[spellLevel].push({ spell: spell, removable: false });
         }
@@ -773,11 +784,22 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         if (this.state.armorToLoad !== null) {
             this.addArmor()
         }
+        if (this.state.newPathChoice !== null) {
+            for (let item of character.pathFeatures) {
+                if (pathChoiceChangePicker(character) === item.name) {
+                    item.choice[0] = this.state.newPathChoice;
+                }
+            }
+        }
         if (this.props.options.pactSelector) {
             if (!this.addWarlockPact()) {
                 return;
             }
             character.charSpecials.warlockPactBoon = this.state.pact;
+        }
+        if (!this.state.customPathComplete) {
+            alert(`You have Information missing in your custom path`);
+            return;
         }
         this.setState({ character }, () => {
             const character = { ...this.state.character };
@@ -805,7 +827,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={styles.container} >
                 {this.state.load ?
                     <View>
                         <View style={{ justifyContent: "center", alignItems: "center", marginTop: 100 }}>
@@ -826,8 +848,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 <View style={{ flexDirection: "row", flexWrap: 'wrap' }}>
                                     {this.props.options.pathSelector.map((path: any, index: number) =>
                                         <TouchableOpacity key={index} onPress={() => this.pickPath(path, index)} style={[styles.item, { backgroundColor: this.state.pathClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
-                                            <AppText color={this.state.pathClicked[index] ? Colors.black : Colors.bitterSweetRed} fontSize={22}>{path.name}</AppText>
+                                            <AppText color={this.state.pathClicked[index] ? Colors.black : Colors.bitterSweetRed} textAlign={'center'} fontSize={22}>{path.name}</AppText>
                                             <AppText fontSize={18}>{path.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
+                                            {path.restriction && <View>
+                                                <AppText textAlign={'center'} color={this.state.pathClicked[index] ? Colors.black : Colors.danger} fontSize={24}>Restrictions</AppText>
+                                                <AppText textAlign={'center'} color={this.state.pathClicked[index] ? Colors.black : Colors.danger} fontSize={18}>{path.restriction.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
+
+                                            </View>}
                                         </TouchableOpacity>)}
                                 </View>
                             </View>
@@ -971,7 +998,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                                 }
                                                                 this.setState({ character })
                                                             }}
-                                                            isAdditionalSkillChoice={(val: boolean) => { this.setState({ additionalSkillPicks: val }) }}
+                                                            isAdditionalSkillChoice={(val: any) => { this.setState({ additionalSkillPicks: val }) }}
                                                             character={this.state.character}
                                                             pathItem={item}
                                                             loadSkills={(val: any[]) => { this.setState({ character: store.getState().character }) }} />
@@ -984,7 +1011,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                             applyExtraPathChoice={(item: any, index: number) => { this.applyExtraPathChoice(item, index) }}
                                                             item={item}
                                                             extraPathChoiceClicked={this.state.extraPathChoiceClicked}
-                                                            isAdditionalSkillChoice={(val: boolean) => { this.setState({ additionalSkillPicks: val }) }}
+                                                            isAdditionalSkillChoice={(val: any) => { this.setState({ additionalSkillPicks: val }) }}
                                                             loadSkills={(val: any[]) => {
                                                                 this.setState({ character: store.getState().character })
                                                             }}
@@ -997,6 +1024,11 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 null
                             :
                             null}
+
+                        {this.state.character.level > 3 && allowedChangingPaths(this.state.character) ?
+                            <AppChangePathChoiceAtLevelUp character={this.props.character} newPathChoice={(val: any) => { this.setState({ newPathChoice: val }) }} />
+                            : null}
+
                         {this.props.options.expertise ?
                             <View style={{ alignItems: "center", justifyContent: "center" }}>
                                 {this.state.reloadingSkills ? <AppActivityIndicator visible={this.state.reloadingSkills} /> :

@@ -269,7 +269,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
                         <Modal visible={this.state.levelUpFunctionActive} >
-                            <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                            <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
                             </ScrollView>
                         </Modal>
@@ -467,6 +467,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <IconGen size={80} backgroundColor={Colors.burgundy} name={"file-pdf-box"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Generate Pdf</AppText>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
                                 </View>
                             </TouchableOpacity>
                         </View>

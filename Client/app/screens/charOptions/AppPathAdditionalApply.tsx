@@ -35,8 +35,9 @@ export class AppPathAdditionalApply extends Component<{
         return (
             <View style={styles.container}>
                 {this.props.pathItem.skillList &&
-                    <AppSkillItemPicker resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character}
-                        setAdditionalSkillPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} skillsStartAsExpertise={this.props.pathItem.skillsStartAsExpertise}
+                    <AppSkillItemPicker resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character} withConditions={this.props.pathItem.withConditions}
+                        setAdditionalSkillPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} skillsStartAsExpertise={this.props.pathItem.skillsStartAsExpertise} pathChosen={this.props.pathChosen}
+                        extraSkillsTotal={this.props.pathItem.extraSkillsTotal}
                         sendSkillsBack={(val: any) => { this.props.loadSkills(val) }} itemList={this.props.pathItem.skillList} amount={this.props.pathItem.skillPickNumber} />
                 }
                 {this.props.pathItem.armorProf &&
@@ -82,7 +83,8 @@ export class AppPathAdditionalApply extends Component<{
                     <AppPathFirstLevelSpellsAddition character={this.props.character} path={this.props.pathChosen} returnMagic={(val: any) => { this.props.loadCharacter(val) }} />
                 }
                 {this.props.pathItem.specificCantrip &&
-                    <AppPathAddSpecificSpell path={this.props.pathChosen} character={this.props.character} spell={this.props.pathItem.specificCantrip} updateSpecificSpell={(val: any) => { this.props.loadSpecificSpell(val) }} />
+                    <AppPathAddSpecificSpell path={this.props.pathChosen} character={this.props.character} notCountAgainstKnownCantrips={this.props.pathItem.notCountAgainstKnownCantrips}
+                        spell={this.props.pathItem.specificCantrip} updateSpecificSpell={(val: any) => { this.props.loadSpecificSpell(val) }} />
                 }
                 {this.props.pathItem.AddSpellsFromDifferentClass &&
                     <AppPathAddSpellFromDifferentClass character={this.props.character} path={this.props.pathChosen}

@@ -99,8 +99,8 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     clearStorageJunk = async (characters: CharacterModel[]) => {
         await AsyncStorage.removeItem(`AttributeStage`);
+        await AsyncStorage.removeItem(`DicePool`);
         for (let char of characters) {
-            await AsyncStorage.removeItem(`${char.name}DicePool`);
             await AsyncStorage.removeItem(`${char.name}BackstoryStage`);
         }
     }
@@ -168,6 +168,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 </View>
                                 <View style={styles.buttonsView}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
+                                        console.log(this.context.user)
                                         if (!this.state.activated && this.state.characters.length >= 1) {
                                             this.setState({ errorModal: true })
                                             return

@@ -1,23 +1,28 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { CharacterModel } from '../../models/characterModel';
-import AsyncStorage from '@react-native-community/async-storage';
 import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
 import { AppButton } from '../../components/AppButton';
-import { AppCompanion } from '../../components/AppCompanion';
 import { PickCompanion } from '../../components/PickCompanion';
 import wildSurge from '../../../jsonDump/wildMagicList.json'
+import wildBarbarianMagic from '../../../jsonDump/barbarianWildMagicList.json'
+import talesFromTheBeyond from '../../../jsonDump/talesFromTheBeyondList.json'
 import { PaladinLayOnHandsCounter } from '../../components/uniqueCharComponents/PaladinLayOnHandsCounter';
 import { BarbarianRageCounter } from '../../components/uniqueCharComponents/BarbarianRageCounter';
+import { BardInspirationCounter } from '../../components/uniqueCharComponents/BardInspirationCounter';
+import { UniqueRollLists } from '../../components/UniqueRollLists';
 
 interface UniqueCharStatsState {
+    talesFromTheBeyondModal: boolean
+    bardAnimatedDancingItem: boolean,
     monkElementModel: boolean
     pickedMonkElement: any
     maneuversModal: boolean
     pickedManeuver: any
     companionModal: boolean
     wildMagicModal: boolean
+    barbarianMagicModal: boolean
 }
 
 
@@ -25,6 +30,9 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
     constructor(props: any) {
         super(props)
         this.state = {
+            talesFromTheBeyondModal: false,
+            bardAnimatedDancingItem: false,
+            barbarianMagicModal: false,
             wildMagicModal: false,
             companionModal: false,
             maneuversModal: false,
@@ -48,29 +56,61 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     :
                     null}
                 {this.props.character.path?.name === "Wild Magic" &&
+                    <UniqueRollLists modalContacts={wildSurge.wildMagic} title={"Wild Magic"} />
+                }
+                {this.props.character.path?.name === "College of Creation" && this.props.character.level >= 6 ?
                     <View>
-                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Wild Magic Effects'}
-                            onPress={() => { this.setState({ wildMagicModal: true }) }} />
-                        <Modal visible={this.state.wildMagicModal} animationType='slide'>
-                            {this.state.wildMagicModal &&
-                                <ScrollView style={{ padding: 20, backgroundColor: Colors.pageBackground }}>
-                                    <AppText color={Colors.berries} textAlign={'center'} fontSize={18}>List of Wild Magic Surge, roll result and effect</AppText>
-                                    {wildSurge.wildMagic.map((magic, index) =>
-                                        <View key={index}>
-                                            <AppText fontSize={20} textAlign={'center'} color={Colors.berries}>{magic.roll}</AppText>
-                                            <View style={{ padding: 10, backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 25 }}>
-                                                <AppText fontSize={16} textAlign={'center'}>{magic.effect}</AppText>
-                                            </View>
-                                        </View>)}
-                                </ScrollView>
-                            }
-                            <View>
-                                <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
-                                    onPress={() => { this.setState({ wildMagicModal: false }) }} />
-                            </View>
+                        <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Animated dancing'}
+                            onPress={() => { this.setState({ bardAnimatedDancingItem: true }) }} />
+                        <Modal visible={this.state.bardAnimatedDancingItem}>
+                            <ScrollView style={{ padding: 20, backgroundColor: Colors.pageBackground }}>
+                                <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                    <AppText padding={15} textAlign={'center'} fontSize={25}>Animating Performance Item Stats</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>Armor class: 16 (natural armor)</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>Hit Points: 10 + 5 times your bard level</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>Speed: 30 ft., fly 30 ft. (hover)</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Actions -</AppText>
+                                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>- Force Empowered Slam -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}> Melee Weapon Attack: your spell attack modifier to hit {'\n'} reach 5 ft., one target you can see. Hit: 1d10 + proficiency bonus force damage.</AppText>
+                                    <View style={{ padding: 15, borderWidth: 1, borderColor: Colors.black, borderRadius: 15 }}>
+                                        <AppText fontSize={22} color={Colors.bitterSweetRed}>Attributes:</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>STR - 18(+4)</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>DEX - 14(+2)</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>CON - 16(+3)</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>INT - 4(-3)</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>WIZ - 10(+0)</AppText>
+                                        <AppText fontSize={18} color={Colors.berries}>CHA - 6(-2)</AppText>
+                                    </View>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Damage Immunities -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18} > poison, psychic</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Condition Immunities -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18} > charmed, exhaustion, poisoned, frightened.</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Senses -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>Darkvision 60 ft., passive Perception 10.</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Languages -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>understands the languages you speak.</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Proficiency Bonus -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>equals your bonus.</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Immutable Form -</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>The item is immune to any spell or effect that would alter its form.</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Irrepressible Dance - </AppText>
+                                    <AppText textAlign={'center'} fontSize={18} >Irrepressible Dance. When any creature starts its turn within 10 feet of the item, the item can increase or decrease (your choice){`\n`}the walking speed of that creature by 10 feet until the end of the turn, provided the item isn't incapacitated.</AppText>
+                                    <AppButton padding={25} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
+                                        onPress={() => { this.setState({ bardAnimatedDancingItem: false }) }} />
+                                </View>
+                            </ScrollView>
                         </Modal>
                     </View>
+                    : null}
+
+                {this.props.character.path?.name === "Path of Wild Magic" &&
+                    <UniqueRollLists modalContacts={wildBarbarianMagic.magicRolls} title={"Wild Magic"} />
                 }
+
+                {this.props.character.path?.name === "College of Spirits" &&
+                    <UniqueRollLists modalContacts={talesFromTheBeyond.inspirationRolls} title={"Spirits' Tales"} />
+                }
+
                 {this.props.character.charSpecials.fightingStyle.length > 0 ?
                     <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Fighting Style:</AppText>
@@ -115,6 +155,10 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     <BarbarianRageCounter character={this.props.character} />
                     : null
                 }
+                {this.props.character.characterClass === "Bard" ?
+                    <BardInspirationCounter character={this.props.character} />
+                    : null}
+
                 {this.props.character.characterClass === "Paladin" ?
                     <PaladinLayOnHandsCounter character={this.props.character} />
                     : null}

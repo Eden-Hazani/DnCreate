@@ -98,6 +98,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         for (let level = 1; level < 20; level++) {
             await AsyncStorage.removeItem(`current${character._id}level${level}`)
         }
+        AsyncStorage.removeItem(`notes${character._id}`)
         userCharApi.deleteChar(character._id)
 
     }

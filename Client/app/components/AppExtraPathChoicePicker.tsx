@@ -41,7 +41,7 @@ export class AppExtraPathChoicePicker extends Component<{
         return (
             <View style={styles.container}>
                 {this.props.item.choice.map((item: any, index: number) =>
-                    <View key={item.name}>
+                    <View key={`${item.name}${index}`}>
                         <TouchableOpacity style={[styles.item, { backgroundColor: this.props.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                             onPress={() => { this.props.applyExtraPathChoice(item, index) }}>
                             <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>{item.name}</AppText>

@@ -115,8 +115,12 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                 </View>
                             </View>
                         </Modal>
-                        <View style={{ flex: .4 }}>
+                        <View style={{ flex: .2 }}>
                             <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Privacy Policy"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
+                        </View>
+                        <View style={{ flex: .2 }}>
+                            <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Create Custom Path"}
+                                textAlign={"center"} fontSize={15} onPress={() => { this.props.navigation.navigate("CreateNewPath") }} />
                         </View>
                         <View style={{ flexDirection: 'row' }}>
                             <AppText>Dark mode</AppText>

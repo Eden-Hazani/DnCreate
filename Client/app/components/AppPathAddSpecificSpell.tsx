@@ -5,6 +5,7 @@ import { AppText } from './AppText';
 import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { store } from '../redux/store';
+import { Colors } from '../config/colors';
 
 
 interface AppPathAddSpecificSpellState {
@@ -12,7 +13,9 @@ interface AppPathAddSpecificSpellState {
     alreadyHaveSpell: boolean
 }
 
-export class AppPathAddSpecificSpell extends Component<{ character: CharacterModel, path: any, updateSpecificSpell: any, spell: string }, AppPathAddSpecificSpellState>{
+export class AppPathAddSpecificSpell extends Component<{
+    character: CharacterModel, path: any, updateSpecificSpell: any, spell: string, notCountAgainstKnownCantrips: boolean
+}, AppPathAddSpecificSpellState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -30,7 +33,7 @@ export class AppPathAddSpecificSpell extends Component<{ character: CharacterMod
                 return;
             }
         }
-        this.props.updateSpecificSpell(this.props.spell)
+        this.props.updateSpecificSpell({ name: this.props.spell, notCountAgainstKnownCantrips: this.props.notCountAgainstKnownCantrips })
     }
     render() {
         return (
@@ -41,8 +44,9 @@ export class AppPathAddSpecificSpell extends Component<{ character: CharacterMod
                     </View>
                     :
                     <View>
-                        <AppText textAlign={"center"} fontSize={18}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.props.path} You gain the Following spell</AppText>
-                        <AppText textAlign={"center"} fontSize={18}>{this.props.spell}</AppText>
+                        {this.props.notCountAgainstKnownCantrips && <AppText textAlign={"center"} fontSize={18}>This cantrip does not count against your known cantrips</AppText>}
+                        <AppText textAlign={"center"} fontSize={18}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.props.path} You gain the Following spell:</AppText>
+                        <AppText textAlign={"center"} fontSize={25} color={Colors.berries}>{this.props.spell}</AppText>
                     </View>
                 }
             </View>

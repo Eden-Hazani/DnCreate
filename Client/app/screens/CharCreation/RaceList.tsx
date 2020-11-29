@@ -168,7 +168,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                         />
                                     </View>
                                     <View>
-                                        {console.log(this.state.raceColors)}
                                         <AnimatedHorizontalList data={this.state.races} backDropColors={this.state.raceColors}
                                             onPress={(val: any) => { this.pickRace(val) }} />
                                     </View>
