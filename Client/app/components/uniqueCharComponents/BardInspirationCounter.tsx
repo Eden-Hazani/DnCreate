@@ -14,7 +14,7 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
     constructor(props: any) {
         super(props)
         this.state = {
-            inspectionTotal: this.props.character.modifiers.charisma,
+            inspectionTotal: this.props.character.modifiers.charisma >= 1 ? this.props.character.modifiers.charisma : 1,
             inspectionRemaining: null
         }
     }

@@ -28,6 +28,8 @@ import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
 import { AttackRollTutorial } from './charOptions/AttackRollTutorial';
 import { charHasMagic } from './charOptions/helperFunctions/charHasMagic';
+import { CompleteSkillList } from '../components/CompleteSkillList';
+import { racialArmorBonuses } from './charOptions/helperFunctions/racialArmorBonuses';
 
 /**
  * 
@@ -48,6 +50,8 @@ interface SelectCharacterState {
     resetHpModal: boolean
     isDm: boolean
     setCurrentHpModal: boolean
+    completeSkillModel: boolean
+    cashedSavingThrows: []
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -56,6 +60,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            cashedSavingThrows: [],
+            completeSkillModel: false,
             attackRollTutorialModal: false,
             setCurrentHpModal: false,
             currentHp: '',
@@ -115,8 +121,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             this.setState({ loading: false })
         }, 800);
         this.setState({ character: startCharInfo }, async () => {
+            this.loadCashedSavingThrows()
             if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
-                const { operation, action } = levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
+                const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
             this.maxHpCheck();
@@ -126,7 +133,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         })
     }
 
-
+    loadCashedSavingThrows = async () => {
+        const cashedSavingThrows = await AsyncStorage.getItem(`${this.state.character._id}SavingThrows`);
+        const savingThrows: any = cashedSavingThrows !== null ? getSpecialSaveThrows(this.state.character).concat(JSON.parse(cashedSavingThrows)) : getSpecialSaveThrows(this.state.character)
+        this.setState({ cashedSavingThrows: savingThrows })
+    }
 
 
     listStats = () => {
@@ -218,10 +229,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             maxHp = maxHp + 1
         }
         character.maxHp = maxHp;
-        this.setState({ character }, () => {
+        this.setState({ character }, async () => {
             userCharApi.updateChar(this.state.character)
-            if (levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
-                const { operation, action } = levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
+            const levelUpTreeFunc = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)
+            if (levelUpTreeFunc) {
+                const { operation, action } = levelUpTreeFunc;
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
             this.setState({ currentHp: this.state.character.maxHp.toString() }, async () => {
@@ -320,7 +332,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
-                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.equippedArmor.ac}</AppText>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.equippedArmor.ac + racialArmorBonuses(this.state.character.race)}</AppText>
                                                 </View>
                                                 <AppText>AC</AppText>
                                             </View>
@@ -482,7 +494,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         <View>
                             <AppText textAlign={'center'}>Saving Throws</AppText>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-                                {getSpecialSaveThrows(this.state.character).map(saveThrow =>
+                                {this.state.cashedSavingThrows.map(saveThrow =>
                                     <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5 }} key={saveThrow}>
                                         <AppText fontSize={18}>{saveThrow} </AppText>
                                     </View>)}
@@ -499,6 +511,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                         </View>
                                     )}
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={80} height={50} borderRadius={25} title={'complete skill list'}
+                                        onPress={() => { this.setState({ completeSkillModel: true }) }} />
+                                    <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
+                                        <View>
+                                            <CompleteSkillList character={this.state.character} />
+                                        </View>
+                                        <View>
+                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
+                                                onPress={() => { this.setState({ completeSkillModel: false }) }} />
+                                        </View>
+                                    </Modal>
                                 </View>
                                 <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
                                     <AppText fontSize={25}>Hit Dice</AppText>

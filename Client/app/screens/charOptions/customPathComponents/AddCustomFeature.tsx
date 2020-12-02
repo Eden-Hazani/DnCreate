@@ -21,9 +21,9 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
         this.state = {
             featureDetailModal: [],
             values: {
-                featureName: '',
-                featureDescription: '',
-                choice: []
+                // name: '',
+                // description: '',
+                // choice: []
             },
             completed: false,
             featureList: []
@@ -33,7 +33,17 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
     render() {
         return (
             <View style={styles.container}>
-                {this.state.completed ? <ConfirmFormPart visible={this.state.completed} /> :
+                {this.state.completed ?
+                    <View>
+                        <ConfirmFormPart visible={this.state.completed} />
+                        <View>
+                            {this.state.featureList.map((item, index) => <View key={index} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <AppText textAlign={'center'} fontSize={22} color={Colors.berries}>{item.name}</AppText>
+                                <AppText textAlign={'center'} fontSize={18} color={Colors.berries}>{item.description}</AppText>
+                            </View>)}
+                        </View>
+                    </View>
+                    :
                     <View>
                         <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
                             <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
@@ -56,18 +66,18 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
                         </View>
                         {this.state.featureList.map((item, index) => <View key={index} style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, margin: 15 }}>
                             <AppTextInput placeholder={"Feature name"} iconName={"text"}
-                                onChangeText={(featureName: string) => {
+                                onChangeText={(name: string) => {
                                     let featureList = [...this.state.featureList];
                                     let item = { ...featureList[index] }
-                                    item.featureName = featureName
+                                    item.name = name
                                     featureList[index] = item;
                                     this.setState({ featureList })
                                 }} />
                             <AppTextInput placeholder={"Feature description"} iconName={"text"} numberOfLines={5} multiline={true} textAlignVertical={"top"}
-                                onChangeText={(featureDescription: string) => {
+                                onChangeText={(description: string) => {
                                     let featureList = [...this.state.featureList];
                                     let item = { ...featureList[index] }
-                                    item.featureDescription = featureDescription
+                                    item.description = description
                                     featureList[index] = item;
                                     this.setState({ featureList })
                                 }} />
@@ -88,7 +98,8 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
                                         let item = { ...featureList[index] }
                                         item.choice = array
                                         featureList[index] = item;
-                                        this.setState({ featureList }, () => console.log(featureList))
+                                        console.log(featureList)
+                                        this.setState({ featureList })
                                     }} />
                                     <View>
                                         <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
@@ -108,7 +119,7 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
                                     alert("You must provide at least one feature per path level");
                                     return
                                 }
-                                this.props.sendValues(this.state.featureList)
+                                this.props.sendValues({ feature: this.state.featureList, isDone: true })
                                 this.setState({ completed: true })
                             }} />
                     </View>

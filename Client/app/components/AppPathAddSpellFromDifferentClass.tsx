@@ -8,7 +8,10 @@ interface AppPathAddSpellFromDifferentClassState {
 }
 
 
-export class AppPathAddSpellFromDifferentClass extends Component<{ numberOfSpells: number, loadSpellsFromOtherClasses: any, character: CharacterModel, className: string, path: string, spellLevel: number }, AppPathAddSpellFromDifferentClassState>{
+export class AppPathAddSpellFromDifferentClass extends Component<{
+    numberOfSpells: number, loadSpellsFromOtherClasses: any,
+    character: CharacterModel, className: string, path: string, spellLevel: any
+}, AppPathAddSpellFromDifferentClassState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -25,8 +28,8 @@ export class AppPathAddSpellFromDifferentClass extends Component<{ numberOfSpell
     render() {
         return (
             <View style={styles.container}>
-                <AppText>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.props.path}</AppText>
-                <AppText>You gain {this.props.numberOfSpells} Spells of the {this.props.className} class to pick, you will be able to pick them from your spell book after you finish leveling up</AppText>
+                <AppText textAlign={"center"}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.props.path}</AppText>
+                <AppText textAlign={"center"}>You gain {this.props.numberOfSpells} of the {this.props.spellLevel} level from the {this.props.className} class to pick, you will be able to pick them from your spell book after you finish leveling up</AppText>
             </View>
         )
     }
@@ -35,6 +38,7 @@ export class AppPathAddSpellFromDifferentClass extends Component<{ numberOfSpell
 
 const styles = StyleSheet.create({
     container: {
-
+        justifyContent: "center",
+        alignItems: "center"
     }
 });

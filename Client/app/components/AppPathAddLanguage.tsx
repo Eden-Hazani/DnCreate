@@ -7,7 +7,7 @@ interface AppPathAddLanguageState {
     languageToAdd: string[]
 }
 
-export class AppPathAddLanguage extends Component<{ loadLanguage: any, amountOfLanguages: [], languagesToPick: any }, AppPathAddLanguageState> {
+export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, loadLanguage: any, amountOfLanguages: [], languagesToPick: any }, AppPathAddLanguageState> {
     constructor(props: any) {
         super(props)
         this.state = {
@@ -15,6 +15,12 @@ export class AppPathAddLanguage extends Component<{ loadLanguage: any, amountOfL
         }
     }
     componentDidMount() {
+        console.log(this.props.languagesToPick)
+        if (this.props.learnSpecificLanguage) {
+            this.props.loadLanguage(this.props.amountOfLanguages)
+            this.props.languagesToPick(false)
+            return;
+        }
         this.props.languagesToPick(true)
     }
     componentWillUnmount() {
@@ -38,11 +44,15 @@ export class AppPathAddLanguage extends Component<{ loadLanguage: any, amountOfL
     render() {
         return (
             <View style={styles.container}>
-                <AppText fontSize={20} textAlign={"center"}>Input your languages, you can use official languages or the languages that fir the world of your adventure.</AppText>
-                {this.props.amountOfLanguages.map((item: string, index: number) =>
-                    <View key={index} >
-                        <AppTextInput width={250} placeholder={`language ${index + 1} ...`} iconName={"podium-gold"} onChangeText={(text: string) => { this.setLang(text, index) }} />
-                    </View>)}
+                {!this.props.learnSpecificLanguage &&
+                    <View>
+                        <AppText fontSize={20} textAlign={"center"}>Input your languages, you can use official languages or the languages that fit the world of your adventure.</AppText>
+                        {this.props.amountOfLanguages.map((item: string, index: number) =>
+                            <View key={index} >
+                                <AppTextInput width={250} placeholder={`language ${index + 1} ...`} iconName={"podium-gold"} onChangeText={(text: string) => { this.setLang(text, index) }} />
+                            </View>)}
+                    </View>
+                }
             </View>
         )
     }

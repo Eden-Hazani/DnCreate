@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
@@ -36,7 +35,6 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
             if (item.name === pathChoiceChangePicker(this.props.character)) {
                 this.setState({ pickedPathChoice: item.choice[0] }, () => {
                     this.setState({ optionsToPickFrom: levelUpPathChoice[this.props.character.path.name] }, () => {
-                        console.log(this.state.optionsToPickFrom)
                         this.state.optionsToPickFrom.forEach((item: any, index: number) => {
                             if (this.state.pickedPathChoice.name === item.name) {
                                 let choiceClicked = this.state.choiceClicked;

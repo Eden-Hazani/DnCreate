@@ -14,6 +14,9 @@ const raceSchema = mongoose.Schema({
     abilityBonus: {
         type: Object
     },
+    languages: {
+        type: Array
+    },
     raceColor: {
         type: String
     },

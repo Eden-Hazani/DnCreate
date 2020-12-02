@@ -9,7 +9,8 @@ export class RaceModel {
         public image?: string,
         public abilityBonus?: ModifiersModel,
         public raceAbilities?: RaceAbilityModel,
-        public raceColor?: string
+        public raceColor?: string,
+        public languages?: []
     ) {
         if (!abilityBonus) {
             this.abilityBonus = new ModifiersModel()

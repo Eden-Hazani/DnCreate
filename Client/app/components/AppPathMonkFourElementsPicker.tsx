@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
@@ -18,7 +17,7 @@ interface AppPathMonkFourElementsPickerState {
 
 
 export class AppPathMonkFourElementsPicker extends Component<{
-    character: CharacterModel, firstElement: any,
+    character: CharacterModel, firstElement: any, totalElementsToPick: any,
     item: any, loadElements: any, pathChosen: any, elementsToPick: any
 }, AppPathMonkFourElementsPickerState>{
     constructor(props: any) {
@@ -85,8 +84,8 @@ export class AppPathMonkFourElementsPicker extends Component<{
                 return;
             }
             if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && !this.state.elementClicked[index]) {
-                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
-                    alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + extraPathChoiceNumbers(this.props.character, this.props.character.level)} element disciplines to pick`)
+                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
+                    alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`)
                     return;
                 }
                 let pickedElements = this.state.pickedElements;
@@ -95,7 +94,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
                 pickedElements.push(item);
                 this.setState({ pickedElements, extraElementChange: false }, () => {
                     this.props.loadElements(this.state.pickedElements)
-                    if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
+                    if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
                         this.props.elementsToPick(false)
                     }
                 })
@@ -103,8 +102,8 @@ export class AppPathMonkFourElementsPicker extends Component<{
             }
         }
         if (!this.state.elementClicked[index]) {
-            if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
-                alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + extraPathChoiceNumbers(this.props.character, this.props.character.level)} element disciplines to pick`);
+            if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
+                alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`);
                 return;
             }
             const pickedElements = this.state.pickedElements;
@@ -113,7 +112,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
             pickedElements.push(item);
             this.setState({ pickedElements }, () => {
                 this.props.loadElements(this.state.pickedElements)
-                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
+                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
                     this.props.elementsToPick(false)
                 }
             })
@@ -133,7 +132,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
         return (
             <View style={styles.container}>
                 {this.props.character.level > 3 &&
-                    <AppText>At Level {this.props.character.level} you can pick {(store.getState().character.charSpecials.monkElementsDisciplines.length - 1) + extraPathChoiceNumbers(this.props.character, this.props.character.level)} Elements</AppText>
+                    <AppText>At Level {this.props.character.level} you can pick {(store.getState().character.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} Elements</AppText>
                 }
                 {this.state.fullElementList.map((item: any, index: number) =>
                     <View key={`${index}${item.name}`}>

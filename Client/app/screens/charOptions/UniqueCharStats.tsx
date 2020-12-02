@@ -12,10 +12,12 @@ import { PaladinLayOnHandsCounter } from '../../components/uniqueCharComponents/
 import { BarbarianRageCounter } from '../../components/uniqueCharComponents/BarbarianRageCounter';
 import { BardInspirationCounter } from '../../components/uniqueCharComponents/BardInspirationCounter';
 import { UniqueRollLists } from '../../components/UniqueRollLists';
+import { PathSummonedCompanion } from '../../components/uniqueCharComponents/PathSummonedCompanion';
+import pathCreatedCompanion from '../../../jsonDump/pathCreatedCompanion.json'
 
 interface UniqueCharStatsState {
     talesFromTheBeyondModal: boolean
-    bardAnimatedDancingItem: boolean,
+    pathSummonedCompanionStatsModal: boolean,
     monkElementModel: boolean
     pickedMonkElement: any
     maneuversModal: boolean
@@ -31,7 +33,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
         super(props)
         this.state = {
             talesFromTheBeyondModal: false,
-            bardAnimatedDancingItem: false,
+            pathSummonedCompanionStatsModal: false,
             barbarianMagicModal: false,
             wildMagicModal: false,
             companionModal: false,
@@ -40,6 +42,15 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
             pickedMonkElement: null,
             monkElementModel: false
         }
+    }
+    test = () => {
+        let choices: any[] = []
+        for (let charChoice of this.props.character.pathFeatures) {
+            if (charChoice.choice) {
+                charChoice.choice.forEach((item: any) => choices.push(item))
+            }
+        }
+        return choices;
     }
     render() {
         return (
@@ -58,51 +69,25 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                 {this.props.character.path?.name === "Wild Magic" &&
                     <UniqueRollLists modalContacts={wildSurge.wildMagic} title={"Wild Magic"} />
                 }
-                {this.props.character.path?.name === "College of Creation" && this.props.character.level >= 6 ?
+                {(this.props.character.path?.name === "College of Creation" && this.props.character.level >= 6 ||
+                    this.props.character.path?.name === "Circle of Wildfire" && this.props.character.level >= 2)
+                    ?
                     <View>
-                        <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Animated dancing'}
-                            onPress={() => { this.setState({ bardAnimatedDancingItem: true }) }} />
-                        <Modal visible={this.state.bardAnimatedDancingItem}>
-                            <ScrollView style={{ padding: 20, backgroundColor: Colors.pageBackground }}>
-                                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                    <AppText padding={15} textAlign={'center'} fontSize={25}>Animating Performance Item Stats</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>Armor class: 16 (natural armor)</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>Hit Points: 10 + 5 times your bard level</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>Speed: 30 ft., fly 30 ft. (hover)</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Actions -</AppText>
-                                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>- Force Empowered Slam -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}> Melee Weapon Attack: your spell attack modifier to hit {'\n'} reach 5 ft., one target you can see. Hit: 1d10 + proficiency bonus force damage.</AppText>
-                                    <View style={{ padding: 15, borderWidth: 1, borderColor: Colors.black, borderRadius: 15 }}>
-                                        <AppText fontSize={22} color={Colors.bitterSweetRed}>Attributes:</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>STR - 18(+4)</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>DEX - 14(+2)</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>CON - 16(+3)</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>INT - 4(-3)</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>WIZ - 10(+0)</AppText>
-                                        <AppText fontSize={18} color={Colors.berries}>CHA - 6(-2)</AppText>
-                                    </View>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Damage Immunities -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18} > poison, psychic</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Condition Immunities -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18} > charmed, exhaustion, poisoned, frightened.</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Senses -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>Darkvision 60 ft., passive Perception 10.</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Languages -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>understands the languages you speak.</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Proficiency Bonus -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>equals your bonus.</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Immutable Form -</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>The item is immune to any spell or effect that would alter its form.</AppText>
-                                    <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>- Irrepressible Dance - </AppText>
-                                    <AppText textAlign={'center'} fontSize={18} >Irrepressible Dance. When any creature starts its turn within 10 feet of the item, the item can increase or decrease (your choice){`\n`}the walking speed of that creature by 10 feet until the end of the turn, provided the item isn't incapacitated.</AppText>
-                                    <AppButton padding={25} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
-                                        onPress={() => { this.setState({ bardAnimatedDancingItem: false }) }} />
+                        <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={pathCreatedCompanion[this.props.character.path?.name].name}
+                            onPress={() => { this.setState({ pathSummonedCompanionStatsModal: true }) }} />
+                        <Modal visible={this.state.pathSummonedCompanionStatsModal}>
+                            <View style={{ flex: 1 }}>
+                                <View style={{ flex: .9 }}>
+                                    <PathSummonedCompanion character={this.props.character} />
                                 </View>
-                            </ScrollView>
+                                <View style={{ flex: .1 }}>
+                                    <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'Close'}
+                                        onPress={() => { this.setState({ pathSummonedCompanionStatsModal: false }) }} />
+                                </View>
+                            </View>
                         </Modal>
                     </View>
                     : null}
-
                 {this.props.character.path?.name === "Path of Wild Magic" &&
                     <UniqueRollLists modalContacts={wildBarbarianMagic.magicRolls} title={"Wild Magic"} />
                 }
@@ -124,6 +109,15 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     </View>
                     : null
                 }
+                {this.props.character.path?.name === "Arcane Archer" ?
+                    this.test().map((arrow: any, index: any) => <TouchableOpacity key={index} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
+                        onPress={() => { this.setState({ maneuversModal: true, pickedManeuver: arrow }) }}>
+                        <AppText fontSize={20} color={Colors.bitterSweetRed}>{arrow.name}</AppText>
+                        <View style={{ paddingRight: 10 }}>
+                            <AppText>{arrow.description.substring(0, 80)}...</AppText>
+                        </View>
+                    </TouchableOpacity>)
+                    : null}
                 {this.props.character.charSpecials.battleMasterManeuvers.length > 0 ?
                     <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginTop: 15 }]}>
                         <AppText textAlign={'left'} color={Colors.bitterSweetRed} fontSize={22}>Maneuvers:</AppText>
@@ -135,22 +129,22 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                                     <AppText>{maneuver.description.substring(0, 80)}...</AppText>
                                 </View>
                             </TouchableOpacity>)}
-                        <Modal visible={this.state.maneuversModal}>
-                            {this.state.pickedManeuver &&
-                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
-                                    <View style={{ padding: 20, flex: .8 }}>
-                                        <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>{this.state.pickedManeuver.name}</AppText>
-                                        <AppText textAlign={'center'} fontSize={19}>{this.state.pickedManeuver.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
-                                    </View>
-                                    <View style={{ flex: .2 }}>
-                                        <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ maneuversModal: false, pickedManeuver: null }) }} />
-                                    </View>
-                                </View>
-                            }
-                        </Modal>
                     </View>
                     : null
                 }
+                <Modal visible={this.state.maneuversModal} animationType={'slide'}>
+                    {this.state.pickedManeuver &&
+                        <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
+                            <View style={{ padding: 20, flex: .8 }}>
+                                <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>{this.state.pickedManeuver.name}</AppText>
+                                <AppText textAlign={'center'} fontSize={19}>{this.state.pickedManeuver.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
+                            </View>
+                            <View style={{ flex: .2 }}>
+                                <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={'close'} onPress={() => { this.setState({ maneuversModal: false, pickedManeuver: null }) }} />
+                            </View>
+                        </View>
+                    }
+                </Modal>
                 {this.props.character.charSpecials.rageAmount ?
                     <BarbarianRageCounter character={this.props.character} />
                     : null

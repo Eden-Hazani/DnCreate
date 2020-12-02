@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import errorHandler from '../../utility/errorHander';
-import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
 import userCharApi from '../api/userCharApi';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
@@ -12,24 +11,41 @@ import { AppSkillItemPicker } from './AppSkillItemPicker';
 import { AppText } from './AppText';
 
 interface AppExtraPathChoicePickerState {
+    disabledChoice: boolean[]
 }
 
 export class AppExtraPathChoicePicker extends Component<{
-    character: CharacterModel,
+    character: CharacterModel, numberOfChoices: any,
     item: any, extraPathChoiceClicked: any, applyExtraPathChoice: any, isExtraChoice: any
     isAdditionalSkillChoice: any, loadSkills: any, resetExpertiseSkills: any
 }, AppExtraPathChoicePickerState>{
     constructor(props: any) {
         super(props)
         this.state = {
-
+            disabledChoice: []
         }
     }
 
     componentDidMount() {
-
+        const multipleChoices: any = []
         this.props.isExtraChoice(true)
-        this.setState({ loading: false })
+        this.props.numberOfChoices(this.props.item.numberOfChoices)
+        const disabledChoice = this.state.disabledChoice;
+        multipleChoices.push(this.props.item);
+        if (this.props.item.excludePreviousLevelChoices) {
+            console.log('gg')
+            for (let charChoice of this.props.character.pathFeatures) {
+                if (charChoice.choice) {
+                    const takenChoiceArray = charChoice.choice.map((takenChoice: any) => { return takenChoice.name });
+                    this.props.item.choice.forEach((newChoice: any, index: number) => {
+                        if (takenChoiceArray.includes(newChoice.name)) {
+                            disabledChoice[index] = true;
+                        }
+                    })
+                }
+            }
+            this.setState({ disabledChoice }, () => console.log(this.state.disabledChoice))
+        }
     }
     componentWillUnmount() {
         this.props.isExtraChoice(false)
@@ -42,13 +58,13 @@ export class AppExtraPathChoicePicker extends Component<{
             <View style={styles.container}>
                 {this.props.item.choice.map((item: any, index: number) =>
                     <View key={`${item.name}${index}`}>
-                        <TouchableOpacity style={[styles.item, { backgroundColor: this.props.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                        <TouchableOpacity disabled={this.state.disabledChoice[index]} style={[styles.item, { backgroundColor: this.state.disabledChoice[index] ? Colors.berries : this.props.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                             onPress={() => { this.props.applyExtraPathChoice(item, index) }}>
                             <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>{item.name}</AppText>
-                            <AppText color={Colors.whiteInDarkMode} fontSize={15} textAlign={'center'}>{item.description}</AppText>
+                            <AppText color={Colors.whiteInDarkMode} fontSize={15} textAlign={'center'}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                         </TouchableOpacity>
                         {item.skillList && this.props.extraPathChoiceClicked[index] &&
-                            <AppSkillItemPicker skillsStartAsExpertise={this.props.item.skillsStartAsExpertise} resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character}
+                            <AppSkillItemPicker extraSkillsTotal withConditions pathChosen skillsStartAsExpertise={this.props.item.skillsStartAsExpertise} resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character}
                                 setAdditionalSkillPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} sendSkillsBack={(val: any) => { this.props.loadSkills(val) }}
                                 itemList={item.skillList} amount={item.skillPickNumber} />}
                     </View>)}

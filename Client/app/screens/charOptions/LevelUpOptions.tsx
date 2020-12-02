@@ -17,7 +17,6 @@ import { eldritchInvocations } from "../../classFeatures/eldritchInvocations";
 import { highLightPicked } from './helperFunctions/highLightPicked';
 import { FeatOptions } from './FeatOptions';
 import { setTotalKnownSpells } from './helperFunctions/setTotalKnownSpells';
-import { extraPathChoiceNumbers } from '../../../utility/extraPathChoiceNumbers';
 import { PathFeatureOrganizer } from './helperFunctions/PathFeatureOrganizer';
 import { AppExtraPathChoicePicker } from '../../components/AppExtraPathChoicePicker';
 import * as Path from "../../../jsonDump/paths.json"
@@ -27,10 +26,10 @@ import spellsJSON from '../../../jsonDump/spells.json'
 import { spellLevelChanger } from './helperFunctions/SpellLevelChanger';
 import { AppChangePathChoiceAtLevelUp } from '../../components/AppChangePathChoiceAtLevelUp';
 import { allowedChangingPaths, pathChoiceChangePicker } from '../../classFeatures/pathChoiceChnagePicker';
+import { addRacialSpells } from './helperFunctions/addRacialSpells';
 
 
 interface LevelUpOptionsState {
-    customPathComplete: any
     beforeAnyChanges: CharacterModel,
     beforeLevelUp: CharacterModel
     skillsClicked: any[]
@@ -85,13 +84,15 @@ interface LevelUpOptionsState {
     armorToLoad: any
     newSpellAvailabilityList: string[]
     newPathChoice: any
+    customPathFeatureList: any[],
+    numberOfChoices: number,
+    spellListToLoad: any
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
     constructor(props: any) {
         super(props)
         this.state = {
-            customPathComplete: true,
             armorToLoad: null,
             specificSpell: null,
             specificSpellToLoad: false,
@@ -145,9 +146,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             invocations: this.props.character.charSpecials.eldritchInvocations,
             totalInvocationPoints: null,
             newSpellAvailabilityList: [],
-            newPathChoice: null
+            newPathChoice: null,
+            customPathFeatureList: [],
+            numberOfChoices: null,
+            spellListToLoad: null
         }
     }
+
 
     async componentDidMount() {
         const character = { ...this.props.character }
@@ -156,6 +161,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         }, 1000);
         const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
         const beforeLevelUpString = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
+        this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
         character.magic = new MagicModel()
         this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
         if (this.props.options.spells || this.props.options.spellsKnown) {
@@ -175,6 +181,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.props.options.spellsKnown) {
                 const spellsKnown = setTotalKnownSpells(this.props.character);
                 character.spellsKnown = spellsKnown;
+                console.log(character.spellsKnown)
             }
             character.magic = new MagicModel()
             character.magic.cantrips = this.props.options.cantrips;
@@ -195,6 +202,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
                 userCharApi.updateChar(this.state.character);
             })
+        }
+        if (this.props.character.level === 1) {
+            addRacialSpells(this.props.character.race).forEach(item => {
+                const spell = spellsJSON.find(spell => spell.name === item)
+                const spellLevel = spellLevelChanger(spell.level)
+                character.spells[spellLevel].push({ spell: spell, removable: false });
+            })
+            this.setState({ character })
         }
         if (this.props.options.abilityPointIncrease) {
             this.setState({ totalAbilityPoints: 2 });
@@ -238,7 +253,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             const pathClicked = this.state.pathClicked;
             pathClicked[index] = true
-            this.setState({ pathClicked, pathChosen: path });
+            this.setState({ pathClicked, pathChosen: path }, () => {
+                this.extractCustomPathJson(this.state.pathChosen.name)
+            });
         }
         else if (this.state.pathClicked[index]) {
             character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
@@ -532,9 +549,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
     applyExtraPathChoice = (choice: any, index: number) => {
         if (!this.state.extraPathChoiceClicked[index]) {
-            const extraPathChoiceAmount = extraPathChoiceNumbers(this.state.character, this.state.character.level);
+            const extraPathChoiceAmount = this.state.numberOfChoices;
             if (this.state.extraPathChoiceValue.length === extraPathChoiceAmount) {
-                alert(`You can only ${extraPathChoiceAmount} pick one choice.`)
+                alert(`You can only pick ${extraPathChoiceAmount} choices.`)
                 return;
             }
             const extraPathChoiceValue = this.state.extraPathChoiceValue;
@@ -625,7 +642,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             if (this.state.extraPathChoice) {
-                if (this.state.extraPathChoiceValue.length !== extraPathChoiceNumbers(this.state.character, this.state.character.level)) {
+                if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
                     alert('You have additional choices to pick from')
                     return;
                 }
@@ -641,7 +658,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
             character.charSpecials.monkElementsDisciplines = this.state.elements;
             character.path = this.state.pathChosen;
-            const pathResult = PathFeatureOrganizer(Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level], this.state.extraPathChoiceValue)
+            const officialOrCustom = Path[this.state.character.characterClass][this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
+            const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
             for (let item of pathResult) {
                 character.pathFeatures.push(item)
             }
@@ -665,7 +683,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             if (this.state.extraPathChoice) {
-                if (this.state.extraPathChoiceValue.length !== extraPathChoiceNumbers(this.state.character, this.state.character.level)) {
+                if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
                     alert('You have additional choices to pick from')
                     return;
                 }
@@ -680,7 +698,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
             character.charSpecials.monkElementsDisciplines = this.state.elements;
-            const pathResult = PathFeatureOrganizer(Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level], this.state.extraPathChoiceValue)
+            const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
+            const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
             for (let item of pathResult) {
                 character.pathFeatures.push(item)
             }
@@ -691,6 +710,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 const spell = spellsJSON.find(spell => spell.name === item)
                 const spellLevel = spellLevelChanger(spell.level)
                 character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
+            if (this.props.options.notCountAgainstKnown) {
+                character.spellsKnown = parseInt(character.spellsKnown + this.props.options.extraSpells.length).toString()
             }
         }
         if (this.props.options.abilityPointIncrease && !this.state.featsWindow && !this.state.abilityWindow) {
@@ -722,6 +744,17 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             character.intelligence = this.state.intelligence;
             character.charisma = this.state.charisma;
             character.wisdom = this.state.wisdom;
+        }
+        if (this.state.spellListToLoad) {
+            if (this.state.spellListToLoad.spells.length < this.state.spellListToLoad.limit) {
+                alert("You have additional spells to pick");
+                return;
+            }
+            for (let item of this.state.spellListToLoad.spells) {
+                const spell = spellsJSON.find(spell => spell.name === item)
+                const spellLevel = spellLevelChanger(spell.level)
+                character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
         }
         if (this.state.specificSpellToLoad) {
             if (this.state.specificSpell.notCountAgainstKnownCantrips) {
@@ -797,10 +830,6 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             character.charSpecials.warlockPactBoon = this.state.pact;
         }
-        if (!this.state.customPathComplete) {
-            alert(`You have Information missing in your custom path`);
-            return;
-        }
         this.setState({ character }, () => {
             const character = { ...this.state.character };
             const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
@@ -823,6 +852,32 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.props.close(false);
             })
         })
+    }
+
+    extractCustomPathJson = async (pathName: any) => {
+        const json = await AsyncStorage.getItem(`${this.props.character.characterClass}-CustomPathFeatures`);
+        if (this.props.options.pathFeature && json) {
+            const strArray = JSON.parse(json);
+            let levelFeatures: any = [];
+            for (let item of strArray) {
+                if (pathName === Object.keys(JSON.parse(item))[0]) {
+                    const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level])
+                    currentLevel[this.state.character.level].forEach((feature: any, index: number) => levelFeatures.push(feature))
+                }
+                // Pathname
+                // Level
+            }
+            this.setState({ customPathFeatureList: levelFeatures })
+            // return levelFeatures
+        }
+    }
+
+    customOrOfficialPath = () => {
+        if (Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name]) {
+            return Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level])
+        } else {
+            return this.state.customPathFeatureList
+        }
     }
 
     render() {
@@ -937,7 +992,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                         :
                                         <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
                                             <AppText fontSize={25} textAlign={'center'}>Level {this.props.character.level} with the {this.state.pathChosen?.name || this.state.character.path.name}!</AppText>
-                                            {Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level]).map((item: any, index: number) =>
+                                            {this.customOrOfficialPath().map((item: any, index: number) =>
                                                 <View key={item.name}>
                                                     <View style={item.description && styles.infoContainer}>
                                                         <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={'center'}>
@@ -948,9 +1003,11 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                     {(item.armorProf || item.weaponProf || item.skillList || item.fightingStyles || item.additionCantrip || item.druidCircleSpellLists ||
                                                         item.unrestrictedMagicPick || item.addMagicalAbilities || item.maneuvers || item.toolsToPick || item.learnLanguage ||
                                                         item.levelOneSpells || item.specificCantrip || item.AddSpellsFromDifferentClass || item.addElementalAttunement ||
-                                                        item.elementList || item.spellsToBeAdded || item.toolsToBeAdded || item.addArmor ||
+                                                        item.elementList || item.spellsToBeAdded || item.toolsToBeAdded || item.addArmor || item.spellListWithLimiter ||
+                                                        item.savingThrowList || item.addExactSkillProficiency ||
                                                         item.increaseMaxHp || item.addSpellAvailability || item.pickSpecificSpellWithChoices) &&
                                                         <AppPathAdditionalApply
+                                                            updateSpellList={(val: any) => { this.setState({ spellListToLoad: val }) }}
                                                             loadSpellPickAvailability={(val: any) => { this.setState({ newSpellAvailabilityList: val }) }}
                                                             armorToLoad={(val: any) => { this.setState({ armorToLoad: val }) }}
                                                             loadCharacter={(val: CharacterModel) => { this.setState({ character: val }) }}
@@ -1005,6 +1062,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                     }
                                                     {item.choice &&
                                                         <AppExtraPathChoicePicker
+                                                            numberOfChoices={(numberOfChoices: number) => { this.setState({ numberOfChoices }) }}
                                                             resetExpertiseSkills={(skill: any) => { this.resetExpertiseSkills(skill) }}
                                                             character={this.state.character}
                                                             isExtraChoice={(val: boolean) => { this.setState({ extraPathChoice: val }) }}

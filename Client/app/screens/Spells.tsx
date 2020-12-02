@@ -165,25 +165,54 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             })
             return;
         }
-        if (character.differentClassSpellsToPick.length > 0 && character.differentClassSpellsToPick.includes(this.state.pickedSpell.name)) {
-            const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
-            if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
-                alert('You already possess this spell');
-                return;
+        if (character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
+            let index = 0;
+            for (let item of character.differentClassSpellsToPick) {
+                console.log(this.state.pickedSpell.level)
+                if (this.state.pickedSpell.classes.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
+                    const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                    if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                        alert('You already possess this spell');
+                        return;
+                    }
+                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                    item.numberOfSpells = item.numberOfSpells - 1;
+                    if (item.numberOfSpells === 0) {
+
+                        character.differentClassSpellsToPick.splice(index, 1);
+                    }
+                    this.setState({ character, confirmed: true }, () => {
+                        setTimeout(() => {
+                            this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                        }, 1200);
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                        userCharApi.updateChar(this.state.character)
+                    })
+                    return;
+                }
+                if (this.state.pickedSpell.school.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
+                    const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                    if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                        alert('You already possess this spell');
+                        return;
+                    }
+                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                    item.numberOfSpells = item.numberOfSpells - 1;
+                    if (item.numberOfSpells === 0) {
+
+                        character.differentClassSpellsToPick.splice(index, 1);
+                    }
+                    this.setState({ character, confirmed: true }, () => {
+                        setTimeout(() => {
+                            this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                        }, 1200);
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                        userCharApi.updateChar(this.state.character)
+                    })
+                    return;
+                }
+                index++
             }
-            if (!character.differentClassSpellsToPick.includes(this.state.pickedSpell.name)) {
-                alert("Your class cannot use this spell")
-                return;
-            }
-            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-            this.setState({ character, confirmed: true }, () => {
-                setTimeout(() => {
-                    this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                }, 1200);
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                userCharApi.updateChar(this.state.character)
-            })
-            return;
         }
         const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
         if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {

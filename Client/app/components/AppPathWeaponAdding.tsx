@@ -13,7 +13,7 @@ export class AppPathWeaponAdding extends Component<{ weaponList: any, loadWeapon
                 <AppText textAlign={'center'} fontSize={22}>Weapon proficiencies added:</AppText>
                 {this.props.weaponList.map((weapon: any, index: number) =>
                     <View key={index}>
-                        <AppText fontSize={20} color={Colors.totalWhite}>{weapon}</AppText>
+                        <AppText fontSize={20} color={Colors.berries}>{weapon}</AppText>
                     </View>)}
             </View>
         )

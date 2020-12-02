@@ -10,6 +10,8 @@ import { ActionType } from '../../redux/action-type';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { RaceModel } from '../../models/raceModel';
+import skillJson from '../../../jsonDump/skillList.json';
+import toolJson from '../../../jsonDump/toolList.json';
 
 interface SpacialRaceBonusesState {
     character: CharacterModel
@@ -21,6 +23,10 @@ interface SpacialRaceBonusesState {
     extraLanguages: string[]
     extraLanguagesNumber: number
     race: RaceModel
+
+    secondItemClicked: boolean[],
+    secondItemPicked: any[]
+    secondAmountToPick: number
 }
 
 export class SpacialRaceBonuses extends Component<{ navigation: any, route: any }, SpacialRaceBonusesState>{
@@ -36,7 +42,10 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             choice: null,
             character: store.getState().character,
             extraLanguagesNumber: null,
-            race: this.props.route.params.race
+            race: this.props.route.params.race,
+            secondItemClicked: [],
+            secondItemPicked: [],
+            secondAmountToPick: null
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -60,6 +69,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         character.tools = [];
         if (this.state.character.race === "DragonBorn") {
             this.setState({ amountToPick: 1 })
+        }
+        if (this.state.character.race === "Warforged") {
+            this.setState({ amountToPick: 1, secondAmountToPick: 1, extraLanguagesNumber: 1 })
         }
         if (this.state.character.race === "Human") {
             this.setState({ extraLanguagesNumber: 1 })
@@ -102,6 +114,32 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             }
             const itemPicked = oldPickedItems.filter(item => item.name !== item.name);
             this.setState({ itemClicked, itemPicked });
+        }
+    }
+
+    pickSecondItem = (item: any, index: number) => {
+        if (!this.state.secondItemClicked[index]) {
+            if (this.state.secondAmountToPick === this.state.secondItemPicked.length) {
+                alert(`You can only pick ${this.state.secondAmountToPick}`)
+                return
+            }
+            const secondItemPicked = this.state.secondItemPicked;
+            const secondItemClicked = this.state.secondItemClicked;
+            secondItemClicked[index] = true;
+            secondItemPicked.push(item)
+            this.setState({ secondItemClicked, secondItemPicked });
+        }
+        else if (this.state.secondItemClicked[index]) {
+            const oldPickedItems = this.state.secondItemPicked;
+            const secondItemClicked = this.state.secondItemClicked;
+            secondItemClicked[index] = false;
+            if (this.state.character.race === "Changeling") {
+                const secondItemPicked = oldPickedItems.filter(skill => skill[0] !== item[0]);
+                this.setState({ secondItemClicked, secondItemPicked });
+                return
+            }
+            const secondItemPicked = oldPickedItems.filter(item => item.name !== item.name);
+            this.setState({ secondItemClicked, secondItemPicked });
         }
     }
 
@@ -177,6 +215,24 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         }
         if (this.state.character.race === "Tiefling") {
             character.languages.push("Common", "Infernal")
+        }
+
+        if (this.state.character.race === "Warforged") {
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('Must pick 1 tool from the list')
+                return;
+            }
+            if (this.state.secondAmountToPick > this.state.secondItemPicked.length) {
+                alert('Must pick 1 skill from the list')
+                return;
+            }
+            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
+                alert('You have another language to add')
+                return
+            }
+        }
+        for (let language of this.state.race?.languages) {
+            character.languages.push(language)
         }
         for (let item of this.state.extraLanguages) {
             character.languages.push(item)
@@ -290,6 +346,38 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                             </View>
                         }
+
+                        {this.state.character.race === "Warforged" &&
+                            <View>
+                                <View style={{ padding: 15 }}>
+                                    <AppText textAlign={'center'} fontSize={22}>As a Warforged you get to pick one tool proficiency</AppText>
+                                </View>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {toolJson.tools.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                                            onPress={() => this.pickItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
+                                <View style={{ padding: 15 }}>
+                                    <AppText textAlign={'center'} fontSize={22}>You also pick one skill proficiency</AppText>
+                                </View>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {skillJson.skillList.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.secondItemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                                            onPress={() => this.pickSecondItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
+                                <AppText textAlign={'center'} fontSize={22}>And one extra language</AppText>
+                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
+                                    const extraLanguages = this.state.extraLanguages;
+                                    extraLanguages[0] = txt;
+                                    this.setState({ extraLanguages })
+                                }} />
+                            </View>
+                        }
+
                         {this.state.character.race === "Half Elf" &&
                             <View style={{ padding: 15 }}>
                                 <AppText textAlign={'center'} fontSize={18}>As a Half Elf you can read speak and write Common, Elven and another extra language of your choice.</AppText>

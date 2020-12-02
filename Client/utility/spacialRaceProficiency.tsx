@@ -9,6 +9,9 @@ const spacialRaceProficiency = (race: string) => {
         case race === 'Changeling':
             totalPoints = 1;
             break;
+        case race === 'Warforged':
+            totalPoints = 1;
+            break;
     }
 
     return totalPoints;

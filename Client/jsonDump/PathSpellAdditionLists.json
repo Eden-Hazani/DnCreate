@@ -1,4 +1,69 @@
 {
+    "Druid": {
+        "Circle of Spores": {
+            "2": {
+                "spellList": [
+                    "Chill Touch"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Blindness/Deafness",
+                    "Gentle Repose"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Animate Dead",
+                    "Gaseous Form"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Blight",
+                    "Confusion"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Cloudkill",
+                    "Contagion"
+                ]
+            }
+        },
+        "Circle of Wildfire": {
+            "2": {
+                "spellList": [
+                    "Burning Hands",
+                    "Cure Wounds"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Flaming Sphere",
+                    "Scorching Ray"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Plant Growth",
+                    "Revivify"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Aura of Life",
+                    "Fire Shield"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Flame Strike",
+                    "Mass Cure Wounds"
+                ]
+            }
+        }
+    },
     "Paladin": {
         "Oath of the Ancients": {
             "3": {
@@ -98,6 +163,70 @@
         }
     },
     "Cleric": {
+        "Arcana Domain": {
+            "1": {
+                "spellList": [
+                    "Detect Magic",
+                    "Magic Missile"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Magic Weapon",
+                    "Nystul's Magic Aura"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Dispel Magic",
+                    "Magic Circle"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Arcane Eye",
+                    "Leomund's Secret Chest"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Planar Binding",
+                    "Teleportation Circle"
+                ]
+            }
+        },
+        "Death Domain": {
+            "1": {
+                "spellList": [
+                    "False Life",
+                    "Ray of Sickness"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Blindness/Deafness",
+                    "Ray of Enfeeblement"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Animate Dead",
+                    "Vampiric Touch"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Blight",
+                    "Death Ward"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Antilife Shell",
+                    "Cloudkill"
+                ]
+            }
+        },
         "Knowledge Domain": {
             "1": {
                 "spellList": [

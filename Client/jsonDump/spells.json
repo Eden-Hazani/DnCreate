@@ -2824,6 +2824,60 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "(an exquisite chest, 3 feet by 2 feet by 2 feet, constructed from rare materials worth at least 5,000 gp, and a Tiny replica made from the same materials worth at least 50 gp)"
+            ],
+            "raw": "V, S, M (an exquisite chest, 3 feet by 2 feet by 2 feet, constructed from rare materials worth at least 5,000 gp, and a Tiny replica made from the same materials worth at least 50 gp)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You hide a chest, and all its contents, on the Ethereal Plane. You must touch the chest and the miniature replica that serves as a material component for the spell. The chest can contain up to 12 cubic feet of nonliving material (3 feet by 2 feet by 2 feet). While the chest remains on the Ethereal Plane, you can use an action and touch the replica to recall the chest. It appears in an unoccupied space on the ground within 5 feet of you. You can send the chest back to the Ethereal Plane by using an action and touching both the chest and the replica. After 60 days, there is a cumulative 5 percent chance per day that the spell’s effect ends. This effect ends if you cast this spell again, if the smaller replica chest is destroyed, or if you choose to end the spell as an action. If the spell ends and the larger chest is on the Ethereal Plane, it is irretrievably lost.",
+        "duration": "Instantaneous",
+        "level": "4",
+        "name": "Leomund's Secret Chest",
+        "range": "Touch",
+        "ritual": false,
+        "school": "conjuration",
+        "tags": [
+            "wizard",
+            "level4"
+        ],
+        "type": "4th-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "(a small square of silk)"
+            ],
+            "raw": "V, S, M (a small square of silk)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You place an illusion on a creature or an object you touch so that divination spells reveal false information about it. The target can be a willing creature or an object that isn’t being carried or worn by another creature. When you cast the spell, choose one or both of the following effects. The effect lasts for the duration. If you cast this spell on the same creature or object every day for 30 days, placing the same effect on it each time, the illusion lasts until it is dispelled. False Aura. You change the way the target appears to spells and magical effects, such as Detect Magic, that detect magical auras. You can make a nonmagical object appear magical, a magical object appear nonmagical, or change the object’s magical aura so that it appears to belong to a specific school of magic that you choose. When you use this effect on an object, you can make the false magic apparent to any creature that handles the item. Mask. You change the way the target appears to spells and magical effects that detect creature types, such as a paladin’s Divine Sense or the trigger of a sym bol spell. You choose a creature type and other spells and magical effects treat the target as if it were a creature of that type or of that alignment.",
+        "duration": "24 hours",
+        "level": "2",
+        "name": "Nystul's Magic Aura",
+        "range": "Touch",
+        "ritual": false,
+        "school": "illusion",
+        "tags": [
+            "wizard",
+            "level2"
+        ],
+        "type": "2th-level illusion"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
             "paladin"
         ],
         "components": {

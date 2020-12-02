@@ -1,0 +1,83 @@
+{
+    "College of Creation": {
+        "name": "Animating Performance",
+        "armorClass": "Armor class: 16 (natural armor)",
+        "hitPoints": "Hit Points: 10 + 5 times your bard level",
+        "speed": "Speed: 30 ft., fly 30 ft. (hover)",
+        "actions": [
+            {
+                "name": "Force Empowered Slam",
+                "description": "Melee Weapon Attack: your spell attack modifier to hit \n reach 5 ft., one target you can see. Hit: 1d10 + proficiency bonus force damage."
+            }
+        ],
+        "str": "STR - 18(+4)",
+        "dex": "DEX - 14(+2)",
+        "con": "CON - 16(+3)",
+        "int": "INT - 4(-3)",
+        "wiz": "WIZ - 10(+0)",
+        "cha": "CHA - 6(-2)",
+        "damageImmune": [
+            "poison",
+            "psychic"
+        ],
+        "conditionImmune": [
+            "charmed",
+            "exhaustion",
+            "poisoned",
+            "frightened"
+        ],
+        "senses": "Darkvision 60 ft., passive Perception 10.",
+        "languages": [
+            "understands the languages you speak"
+        ],
+        "proficiency": "equals your bonus",
+        "abilities": [
+            {
+                "name": "Immutable Form",
+                "description": " The item is immune to any spell or effect that would alter its form."
+            },
+            {
+                "name": "Irrepressible Dance",
+                "description": "When any creature starts its turn within 10 feet of the item, the item can increase or decrease (your choice) the walking speed of that creature by 10 feet until the end of the turn, provided the item isn't incapacitated."
+            }
+        ]
+    },
+    "Circle of Wildfire": {
+        "name": "Wildfire Spirit",
+        "armorClass": "Armor class: 13 (natural armor)",
+        "hitPoints": "5 + five times your druid level",
+        "speed": "Speed: 30 ft., fly 30 ft. (hover)",
+        "actions": [
+            {
+                "name": "Flame Seed",
+                "description": "Ranged Weapon Attack: your spell attack modifier to hit, range 60 ft., one target you can see. Hit: 1d6 + PB fire damage."
+            },
+            {
+                "name": "Fiery Teleportation",
+                "description": "The spirit and each willing creature of your choice within 5 feet of it teleport up to 15 feet to unoccupied spaces you can see. Then each creature within 5 feet of the space that the spirit left must succeed on a Dexterity saving throw against your spell save DC or take 1d6 + PB fire damage."
+            }
+        ],
+        "str": "STR - 10(+0)",
+        "dex": "DEX - 14(+2)",
+        "con": "CON - 14(+2)",
+        "int": "INT - 13(+1)",
+        "wiz": "WIZ - 15(+2)",
+        "cha": "CHA - 11(+0)",
+        "damageImmune": [
+            "fire"
+        ],
+        "conditionImmune": [
+            "charmed",
+            "grappled",
+            "prone",
+            "frightened",
+            "restrained"
+        ],
+        "senses": "darkvision 60 ft., passive Perception 12",
+        "languages": [
+            "understands the languages you speak"
+        ],
+        "proficiency": "equals your bonus",
+        "abilities": []
+    }
+}

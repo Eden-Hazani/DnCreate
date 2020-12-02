@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { extraPathChoiceNumbers } from '../../utility/extraPathChoiceNumbers';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
@@ -17,7 +16,7 @@ interface AppManeuverPickerState {
 
 
 export class AppManeuverPicker extends Component<{
-    character: CharacterModel,
+    character: CharacterModel, totalManeuvers: any,
     item: any, loadManeuvers: any, pathChosen: any, maneuversToPick: any
 }, AppManeuverPickerState>{
     constructor(props: any) {
@@ -73,8 +72,8 @@ export class AppManeuverPicker extends Component<{
                 return;
             }
             if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && !this.state.ManeuverClicked[index]) {
-                if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
-                    alert(`You have ${this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)} maneuvers to pick`)
+                if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers) {
+                    alert(`You have ${this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers} maneuvers to pick`)
                     return;
                 }
                 let pickedManeuvers = this.state.pickedManeuvers;
@@ -83,7 +82,7 @@ export class AppManeuverPicker extends Component<{
                 pickedManeuvers.push(item);
                 this.setState({ pickedManeuvers, extraManeuverChange: false }, () => {
                     this.props.loadManeuvers(this.state.pickedManeuvers)
-                    if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
+                    if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers) {
                         this.props.maneuversToPick(false)
                     }
                 })
@@ -91,8 +90,8 @@ export class AppManeuverPicker extends Component<{
             }
         }
         if (!this.state.ManeuverClicked[index]) {
-            if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
-                alert(`You have ${this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)} maneuvers to pick`)
+            if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers) {
+                alert(`You have ${this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers} maneuvers to pick`)
                 return;
             }
             const pickedManeuvers = this.state.pickedManeuvers;
@@ -101,7 +100,7 @@ export class AppManeuverPicker extends Component<{
             pickedManeuvers.push(item);
             this.setState({ pickedManeuvers }, () => {
                 this.props.loadManeuvers(this.state.pickedManeuvers)
-                if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + extraPathChoiceNumbers(this.props.character, this.props.character.level)) {
+                if (this.state.pickedManeuvers.length === this.state.beforeChangeChar.charSpecials.battleMasterManeuvers.length + this.props.totalManeuvers) {
                     this.props.maneuversToPick(false)
                 }
             })

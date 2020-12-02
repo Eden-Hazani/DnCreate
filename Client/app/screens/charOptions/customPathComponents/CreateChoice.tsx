@@ -66,18 +66,18 @@ export class CreateChoice extends Component<{ sendChoiceArrayBack: any }, Create
                                 {this.state.choiceApprovedList[index] ? <ConfirmFormPart visible={this.state.choiceApprovedList[index]} /> :
                                     <View>
                                         <AppTextInput placeholder={"Choice name"} iconName={"text"}
-                                            onChangeText={(choiceName: string) => {
+                                            onChangeText={(name: string) => {
                                                 let choiceList = [...this.state.choiceList];
                                                 let item = { ...choiceList[index] }
-                                                item.choiceName = choiceName
+                                                item.name = name
                                                 choiceList[index] = item;
                                                 this.setState({ choiceList })
                                             }} />
                                         <AppTextInput placeholder={"Choice description"} iconName={"text"} numberOfLines={5} multiline={true} textAlignVertical={"top"}
-                                            onChangeText={(choiceDescription: string) => {
+                                            onChangeText={(description: string) => {
                                                 let choiceList = [...this.state.choiceList];
                                                 let item = { ...choiceList[index] }
-                                                item.choiceDescription = choiceDescription
+                                                item.description = description
                                                 choiceList[index] = item;
                                                 this.setState({ choiceList })
                                             }} />
@@ -90,14 +90,20 @@ export class CreateChoice extends Component<{ sendChoiceArrayBack: any }, Create
                                                         this.setState({ skillListOn: true, currentIndex: index })
                                                     }} />
                                             </View>
+                                            {/* <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
+                                                <AppText>Does this choice gives the player new spells?</AppText>
+                                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
+                                                    borderRadius={25} width={100} height={60} title={"Add Skills"}
+                                                    onPress={() => {
+                                                        this.setState({ skillListOn: true, currentIndex: index })
+                                                    }} />
+                                            </View> */}
                                             <Modal visible={this.state.skillListOn}>
                                                 <CustomSkillPick sendSkillsBack={(skills: any) => {
                                                     let choiceList = [...this.state.choiceList];
                                                     let item = { ...choiceList[this.state.currentIndex] }
-                                                    item.choiceSkillList = {
-                                                        skillList: skills.skills,
-                                                        amountToPick: skills.amountToPick
-                                                    };
+                                                    item.skillList = skills.skills;
+                                                    item.amountToPick = skills.amountToPick;
                                                     choiceList[this.state.currentIndex] = item;
                                                     this.setState({ skillListOn: false, choiceList, currentIndex: null })
                                                 }} />

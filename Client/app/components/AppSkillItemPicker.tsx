@@ -16,11 +16,11 @@ interface AppSkillItemPickerState {
     skillConfirmation: boolean
     character: CharacterModel
     alreadyPickedSkills: boolean[]
-
+    skillWasPickedByPath: boolean[]
 }
 
 export class AppSkillItemPicker extends Component<{
-    character: CharacterModel, withConditions: boolean, pathChosen: any, extraSkillsTotal: number,
+    character: CharacterModel, withConditions: boolean, pathChosen: any, extraSkillsTotal: any,
     amount: number, itemList: any, setAdditionalSkillPicks: any, sendSkillsBack: any, resetExpertiseSkills: any, skillsStartAsExpertise: any
 }, AppSkillItemPickerState> {
     constructor(props: any) {
@@ -31,7 +31,8 @@ export class AppSkillItemPicker extends Component<{
             skills: [],
             amountToPick: this.props.amount,
             skillsClicked: [],
-            character: store.getState().character
+            character: store.getState().character,
+            skillWasPickedByPath: []
         }
     }
 
@@ -51,7 +52,23 @@ export class AppSkillItemPicker extends Component<{
                 }
             }
             this.setState({ alreadyPickedSkills }, () => {
-                this.setState({ amountToPick: generateSkillPickPathCondition(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSkillsTotal) })
+                const { extraSkillsToPick, pickedSkillFromStart } = generateSkillPickPathCondition(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSkillsTotal)
+                if (pickedSkillFromStart) {
+                    let skillWasPickedByPath = this.state.skillWasPickedByPath
+                    skillWasPickedByPath.push(pickedSkillFromStart)
+                    this.setState({ skillWasPickedByPath }, () => {
+                        for (let item of this.state.skillWasPickedByPath) {
+                            if (this.props.itemList.includes(item)) {
+                                const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                                alreadyPickedSkills[this.props.itemList.indexOf(item)] = true;
+                            }
+                        }
+                        this.pickSkill(pickedSkillFromStart, 0)
+                        this.setState({ amountToPick: extraSkillsToPick })
+                    })
+                } else {
+                    this.setState({ amountToPick: extraSkillsToPick })
+                }
             })
             this.props.setAdditionalSkillPicks(this.state.amountToPick)
             return
@@ -68,7 +85,7 @@ export class AppSkillItemPicker extends Component<{
         this.props.setAdditionalSkillPicks(0)
     }
     componentDidUpdate() {
-        if (this.state.skills.length === this.state.amountToPick && !this.state.skillConfirmation) {
+        if ((this.state.skills.length === this.state.amountToPick && !this.state.skillConfirmation) || (this.state.amountToPick && !this.state.skillConfirmation)) {
             this.setState({ skillConfirmation: true })
             this.props.sendSkillsBack(this.state.skills)
             this.props.setAdditionalSkillPicks(0)
@@ -127,7 +144,8 @@ export class AppSkillItemPicker extends Component<{
                 }
             }
             if (this.state.skills.length >= this.state.amountToPick) {
-                alert(`You can only pick ${this.state.amountToPick} skills.`)
+                this.state.amountToPick === 0 && alert(`You have zero skills to pick from (a skill might have been auto picked by your path).`)
+                this.state.amountToPick > 0 && alert(`You can only pick ${this.state.amountToPick} skills.`)
                 return;
             }
             const skillsClicked = this.state.skillsClicked;

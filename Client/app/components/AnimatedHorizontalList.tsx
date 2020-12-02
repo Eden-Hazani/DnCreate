@@ -15,7 +15,7 @@ const Indicator = ({ scrollX, races }: any) => {
         , [])
     const [newColor, setColor] = useState(baseColor)
     return (
-        <View style={{ flexDirection: 'row', position: 'absolute', top: height / 1.6, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', position: 'absolute', top: height / 1.3, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
             {races.map((_: any, i: any) => {
                 const inputRange = [(i - 1) * width, i * width, (i + 1) * width]
                 const scale: any = scrollX.interpolate({

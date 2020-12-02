@@ -4,6 +4,7 @@ import spellLists from '../../jsonDump/PathSpellAdditionLists.json'
 import spellsJSON from '../../jsonDump/spells.json'
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
+import { setTotalKnownSpells } from '../screens/charOptions/helperFunctions/setTotalKnownSpells';
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
 
@@ -12,7 +13,7 @@ interface AppPathFirstLevelSpellsAdditionState {
     domainMagic: any[]
 }
 
-export class AppPathFirstLevelSpellsAddition extends Component<{ returnMagic: any, path: any, character: CharacterModel }, AppPathFirstLevelSpellsAdditionState>{
+export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstKnown: any, returnMagic: any, path: any, character: CharacterModel }, AppPathFirstLevelSpellsAdditionState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -28,6 +29,14 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ returnMagic: an
         for (let item of domainMagic) {
             const spell = spellsJSON.find(spell => spell.name === item)
             const spellLevel = spellLevelChanger(spell.level)
+            if (this.props.noCountAgainstKnown && spellLevel !== "cantrip") {
+                if (!character.spellsKnown) {
+                    const spellsKnown = setTotalKnownSpells(this.props.character);
+                    character.spellsKnown = spellsKnown;
+                }
+                character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
+                console.log(character.spellsKnown)
+            }
             character.spells[spellLevel].push({ spell: spell, removable: false });
         }
         this.setState({ character, domainMagic }, () => {

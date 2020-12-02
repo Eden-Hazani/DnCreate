@@ -19,16 +19,19 @@ import { AppToolPicker } from '../../components/AppToolPicker';
 import { CharacterModel } from '../../models/characterModel';
 import { AppAddSpecificTools } from '../../components/AppAddSpecificTools';
 import { AppPathAddArmorToChar } from '../../components/AppPathAddArmorToChar';
+import { AppSavingThrowPathAdder } from '../../components/AppSavingThrowPathAdder';
 import { AppPathIncreaseMaxHp } from '../../components/AppPathIncreaceMaxHp';
 import { AppPathAddSpellPickAvailability } from '../../components/AppPathAddSpellPickAvailability';
 import { AppPickSpecificSpellWithChoices } from '../../components/AppPickSpecificSpellWithChoices';
+import { AppAddSpellChoice } from '../../components/AppAddSpellChoice';
+import { AppAddExactSkillProf } from '../../components/AppAddExectSkillProf';
 
 export class AppPathAdditionalApply extends Component<{
     character: CharacterModel, pathItem: any, isAdditionalSkillChoice: any, pathChosen: any, loadManeuvers: any, maneuversToPick: any
     loadSkills: any, resetExpertiseSkills: any, loadArmors: any, loadWeapons: any, loadUnrestrictedMagic: any,
     isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any,
     pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any, loadSpellPickAvailability: any,
-    loadElements: any, elementsToPick: any, loadCharacter: any
+    loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any
 }> {
 
     render() {
@@ -55,7 +58,7 @@ export class AppPathAdditionalApply extends Component<{
                         loadMagicalAbilities={(character: CharacterModel) => { this.props.loadCharacter(character) }} />
                 }
                 {this.props.pathItem.maneuvers &&
-                    <AppManeuverPicker character={this.props.character} item={this.props.pathItem.maneuvers} loadManeuvers={(val: any) => { this.props.loadManeuvers(val) }}
+                    <AppManeuverPicker totalManeuvers={this.props.pathItem.numberOfChoices} character={this.props.character} item={this.props.pathItem.maneuvers} loadManeuvers={(val: any) => { this.props.loadManeuvers(val) }}
                         maneuversToPick={(val: boolean) => { this.props.maneuversToPick(val) }} pathChosen={this.props.pathChosen} />
                 }
                 {this.props.pathItem.toolsToPick &&
@@ -74,13 +77,15 @@ export class AppPathAdditionalApply extends Component<{
                     <AppDruidSpellPicker pickDruidCircle={(val: boolean) => { this.props.pickDruidCircle(val) }} character={this.props.character} path={this.props.pathChosenObj} items={this.props.pathItem.druidCircleSpellLists}
                         loadSpells={(val: any) => { this.props.loadCharacter(val) }} />
                 }
-                {this.props.pathItem.learnLanguage &&
+                {(this.props.pathItem.learnLanguage || this.props.pathItem.learnSpecificLanguage) &&
                     <AppPathAddLanguage languagesToPick={(val: boolean) => { this.props.languagesToPick(val) }}
                         loadLanguage={(val: any) => { this.props.loadLanguage(val) }}
+                        learnSpecificLanguage={this.props.pathItem?.learnSpecificLanguage}
                         amountOfLanguages={this.props.pathItem.learnLanguage} />
                 }
                 {this.props.pathItem.levelOneSpells &&
-                    <AppPathFirstLevelSpellsAddition character={this.props.character} path={this.props.pathChosen} returnMagic={(val: any) => { this.props.loadCharacter(val) }} />
+                    <AppPathFirstLevelSpellsAddition character={this.props.character} path={this.props.pathChosen} noCountAgainstKnown={this.props.pathItem.noCountAgainstKnown}
+                        returnMagic={(val: any) => { this.props.loadCharacter(val) }} />
                 }
                 {this.props.pathItem.specificCantrip &&
                     <AppPathAddSpecificSpell path={this.props.pathChosen} character={this.props.character} notCountAgainstKnownCantrips={this.props.pathItem.notCountAgainstKnownCantrips}
@@ -92,7 +97,7 @@ export class AppPathAdditionalApply extends Component<{
                         spellLevel={this.props.pathItem.AddSpellsFromDifferentClass.spellLevel} loadSpellsFromOtherClasses={(val: any) => { this.props.loadCharacter(val) }} />
                 }
                 {this.props.pathItem.elementList &&
-                    <AppPathMonkFourElementsPicker elementsToPick={(val: any) => { this.props.elementsToPick(val) }}
+                    <AppPathMonkFourElementsPicker elementsToPick={(val: any) => { this.props.elementsToPick(val) }} totalElementsToPick={this.props.pathItem.numberOfChoices}
                         loadElements={(val: any) => { this.props.loadElements(val) }} firstElement={this.props.pathItem.addElementalAttunement}
                         character={this.props.character} item={this.props.pathItem.elementList} pathChosen={this.props.pathChosen} />
                 }
@@ -118,6 +123,17 @@ export class AppPathAdditionalApply extends Component<{
                 {this.props.pathItem.pickSpecificSpellWithChoices &&
                     <AppPickSpecificSpellWithChoices character={this.props.character} spell={this.props.pathItem.pickSpecificSpellWithChoices}
                         updateSpells={(val: CharacterModel) => { this.props.loadCharacter(val) }} />
+                }
+                {this.props.pathItem.spellListWithLimiter &&
+                    <AppAddSpellChoice character={this.props.character} spellListWithLimiter={this.props.pathItem.spellListWithLimiter}
+                        updateSpellList={(spellList: any) => { this.props.updateSpellList(spellList) }} />
+                }
+                {this.props.pathItem.savingThrowList &&
+                    <AppSavingThrowPathAdder character={this.props.character} pathChosen={this.props.pathChosen} itemList={this.props.pathItem.savingThrowList} amount={this.props.pathItem.saveThrowPickNumber}
+                        withConditions={this.props.pathItem.withConditions} setAdditionalSaveThrowPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} extraSavingThrowsTotal={this.props.pathItem.extraSavingThrowsTotal} />
+                }
+                {this.props.pathItem.addExactSkillProficiency &&
+                    <AppAddExactSkillProf skillsStartAsExpertise={this.props.pathItem.skillsStartAsExpertise} character={this.props.character} skillList={this.props.pathItem.addExactSkillProficiency} />
                 }
             </View>
         )

@@ -53,5 +53,15 @@
         "spellcastingAbility": "none",
         "baseSpellSaveDc": "none",
         "spellAttackModifier": "none"
+    },
+    "Arcane Archer": {
+        "spellcastingAbility": "none",
+        "baseSpellSaveDc": "none",
+        "spellAttackModifier": "none"
+    },
+    "Aasimar": {
+        "spellcastingAbility": "Charisma",
+        "baseSpellSaveDc": "none",
+        "spellAttackModifier": "none"
     }
 }
