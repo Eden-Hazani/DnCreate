@@ -227,6 +227,70 @@
                 ]
             }
         },
+        "Forge Domain": {
+            "1": {
+                "spellList": [
+                    "Identify",
+                    "Searing Smite"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Heat Metal",
+                    "Magic Weapon"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Elemental Weapon",
+                    "Protection from Energy"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Fabricate",
+                    "Wall of Fire"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Animate Objects",
+                    "Creation"
+                ]
+            }
+        },
+        "Peace Domain": {
+            "1": {
+                "spellList": [
+                    "Heroism",
+                    "Sanctuary"
+                ]
+            },
+            "3": {
+                "spellList": [
+                    "Aid",
+                    "Warding Bond"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Beacon of Hope",
+                    "Sending"
+                ]
+            },
+            "7": {
+                "spellList": [
+                    "Aura of Purity",
+                    "Otiluke's Resilient Sphere"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Greater Restoration",
+                    "Rary's Telepathic Bond"
+                ]
+            }
+        },
         "Knowledge Domain": {
             "1": {
                 "spellList": [

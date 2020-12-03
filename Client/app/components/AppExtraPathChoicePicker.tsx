@@ -33,7 +33,6 @@ export class AppExtraPathChoicePicker extends Component<{
         const disabledChoice = this.state.disabledChoice;
         multipleChoices.push(this.props.item);
         if (this.props.item.excludePreviousLevelChoices) {
-            console.log('gg')
             for (let charChoice of this.props.character.pathFeatures) {
                 if (charChoice.choice) {
                     const takenChoiceArray = charChoice.choice.map((takenChoice: any) => { return takenChoice.name });
@@ -44,7 +43,7 @@ export class AppExtraPathChoicePicker extends Component<{
                     })
                 }
             }
-            this.setState({ disabledChoice }, () => console.log(this.state.disabledChoice))
+            this.setState({ disabledChoice })
         }
     }
     componentWillUnmount() {

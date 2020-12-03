@@ -181,7 +181,6 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.props.options.spellsKnown) {
                 const spellsKnown = setTotalKnownSpells(this.props.character);
                 character.spellsKnown = spellsKnown;
-                console.log(character.spellsKnown)
             }
             character.magic = new MagicModel()
             character.magic.cantrips = this.props.options.cantrips;

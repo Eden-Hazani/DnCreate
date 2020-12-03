@@ -14,6 +14,7 @@ import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import userCharApi from '../../api/userCharApi';
 import { EquippedArmorModel } from '../../models/EquippedArmorModel';
+import { armorBonusCalculator } from './helperFunctions/armorBonusCalculator';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -130,6 +131,9 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
 
     armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
         let newArmorAc: number = null;
+        if (armorBonusesCalculationType === "none") {
+            newArmorAc = +armorAc
+        }
         if (armorBonusesCalculationType === "Medium Armor") {
             newArmorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
         }
@@ -138,19 +142,6 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         }
         if (armorBonusesCalculationType === "Heavy Armor") {
             newArmorAc = +armorAc
-        }
-        if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.constitution)
-        }
-        if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.wisdom)
-        }
-        if (this.state.character.pathFeatures.length > 0) {
-            this.state.character.pathFeatures.forEach(item => {
-                if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
-                    newArmorAc = (13 + this.state.character.modifiers.dexterity)
-                }
-            })
         }
         return newArmorAc
     }

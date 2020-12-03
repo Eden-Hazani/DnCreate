@@ -18,7 +18,8 @@ import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AdMobInterstitial } from 'expo-ads-admob'
-
+import NetInfo from '@react-native-community/netinfo'
+import { AppNoInternet } from '../components/AppNoInternet';
 
 interface CharacterHallState {
     characters: CharacterModel[]
@@ -26,6 +27,7 @@ interface CharacterHallState {
     loading: boolean
     error: boolean
     showAds: boolean
+    isInternet: boolean
     loadingAd: boolean
 }
 
@@ -35,9 +37,11 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     public interstitialAd: string;
     public bannerAd: string;
     static contextType = AuthContext;
+    private NetUnSub: any;
     constructor(props: any) {
         super(props)
         this.state = {
+            isInternet: true,
             loadingAd: false,
             showAds: store.getState().firstLoginAd,
             error: false,
@@ -45,6 +49,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             userInfo: this.context,
             characters: [],
         }
+        this.NetUnSub = NetInfo.addEventListener(netInfo => { this.setState({ isInternet: netInfo.isInternetReachable }) })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
         this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     }
@@ -107,47 +112,52 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         store.dispatch({ type: ActionType.SetInfoToChar, payload: character })
         this.props.navigation.navigate("SelectCharacter", { character: character, isDm: false })
     }
+    componentWillUnmount() {
+        this.NetUnSub()
+    }
 
     render() {
         return (
             <View>
-                {this.state.loading ?
-                    <View>
-                        <AppActivityIndicator visible={this.state.loading} />
-                        {this.state.loadingAd &&
-                            <View>
-                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Your one time session ad is loading</AppText>
-                                <AppText textAlign={'center'} color={Colors.whiteInDarkMode} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
-                            </View>
-                        }
-                    </View>
+                {!this.state.isInternet ? <AppNoInternet />
                     :
-                    <View>
-                        {this.state.error ? <AppError /> :
-                            <View>
-                                {this.state.characters.length === 0 ?
-                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                        <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
-                                    </View> :
-                                    <FlatList
-                                        data={this.state.characters}
-                                        keyExtractor={characters => characters._id.toString()}
-                                        renderItem={({ item }) => <ListItem
-                                            title={item.name}
-                                            subTitle={`${item.characterClass} ${item.race}`}
-                                            imageUrl={`${Config.serverUrl}/assets/${item.image}`}
-                                            direction={'row'}
-                                            padding={20} width={60} height={60}
-                                            headTextAlign={"left"}
-                                            subTextAlign={"left"}
-                                            justifyContent={"flex-start"} textDistanceFromImg={10}
-                                            renderRightActions={() =>
-                                                <ListItemDelete onPress={() =>
-                                                    Alert.alert("Delete", "Are you sure you want to delete this character? (this action is irreversible)", [{ text: 'Yes', onPress: () => this.handleDelete(item) }, { text: 'No' }])} />}
-                                            onPress={() => this.characterWindow(item)} />}
-                                        ItemSeparatorComponent={ListItemSeparator} />}
-                            </View>}
-                    </View>}
+                    this.state.loading ?
+                        <View>
+                            <AppActivityIndicator visible={this.state.loading} />
+                            {this.state.loadingAd &&
+                                <View>
+                                    <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Your one time session ad is loading</AppText>
+                                    <AppText textAlign={'center'} color={Colors.whiteInDarkMode} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
+                                </View>
+                            }
+                        </View>
+                        :
+                        <View>
+                            {this.state.error ? <AppError /> :
+                                <View>
+                                    {this.state.characters.length === 0 ?
+                                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                            <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
+                                        </View> :
+                                        <FlatList
+                                            data={this.state.characters}
+                                            keyExtractor={characters => characters._id.toString()}
+                                            renderItem={({ item }) => <ListItem
+                                                title={item.name}
+                                                subTitle={`${item.characterClass} ${item.race}`}
+                                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
+                                                direction={'row'}
+                                                padding={20} width={60} height={60}
+                                                headTextAlign={"left"}
+                                                subTextAlign={"left"}
+                                                justifyContent={"flex-start"} textDistanceFromImg={10}
+                                                renderRightActions={() =>
+                                                    <ListItemDelete onPress={() =>
+                                                        Alert.alert("Delete", "Are you sure you want to delete this character? (this action is irreversible)", [{ text: 'Yes', onPress: () => this.handleDelete(item) }, { text: 'No' }])} />}
+                                                onPress={() => this.characterWindow(item)} />}
+                                            ItemSeparatorComponent={ListItemSeparator} />}
+                                </View>}
+                        </View>}
             </View>
         )
     }

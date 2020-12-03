@@ -20,6 +20,9 @@ import { Colors } from '../../config/colors';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppText } from '../../components/AppText';
 import { AnimatedHorizontalList } from '../../components/AnimatedHorizontalList';
+import NetInfo from '@react-native-community/netinfo'
+import { AppNoInternet } from '../../components/AppNoInternet';
+
 const { width, height } = Dimensions.get('screen');
 
 
@@ -34,14 +37,17 @@ interface RaceListState {
     confirmed: boolean
     raceColors: string[]
     searchColor: string
+    isInternet: boolean
 }
 
 
 export class RaceList extends Component<{ props: any, navigation: any }, RaceListState> {
     private unsubscribeStore: Unsubscribe;
+    private NetUnSub: any;
     constructor(props: any) {
         super(props)
         this.state = {
+            isInternet: true,
             searchColor: Colors.pageBackground,
             raceColors: [],
             confirmed: false,
@@ -53,6 +59,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             refreshing: false,
             error: false
         }
+        this.NetUnSub = NetInfo.addEventListener(netInfo => { this.setState({ isInternet: netInfo.isInternetReachable }) })
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
             this.setState({ searchColor: Colors.pageBackground })
@@ -62,6 +69,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         this.getRacesFromServer();
     }
     componentWillUnmount() {
+        this.NetUnSub();
         this.unsubscribeStore()
     }
     getRaces = async () => {
@@ -145,34 +153,39 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     render() {
         return (
             <View>
-                {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
-                    this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                        <View>
-                            {this.state.error ? <>
-                                <AppError onPress={() => { this.getRaces() }} />
-                            </> :
-                                <View>
-                                    <View style={{
-                                        width: width / 2, position: "absolute", zIndex: 10,
-                                        alignSelf: 'center',
-                                        top: '1%',
-                                    }}>
-                                        <SearchBar
-                                            searchIcon={false}
-                                            containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
-                                            inputContainerStyle={{ backgroundColor: this.state.searchColor }}
-                                            lightTheme={this.state.searchColor === "#121212" ? false : true}
-                                            placeholder="Search For Race"
-                                            onChangeText={this.updateSearch}
-                                            value={this.state.search}
-                                        />
-                                    </View>
+                {!this.state.isInternet ?
+                    <View>
+                        <AppNoInternet />
+                    </View>
+                    :
+                    this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
+                        this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
+                            <View>
+                                {this.state.error ? <>
+                                    <AppError onPress={() => { this.getRaces() }} />
+                                </> :
                                     <View>
-                                        <AnimatedHorizontalList data={this.state.races} backDropColors={this.state.raceColors}
-                                            onPress={(val: any) => { this.pickRace(val) }} />
-                                    </View>
-                                </View>}
-                        </View>}
+                                        <View style={{
+                                            width: width / 2, position: "absolute", zIndex: 10,
+                                            alignSelf: 'center',
+                                            top: '1%',
+                                        }}>
+                                            <SearchBar
+                                                searchIcon={false}
+                                                containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
+                                                inputContainerStyle={{ backgroundColor: this.state.searchColor }}
+                                                lightTheme={this.state.searchColor === "#121212" ? false : true}
+                                                placeholder="Search For Race"
+                                                onChangeText={this.updateSearch}
+                                                value={this.state.search}
+                                            />
+                                        </View>
+                                        <View>
+                                            <AnimatedHorizontalList data={this.state.races} backDropColors={this.state.raceColors}
+                                                onPress={(val: any) => { this.pickRace(val) }} />
+                                        </View>
+                                    </View>}
+                            </View>}
             </View>
         )
     }

@@ -43,7 +43,7 @@ const ValidationSchema = Yup.object().shape({
 
 
 
-export class NewCharInfo extends Component<{ props: any, navigation: any }, NewCharInfoState> {
+export class NewCharInfo extends Component<{ route: any, navigation: any }, NewCharInfoState> {
     static contextType = AuthContext;
     private unsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -71,7 +71,7 @@ export class NewCharInfo extends Component<{ props: any, navigation: any }, NewC
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
         })
         setTimeout(() => {
-            this.props.navigation.navigate("ClassPick")
+            this.props.navigation.navigate("ClassPick", { race: this.props.route.params.race })
         }, 800);
         setTimeout(() => {
             this.setState({ confirmed: false })

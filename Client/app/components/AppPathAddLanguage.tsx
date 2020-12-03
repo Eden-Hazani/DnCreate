@@ -15,7 +15,6 @@ export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, 
         }
     }
     componentDidMount() {
-        console.log(this.props.languagesToPick)
         if (this.props.learnSpecificLanguage) {
             this.props.loadLanguage(this.props.amountOfLanguages)
             this.props.languagesToPick(false)

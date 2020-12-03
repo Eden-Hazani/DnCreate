@@ -98,7 +98,6 @@ export class AddCustomFeature extends Component<{ sendValues: any }, AddCustomFe
                                         let item = { ...featureList[index] }
                                         item.choice = array
                                         featureList[index] = item;
-                                        console.log(featureList)
                                         this.setState({ featureList })
                                     }} />
                                     <View>

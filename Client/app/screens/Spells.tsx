@@ -168,7 +168,6 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         if (character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
             let index = 0;
             for (let item of character.differentClassSpellsToPick) {
-                console.log(this.state.pickedSpell.level)
                 if (this.state.pickedSpell.classes.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
                     const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
                     if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {

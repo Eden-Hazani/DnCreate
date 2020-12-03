@@ -106,7 +106,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
 
     onFocus = () => {
-        this.setState({ characters: store.getState().characters })
+        this.setState({ characters: store.getState().characters }, () => {
+            this.clearStorageJunk(this.state.characters)
+        })
         this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
         store.dispatch({ type: ActionType.CleanCreator })
     }
@@ -168,7 +170,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 </View>
                                 <View style={styles.buttonsView}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
-                                        console.log(this.context.user)
                                         if (!this.state.activated && this.state.characters.length >= 1) {
                                             this.setState({ errorModal: true })
                                             return

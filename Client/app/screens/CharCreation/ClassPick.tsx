@@ -25,7 +25,7 @@ interface ClassPickState {
     confirmed: boolean
 }
 
-export class ClassPick extends Component<{ props: any, placeholder: string, navigation: any }, ClassPickState>{
+export class ClassPick extends Component<{ route: any, placeholder: string, navigation: any }, ClassPickState>{
     private UnsubscribeStore: Unsubscribe;
     private dragonClasses: any
     constructor(props: any) {
@@ -69,7 +69,7 @@ export class ClassPick extends Component<{ props: any, placeholder: string, navi
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
         })
         setTimeout(() => {
-            this.props.navigation.navigate("AttributePicking")
+            this.props.navigation.navigate("AttributePicking", { race: this.props.route.params.race })
         }, 800);
         setTimeout(() => {
             this.setState({ confirmed: false })

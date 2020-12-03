@@ -35,7 +35,6 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstK
                     character.spellsKnown = spellsKnown;
                 }
                 character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
-                console.log(character.spellsKnown)
             }
             character.spells[spellLevel].push({ spell: spell, removable: false });
         }

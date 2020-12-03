@@ -27,7 +27,6 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
 
     increase = () => {
         increaseRage(this.props.character._id, this.props.character.charSpecials.rageAmount).then((result: any) => {
-            console.log(result)
             this.setState({ rageRemaining: result })
         })
     }

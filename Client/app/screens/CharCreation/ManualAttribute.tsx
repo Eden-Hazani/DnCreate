@@ -9,6 +9,7 @@ import { AppFormField } from '../../components/forms/AppFormField';
 import { SubmitButton } from '../../components/forms/SubmitButton';
 import { CharacterModel } from '../../models/characterModel';
 import switchModifier from '../../../utility/abillityModifierSwitch';
+import { RaceModel } from '../../models/raceModel';
 
 
 
@@ -25,7 +26,7 @@ interface ManualAttributeState {
     character: CharacterModel
 }
 
-export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any, character: CharacterModel }, ManualAttributeState>{
+export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any, character: CharacterModel, race: RaceModel }, ManualAttributeState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -33,12 +34,14 @@ export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any
             character: this.props.character
         }
     }
+    componentDidMount() {
+    }
 
     applyChanges = (values: any) => {
         const character = { ...this.state.character }
         const attributeArray = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
         for (let attribute of attributeArray) {
-            character[attribute] = values[attribute]
+            character[attribute] = +values[attribute] + +this.props.race.abilityBonus[attribute]
             character.modifiers[attribute] = (switchModifier(parseInt(character[attribute])));
         }
         this.setState({ visible: false, character }, () => {

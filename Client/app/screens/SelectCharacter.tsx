@@ -30,6 +30,7 @@ import { AttackRollTutorial } from './charOptions/AttackRollTutorial';
 import { charHasMagic } from './charOptions/helperFunctions/charHasMagic';
 import { CompleteSkillList } from '../components/CompleteSkillList';
 import { racialArmorBonuses } from './charOptions/helperFunctions/racialArmorBonuses';
+import { armorBonusCalculator } from './charOptions/helperFunctions/armorBonusCalculator';
 
 /**
  * 
@@ -332,7 +333,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
-                                                    <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.equippedArmor.ac + racialArmorBonuses(this.state.character.race)}</AppText>
+                                                    <AppText color={Colors.totalWhite} fontSize={25}>{
+                                                        armorBonusCalculator(this.state.character, this.state.character.equippedArmor.ac, this.state.character.equippedArmor.armorBonusesCalculationType) + racialArmorBonuses(this.state.character.race)}</AppText>
                                                 </View>
                                                 <AppText>AC</AppText>
                                             </View>

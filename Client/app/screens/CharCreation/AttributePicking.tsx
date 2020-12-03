@@ -39,7 +39,7 @@ interface AttributePickingState {
     colorCodedGuideArray: any[]
 }
 
-export class AttributePicking extends Component<{ props: any, navigation: any }, AttributePickingState> {
+export class AttributePicking extends Component<{ route: any, navigation: any }, AttributePickingState> {
     private unsubscribeStore: Unsubscribe;
     navigationSubscription: any;
     constructor(props: any) {
@@ -396,7 +396,7 @@ export class AttributePicking extends Component<{ props: any, navigation: any },
                                     <AppButton backgroundColor={Colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
                                         width={Dimensions.get('screen').width / 3.2} fontSize={18} onPress={() => this.state.finishRolls ? alert("No rolls left!") : this.rollDice()} />
                                     <AttributeHelp />
-                                    <ManualAttribute character={this.state.characterInfo}
+                                    <ManualAttribute character={this.state.characterInfo} race={this.props.route.params.race}
                                         finishedRollsAndInsertInfo={(rolls: boolean, characterInfo: CharacterModel) => { this.setState({ finishRolls: rolls, characterInfo }) }} />
                                 </View>
                                 <View style={styles.dicePool}>

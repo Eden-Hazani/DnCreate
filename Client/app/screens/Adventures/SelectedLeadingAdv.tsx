@@ -102,8 +102,6 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 }
                 const userPicList: any = await adventureApi.getUserProfileImages(userArray)
                 const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
-                console.log(picList)
-                console.log(this.state.adventure.participants_id.length)
                 this.setState({ profilePicList: picList, loading: false })
             })
         })
