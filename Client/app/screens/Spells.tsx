@@ -21,6 +21,8 @@ import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import Slider from '@react-native-community/slider';
 import { AppConfirmation } from '../components/AppConfirmation';
 import { spellLevelReadingChanger } from './charOptions/helperFunctions/spellLevelReadingChanger';
+import AuthContext from '../auth/context';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 interface SpellsState {
@@ -41,6 +43,7 @@ interface SpellsState {
 }
 
 export class Spells extends Component<{ navigation: any, route: any }, SpellsState>{
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -147,6 +150,18 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         })
     }
 
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+    }
+
     addSpellToChar = () => {
         const character = { ...this.state.character };
         if (character.unrestrictedKnownSpells > 0 && !this.state.pickedSpell.classes.includes(character.spellCastingClass.toLowerCase())) {
@@ -161,7 +176,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
                 alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)
-                userCharApi.updateChar(this.state.character)
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
             })
             return;
         }
@@ -185,7 +200,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                             this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
                         }, 1200);
                         store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                        userCharApi.updateChar(this.state.character)
+                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
                     })
                     return;
                 }
@@ -206,7 +221,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                             this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
                         }, 1200);
                         store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                        userCharApi.updateChar(this.state.character)
+                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
                     })
                     return;
                 }
@@ -249,7 +264,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
             }, 1200);
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
         })
 
     }

@@ -1,7 +1,9 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
+import AuthContext from '../../auth/context';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
@@ -20,6 +22,7 @@ interface CharIdealsState {
 
 export class CharIdeals extends Component<{ route: any, navigation: any, updateIdeals: boolean }, CharIdealsState>{
     private UnsubscribeStore: Unsubscribe;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -101,7 +104,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                userCharApi.updateChar(this.state.characterInfo)
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
                 }, 800);
@@ -110,6 +113,18 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
                 }, 1100);
             })
         }
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.characterInfo._id) {
+                characters[index] = this.state.characterInfo;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     cancelUpdate = () => {

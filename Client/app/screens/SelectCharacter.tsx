@@ -31,6 +31,7 @@ import { charHasMagic } from './charOptions/helperFunctions/charHasMagic';
 import { CompleteSkillList } from '../components/CompleteSkillList';
 import { racialArmorBonuses } from './charOptions/helperFunctions/racialArmorBonuses';
 import { armorBonusCalculator } from './charOptions/helperFunctions/armorBonusCalculator';
+import AuthContext from '../auth/context';
 
 /**
  * 
@@ -58,6 +59,7 @@ interface SelectCharacterState {
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
     private UnsubscribeStore: Unsubscribe;
     navigationSubscription: any;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -90,6 +92,15 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     refreshData = async () => {
         this.setState({ loading: true })
+        if (await AsyncStorage.getItem('isOffline')) {
+            const stringChars = await AsyncStorage.getItem('offLineCharacterList');
+            const characters = JSON.parse(stringChars);
+            const character = characters.find((char: CharacterModel) => char._id === this.state.character._id)
+            this.setState({ character }, () => {
+                this.setState({ loading: false })
+            });
+            return;
+        }
         const response = await userCharApi.getChar(this.state.character._id);
         if (!response.ok) {
             errorHandler(response);
@@ -153,6 +164,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         return modifiers;
     }
 
+    updateOfflineChar = async (character: CharacterModel) => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === character._id) {
+                characters[index] = character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+    }
+
     setLevel = (level: number) => {
         let validLevel: number = level;
         if (level < this.state.character.level) {
@@ -168,6 +191,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: JSON.parse(character) })
                     this.setState({ character: JSON.parse(character), currentLevel: validLevel }, () => {
                         this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
+                        if (this.context.user._id === "Offline") {
+                            this.updateOfflineChar(this.state.character);
+                            this.setState({ currentHp: this.state.character.maxHp.toString() });
+                            this.refreshData();
+                            return;
+                        }
                         userCharApi.updateChar(this.state.character).then(() => {
                             this.setState({ currentHp: this.state.character.maxHp.toString() });
                             this.refreshData();
@@ -231,7 +260,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         }
         character.maxHp = maxHp;
         this.setState({ character }, async () => {
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineChar(this.state.character) : userCharApi.updateChar(this.state.character);
             const levelUpTreeFunc = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)
             if (levelUpTreeFunc) {
                 const { operation, action } = levelUpTreeFunc;
@@ -257,7 +286,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             this.setState({ character }, async () => {
                 const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
                 currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp.toString() });
-                userCharApi.updateChar(this.state.character)
+                this.context.user._id === "Offline" ? this.updateOfflineChar(this.state.character) : userCharApi.updateChar(this.state.character);
             })
         }
         const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);

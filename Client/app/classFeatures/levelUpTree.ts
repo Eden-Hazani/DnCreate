@@ -768,7 +768,9 @@ const Paladin = async (level: number, character: CharacterModel) => {
     let LevelUpFunction: any;
     switch (true) {
         case level === 1:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: false
+            };
             break;
         case level === 2:
             LevelUpFunction = {
@@ -878,7 +880,9 @@ const Ranger = async (level: number, character: CharacterModel) => {
     let LevelUpFunction: any;
     switch (true) {
         case level === 1:
-            LevelUpFunction = false;
+            LevelUpFunction = {
+                operation: false
+            };
             break;
         case level === 2:
             LevelUpFunction = {

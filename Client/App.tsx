@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { Colors } from './app/config/colors';
 import { I18nManager } from "react-native";
 import { StartAnimation } from './app/animations/StartAnimation';
+import OfflineNavigator from './app/navigators/OfflineNavigator';
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
@@ -33,6 +34,7 @@ interface AppState {
   isReady: boolean
   AppMainLoadAnimation: boolean
   colorScheme: boolean
+  offLineMode: boolean
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
@@ -44,6 +46,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   constructor(props: any) {
     super(props)
     this.state = {
+      offLineMode: false,
       AppMainLoadAnimation: false,
       isReady: false,
       user: new UserModel(),
@@ -63,15 +66,24 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       this.loadColors().then(async () => {
         store.dispatch({ type: ActionType.CleanCreator })
         await TokenHandler().then(async (user) => {
-          this.setState({ user }, async () => {
-            if (user !== null) {
+          if (user !== null && user._id !== "Offline") {
+            this.setState({ user }, async () => {
               const result = await authApi.isUserLogged();
               if (!result.ok) {
                 errorHandler(result);
                 return;
               }
+            })
+          }
+          if (user === null) {
+            const isOffline = await AsyncStorage.getItem("isOffline");
+            console.log(isOffline)
+            const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
+            if (JSON.parse(isOffline)) {
+              store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
+              this.setState({ user: offlineUser })
             }
-          });
+          }
           Font.loadAsync({
             'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
           }).then(() => this.setState({ fontsLoaded: true, AppMainLoadAnimation: true }, () => {
@@ -108,12 +120,17 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
 
 
   isUserLogged = async () => {
+    const isOffline = await AsyncStorage.getItem('isOffline');
+    if (JSON.parse(isOffline)) {
+      return;
+    }
     const result = await authApi.isUserLogged();
     if (result.status === 403) {
       errorHandler(result);
       return;
     }
   }
+
 
 
   render() {
@@ -128,7 +145,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
               :
               !this.state.fontsLoaded ? <AppLoading /> :
                 <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
-                  {user && user.username ? <AppNavigator /> : <AuthNavigator />}
+                  {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
                 </NavigationContainer>
             }
           </AuthContext.Provider>}

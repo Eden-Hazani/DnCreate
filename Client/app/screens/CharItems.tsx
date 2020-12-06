@@ -16,6 +16,8 @@ import ListItemDecreaseIncrease from '../components/ListItemDecreaseIncrease';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
 import { IconGen } from '../components/IconGen';
+import AuthContext from '../auth/context';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface CharItemsState {
     character: CharacterModel
@@ -33,6 +35,7 @@ interface CharItemsState {
 
 export class CharItems extends Component<{ navigation: any, route: any }, CharItemsState> {
     private UnsubscribeStore: Unsubscribe;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -55,6 +58,18 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         this.UnsubscribeStore()
     }
 
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+    }
+
 
 
     addItem = () => {
@@ -67,7 +82,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         character.items.push(item);
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
             this.setState({ addItemModal: false })
         })
 
@@ -79,7 +94,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         character.items = items
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
         })
     }
 
@@ -93,7 +108,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         })
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
         })
     }
 
@@ -110,7 +125,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         })
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
         })
     }
 
@@ -125,7 +140,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         character.currency.copper = +this.state.newCopper;
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
             this.setState({ changeCurrencyModal: false })
         })
     }

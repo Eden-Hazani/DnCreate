@@ -15,6 +15,7 @@ import { ActionType } from '../../redux/action-type';
 import userCharApi from '../../api/userCharApi';
 import { EquippedArmorModel } from '../../models/EquippedArmorModel';
 import { armorBonusCalculator } from './helperFunctions/armorBonusCalculator';
+import AuthContext from '../../auth/context';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -36,6 +37,7 @@ interface ArmorState {
 }
 
 export class Armor extends Component<{ navigation: any, route: any }, ArmorState>{
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -106,7 +108,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         character.equippedArmor = {
             id: '1',
             name: 'No Armor Equipped',
-            ac: this.armorBonuses(10, 'none'),
+            ac: 10,
             baseAc: 10,
             armorBonusesCalculationType: 'none',
             disadvantageStealth: false,
@@ -114,37 +116,42 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         }
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            userCharApi.updateChar(this.state.character)
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter();
+                return;
+            }
+            userCharApi.updateChar(this.state.character);
         });
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     equipSet = (set: EquippedArmorModel) => {
         const newSet = JSON.parse(JSON.stringify(set))
         const character = { ...this.state.character };
-        newSet.ac = this.armorBonuses(set.baseAc, set.armorBonusesCalculationType)
+        newSet.ac = +set.baseAc;
         character.equippedArmor = newSet;
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter();
+                return;
+            }
             userCharApi.updateChar(this.state.character)
         });
     }
 
-    armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
-        let newArmorAc: number = null;
-        if (armorBonusesCalculationType === "none") {
-            newArmorAc = +armorAc
-        }
-        if (armorBonusesCalculationType === "Medium Armor") {
-            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
-        }
-        if (armorBonusesCalculationType === "Light Armor") {
-            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity)
-        }
-        if (armorBonusesCalculationType === "Heavy Armor") {
-            newArmorAc = +armorAc
-        }
-        return newArmorAc
-    }
+
     render() {
         return (
             <ScrollView style={styles.container}>
@@ -278,7 +285,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                 }
                                 <View style={{ width: '65%' }}>
                                     <AppText fontSize={16}>Name: {armor.name}</AppText>
-                                    <AppText fontSize={16}>AC: {this.armorBonuses(armor.baseAc, armor.armorBonusesCalculationType)}</AppText>
+                                    <AppText fontSize={16}>AC: {armor.baseAc}</AppText>
                                     <AppText fontSize={16}>Type: {armor.armorType}</AppText>
                                     <AppText fontSize={16} >{armor.disadvantageStealth ? `This armor has stealth disadvantage` : `This armor does not have stealth disadvantage`}</AppText>
                                 </View>

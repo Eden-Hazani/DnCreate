@@ -7,6 +7,7 @@ import TokenHandler from "../auth/TokenHandler";
 import reduxToken from "../auth/reduxToken";
 import { CharacterModel } from "../models/characterModel";
 import jwtDecode from 'jwt-decode';
+import AsyncStorage from "@react-native-community/async-storage";
 
 export function reduce(currentState: AppState, action: Action): AppState {
 

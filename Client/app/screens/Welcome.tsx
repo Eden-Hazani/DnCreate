@@ -12,6 +12,8 @@ import { ActionType } from '../redux/action-type';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import Carousel from 'react-native-snap-carousel';
+import AuthContext from '../auth/context';
+import { UserModel } from '../models/userModel';
 
 
 interface WelcomeState {
@@ -24,6 +26,7 @@ interface WelcomeState {
 
 
 export class Welcome extends Component<{ navigation: any }, WelcomeState> {
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -33,18 +36,18 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
             darkModeOn: store.getState().colorScheme,
             carouselItems: [
                 {
-                    title: "Creating fifth edition characters has never been easier!",
-                    text: "Log in or Register to begin creating your own!",
+                    title: "Welcome to DnCreate!",
+                    text: "Please scroll down and choose how you want to experience the app!",
                     image: { img: require('../../assets/welcomeDragon.png') }
                 },
                 {
-                    title: "Start using DnCreate today and produce fully flushed out characters in minutes.",
+                    title: "DnCreate allows you to produce fully flushed out characters in minutes.",
                     text: "Level up and progress through your subclass choices and spellcasting abilities",
                     image: { img: require('../../assets/welcomeDragon2.png') }
                 },
                 {
                     title: "Connect with your friends using DnCreate's adventure mode.",
-                    text: "What are you waiting for? start using DnCreate for FREE",
+                    text: "Sign up now and unlock DnCreate's full potential",
                     image: { img: require('../../assets/welcomeDragon3.png') }
                 },
             ]
@@ -91,6 +94,14 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
         this.props.navigation.navigate("RaceList")
     }
 
+    useAppOffline = async () => {
+        const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
+        const { user, setUser } = this.context
+        store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
+        setUser(offlineUser);
+        await AsyncStorage.setItem('isOffline', JSON.stringify(true));
+    }
+
     render() {
         return (
             <ScrollView style={{ flex: 1 }}>
@@ -107,9 +118,20 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                         itemWidth={Dimensions.get("screen").width}
                                     />
                                 </View>
-                                <View style={styles.buttonsView}>
-                                    <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("Login")} borderRadius={100} width={100} height={100} title={"Login"} />
-                                    <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ newUserModal: true }) }} borderRadius={100} width={100} height={100} title={"New User?"} />
+                                <View style={{ justifyContent: "center", alignItems: "center", borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, margin: 10, padding: 10 }}>
+                                    <AppText fontSize={18} textAlign={'center'}>If you wish to fully utilize DnCreate's abilities please create a new user or log into your existing one</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>It's completely FREE</AppText>
+                                    <View style={styles.buttonsView}>
+                                        <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("Login")} borderRadius={100} width={100} height={100} title={"Login"} />
+                                        <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ newUserModal: true }) }} borderRadius={100} width={100} height={100} title={"New User?"} />
+                                    </View>
+                                </View>
+                                <View style={{ justifyContent: "center", alignItems: "center", borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, margin: 10, padding: 10 }}>
+                                    <AppText fontSize={18} textAlign={'center'}>If you only wish to create characters for yourself and not use DnCreate online features</AppText>
+                                    <View style={styles.buttonsView}>
+                                        <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.berries}
+                                            onPress={() => this.useAppOffline()} borderRadius={100} width={100} height={100} title={"Use Offline"} />
+                                    </View>
                                 </View>
                                 <Modal visible={this.state.newUserModal} animationType={"slide"}>
                                     <View style={{ flex: 1, paddingTop: 25, backgroundColor: Colors.pageBackground }} >
@@ -208,9 +230,11 @@ const styles = StyleSheet.create({
     },
     buttonsView: {
         flexDirection: "row",
+        width: '100%',
         justifyContent: "space-around",
         alignItems: "center",
-        paddingBottom: 20
+        marginTop: 10,
+        paddingBottom: 10
 
     }, button: {
         elevation: 10,

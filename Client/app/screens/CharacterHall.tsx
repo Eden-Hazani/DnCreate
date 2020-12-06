@@ -61,39 +61,83 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             if (this.state.showAds) {
                 this.setState({ loading: true, loadingAd: true })
                 AdMobInterstitial.setAdUnitID(this.interstitialAd);
-                AdMobInterstitial.requestAdAsync().then(() => {
+                AdMobInterstitial.requestAdAsync().then(async () => {
                     AdMobInterstitial.showAdAsync().then(async () => {
                         this.setState({ loading: false, loadingAd: false })
-                        const response = await userCharApi.getChars(this.context.user._id);
-                        const characters = response.data;
-                        this.setState({ characters, error: errorHandler(response) });
+                        if (this.context.user._id === "Offline") {
+                            this.loadOfflineChars()
+                        }
+                        if (this.context.user._id !== "Offline") {
+                            const response = await userCharApi.getChars(this.context.user._id);
+                            const characters = response.data;
+                            this.setState({ characters, error: errorHandler(response) });
+                        }
                         store.dispatch({ type: ActionType.firstLoginAd });
                     }).catch((err) => console.log(err))
                 }).catch((err) => console.log(err))
             } else {
                 this.setState({ loading: true })
-                const response = await userCharApi.getChars(this.context.user._id);
+                if (this.context.user._id === "Offline") {
+                    this.loadOfflineChars()
+                }
+                if (this.context.user._id !== "Offline") {
+                    const response = await userCharApi.getChars(this.context.user._id);
+                    const characters = response.data;
+                    this.setState({ characters, error: errorHandler(response) });
+                }
                 this.setState({ loading: false })
-                const characters = response.data;
-                this.setState({ characters, error: errorHandler(response) });
             }
         } catch (err) {
             console.log(err)
         }
     }
 
+    loadOfflineChars = async () => {
+        const characters = await AsyncStorage.getItem('offLineCharacterList');
+        if (!characters) {
+            this.setState({ characters: [] });
+            return
+        }
+        for (let item of JSON.parse(characters)) {
+            console.log(item._id)
+        }
+        this.setState({ characters: JSON.parse(characters) });
+    }
+
     onFocus = async () => {
         if (!this.state.showAds) {
             this.setState({ loading: true })
-            const response = await userCharApi.getChars(this.context.user._id);
+            if (this.context.user._id === "Offline") {
+                this.loadOfflineChars()
+            }
+            if (this.context.user._id !== "Offline") {
+                const response = await userCharApi.getChars(this.context.user._id);
+                const characters = response.data;
+                this.setState({ characters, error: errorHandler(response) });
+            }
             this.setState({ loading: false })
-            const characters = response.data;
-            this.setState({ characters, error: errorHandler(response) });
         }
     }
 
 
     handleDelete = async (character: CharacterModel) => {
+        if (this.context.user._id === "Offline") {
+            for (let item of this.state.characters) {
+                if (item._id === character._id) {
+                    const characters = this.state.characters.filter(m => m._id !== item._id)
+                    this.setState({ characters })
+                }
+            }
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            const characters = JSON.parse(stringifiedChars);
+            const newCharacters = characters.filter((char: CharacterModel) => char._id !== character._id);
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(newCharacters))
+            for (let level = 1; level < 20; level++) {
+                await AsyncStorage.removeItem(`current${character._id}level${level}`)
+            }
+            AsyncStorage.removeItem(`notes${character._id}`)
+            return;
+        }
         for (let item of this.state.characters) {
             if (item._id === character._id) {
                 const characters = this.state.characters.filter(m => m._id !== item._id)
@@ -115,6 +159,8 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     componentWillUnmount() {
         this.NetUnSub()
     }
+
+
 
     render() {
         return (

@@ -9,6 +9,8 @@ import { store } from '../../redux/store';
 import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { ActionType } from '../../redux/action-type';
+import AuthContext from '../../auth/context';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface SaveCharacterState {
     characterInfo: CharacterModel
@@ -17,6 +19,7 @@ interface SaveCharacterState {
 
 export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterState>{
     private UnsubscribeStore: Unsubscribe;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -31,7 +34,19 @@ export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterS
     }
 
     componentDidMount() {
-        userCharApi.updateChar(this.state.characterInfo);
+        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo);
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.characterInfo._id) {
+                characters[index] = this.state.characterInfo;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     home = () => {

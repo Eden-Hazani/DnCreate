@@ -22,6 +22,7 @@ interface ClassPickState {
     pickedClass: ClassModel
     characterInfo: CharacterModel
     error: boolean
+    isUserOffline: boolean
     confirmed: boolean
 }
 
@@ -31,6 +32,7 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
     constructor(props: any) {
         super(props)
         this.state = {
+            isUserOffline: false,
             confirmed: false,
             loading: false,
             error: false,
@@ -63,7 +65,7 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
     insertInfoAndContinue = () => {
         const characterInfo = { ...this.state.characterInfo };
         characterInfo.characterClass = this.state.pickedClass.name;
-        characterInfo.characterClassId = this.state.pickedClass._id as any;
+        this.state.isUserOffline ? characterInfo.characterClassId = this.state.pickedClass : characterInfo.characterClassId = this.state.pickedClass._id as any;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
@@ -75,7 +77,9 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
             this.setState({ confirmed: false })
         }, 1100);
     }
-    componentDidMount() {
+    async componentDidMount() {
+        const isOffline = await AsyncStorage.getItem('isOffline');
+        this.setState({ isUserOffline: JSON.parse(isOffline) })
         this.getClasses()
     }
 

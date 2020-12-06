@@ -12,12 +12,26 @@ export function armorBonusCalculator(character: CharacterModel, armorAc: number,
         case character.characterClass === "Barbarian" && armorBonusesCalculationType === "none":
             newArmorAc = (10 + character.modifiers.dexterity + +character.modifiers.constitution);
             break;
-        case character.pathFeatures.length > 0 && character.path?.name === "Draconic Bloodline":
+        case character.pathFeatures?.length > 0 && character.path?.name === "Draconic Bloodline":
             character.pathFeatures.forEach(item => {
                 if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
                     newArmorAc = (13 + character.modifiers.dexterity)
                 }
             })
+            break;
+        case armorBonusesCalculationType === "none":
+            newArmorAc = character.equippedArmor?.ac + +character.modifiers.dexterity
+            break;
+        case armorBonusesCalculationType === "Medium Armor":
+            newArmorAc = +armorAc + (character.modifiers.dexterity >= 2 ? 2 : character.modifiers.dexterity);
+            break;
+        case armorBonusesCalculationType === "Light Armor":
+            newArmorAc = +armorAc + (character.modifiers.dexterity);
+            break;
+        case armorBonusesCalculationType === "Heavy Armor":
+            newArmorAc = +armorAc
+            break;
     }
     return newArmorAc
 }
+

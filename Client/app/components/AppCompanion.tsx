@@ -1,8 +1,10 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Platform, Dimensions } from 'react-native';
 import switchModifier from '../../utility/abillityModifierSwitch';
 import skillModifier from '../../utility/skillModifier';
 import userCharApi from '../api/userCharApi';
+import AuthContext from '../auth/context';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { CompanionModel } from '../models/companionModel';
@@ -28,6 +30,7 @@ const skillList: string[] = ['Animal Handling', 'Athletics', 'Intimidation', 'Na
     , 'Stealth', 'Arcana', 'History', 'Investigation', 'Religion', 'Insight', 'Medicine', 'Deception', 'Performance', 'Persuasion'];
 
 export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, character: CharacterModel, proficiency: any, pickedIndex: number }, AppCompanionState> {
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -70,8 +73,24 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
         character.charSpecials.companion[this.props.pickedIndex].modifiers.charisma = modifiers[5];
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter();
+                return;
+            }
             userCharApi.updateChar(this.state.character)
         })
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     componentDidMount() {
@@ -118,6 +137,10 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
         }
         this.setState({ loading: false, character, clickedSkills }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter();
+                return;
+            }
             userCharApi.updateChar(this.state.character)
         })
     }
@@ -163,6 +186,10 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
         }
         this.props.closeModal(false)
         this.setState({ character }, () => {
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter();
+                return;
+            }
             userCharApi.updateChar(this.state.character)
         })
     }

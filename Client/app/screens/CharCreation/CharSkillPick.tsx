@@ -19,7 +19,7 @@ import authApi from '../../api/authApi';
 import reduxToken from '../../auth/reduxToken';
 import AuthContext from '../../auth/context';
 import { UserModel } from '../../models/userModel';
-
+import { SpellsModel } from '../../models/spellsModel';
 
 interface CharSkillPickState {
     characterInfo: CharacterModel
@@ -108,7 +108,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         characterInfo.equippedArmor = {
             id: '1',
             name: 'No Armor Equipped',
-            ac: (10 + +characterInfo.modifiers.dexterity),
+            ac: 10,
             baseAc: 10,
             armorBonusesCalculationType: 'none',
             disadvantageStealth: false,
@@ -136,8 +136,75 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         this.sendInfo(characterInfo)
     }
 
-    sendInfo = (characterInfo: CharacterModel) => {
+    sendInfo = async (characterInfo: CharacterModel) => {
         characterInfo.user_id = this.state.userInfo._id;
+        // offline Saving
+        if (this.context.user._id === "Offline") {
+            characterInfo.personalityTraits = [];
+            characterInfo.flaws = [];
+            characterInfo.bonds = [];
+            characterInfo.backStory = "";
+            characterInfo.ideals = [];
+            characterInfo.magic = {
+                cantrips: null,
+                firstLevelSpells: null,
+                secondLevelSpells: null,
+                thirdLevelSpells: null,
+                forthLevelSpells: null,
+                fifthLevelSpells: null,
+                sixthLevelSpells: null,
+                seventhLevelSpells: null,
+                eighthLevelSpells: null,
+                ninthLevelSpells: null,
+            }
+            characterInfo.level = 1;
+            characterInfo.items = [];
+            characterInfo.currency = {
+                gold: 0,
+                silver: 0,
+                copper: 0
+            }
+            characterInfo.feats = [];
+            characterInfo.pathFeatures = [];
+            characterInfo.spells = new SpellsModel();
+            characterInfo.spells.cantrips = [];
+            characterInfo.spells.firstLevelSpells = [];
+            characterInfo.spells.secondLevelSpells = [];
+            characterInfo.spells.thirdLevelSpells = [];
+            characterInfo.spells.forthLevelSpells = [];
+            characterInfo.spells.fifthLevelSpells = [];
+            characterInfo.spells.sixthLevelSpells = [];
+            characterInfo.spells.seventhLevelSpells = [];
+            characterInfo.spells.eighthLevelSpells = [];
+            characterInfo.spells.ninthLevelSpells = [];
+            characterInfo.addedWeaponProf = [];
+            characterInfo.addedArmorProf = [];
+            characterInfo.differentClassSpellsToPick = [];
+            characterInfo.nonClassAvailableSpells = [];
+            characterInfo._id = Math.floor(100000000 + Math.random() * 900000000).toString();
+            this.setState({ characterInfo, loading: true }, async () => {
+                const stringedCharacters = await AsyncStorage.getItem('offLineCharacterList');
+                if (!stringedCharacters) {
+                    await AsyncStorage.setItem(`offLineCharacterList`, JSON.stringify([this.state.characterInfo]))
+                }
+                if (stringedCharacters) {
+                    const characters = JSON.parse(stringedCharacters);
+                    characters.push(this.state.characterInfo);
+                    await AsyncStorage.setItem(`offLineCharacterList`, JSON.stringify(characters))
+                }
+                this.setState({ confirmed: true, loading: false })
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                store.dispatch({ type: ActionType.SetCharacters, payload: [this.state.characterInfo] })
+                await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
+                setTimeout(() => {
+                    this.props.navigation.navigate("CharBackstory", { updateStory: false });
+                }, 800);
+                setTimeout(() => {
+                    this.setState({ confirmed: false })
+                }, 1100);
+            })
+            return;
+        }
         this.setState({ characterInfo }, async () => {
             if (store.getState().beforeRegisterChar.name) {
                 store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })

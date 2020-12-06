@@ -20,5 +20,5 @@ export enum ActionType {
     ResetCharSkillsToLowerLevel,
     firstLoginAd,
     StartAsNonUser,
-    colorScheme
+    colorScheme,
 }

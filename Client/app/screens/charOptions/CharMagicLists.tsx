@@ -1,6 +1,8 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
 import userCharApi from '../../api/userCharApi';
+import AuthContext from '../../auth/context';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
@@ -19,6 +21,7 @@ interface CharMagicListsState {
 }
 
 export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, character: CharacterModel, spells: any, level: any }, CharMagicListsState> {
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -36,8 +39,20 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
         this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             this.props.reloadChar()
-            userCharApi.updateChar(this.state.character)
+            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
         })
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     render() {

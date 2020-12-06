@@ -14,6 +14,7 @@ import { SubmitButton } from '../../components/forms/SubmitButton';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { AppConfirmation } from '../../components/AppConfirmation';
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 interface NewCharInfoState {
@@ -23,6 +24,21 @@ interface NewCharInfoState {
 
 const ValidationSchema = Yup.object().shape({
     fullName: Yup.string().required().test('test-name', 'Cannot have the same same of an existing character', async function (value) {
+        if (store.getState().nonUser) { return true }
+        const isOffline = await AsyncStorage.getItem('isOffline');
+        if (isOffline) {
+            const stringedCharacters = await AsyncStorage.getItem('offLineCharacterList');
+            if (!stringedCharacters) {
+                return true
+            }
+            const characters = JSON.parse(stringedCharacters)
+            for (let char of characters) {
+                if (char.name === value) {
+                    return false
+                }
+            }
+            return true;
+        }
         if (store.getState().nonUser) { return true }
         const response = await userCharApi.validateCharName(value, this.parent.user_id);
         if (response.data) {

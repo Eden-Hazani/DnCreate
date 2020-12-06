@@ -27,6 +27,7 @@ import { spellLevelChanger } from './helperFunctions/SpellLevelChanger';
 import { AppChangePathChoiceAtLevelUp } from '../../components/AppChangePathChoiceAtLevelUp';
 import { allowedChangingPaths, pathChoiceChangePicker } from '../../classFeatures/pathChoiceChnagePicker';
 import { addRacialSpells } from './helperFunctions/addRacialSpells';
+import AuthContext from '../../auth/context';
 
 
 interface LevelUpOptionsState {
@@ -90,6 +91,7 @@ interface LevelUpOptionsState {
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -196,10 +198,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 character.magic.ninthLevelSpells = this.props.options.spells[8];
             }
             const beforeAnyChanges = JSON.parse(JSON.stringify(character))
-            this.setState({ character, beforeAnyChanges }, () => {
+            this.setState({ character, beforeAnyChanges }, async () => {
                 this.setAvailableMagicSlots()
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-                userCharApi.updateChar(this.state.character);
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
             })
         }
         if (this.props.character.level === 1) {
@@ -601,7 +603,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
             newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.wisdom)
         }
-        if (this.state.character.pathFeatures.length > 0) {
+        if (this.state.character.pathFeatures?.length > 0) {
             this.state.character.pathFeatures.forEach(item => {
                 if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
                     newArmorAc = (13 + +this.state.character.modifiers.dexterity)
@@ -829,7 +831,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             character.charSpecials.warlockPactBoon = this.state.pact;
         }
-        this.setState({ character }, () => {
+        this.setState({ character }, async () => {
             const character = { ...this.state.character };
             const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
             const modifiers = Object.values(this.state.character.modifiers);
@@ -846,11 +848,30 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 character.equippedArmor.ac = this.armorBonuses(character.equippedArmor.baseAc, character.equippedArmor.armorBonusesCalculationType)
                 this.setState({ character })
             }
+            if (this.context.user._id === "Offline") {
+                this.updateOfflineCharacter().then(() => {
+                    this.props.refresh()
+                    this.props.close(false);
+                })
+                return
+            }
             userCharApi.updateChar(this.state.character).then(() => {
                 this.props.refresh()
                 this.props.close(false);
             })
         })
+    }
+
+    updateOfflineCharacter = async () => {
+        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+        const characters = JSON.parse(stringifiedChars);
+        for (let index in characters) {
+            if (characters[index]._id === this.state.character._id) {
+                characters[index] = this.state.character;
+                break;
+            }
+        }
+        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     extractCustomPathJson = async (pathName: any) => {
@@ -894,6 +915,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     <View>
                         {this.props.options.pathSelector ?
                             <View>
+                                {console.log(this.props.options)}
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
                                     <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can pick a path</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>It is highly recommended to search the many guides online in order to find the path that suites you best.</AppText>

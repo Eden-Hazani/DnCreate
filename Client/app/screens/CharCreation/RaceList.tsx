@@ -38,6 +38,7 @@ interface RaceListState {
     raceColors: string[]
     searchColor: string
     isInternet: boolean
+    isUserOffline: boolean
 }
 
 
@@ -47,6 +48,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     constructor(props: any) {
         super(props)
         this.state = {
+            isUserOffline: false,
             isInternet: true,
             searchColor: Colors.pageBackground,
             raceColors: [],
@@ -65,7 +67,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             this.setState({ searchColor: Colors.pageBackground })
         })
     }
-    componentDidMount() {
+    async componentDidMount() {
+        const isOffline = await AsyncStorage.getItem('isOffline');
+        this.setState({ isUserOffline: JSON.parse(isOffline) })
         this.getRacesFromServer();
     }
     componentWillUnmount() {
@@ -131,7 +135,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.charisma = race.abilityBonus.charisma;
         characterInfo.wisdom = race.abilityBonus.wisdom;
         characterInfo.intelligence = race.abilityBonus.intelligence;
-        characterInfo.raceId = race._id as any;
+        this.state.isUserOffline ? characterInfo.raceId = race : characterInfo.raceId = race._id as any
         characterInfo.race = race.name;
         characterInfo.image = race.image;
         this.setState({ confirmed: true })

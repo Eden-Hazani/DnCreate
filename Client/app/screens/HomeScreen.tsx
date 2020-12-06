@@ -74,6 +74,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
     async componentDidMount() {
         try {
+            const isOffline = await AsyncStorage.getItem('isOffline');
             if (store.getState().nonUser) {
                 this.setState({ loading: true }, () => {
                     setTimeout(() => {
