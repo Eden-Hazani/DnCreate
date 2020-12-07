@@ -77,7 +77,6 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           }
           if (user === null) {
             const isOffline = await AsyncStorage.getItem("isOffline");
-            console.log(isOffline)
             const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
             if (JSON.parse(isOffline)) {
               store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })

@@ -32,7 +32,7 @@ export class PaladinLayOnHandsCounter extends Component<{ character: CharacterMo
 
     pushChange = () => {
         changeLayOnHands(this.props.character._id, this.state.newValue).then(result => {
-            this.setState({ changeWindow: result.stayOpen, layOnHandsTotal: result.newNumber })
+            this.setState({ changeWindow: result.stayOpen, layOnHandsRemaining: result.newNumber })
         })
     }
 

@@ -4,6 +4,7 @@ import { clericDomainSpellsPicker } from "./clericDomainSpellsPicker";
 import { druidCircleSpellsPicker } from "./druidCircleSpellsPicker";
 import { druidPathSpellPicker } from "./druidPathSpellPicker";
 import { paladinOathSpellsPicker } from "./paladinOathSpellsPicker";
+import { rangerConclaveSpells } from "./rangerConclaveSpells";
 
 
 const Barbarian = async (level: number, character: CharacterModel) => {
@@ -649,7 +650,9 @@ const Monk = async (level: number, character: CharacterModel) => {
     const customPaths = await AsyncStorage.getItem('Monk-CustomPath')
     let paths: any[] = [{ name: "Way of the Four Elements", description: "You follow a monastic tradition that teaches you to harness the elements. When you focus your ki, you can align yourself with the forces of creation and bend the four elements to your will, using them as an extension of your body. Some members of this tradition dedicate themselves to a single element, but others weave the elements together." },
     { name: "Way of the Open Hand", description: "Monks of the Way of the Open Hand are the ultimate masters of martial arts combat, whether armed or unarmed. They learn techniques to push and trip their opponents, manipulate ki to heal damage to their bodies, and practice advanced meditation that can protect them from harm." },
-    { name: "Way of the Shadow", description: "Monks of the Way of Shadow follow a tradition that values stealth and subterfuge. These monks might be called ninjas or shadowdancers, and they serve as spies and assassins. Sometimes the members of a ninja monastery are family members, forming a clan sworn to secrecy about their arts and missions. Other monasteries are more like thieves' guilds, hiring out their services to nobles, rich merchants, or anyone else who can pay their fees." }]
+    { name: "Way of the Shadow", description: "Monks of the Way of Shadow follow a tradition that values stealth and subterfuge. These monks might be called ninjas or shadowdancers, and they serve as spies and assassins. Sometimes the members of a ninja monastery are family members, forming a clan sworn to secrecy about their arts and missions. Other monasteries are more like thieves' guilds, hiring out their services to nobles, rich merchants, or anyone else who can pay their fees." },
+    { name: "Way of the Astral Self", description: "A monk who follows the Way of the Astral Self believes their body is an illusion. They see their ki as a representation of their true form, an astral self. This astral self has the capacity to be a force of order or disorder, with some monasteries training students to use their power to protect the weak and other instructing aspirants in how to manifest their true selves in service to the mighty." },
+    { name: "Way of Mercy", description: "Monks of the Way of Mercy learn to manipulate the life force of others to bring aid to those in need. They are wandering physicians to the poor and hurt. However, to those beyond their help, they bring a swift end as an act of mercy. Those who follow the Way of Mercy might be members of a religious order, administering to the needy and making grim choices rooted in reality rather than idealism. Some might be gentle-voiced healers, beloved by their communities, while others might be masked bringers of macabre mercies." }]
     paths = customPaths !== null ? paths.concat(JSON.parse(customPaths)) : paths;
     let LevelUpFunction: any;
     switch (true) {
@@ -760,10 +763,12 @@ const Monk = async (level: number, character: CharacterModel) => {
 const Paladin = async (level: number, character: CharacterModel) => {
     const customPaths = await AsyncStorage.getItem('Paladin-CustomPath')
     let fightingStyle: any[] = [{ name: 'Defense', description: 'While you are wearing armor, you gain a +1 bonus to AC.' }, { name: 'Great Weapon Fighting', description: 'When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2. The weapon must have the two-handed or versatile property for you to gain this benefit.' },
-    { name: 'Protection', description: 'When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.' }]
+    { name: 'Protection', description: 'When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.' }, { name: "Blind Fighting", description: " You have blindsight with a range of 10 feet. Within that range, you can effectively see anything that isn't behind total cover, even if you're blinded or in darkness. Moreover, you can see an invisible creature within that range, unless the creature successfully hides from you." }]
     let paths: any[] = [{ name: "Oath of Devotion", description: "The Oath of Devotion binds a paladin to the loftiest ideals of justice, virtue, and order. Sometimes called cavaliers, white knights, or holy warriors, these paladins meet the ideal of the knight in shining armor, acting with honor in pursuit of justice and the greater good." },
     { name: "Oath of Vengeance", description: "The Oath of Vengeance is a solemn commitment to punish those who have committed a grievous sin. When evil forces slaughter helpless villagers, when an entire people turns against the will of the gods, when a thieves' guild grows too violent and powerful, when a dragon rampages through the countryside – at times like these, paladins arise and swear an Oath of Vengeance to set right that which has gone wrong." },
-    { name: "Oath of the Ancients", description: "The Oath of the Ancients is as old as the race of elves and the rituals of the druids. Sometimes called fey knights, green knights, or horned knights, paladins who swear this oath cast their lot with the side of the light in the cosmic struggle against darkness because they love the beautiful and life-giving things of the world, not necessarily because they believe in principles of honor, courage, and justice." }]
+    { name: "Oath of the Ancients", description: "The Oath of the Ancients is as old as the race of elves and the rituals of the druids. Sometimes called fey knights, green knights, or horned knights, paladins who swear this oath cast their lot with the side of the light in the cosmic struggle against darkness because they love the beautiful and life-giving things of the world, not necessarily because they believe in principles of honor, courage, and justice." },
+    { name: "Oath of Glory", description: "Paladins who take the Oath of Glory believe they and their companions are destined to achieve glory through deeds of heroism. They train diligently and encourage their companions so they're all ready when destiny calls." },
+    { name: "Oath of the Watchers", description: "The Oath of the Watchers binds paladins to protect mortal realms from the predations of extraplanar creatures, many of which can lay waste to mortal soldiers. Thus, the Watchers hone their minds, spirits, and bodies to be the ultimate weapons against such threats. Paladins who follow the Watchers' oath are ever vigilant in spotting the influence of extraplanar forces, often establishing a network of spies and informants to gather information on suspected cults. To a Watcher, keeping a healthy suspicion and awareness about one's surroundings is as natural as wearing armor in battle." }]
     paths = customPaths !== null ? paths.concat(JSON.parse(customPaths)) : paths;
     let LevelUpFunction: any;
     switch (true) {
@@ -789,7 +794,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 5:
             LevelUpFunction = {
-                operation: true, action: { spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
             }
             break;
         case level === 6:
@@ -809,7 +814,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 9:
             LevelUpFunction = {
-                operation: true, action: { spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
             }
             break;
         case level === 10:
@@ -829,7 +834,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 13:
             LevelUpFunction = {
-                operation: true, action: { spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
             }
             break;
         case level === 14:
@@ -849,7 +854,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 17:
             LevelUpFunction = {
-                operation: true, action: { spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
             }
             break;
         case level === 18:
@@ -875,7 +880,10 @@ const Ranger = async (level: number, character: CharacterModel) => {
     let fightingStyle: any[] = [{ name: 'Defense', description: 'While you are wearing armor, you gain a +1 bonus to AC.' }, { name: 'Archery', description: 'You gain a +2 bonus to attack rolls you make with ranged weapons.' },
     { name: 'Dueling', description: 'When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.' }, { name: "Two-Weapon Fighting", description: "When you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack." }]
     let paths: any[] = [{ name: "Beast Master Conclave", description: "Many rangers are more at home in the wilds than in civilization, to the point where animals consider them kin. Rangers of the Beast Conclave develop a close bond with a beast, then further strengthen that bond through the use of magic." },
-    { name: "Hunter Conclave", description: "Some rangers seek to master weapons to better protect civilization from the terrors of the wilderness. Members of the Hunter Conclave learn specialized fighting techniques for use against the most dire threats, from rampaging ogres and hordes of orcs to towering giants and terrifying dragons." }]
+    { name: "Hunter Conclave", description: "Some rangers seek to master weapons to better protect civilization from the terrors of the wilderness. Members of the Hunter Conclave learn specialized fighting techniques for use against the most dire threats, from rampaging ogres and hordes of orcs to towering giants and terrifying dragons." },
+    { name: "Monster Slayer Conclave", description: "You have dedicated yourself to hunting down creatures of the night and wielders of grim magic. A monster slayer seeks out vampires, dragons, evil fey, fiends, and other magical threats. Trained in supernatural techniques to overcome such monsters, slayers are experts at unearthing and defeating mighty, mystical foes." },
+    { name: "Swarmkeeper Conclave", description: "Feeling a deep connection to the environment around them, some rangers reach out through their magical connection to the world and bond with a swarm of nature spirits. The swarm becomes a potent force in battle, as well as helpful company for the ranger. Some Swarmkeepers are outcasts or hermits, keeping to themselves and their attendant swarms rather than dealing with the discomfort of others. " },
+    { name: "Fey Wanderer Conclave", description: "A fey mystique surrounds you, thanks to the boon of an archfey, the shining fruit you ate from a talking tree, the magic spring you swam in, or some other auspicious event. However you acquired your fey magic, you are now a Fey Wanderer, a ranger who represents both the mortal and the fey realms. As you wander the multiverse, your joyful laughter brightens the hearts of the downtrodden, and your martial prowess strikes terror in your foes, for great is the mirth of the fey and dreadful is their fury." }]
     paths = customPaths !== null ? paths.concat(JSON.parse(customPaths)) : paths;
     let LevelUpFunction: any;
     switch (true) {
@@ -891,92 +899,104 @@ const Ranger = async (level: number, character: CharacterModel) => {
             break;
         case level === 3:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 3, spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], pathSelector: paths, pathFeature: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown) + 1, spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], pathSelector: paths, pathFeature: true }
             }
             break;
         case level === 4:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 3, spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
             }
             break;
         case level === 5:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 4, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], pathFeature: character.path.name === "Hunter Conclave" ? true : false }
+                operation: true, action: {
+                    spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], pathFeature: character.path.name === "Hunter Conclave" ? true : false,
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                }
             }
             break;
         case level === 6:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 4, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0] }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 2, 0, 0, 0, 0, 0, 0, 0] }
             }
             break;
         case level === 7:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 5, spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], pathFeature: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], pathFeature: true }
             }
             break;
         case level === 8:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 5, spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
             }
             break;
         case level === 9:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 6, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0] }
+                operation: true, action: {
+                    spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0],
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                }
             }
             break;
         case level === 10:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 6, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0] }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 2, 0, 0, 0, 0, 0, 0] }
             }
             break;
         case level === 11:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 7, spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], pathFeature: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], pathFeature: true }
             }
             break;
         case level === 12:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 7, spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], abilityPointIncrease: true }
             }
             break;
         case level === 13:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 8, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0] }
+                operation: true, action: {
+                    spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0],
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                }
             }
             break;
         case level === 14:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 8, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0] }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 3, 1, 0, 0, 0, 0, 0] }
             }
             break;
         case level === 15:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 9, spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], pathFeature: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], pathFeature: true }
             }
             break;
         case level === 16:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 9, spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], abilityPointIncrease: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], abilityPointIncrease: true }
             }
             break;
         case level === 17:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 10, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0] }
+                operation: true, action: {
+                    spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0],
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                }
             }
             break;
         case level === 18:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 10, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0] }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 3, 3, 1, 0, 0, 0, 0] }
             }
             break;
         case level === 19:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 11, spells: [4, 3, 3, 3, 2, 0, 0, 0, 0], abilityPointIncrease: true }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 3, 2, 0, 0, 0, 0], abilityPointIncrease: true }
             }
             break;
         case level === 20:
             LevelUpFunction = {
-                operation: true, action: { spellsKnown: 11, spells: [4, 3, 3, 3, 2, 0, 0, 0, 0] }
+                operation: true, action: { spellsKnown: parseInt(character.spellsKnown), spells: [4, 3, 3, 3, 2, 0, 0, 0, 0] }
             }
             break;
     }
@@ -987,7 +1007,8 @@ const Rogue = async (level: number, character: CharacterModel) => {
     const customPaths = await AsyncStorage.getItem('Rogue-CustomPath')
     let paths: any[] = [{ name: "Arcane Trickster", description: "Some rogues enhance their fine-honed skills of stealth and agility with magic, learning tricks of enchantment and illusion. These rogues include pickpockets and burglars, but also pranksters, mischief-makers, and a significant number of adventurers." },
     { name: "Assassin", description: "You focus your training on the grim art of death. Those who adhere to this archetype are diverse: hired killers, spies, bounty hunters, and even specially anointed priests trained to exterminate the enemies of their deity. Stealth, poison, and disguise help you eliminate your foes with deadly efficiency." },
-    { name: "Thief", description: "You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype, but so do rogues who prefer to think of themselves as professional treasure seekers, explorers, delvers, and investigators. In addition to improving your agility and stealth, you learn skills useful for delving into ancient ruins, reading unfamiliar languages, and using magic items you normally couldn't employ." }]
+    { name: "Thief", description: "You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype, but so do rogues who prefer to think of themselves as professional treasure seekers, explorers, delvers, and investigators. In addition to improving your agility and stealth, you learn skills useful for delving into ancient ruins, reading unfamiliar languages, and using magic items you normally couldn't employ." },
+    { name: "Phantom", description: "Many rogues walk a fine line between life and death, risking their own lives and taking the lives of others. While adventuring on that line, some rogues discover a mystical connection to death itself. These rogues take knowledge from the dead and become immersed in negative energy, eventually becoming like ghosts. Thieves' guilds value them as highly effective information gatherers and spies." }]
     paths = customPaths !== null ? paths.concat(JSON.parse(customPaths)) : paths;
     let LevelUpFunction: any;
     switch (true) {
@@ -1323,13 +1344,15 @@ const Warlock = async (level: number, character: CharacterModel) => {
 }
 const Wizard = async (level: number, character: CharacterModel) => {
     const customPaths = await AsyncStorage.getItem('Wizard-CustomPath')
-    let paths: any[] = [{ name: "School of Conjuration", description: "As a conjurer, you favor spells that produce objects and creatures out of thin air. You can conjure billowing clouds of killing fog or summon creatures from elsewhere to fight on your behalf. As your mastery grows, you learn spells of transportation and can teleport yourself across vast distances, even to other planes of existence, in an instant." },
-    { name: "School of Divination", description: "The counsel of a diviner is sought by royalty and commoners alike, for all seek a clearer understanding of the past, present, and future. As a diviner, you strive to part the veils of space, time, and consciousness so that you can see clearly. You work to master spells of discernment, remote viewing, supernatural knowledge, and foresight." },
-    { name: "School of Enchantment", description: "As a member of the School of Enchantment, you have honed your ability to magically entrance and beguile other people and monsters. Some enchanters are peacemakers who bewitch the violent to lay down their arms and charm the cruel into showing mercy. Others are tyrants who magically bind the unwilling into their service. Most enchanters fall somewhere in between." },
-    { name: "School of Evocation", description: "You focus your study on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some evokers find employment in military forces, serving as artillery to blast enemy armies from afar. Others use their spectacular power to protect the weak, while some seek their own gain as bandits, adventurers, or aspiring tyrants." },
-    { name: "School of Illusion", description: "You focus your studies on magic that dazzles the senses, befuddles the mind, and tricks even the wisest folk. Your magic is subtle, but the illusions crafted by your keen mind make the impossible seem real. Some illusionists – including many gnome wizards – are benign tricksters who use their spells to entertain. Others are more sinister masters of deception, using their illusions to frighten and fool others for their personal gain." },
-    { name: "School of Necromancy", description: "The School of Necromancy explores the cosmic forces of life, death, and undeath. As you focus your studies in this tradition, you learn to manipulate the energy that animates all living things. As you progress, you learn to sap the life force from a creature as your magic destroys its body, transforming that vital energy into magical power you can manipulate. Most people see necromancers as menacing, or even villainous, due to the close association with death. Not all necromancers are evil, but the forces they manipulate are considered taboo by many societies." },
-    { name: "School of Transmutation", description: "You are a student of spells that modify energy and matter. To you, the world is not a fixed thing, but eminently mutable, and you delight in being an agent of change. You wield the raw stuff of creation and learn to alter both physical forms and mental qualities. Your magic gives you the tools to become a smith on reality's forge. Some transmuters are tinkerers and pranksters, turning people into toads and transforming copper into silver for fun and occasional profit. Others pursue their magical studies with deadly seriousness, seeking the power of the gods to make and destroy worlds." }]
+    let paths: any[] = [
+        { name: "School of Abjuration", description: "The School of Abjuration emphasizes magic that blocks, banishes, or protects. Detractors of this school say that its tradition is about denial, negation rather than positive assertion. You understand, however, that ending harmful effects, protecting the weak, and banishing evil influences is anything but a philosophical void. It is a proud and respected vocation." },
+        { name: "School of Conjuration", description: "As a conjurer, you favor spells that produce objects and creatures out of thin air. You can conjure billowing clouds of killing fog or summon creatures from elsewhere to fight on your behalf. As your mastery grows, you learn spells of transportation and can teleport yourself across vast distances, even to other planes of existence, in an instant." },
+        { name: "School of Divination", description: "The counsel of a diviner is sought by royalty and commoners alike, for all seek a clearer understanding of the past, present, and future. As a diviner, you strive to part the veils of space, time, and consciousness so that you can see clearly. You work to master spells of discernment, remote viewing, supernatural knowledge, and foresight." },
+        { name: "School of Enchantment", description: "As a member of the School of Enchantment, you have honed your ability to magically entrance and beguile other people and monsters. Some enchanters are peacemakers who bewitch the violent to lay down their arms and charm the cruel into showing mercy. Others are tyrants who magically bind the unwilling into their service. Most enchanters fall somewhere in between." },
+        { name: "School of Evocation", description: "You focus your study on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some evokers find employment in military forces, serving as artillery to blast enemy armies from afar. Others use their spectacular power to protect the weak, while some seek their own gain as bandits, adventurers, or aspiring tyrants." },
+        { name: "School of Illusion", description: "You focus your studies on magic that dazzles the senses, befuddles the mind, and tricks even the wisest folk. Your magic is subtle, but the illusions crafted by your keen mind make the impossible seem real. Some illusionists – including many gnome wizards – are benign tricksters who use their spells to entertain. Others are more sinister masters of deception, using their illusions to frighten and fool others for their personal gain." },
+        { name: "School of Necromancy", description: "The School of Necromancy explores the cosmic forces of life, death, and undeath. As you focus your studies in this tradition, you learn to manipulate the energy that animates all living things. As you progress, you learn to sap the life force from a creature as your magic destroys its body, transforming that vital energy into magical power you can manipulate. Most people see necromancers as menacing, or even villainous, due to the close association with death. Not all necromancers are evil, but the forces they manipulate are considered taboo by many societies." },
+        { name: "School of Transmutation", description: "You are a student of spells that modify energy and matter. To you, the world is not a fixed thing, but eminently mutable, and you delight in being an agent of change. You wield the raw stuff of creation and learn to alter both physical forms and mental qualities. Your magic gives you the tools to become a smith on reality's forge. Some transmuters are tinkerers and pranksters, turning people into toads and transforming copper into silver for fun and occasional profit. Others pursue their magical studies with deadly seriousness, seeking the power of the gods to make and destroy worlds." }]
     paths = customPaths !== null ? paths.concat(JSON.parse(customPaths)) : paths;
     let LevelUpFunction: any;
     switch (true) {

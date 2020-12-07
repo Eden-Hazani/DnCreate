@@ -915,7 +915,6 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     <View>
                         {this.props.options.pathSelector ?
                             <View>
-                                {console.log(this.props.options)}
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
                                     <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can pick a path</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>It is highly recommended to search the many guides online in order to find the path that suites you best.</AppText>

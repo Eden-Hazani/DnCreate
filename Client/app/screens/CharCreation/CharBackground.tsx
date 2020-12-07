@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
@@ -17,6 +17,8 @@ import backgroundsJson from '../../../jsonDump/officialBackgrounds.json'
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { BackgroundModal } from '../../models/backgroundModal';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Config } from '../../../config';
+import { Image } from 'react-native-expo-image-cache';
 
 const ValidationSchema = Yup.object().shape({
     backgroundName: Yup.string().required().label("Background Name"),
@@ -71,20 +73,20 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             characterInfo: store.getState().character
         }
         this.backgroundDragon = {
-            Acolyte: { icon: require("../../../assets/backgroundDragons/acolyteDragon.png") },
-            Urchin: { icon: require("../../../assets/backgroundDragons/urchinDragon.png") },
-            Soldier: { icon: require("../../../assets/backgroundDragons/soldierDragon.png") },
-            Sailor: { icon: require("../../../assets/backgroundDragons/sailorDragon.png") },
-            Pirate: { icon: require("../../../assets/backgroundDragons/pirateDragon.png") },
-            Sage: { icon: require("../../../assets/backgroundDragons/sageDragon.png") },
-            Outlander: { icon: require("../../../assets/backgroundDragons/outlanderDragon.png") },
-            Noble: { icon: require("../../../assets/backgroundDragons/nobleDragon.png") },
-            Hermit: { icon: require("../../../assets/backgroundDragons/hermitDragon.png") },
-            "Guild Artisan": { icon: require("../../../assets/backgroundDragons/guildArtisanDragon.png") },
-            "Folk Hero": { icon: require("../../../assets/backgroundDragons/folkHeroDragon.png") },
-            Entertainer: { icon: require("../../../assets/backgroundDragons/entertainerDragon.png") },
-            Criminal: { icon: require("../../../assets/backgroundDragons/criminalDragon.png") },
-            Charlatan: { icon: require("../../../assets/backgroundDragons/charlatanDragon.png") },
+            Acolyte: `${Config.serverUrl}/assets/backgroundDragons/acolyteDragon.png`,
+            Urchin: `${Config.serverUrl}/assets/backgroundDragons/urchinDragon.png`,
+            Soldier: `${Config.serverUrl}/assets/backgroundDragons/soldierDragon.png`,
+            Sailor: `${Config.serverUrl}/assets/backgroundDragons/sailorDragon.png`,
+            Pirate: `${Config.serverUrl}/assets/backgroundDragons/pirateDragon.png`,
+            Sage: `${Config.serverUrl}/assets/backgroundDragons/sageDragon.png`,
+            Outlander: `${Config.serverUrl}/assets/backgroundDragons/outlanderDragon.png`,
+            Noble: `${Config.serverUrl}/assets/backgroundDragons/nobleDragon.png`,
+            Hermit: `${Config.serverUrl}/assets/backgroundDragons/hermitDragon.png`,
+            "Guild Artisan": `${Config.serverUrl}/assets/backgroundDragons/guildArtisanDragon.png`,
+            "Folk Hero": `${Config.serverUrl}/assets/backgroundDragons/folkHeroDragon.png`,
+            Entertainer: `${Config.serverUrl}/assets/backgroundDragons/entertainerDragon.png`,
+            Criminal: `${Config.serverUrl}/assets/backgroundDragons/criminalDragon.png`,
+            Charlatan: `${Config.serverUrl}/assets/backgroundDragons/charlatanDragon.png`,
 
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
@@ -423,7 +425,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                     {this.state.pickedOfficial !== null &&
                                         <View>
                                             <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                                <Image style={{ width: 150, height: 150 }} source={this.backgroundDragon[this.state.pickedOfficial.name].icon} />
+                                                <Image style={{ width: 150, height: 150 }} uri={this.backgroundDragon[this.state.pickedOfficial.name]} />
                                             </View>
                                             <View style={{ padding: 17 }}>
                                                 <AppText fontSize={25} textAlign={'center'} color={Colors.berries}>{this.state.pickedOfficial.name}</AppText>

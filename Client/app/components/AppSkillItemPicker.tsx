@@ -85,7 +85,7 @@ export class AppSkillItemPicker extends Component<{
         this.props.setAdditionalSkillPicks(0)
     }
     componentDidUpdate() {
-        if ((this.state.skills.length === this.state.amountToPick && !this.state.skillConfirmation) || (this.state.amountToPick && !this.state.skillConfirmation)) {
+        if ((this.state.skills.length === this.state.amountToPick && !this.state.skillConfirmation) || (this.state.amountToPick && !this.state.skillConfirmation && this.props.withConditions)) {
             this.setState({ skillConfirmation: true })
             this.props.sendSkillsBack(this.state.skills)
             this.props.setAdditionalSkillPicks(0)

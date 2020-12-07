@@ -14,6 +14,8 @@ import { BardInspirationCounter } from '../../components/uniqueCharComponents/Ba
 import { UniqueRollLists } from '../../components/UniqueRollLists';
 import { PathSummonedCompanion } from '../../components/uniqueCharComponents/PathSummonedCompanion';
 import pathCreatedCompanion from '../../../jsonDump/pathCreatedCompanion.json'
+import { MonkKiPointCounter } from '../../components/uniqueCharComponents/MonkKiPointCounter';
+import { RoguePhantomSkillPicks } from '../../components/uniqueCharComponents/RoguePhantomSkillPicks';
 
 interface UniqueCharStatsState {
     talesFromTheBeyondModal: boolean
@@ -76,7 +78,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={pathCreatedCompanion[this.props.character.path?.name].name}
                             onPress={() => { this.setState({ pathSummonedCompanionStatsModal: true }) }} />
                         <Modal visible={this.state.pathSummonedCompanionStatsModal}>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                 <View style={{ flex: .9 }}>
                                     <PathSummonedCompanion character={this.props.character} />
                                 </View>
@@ -152,20 +154,19 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                 {this.props.character.characterClass === "Bard" ?
                     <BardInspirationCounter character={this.props.character} />
                     : null}
-
+                {this.props.character.path?.name === "Phantom" ?
+                    <RoguePhantomSkillPicks character={this.props.character} currentProficiency={this.props.proficiency} />
+                    : null}
                 {this.props.character.characterClass === "Paladin" ?
                     <PaladinLayOnHandsCounter character={this.props.character} />
                     : null}
                 {this.props.character.charSpecials.martialPoints ?
                     <View>
                         {this.props.character.charSpecials.kiPoints ?
-                            <View style={{ flexDirection: 'row' }}>
-                                <AppText fontSize={20}>Your max ki points -</AppText>
-                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.kiPoints}</AppText>
-                            </View>
+                            <MonkKiPointCounter character={this.props.character} />
                             : null}
-                        <View style={{ paddingRight: 10 }}>
-                            <AppText fontSize={18}>Martial hit die - 1D{this.props.character.charSpecials.martialPoints}</AppText>
+                        <View>
+                            <AppText fontSize={18} textAlign={"center"}>Martial hit die - 1D{this.props.character.charSpecials.martialPoints}</AppText>
                         </View>
                     </View>
                     : null}

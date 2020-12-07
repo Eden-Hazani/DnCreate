@@ -534,6 +534,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         <View style={styles.infoContainer}>
                             <View style={{ flexDirection: 'row' }}>
                                 <View style={[styles.list, { width: '40%' }]}>
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={18} width={100} height={50} borderRadius={25} title={'complete skill list'}
+                                        onPress={() => { this.setState({ completeSkillModel: true }) }} />
                                     <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
                                     {this.state.character.skills.map(skill =>
                                         <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
@@ -542,16 +544,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                         </View>
                                     )}
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={80} height={50} borderRadius={25} title={'complete skill list'}
-                                        onPress={() => { this.setState({ completeSkillModel: true }) }} />
                                     <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
-                                        <View>
+                                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                                             <CompleteSkillList character={this.state.character} />
-                                        </View>
-                                        <View>
-                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
-                                                onPress={() => { this.setState({ completeSkillModel: false }) }} />
-                                        </View>
+                                            <View>
+                                                <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
+                                                    onPress={() => { this.setState({ completeSkillModel: false }) }} />
+                                            </View>
+                                        </ScrollView>
                                     </Modal>
                                 </View>
                                 <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>

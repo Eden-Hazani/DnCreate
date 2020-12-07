@@ -36,7 +36,6 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
 
 
     componentDidMount() {
-        console.log(this.state.characterInfo)
         if (this.props.updateStory) {
             this.setState({ characterInfo: this.props.route.params.character })
         }

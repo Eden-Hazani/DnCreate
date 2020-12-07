@@ -3,9 +3,6 @@ import { CharacterModel } from "../../../models/characterModel";
 export function armorBonusCalculator(character: CharacterModel, armorAc: number, armorBonusesCalculationType: any) {
     let newArmorAc: number = null;
     switch (true) {
-        case character.path?.name === "Forge Domain" && armorBonusesCalculationType === "Heavy Armor" && character.level >= 6:
-            newArmorAc = +armorAc + 1;
-            break;
         case character.characterClass === "Monk" && armorBonusesCalculationType === "none":
             newArmorAc = (10 + +character.modifiers.dexterity + +character.modifiers.wisdom);
             break;
@@ -31,6 +28,16 @@ export function armorBonusCalculator(character: CharacterModel, armorAc: number,
         case armorBonusesCalculationType === "Heavy Armor":
             newArmorAc = +armorAc
             break;
+    }
+    if (character.charSpecials.fightingStyle.length > 0) {
+        character.charSpecials.fightingStyle.forEach(item => {
+            if (item.name === "Defence" && armorBonusesCalculationType !== "none") {
+                newArmorAc = (newArmorAc + 1)
+            }
+        })
+    }
+    if (character.path?.name === "Forge Domain" && armorBonusesCalculationType === "Heavy Armor" && character.level >= 6) {
+        newArmorAc = +newArmorAc + 1;
     }
     return newArmorAc
 }

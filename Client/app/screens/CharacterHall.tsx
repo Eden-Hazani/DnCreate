@@ -98,9 +98,6 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             this.setState({ characters: [] });
             return
         }
-        for (let item of JSON.parse(characters)) {
-            console.log(item._id)
-        }
         this.setState({ characters: JSON.parse(characters) });
     }
 

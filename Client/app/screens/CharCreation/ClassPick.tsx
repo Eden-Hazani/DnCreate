@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Linking, Image } from 'react-native';
+import { View, StyleSheet, Linking } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
@@ -16,6 +16,8 @@ import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Image } from 'react-native-expo-image-cache';
+import { Config } from '../../../config';
 interface ClassPickState {
     loading: boolean
     classes: ClassModel[] | undefined
@@ -44,18 +46,18 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
             store.getState().character
         })
         this.dragonClasses = {
-            Barbarian: { icon: require('../../../assets/barbarianDragon.png') },
-            Bard: { icon: require('../../../assets/bardDragon.png') },
-            Fighter: { icon: require('../../../assets/fighterDragon.png') },
-            Druid: { icon: require('../../../assets/druidDragon.png') },
-            Cleric: { icon: require('../../../assets/clericDragon.png') },
-            Monk: { icon: require('../../../assets/monkDragon.png') },
-            Paladin: { icon: require('../../../assets/paladinDragon.png') },
-            Ranger: { icon: require('../../../assets/rangerDragon.png') },
-            Rogue: { icon: require('../../../assets/rogueDragon.png') },
-            Sorcerer: { icon: require('../../../assets/sorcererDragon.png') },
-            Warlock: { icon: require('../../../assets/warlockDragon.png') },
-            Wizard: { icon: require('../../../assets/wizardDragon.png') },
+            Barbarian: `${Config.serverUrl}/assets/classDragons/barbarianDragon.png`,
+            Bard: `${Config.serverUrl}/assets/classDragons/bardDragon.png`,
+            Fighter: `${Config.serverUrl}/assets/classDragons/fighterDragon.png`,
+            Druid: `${Config.serverUrl}/assets/classDragons/druidDragon.png`,
+            Cleric: `${Config.serverUrl}/assets/classDragons/clericDragon.png`,
+            Monk: `${Config.serverUrl}/assets/classDragons/monkDragon.png`,
+            Paladin: `${Config.serverUrl}/assets/classDragons/paladinDragon.png`,
+            Ranger: `${Config.serverUrl}/assets/classDragons/rangerDragon.png`,
+            Rogue: `${Config.serverUrl}/assets/classDragons/rogueDragon.png`,
+            Sorcerer: `${Config.serverUrl}/assets/classDragons/sorcererDragon.png`,
+            Warlock: `${Config.serverUrl}/assets/classDragons/warlockDragon.png`,
+            Wizard: `${Config.serverUrl}/assets/classDragons/wizardDragon.png`,
         }
     }
     componentWillUnmount() {
@@ -122,7 +124,7 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
                                         <View style={styles.infoContainer}>
                                             <View >
                                                 <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                                    <Image style={{ width: 150, height: 150 }} source={this.dragonClasses[this.state.pickedClass.name].icon} />
+                                                    <Image style={{ width: 150, height: 150 }} uri={this.dragonClasses[this.state.pickedClass.name]} />
                                                 </View>
                                                 <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
                                                 <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description.replace(/\. /g, '.\n\n')}</AppText>

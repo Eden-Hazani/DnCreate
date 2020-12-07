@@ -1,4 +1,87 @@
 {
+    "Ranger": {
+        "Fey Wanderer Conclave": {
+            "3": {
+                "spellList": [
+                    "Charm Person"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Misty Step"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Dispel Magic"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Dimension Door"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Mislead"
+                ]
+            }
+        },
+        "Swarmkeeper Conclave": {
+            "3": {
+                "spellList": [
+                    "Faerie Fire"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Web"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Gaseous Form"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Arcane Eye"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Insect Plague"
+                ]
+            }
+        },
+        "Monster Slayer Conclave": {
+            "3": {
+                "spellList": [
+                    "Protection from Evil and Good"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Zone of Truth"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Magic Circle"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Banishment"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Hold Monster"
+                ]
+            }
+        }
+    },
     "Druid": {
         "Circle of Spores": {
             "2": {
@@ -65,6 +148,70 @@
         }
     },
     "Paladin": {
+        "Oath of the Watchers": {
+            "3": {
+                "spellList": [
+                    "Alarm",
+                    "Detect Magic"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Moonbeam",
+                    "See Invisibility"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Counterspell",
+                    "Nondetection"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Aura of Purity",
+                    "Banishment"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Hold Monster",
+                    "Scrying"
+                ]
+            }
+        },
+        "Oath of Glory": {
+            "3": {
+                "spellList": [
+                    "Guiding Bolt",
+                    "Heroism"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Enhance Ability",
+                    "Magic Weapon"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Haste",
+                    "Protection From Energy"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Compulsion",
+                    "Freedom Of Movement"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Commune",
+                    "Flame Strike"
+                ]
+            }
+        },
         "Oath of the Ancients": {
             "3": {
                 "spellList": [

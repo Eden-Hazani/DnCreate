@@ -76,6 +76,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         if (this.state.character.race === "Human") {
             this.setState({ extraLanguagesNumber: 1 })
         }
+        if (this.state.character.race === "Leonin") {
+            this.setState({ amountToPick: 1 })
+        }
         if (this.state.character.race === "Dwarf") {
             this.setState({ amountToPick: 1 })
         }
@@ -193,8 +196,20 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             character.skills.push(["Intimidation", 0])
             character.languages.push("Common", "Orc")
         }
+        if (this.state.character.race === "Goliath") {
+            character.skills.push(["Athletics", 0])
+        }
         if (this.state.character.race === "Gnome") {
             character.languages.push("Common", "Gnomish")
+        }
+        if (this.state.character.race === "Leonin") {
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('Must pick a skill')
+                return;
+            }
+            for (let item of this.state.itemPicked) {
+                character.skills.push([item, 0])
+            }
         }
         if (this.state.character.race === "Half Elf") {
             if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
@@ -252,6 +267,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     render() {
         const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"];
         const kenkuSkills = ["Acrobatics", "Deception", "Stealth", "Sleight of Hand"]
+        const leoninSkills = ["Athletics", "Intimidation", "Perception", "Survival"]
         const fullSkillList = ['Athletics', 'Acrobatics', 'Sleight of Hand', 'Stealth', 'Arcana', 'History', 'Investigation',
             'Nature', 'Religion', 'Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival', 'Deception',
             'Intimidation', 'Performance', 'Persuasion']
@@ -297,6 +313,18 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 <AppText textAlign={'center'} fontSize={18}>You also gain proficiency in two skills of your choice</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
                                     {kenkuSkills.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                                            onPress={() => this.pickItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
+                            </View>
+                        }
+                        {this.state.character.race === "Leonin" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>You  gain proficiency in a skill of your choice</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {leoninSkills.map((item, index) =>
                                         <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                                             onPress={() => this.pickItem(item, index)}>
                                             <AppText textAlign={'center'} fontSize={18}>{item}</AppText>

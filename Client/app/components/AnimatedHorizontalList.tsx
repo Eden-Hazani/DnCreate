@@ -1,10 +1,12 @@
 import React, { Component, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Animated, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, Animated, Dimensions, TouchableOpacity } from 'react-native';
 import { Config } from '../../config';
 import racesApi from '../api/racesApi';
 import { Colors } from '../config/colors';
 import { store } from '../redux/store';
 import { AppText } from './AppText';
+import { Image } from 'react-native-expo-image-cache';
+
 const { width, height } = Dimensions.get('screen');
 
 const Indicator = ({ scrollX, races }: any) => {
@@ -84,7 +86,6 @@ const Square = ({ scrollX }: any) => {
 
 export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
     const scrollX = React.useRef(new Animated.Value(0)).current;
-    console.log(backDropColors)
     return (
         <View>
             <BackDrop scrollX={scrollX} backDropColors={backDropColors} />
@@ -103,7 +104,7 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
                 renderItem={({ item }: any) =>
                     <View style={{ height, width, justifyContent: "center", alignItems: "center", padding: 25 }}>
                         <TouchableOpacity style={{ flex: .3 }} onPress={() => onPress(item)}>
-                            <Image source={{ uri: `${Config.serverUrl}/assets/${item.image}` }} style={{ borderRadius: 50, resizeMode: 'contain', width: width / 1.5, height: height / 4 }} />
+                            <Image uri={`${Config.serverUrl}/assets/${item.image}`} style={{ borderRadius: 100, resizeMode: 'contain', width: width / 1.8, height: height / 4 }} />
                         </TouchableOpacity>
                         <View style={{ flex: .1 }}>
                             <AppText color={Colors.black} fontWeight={"800"} fontSize={25}>{item.name}</AppText>
