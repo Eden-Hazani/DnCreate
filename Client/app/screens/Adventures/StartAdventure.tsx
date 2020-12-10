@@ -37,14 +37,16 @@ export class StartAdventure extends Component<{ navigation: any }> {
                     <View style={{ justifyContent: "center", alignItems: "center" }}>
                         <AppText fontSize={18} textAlign={'center'}>Adventure Name</AppText>
                         <AppFormField
-                            style={{ width: Dimensions.get('screen').width }}
+                            width={Dimensions.get('screen').width / 1.4}
+                            internalWidth={Dimensions.get('screen').width / 0.9}
                             fieldName={"adventureName"}
                             name="adventureName"
                             iconName={"text-short"}
                             placeholder={"Adventure Name...."} />
                         <AppText fontSize={18} textAlign={'center'}>Adventure Setting</AppText>
                         <AppFormField
-                            style={{ width: Dimensions.get('screen').width }}
+                            width={Dimensions.get('screen').width / 1.4}
+                            internalWidth={Dimensions.get('screen').width / 0.9}
                             multiline={true}
                             numberOfLines={10}
                             textAlignVertical={"top"}

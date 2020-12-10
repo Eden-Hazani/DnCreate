@@ -25,8 +25,9 @@ function findAdventure(adventureIdentifier) {
 }
 
 async function updateAdventure(adventure) {
-    const info = await Adventure.updateOne({ adventureIdentifier: adventure.adventureIdentifier }, adventure).exec();
-    return info.n ? adventure : null;
+    const info = await Adventure.findOneAndUpdate({ adventureIdentifier: adventure.adventureIdentifier }, adventure, { new: true, useFindAndModify: false }).populate('participants_id').exec();
+    console.log(info)
+    return info
 }
 
 function removeAdventure(adventureIdentifier) {

@@ -1,4 +1,5 @@
 import { CharacterModel } from "./characterModel";
+import { QuestModal } from "./questModel";
 
 export class AdventureModel {
     public constructor(
@@ -7,6 +8,7 @@ export class AdventureModel {
         public participants_id?: CharacterModel[],
         public leader_id?: string,
         public adventureSetting?: string,
-        public adventureIdentifier?: string
+        public adventureIdentifier?: string,
+        public quests?: QuestModal[]
     ) { }
 }

@@ -42,9 +42,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
             newState.firstLoginAd = false;
             break;
         case ActionType.SetCharacters:
-            for (let character of action.payload) {
-                newState.characters.push(character);
-            }
+            newState.characters = action.payload
             break;
         case ActionType.SetUserInfo:
             const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated)
@@ -107,7 +105,9 @@ export function reduce(currentState: AppState, action: Action): AppState {
             break;
         case ActionType.UpdateSingleAdventure:
             const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
+            console.log(index)
             newState.leadingAdv[index] = action.payload;
+            break;
 
             break;
 

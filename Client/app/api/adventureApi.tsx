@@ -16,6 +16,12 @@ const updateAdventure = (adventure: AdventureModel) => {
     return client.patch(`${endpoint}/updateAdventure`, formData);
 };
 
+const addAdventureParticipant = (adventure: AdventureModel) => {
+    let formData = new FormData();
+    formData.append("adventure", JSON.stringify(adventure));
+    return client.patch(`${endpoint}/updateAdventure`, formData);
+};
+
 const getLeadingAdventures = (user_id: string) => client.get<AdventureModel[]>(`${endpoint}/getLeadingAdventures/${user_id}`);
 
 const getSingleLeadingAdventure = (user_id: string, adventureIdentifier: string) => client.get<AdventureModel>(`${endpoint}/getSingleLeadingAdventure/${user_id}/${adventureIdentifier}`);
@@ -56,5 +62,6 @@ export default {
     deleteAdventure,
     userInAdv,
     getSingleLeadingAdventure,
-    getUserProfileImages
+    getUserProfileImages,
+    addAdventureParticipant
 }

@@ -26,6 +26,7 @@ function verifiedLoggedIn(request, response, next) {
             response.status(401).send("You are not logged in")
         }
         response.locals = payload
+
         next();
     })
 }

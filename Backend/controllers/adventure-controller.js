@@ -21,7 +21,7 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
 
 router.post("/getUsersProfilePic", verifyLogged, upload.none(), async (request, response) => {
     try {
-        console.log('ff')
+        console.log(JSON.parse(request.body.userList))
         const userList = JSON.parse(request.body.userList);
         const picList = await adventureLogic.getUsersProfilePicture(userList)
         response.json({ list: picList });
@@ -31,7 +31,17 @@ router.post("/getUsersProfilePic", verifyLogged, upload.none(), async (request, 
     }
 });
 
-router.patch("/updateAdventure", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
+router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        response.json(updatedAdventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/addAdventureParticipant", verifyLogged, upload.none(), verifyUserInAdventure, async (request, response) => {
     try {
         const adventure = new Adventure(JSON.parse(request.body.adventure))
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);

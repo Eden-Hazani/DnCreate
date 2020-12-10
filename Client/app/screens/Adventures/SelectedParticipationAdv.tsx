@@ -28,10 +28,16 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
     async componentDidMount() {
         let userArray: string[] = []
         for (let item of this.state.adventure.participants_id) {
-            userArray.push(item.user_id)
+            if (item.user_id) {
+                userArray.push(item.user_id)
+            }
+        }
+        if (userArray.length === 0) {
+            this.setState({ loading: false })
+            return
         }
         const userPicList: any = await adventureApi.getUserProfileImages(userArray)
-        const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+        const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
         this.setState({ profilePicList: picList }, () => {
             this.setState({ loading: false })
         })
@@ -59,7 +65,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                 renderItem={({ item, index }) => <ListItem
                                     title={item.name}
                                     subTitle={item.characterClass}
-                                    imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
+                                    imageUrl={(this.state.profilePicList.length > 0 && this.state.profilePicList[index][1]) ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
                                     direction={'row'}
                                     headerFontSize={18}
                                     headColor={Colors.bitterSweetRed}
@@ -72,6 +78,14 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                         </View>
                         <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
                             fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                            <AppButton padding={20} backgroundColor={Colors.pinkishSilver}
+                                onPress={() => { this.props.navigation.navigate("ActiveQuestList", { adventure: adventure, isDmLevel: false }) }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Active Quests"} />
+                            <AppButton padding={20} backgroundColor={Colors.metallicBlue}
+                                onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: false }) }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
+                        </View>
                     </View>
                 }
             </View>

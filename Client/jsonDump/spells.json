@@ -1334,6 +1334,68 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "bard",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "tiny tarts and a feather that is waved in the air"
+            ],
+            "raw": "V, S, M (tiny tarts and a feather that is waved in the air)",
+            "somatic": true,
+            "verbal": false
+        },
+        "description": "A creature of your choice that you can see within range perceives everything as hilariously funny and falls into fits of laughter if this spell affects it. The target must succeed on a Wisdom saving throw or fall prone, becoming incapacitated and unable to stand up for the duration. A creature with an Intelligence score of 4 or less isn’t affected. At the end of each of its turns, and each time it takes damage, the target can make another Wisdom saving throw. The target has advantage on the saving throw if it’s triggered by damage. On a success, the spell ends.",
+        "duration": "Concentration, up to 1 minute",
+        "level": "1",
+        "name": "Tasha's Hideous Laughter",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "enchantment",
+        "tags": [
+            "bard",
+            "wizard",
+            "level1"
+        ],
+        "type": "1st-level enchantment"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "bard",
+            "wizard",
+            "sorcerer",
+            "warlock"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                ""
+            ],
+            "raw": "V, S",
+            "somatic": true,
+            "verbal": false
+        },
+        "description": "You reach into the mind of one creature you can see and force it to make an Intelligence saving throw. A creature automatically succeeds if it is immune to being frightened. On a failed save, the target loses the ability to distinguish friend from foe, regarding all creatures it can see as enemies until the spell ends. Each time the target takes damage, it can repeat the saving throw, ending the effect on itself on a success. Whenever the affected creature chooses another creature as a target, it must choose the target at random from among the creatures it can see within range of the attack, spell, or other ability it’s using. If an enemy provokes an opportunity attack from the affected creature, the creature must make that attack if it is able to.",
+        "duration": "Concentration, up to 1 minute",
+        "level": "3",
+        "name": "Enemies abound",
+        "range": "120 feet",
+        "ritual": true,
+        "school": "enchantment",
+        "tags": [
+            "bard",
+            "sorcerer",
+            "warlock",
+            "wizard",
+            "level3"
+        ],
+        "type": "3st-level enchantment"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
             "cleric"
         ],
         "components": {

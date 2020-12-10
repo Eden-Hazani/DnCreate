@@ -19,18 +19,24 @@ import { AppActivityIndicator } from '../components/AppActivityIndicator';
 interface CreatePDFState {
     character: CharacterModel
     loading: boolean
+    uri: string
 }
 
 export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
     constructor(props: any) {
         super(props)
         this.state = {
+            uri: '',
             loading: false,
             character: store.getState().character
         }
     }
 
     componentDidMount() {
+        this.setState({ loading: true })
+        this.createPDF().then(() => {
+            this.setState({ loading: false })
+        })
         this.maxHpCheck()
     }
 
@@ -121,7 +127,6 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
     }
 
     createPDF = async () => {
-        this.setState({ loading: true })
         const html = `
             <div style="position: relative; background-repeat: no-repeat; background-size: contain; background-position: center; width: 21cm;
             padding:4cm; height: 29.7cm; margin: 0 auto; overflow:hidden; margin-bottom: 0.5cm; background-image: ${sheetImage.sheet};">
@@ -175,10 +180,14 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
             </div>
             `;
         const { uri } = await Print.printToFileAsync({ html });
+        this.setState({ uri })
+    };
+
+    share = (uri: any) => {
         Sharing.shareAsync(uri).then(() => {
             this.setState({ loading: false })
         });
-    };
+    }
 
 
 
@@ -198,7 +207,7 @@ export class CreatePDF extends Component<{ route: any }, CreatePDFState>{
                     {this.state.loading ?
                         <AppActivityIndicator visible={this.state.loading} />
                         :
-                        <TouchableOpacity onPress={() => { this.createPDF() }}>
+                        <TouchableOpacity onPress={() => { this.share(this.state.uri) }}>
                             <View>
                                 <Image
                                     source={require('../../assets/pdf.png')}

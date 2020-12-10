@@ -2,6 +2,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { Colors } from '../config/colors';
 import { store } from '../redux/store';
+import { ActiveQuestList } from '../screens/Adventures/adventureComponents/ActiveQuestList';
+import { CompletedQuestList } from '../screens/Adventures/adventureComponents/CompletedQuestList';
 import { Adventures } from '../screens/Adventures/Adventures';
 import { JoinAdventure } from '../screens/Adventures/JoinAdventure';
 import { SelectedLeadingAdv } from '../screens/Adventures/SelectedLeadingAdv';
@@ -23,6 +25,8 @@ const AdventuresNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="JoinAdventure" component={JoinAdventure} />
         <Stack.Screen options={{ title: "" }} name="SelectedParticipationAdv" component={SelectedParticipationAdv} />
         <Stack.Screen options={{ title: "", headerShown: false }} name="SelectedLeadingAdv" component={SelectedLeadingAdv} />
+        <Stack.Screen options={{ title: "", }} name="ActiveQuestList" component={ActiveQuestList} />
+        <Stack.Screen options={{ title: "", }} name="CompletedQuestList" component={CompletedQuestList} />
     </Stack.Navigator>
 }
 

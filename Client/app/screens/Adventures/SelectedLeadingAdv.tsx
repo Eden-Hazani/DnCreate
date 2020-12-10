@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, Alert, Modal } from 'react-native';
 import { Config } from '../../../config';
 import adventureApi from '../../api/adventureApi';
 import { AppButton } from '../../components/AppButton';
@@ -15,25 +15,43 @@ import { ActionType } from '../../redux/action-type';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
+import { CreateQuest } from './leaderComponents/CreateQuest';
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
     loading: boolean
     refreshing: boolean
     profilePicList: any[]
+    questCreationModal: boolean
 }
 
 export class SelectedLeadingAdv extends Component<{ navigation: any, route: any }, SelectedLeadingAdvState> {
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
+            questCreationModal: false,
             profilePicList: [],
             adventure: this.props.route.params.adventure,
             loading: true,
             refreshing: false,
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+
+    onFocus = async () => {
+        const leadingAdv = store.getState().leadingAdv;
+        const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
+        this.setState({ adventure })
+    }
+
+    reloadAdventureAfterQuest = () => {
+        const leadingAdv = store.getState().leadingAdv;
+        const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
+        this.setState({ adventure })
+    }
+
     async componentDidMount() {
         let userArray: string[] = []
         for (let item of this.state.adventure.participants_id) {
@@ -154,6 +172,24 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                         <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
                             <AppText fontSize={18}>Adventure identifier:</AppText>
                             <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
+                        </View>
+                        <View>
+                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ questCreationModal: true }) }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Quest Creator"} />
+                            <View style={{ flexDirection: "row" }}>
+                                <AppButton padding={20} backgroundColor={Colors.pinkishSilver}
+                                    onPress={() => { this.props.navigation.navigate("ActiveQuestList", { adventure: adventure, isDmLevel: true }) }}
+                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Active Quests"} />
+                                <AppButton padding={20} backgroundColor={Colors.metallicBlue}
+                                    onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: true }) }}
+                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
+                            </View>
+                            <Modal visible={this.state.questCreationModal}>
+                                <CreateQuest edit={{ true: false }} adventure={this.state.adventure} close={(val: boolean) => {
+                                    this.setState({ questCreationModal: val })
+                                    this.reloadAdventureAfterQuest();
+                                }} />
+                            </Modal>
                         </View>
                         <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
                             <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.back() }}

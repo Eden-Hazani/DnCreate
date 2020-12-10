@@ -127,6 +127,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 charIds.push(character._id)
             }
             const adventures = await adventureApi.getParticipationAdventures(charIds);
+            console.log(adventures.data.length)
             let participatingAdventures: any = []
             if (!adventures.ok) {
                 errorHandler(adventures)
