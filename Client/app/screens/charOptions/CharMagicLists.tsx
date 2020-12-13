@@ -83,6 +83,12 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
                                     <AppText fontSize={20}>Range: {this.state.pickedSpellDetail.range}</AppText>
                                 </View>
                                 <View style={{ marginTop: 10 }}>
+                                    <AppText fontSize={20}>Casting Time: {this.state.pickedSpellDetail.casting_time}</AppText>
+                                </View>
+                                <View style={{ marginTop: 10 }}>
+                                    <AppText fontSize={20}>Casting Time: {this.state.pickedSpellDetail.components?.materials_needed}</AppText>
+                                </View>
+                                <View style={{ marginTop: 10 }}>
                                     <AppText fontSize={20} textAlign={'center'}>Level &amp; type: {'\n' + this.state.pickedSpellDetail.type}</AppText>
                                 </View>
                             </View>

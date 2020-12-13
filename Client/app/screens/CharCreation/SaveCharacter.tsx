@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Linking, Alert } from 'react-native';
 import { AppText } from '../../components/AppText';
 import LottieView from 'lottie-react-native';
 import { Colors } from '../../config/colors';
@@ -11,6 +11,7 @@ import { AppButton } from '../../components/AppButton';
 import { ActionType } from '../../redux/action-type';
 import AuthContext from '../../auth/context';
 import AsyncStorage from '@react-native-community/async-storage';
+import * as StoreReview from 'expo-store-review';
 
 interface SaveCharacterState {
     characterInfo: CharacterModel
@@ -33,7 +34,7 @@ export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterS
         this.UnsubscribeStore()
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo);
     }
 
@@ -49,10 +50,23 @@ export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterS
         await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
-    home = () => {
+    home = async () => {
         store.dispatch({ type: ActionType.CleanCreator });
         this.props.navigation.navigate("HomeScreen")
-
+        setTimeout(async () => {
+            if (await StoreReview.hasAction()) {
+                const didRate = await AsyncStorage.getItem('didUserRate');
+                if (didRate === null) {
+                    Alert.alert("Like what you see?", "Please take a minute to rate DnCreate, it really helps :)", [{
+                        text: 'Rate!', onPress: async () => {
+                            await AsyncStorage.setItem('didUserRate', JSON.stringify(true));
+                            StoreReview.requestReview()
+                        }
+                    }, { text: 'Later' }])
+                }
+                await AsyncStorage.setItem('didUserRate', JSON.stringify(true));
+            }
+        }, 1000);
     }
     render() {
         return (

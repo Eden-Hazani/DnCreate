@@ -28,6 +28,8 @@ import { store } from '../redux/store';
 import React, { useEffect, useState } from 'react'
 import { CreatePDF } from '../screens/CreatePDF';
 import { PersonalNotes } from '../screens/PersonalNotes';
+import { CustomSpellCreator } from '../screens/CustomSpellCreator';
+import { CustomSpellList } from '../screens/CustomSpellList';
 
 const Stack = createStackNavigator();
 
@@ -77,6 +79,8 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="SpacialRaceBonuses" component={SpacialRaceBonuses} />
         <Stack.Screen options={{ title: "" }} name="CreatePDF" component={CreatePDF} />
         <Stack.Screen options={{ title: "" }} name="PersonalNotes" component={PersonalNotes} />
+        <Stack.Screen options={{ title: "" }} name="CustomSpellCreator" component={CustomSpellCreator} />
+        <Stack.Screen options={{ title: "" }} name="CustomSpellList" component={CustomSpellList} />
 
     </Stack.Navigator>
 }

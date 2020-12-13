@@ -250,13 +250,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
 
-    levelUp = () => {
+    levelUp = async () => {
         const character = { ...this.state.character };
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
         let maxHp: number = this.state.character.maxHp;
         maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + this.state.character.modifiers.constitution;
         if (this.state.character.path?.name === "Draconic Bloodline") {
             maxHp = maxHp + 1
+        }
+        if (this.state.character.characterClass === "Paladin") {
+            let layOnHandsAmount = 5 * character.level;
+            await AsyncStorage.setItem(`layOnHands${character._id}`, JSON.stringify(layOnHandsAmount));
         }
         character.maxHp = maxHp;
         this.setState({ character }, async () => {

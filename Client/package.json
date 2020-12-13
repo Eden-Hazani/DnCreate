@@ -44,7 +44,8 @@
     "react-native-web": "~0.11.7",
     "redux": "^4.0.5",
     "yup": "^0.29.3",
-    "expo-blur": "~8.1.2"
+    "expo-blur": "~8.1.2",
+    "expo-store-review": "~2.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

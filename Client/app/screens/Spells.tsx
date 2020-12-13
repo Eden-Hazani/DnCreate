@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, Switch, Modal, ScrollView } from 'react-native';
 import { ListItem } from '../components/ListItem';
-import spellsJSON from '../../jsonDump/spells.json'
+import spellsJsonImport from '../../jsonDump/spells.json'
 import { Colors } from '../config/colors';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { AppText } from '../components/AppText';
@@ -26,7 +26,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 
 interface SpellsState {
-    confirmed: boolean,
+    confirmed: boolean
     shownSpells: any[]
     loadNumber: number
     search: string
@@ -35,11 +35,13 @@ interface SpellsState {
     character: CharacterModel
     filterModel: boolean
     flatListLoadPauseTimer: boolean
-    pickSpellModal: boolean,
+    pickSpellModal: boolean
     pickedSpell: any
     loading: boolean
-    sliderLevelVal: number,
+    sliderLevelVal: number
     sliderLevelFilter: boolean
+    spellsJSON: any
+    contentLoading: boolean
 }
 
 export class Spells extends Component<{ navigation: any, route: any }, SpellsState>{
@@ -47,6 +49,8 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
     constructor(props: any) {
         super(props)
         this.state = {
+            contentLoading: true,
+            spellsJSON: null,
             confirmed: false,
             sliderLevelVal: null,
             sliderLevelFilter: false,
@@ -64,8 +68,19 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
 
         }
     }
-    componentDidMount() {
-        this.loadSpells(this.state.shownSpells)
+    async componentDidMount() {
+        const stringedCustomSpellsJson = await AsyncStorage.getItem('customSpellList');
+        if (!stringedCustomSpellsJson) {
+            this.setState({ spellsJSON: spellsJsonImport, contentLoading: false }, () => {
+                this.loadSpells(this.state.shownSpells)
+            })
+            return
+        }
+        const CustomSpellsJson = JSON.parse(stringedCustomSpellsJson);
+        const spellsJSON = spellsJsonImport.concat(CustomSpellsJson)
+        this.setState({ spellsJSON, contentLoading: false }, () => {
+            this.loadSpells(this.state.shownSpells)
+        })
     }
 
     filterByClass = (shownSpells: any, newSpells: any) => {
@@ -75,7 +90,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             newSpells = fullList;
         } else {
             newSpells = [];
-            const fullList = spellsJSON.filter(spell => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+            const fullList = this.state.spellsJSON.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
             for (let item = 0; item < this.state.loadNumber; item++) {
                 newSpells.push(fullList[item])
             }
@@ -88,11 +103,11 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         if (this.state.search === '') {
             if (this.state.shownSpells.length > 0) {
                 for (let item = this.state.shownSpells.length; item < this.state.loadNumber; item++) {
-                    newSpells.push(spellsJSON[item])
+                    newSpells.push(this.state.spellsJSON[item])
                 }
             } else {
                 for (let item = 0; item < this.state.loadNumber; item++) {
-                    newSpells.push(spellsJSON[item])
+                    newSpells.push(this.state.spellsJSON[item])
                 }
             }
         }
@@ -104,14 +119,14 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             newSpells = result;
         }
         if (this.state.sliderLevelFilter && this.state.sliderLevelVal !== null) {
-            let fullList = spellsJSON.filter(spell => spell.level === this.state.sliderLevelVal.toString())
+            let fullList = this.state.spellsJSON.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString())
             if (this.state.filterByClass) {
                 const searchedSpells = shownSpells;
                 if (this.state.search !== '') {
                     fullList = searchedSpells.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString() && spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
                     newSpells = fullList;
                 } else {
-                    fullList = fullList.filter(spell => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+                    fullList = fullList.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
                 }
             }
             newSpells = fullList
@@ -140,7 +155,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             return;
         }
         const shownSpells: any[] = [];
-        for (let item of spellsJSON) {
+        for (let item of this.state.spellsJSON) {
             if (item.name.includes(search)) {
                 shownSpells.push(item);
             }
@@ -273,196 +288,209 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         const character = this.props.route.params.char;
         return (
             <View style={styles.container}>
-                <View>
-                    <SearchBar
-                        onClear={() => { this.resetList() }}
-                        containerStyle={{ backgroundColor: Colors.pageBackground }}
-                        inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
-                        lightTheme={Colors.pageBackground === "#121212" ? false : true}
-                        placeholder="Search Spells"
-                        onChangeText={this.updateSearch}
-                        value={this.state.search}
-                    />
-                    {this.state.character.magic &&
-                        <View style={{ justifyContent: "flex-end", alignItems: "flex-end", paddingTop: 15, paddingRight: 15 }}>
-                            <AppButton backgroundColor={Colors.bitterSweetRed} width={55} height={55} borderRadius={25}
-                                title={'Filter'} onPress={() => this.setState({ filterModel: true })} />
-                        </View>
-                    }
-                    <Modal visible={this.state.filterModel}>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 25, backgroundColor: Colors.pageBackground }}>
-                            <View style={{ flexDirection: 'row', backgroundColor: Colors.pageBackground }}>
-                                <AppText>Only show spells for your class?</AppText>
-                                <Switch value={this.state.filterByClass} onValueChange={() => {
-                                    if (this.state.filterByClass) {
-                                        this.setState({ filterByClass: false, loadNumber: 10 }, () => {
-                                            this.resetList()
-                                        })
-                                        return;
-                                    }
-                                    this.setState({ filterByClass: true, loadNumber: 10 }, () => {
-                                        this.resetList()
-                                    })
-                                }} />
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <AppText>Only show spells that you can learn?</AppText>
-                                <Switch value={this.state.filterByLevel} onValueChange={() => {
-                                    if (this.state.filterByLevel) {
-                                        this.setState({ filterByLevel: false })
-                                        this.resetList()
-                                        return;
-                                    }
-                                    this.setState({ filterByLevel: true }, () => {
-                                        this.resetList()
-                                    })
-                                }} />
-                            </View>
-                            <View style={{ marginTop: 50, justifyContent: "center", alignItems: "center", backgroundColor: Colors.pageBackground }}>
-                                <AppText>Enable Level filter?</AppText>
-                                <Switch value={this.state.sliderLevelFilter} onValueChange={() => {
-                                    if (this.state.sliderLevelFilter) {
-                                        this.setState({ sliderLevelFilter: false })
-                                        this.resetList()
-                                        return;
-                                    }
-                                    this.setState({ sliderLevelFilter: true, filterByLevel: false }, () => {
-                                        this.resetList()
-                                    })
-                                }} />
-                                <AppText>Use the slider to filter the highest spell level you want.</AppText>
-                                {this.state.sliderLevelVal && <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
-                                <Slider
-                                    disabled={!this.state.sliderLevelFilter}
-                                    style={{ width: 200, height: 40 }}
-                                    minimumValue={1}
-                                    step={1}
-                                    maximumValue={9}
-                                    thumbTintColor={Colors.bitterSweetRed}
-                                    minimumTrackTintColor={Colors.bitterSweetRed}
-                                    maximumTrackTintColor={Colors.berries}
-                                    onValueChange={(val) => {
-                                        this.setState({ sliderLevelVal: val })
-                                    }}
-                                    onSlidingComplete={() => {
-                                        this.resetList()
-                                    }}
-                                />
-                            </View>
-                            <View style={{ backgroundColor: Colors.pageBackground }}>
-                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                    title={'Close'} onPress={() => this.setState({ filterModel: false })} />
-                            </View>
-                        </View>
-                    </Modal>
-                </View>
-                <FlatList
-                    style={{ marginBottom: 120 }}
-                    data={this.state.shownSpells}
-                    keyExtractor={(spells, index) => index.toString()}
-                    onEndReached={() => {
-                        if (this.state.flatListLoadPauseTimer) {
-                            return;
-                        }
-                        this.setState({ loadNumber: this.state.loadNumber + 40 }, () => { this.loadSpells(this.state.shownSpells) })
-                    }}
-                    onEndReachedThreshold={1}
-                    renderItem={({ item }) => <SpellListItem
-                        title={item.name}
-                        subTitle={item.description}
-                        type={`Spell level: ${item.type}`}
-                        classes={`Classes: ${item.classes}`}
-                        duration={`Duration: ${item.duration}`}
-                        range={`Range: ${item.range}`}
-                        higher_levels={`Higher Levels: ${item.higher_levels}`}
-                        direction={'row'}
-                        headColor={Colors.bitterSweetRed}
-                        subColor={Colors.whiteInDarkMode}
-                        headerFontSize={20}
-                        subFontSize={16}
-                        padding={20} width={60} height={60}
-                        headTextAlign={"left"}
-                        subTextAlign={"left"}
-                        justifyContent={"flex-start"} textDistanceFromImg={0}
-                        onPress={() => { this.setState({ pickSpellModal: true, pickedSpell: item }) }}
-                    />}
-                    ItemSeparatorComponent={ListItemSeparator} />
-                <View style={{ position: 'absolute', width: 150, right: 45, top: 45 }}>
-                    <AppActivityIndicator visible={this.state.loading} />
-                </View>
-                <Modal visible={this.state.pickSpellModal} >
-                    {this.state.pickSpellModal &&
+                {this.state.contentLoading ? <AppActivityIndicator visible={this.state.contentLoading} />
+                    :
+                    <View>
                         <View>
-                            {this.state.confirmed ?
-                                <AppConfirmation visible={this.state.confirmed} />
-                                :
-                                <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
-                                    {this.state.character.magic ?
-                                        <View style={{ backgroundColor: Colors.pageBackground }}>
-                                            <View style={{ padding: 10, backgroundColor: Colors.pageBackground }}>
-                                                <AppText fontSize={25} padding={15} color={Colors.berries} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
-                                                <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description.replace(/\. /g, '.\n\n')}</AppText>
-                                                {this.state.pickedSpell?.higher_levels &&
-                                                    <View>
-                                                        <AppText fontSize={22} color={Colors.berries} textAlign={'center'}>Higher Levels</AppText>
-                                                        <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.higher_levels.replace(/\. /g, '.\n\n')}</AppText>
-                                                    </View>}
-                                                <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
-                                                <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
-                                                <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
-                                                {(this.state.character.magic.cantrips && this.state.pickedSpell.level === 'cantrip') ?
-                                                    addSpell(this.state.pickedSpell.type, this.state.character) ?
-                                                        <View style={{ margin: 15 }}>
-                                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                                                title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
-                                                        </View>
-                                                        :
-                                                        <View>
-                                                            <AppText fontSize={18} color={Colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {spellLevelReadingChanger(this.state.pickedSpell.level)}</AppText>
-                                                        </View>
-                                                    : null}
-
-                                                {(!this.state.character.magic.cantrips && this.state.pickedSpell.level === 'cantrip') ?
-                                                    <View>
-                                                        <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>Your Character does not possess the ability to use cantrips.</AppText>
-                                                    </View>
-                                                    : null}
-
-                                                {this.state.pickedSpell.level !== 'cantrip' ?
-                                                    addSpell(this.state.pickedSpell.type, this.state.character) ?
-                                                        <View style={{ margin: 15 }}>
-                                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                                                title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
-                                                        </View>
-                                                        :
-                                                        <View>
-                                                            <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {spellLevelReadingChanger(this.state.pickedSpell.level)}</AppText>
-                                                        </View>
-                                                    : null}
-                                            </View>
-                                            <View style={{ margin: 15, backgroundColor: Colors.pageBackground }}>
-                                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                                    title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
-                                            </View>
-                                        </View>
-                                        :
-                                        <View style={{ padding: 15, backgroundColor: Colors.pageBackground }}>
-                                            <AppText>{this.state.pickedSpell.name}</AppText>
-                                            <AppText>{this.state.pickedSpell.description}</AppText>
-                                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
-                                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
-                                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
-                                            <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>Right now you do not possess magical abilities</AppText>
-                                            <View>
-                                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                                    title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
-                                            </View>
-                                        </View>
-                                    }
-                                </ScrollView>}
+                            <SearchBar
+                                onClear={() => { this.resetList() }}
+                                containerStyle={{ backgroundColor: Colors.pageBackground }}
+                                inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
+                                lightTheme={Colors.pageBackground === "#121212" ? false : true}
+                                placeholder="Search Spells"
+                                onChangeText={this.updateSearch}
+                                value={this.state.search}
+                            />
+                            <View style={{ flexDirection: 'row', justifyContent: "flex-end", alignItems: "flex-end" }}>
+                                {this.state.character.magic &&
+                                    <View style={{ paddingTop: 15, paddingRight: 15 }}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={70} height={55} borderRadius={25}
+                                            title={'Filter'} onPress={() => this.setState({ filterModel: true })} />
+                                    </View>
+                                }
+                                {this.state.character.magic &&
+                                    <View style={{ paddingTop: 15, paddingRight: 15 }}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={70} height={55} borderRadius={25}
+                                            title={'Custom Spells'} onPress={() => { this.props.navigation.navigate('CustomSpellList', { character: this.state.character }) }} />
+                                    </View>
+                                }
+                            </View>
+                            <Modal visible={this.state.filterModel}>
+                                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 25, backgroundColor: Colors.pageBackground }}>
+                                    <View style={{ flexDirection: 'row', backgroundColor: Colors.pageBackground }}>
+                                        <AppText>Only show spells for your class?</AppText>
+                                        <Switch value={this.state.filterByClass} onValueChange={() => {
+                                            if (this.state.filterByClass) {
+                                                this.setState({ filterByClass: false, loadNumber: 10 }, () => {
+                                                    this.resetList()
+                                                })
+                                                return;
+                                            }
+                                            this.setState({ filterByClass: true, loadNumber: 10 }, () => {
+                                                this.resetList()
+                                            })
+                                        }} />
+                                    </View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <AppText>Only show spells that you can learn?</AppText>
+                                        <Switch value={this.state.filterByLevel} onValueChange={() => {
+                                            if (this.state.filterByLevel) {
+                                                this.setState({ filterByLevel: false })
+                                                this.resetList()
+                                                return;
+                                            }
+                                            this.setState({ filterByLevel: true }, () => {
+                                                this.resetList()
+                                            })
+                                        }} />
+                                    </View>
+                                    <View style={{ marginTop: 50, justifyContent: "center", alignItems: "center", backgroundColor: Colors.pageBackground }}>
+                                        <AppText>Enable Level filter?</AppText>
+                                        <Switch value={this.state.sliderLevelFilter} onValueChange={() => {
+                                            if (this.state.sliderLevelFilter) {
+                                                this.setState({ sliderLevelFilter: false })
+                                                this.resetList()
+                                                return;
+                                            }
+                                            this.setState({ sliderLevelFilter: true, filterByLevel: false }, () => {
+                                                this.resetList()
+                                            })
+                                        }} />
+                                        <AppText>Use the slider to filter the highest spell level you want.</AppText>
+                                        {this.state.sliderLevelVal && <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
+                                        <Slider
+                                            disabled={!this.state.sliderLevelFilter}
+                                            style={{ width: 200, height: 40 }}
+                                            minimumValue={1}
+                                            step={1}
+                                            maximumValue={9}
+                                            thumbTintColor={Colors.bitterSweetRed}
+                                            minimumTrackTintColor={Colors.bitterSweetRed}
+                                            maximumTrackTintColor={Colors.berries}
+                                            onValueChange={(val) => {
+                                                this.setState({ sliderLevelVal: val })
+                                            }}
+                                            onSlidingComplete={() => {
+                                                this.resetList()
+                                            }}
+                                        />
+                                    </View>
+                                    <View style={{ backgroundColor: Colors.pageBackground }}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                            title={'Close'} onPress={() => this.setState({ filterModel: false })} />
+                                    </View>
+                                </View>
+                            </Modal>
                         </View>
-                    }
-                </Modal>
+                        <FlatList
+                            style={{ marginBottom: 120 }}
+                            data={this.state.shownSpells}
+                            keyExtractor={(spells, index) => index.toString()}
+                            onEndReached={() => {
+                                if (this.state.flatListLoadPauseTimer) {
+                                    return;
+                                }
+                                this.setState({ loadNumber: this.state.loadNumber + 40 }, () => { this.loadSpells(this.state.shownSpells) })
+                            }}
+                            onEndReachedThreshold={1}
+                            renderItem={({ item }) => <SpellListItem
+                                title={item.name}
+                                subTitle={item.description}
+                                type={`Spell level: ${item.type}`}
+                                classes={`Classes: ${item.classes}`}
+                                duration={`Duration: ${item.duration}`}
+                                range={`Range: ${item.range}`}
+                                higher_levels={`Higher Levels: ${item.higher_levels}`}
+                                direction={'row'}
+                                headColor={Colors.bitterSweetRed}
+                                subColor={Colors.whiteInDarkMode}
+                                headerFontSize={20}
+                                subFontSize={16}
+                                padding={20} width={60} height={60}
+                                headTextAlign={"left"}
+                                subTextAlign={"left"}
+                                justifyContent={"flex-start"} textDistanceFromImg={0}
+                                onPress={() => { this.setState({ pickSpellModal: true, pickedSpell: item }) }}
+                            />}
+                            ItemSeparatorComponent={ListItemSeparator} />
+                        <View style={{ position: 'absolute', width: 150, right: 135, top: 50 }}>
+                            <AppActivityIndicator visible={this.state.loading} />
+                        </View>
+                        <Modal visible={this.state.pickSpellModal} >
+                            {this.state.pickSpellModal &&
+                                <View>
+                                    {this.state.confirmed ?
+                                        <AppConfirmation visible={this.state.confirmed} />
+                                        :
+                                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                            {this.state.character.magic ?
+                                                <View style={{ backgroundColor: Colors.pageBackground }}>
+                                                    <View style={{ padding: 10, backgroundColor: Colors.pageBackground }}>
+                                                        <AppText fontSize={25} padding={15} color={Colors.berries} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
+                                                        <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description.replace(/\. /g, '.\n\n')}</AppText>
+                                                        {this.state.pickedSpell?.higher_levels &&
+                                                            <View>
+                                                                <AppText fontSize={22} color={Colors.berries} textAlign={'center'}>Higher Levels</AppText>
+                                                                <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.higher_levels.replace(/\. /g, '.\n\n')}</AppText>
+                                                            </View>}
+                                                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
+                                                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
+                                                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
+                                                        {(this.state.character.magic.cantrips && this.state.pickedSpell.level === 'cantrip') ?
+                                                            addSpell(this.state.pickedSpell.type, this.state.character) ?
+                                                                <View style={{ margin: 15 }}>
+                                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                                        title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
+                                                                </View>
+                                                                :
+                                                                <View>
+                                                                    <AppText fontSize={18} color={Colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {spellLevelReadingChanger(this.state.pickedSpell.level)}</AppText>
+                                                                </View>
+                                                            : null}
+
+                                                        {(!this.state.character.magic.cantrips && this.state.pickedSpell.level === 'cantrip') ?
+                                                            <View>
+                                                                <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>Your Character does not possess the ability to use cantrips.</AppText>
+                                                            </View>
+                                                            : null}
+
+                                                        {this.state.pickedSpell.level !== 'cantrip' ?
+                                                            addSpell(this.state.pickedSpell.type, this.state.character) ?
+                                                                <View style={{ margin: 15 }}>
+                                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                                        title={'Add Spell'} onPress={() => { this.addSpellToChar() }} />
+                                                                </View>
+                                                                :
+                                                                <View>
+                                                                    <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {spellLevelReadingChanger(this.state.pickedSpell.level)}</AppText>
+                                                                </View>
+                                                            : null}
+                                                    </View>
+                                                    <View style={{ margin: 15, backgroundColor: Colors.pageBackground }}>
+                                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                            title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
+                                                    </View>
+                                                </View>
+                                                :
+                                                <View style={{ padding: 15, backgroundColor: Colors.pageBackground }}>
+                                                    <AppText>{this.state.pickedSpell.name}</AppText>
+                                                    <AppText>{this.state.pickedSpell.description}</AppText>
+                                                    <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
+                                                    <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
+                                                    <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
+                                                    <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>Right now you do not possess magical abilities</AppText>
+                                                    <View>
+                                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                            title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
+                                                    </View>
+                                                </View>
+                                            }
+                                        </ScrollView>}
+                                </View>
+                            }
+                        </Modal>
+                    </View>
+                }
             </View >
         )
     }
