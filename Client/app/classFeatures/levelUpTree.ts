@@ -355,8 +355,8 @@ const Druid = async (level: number, character: CharacterModel) => {
         case level === 3:
             cantrips = 2;
             spells = [4, 2, 0, 0, 0, 0, 0, 0, 0];
-            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level, character.charSpecials.druidCircle, character), cantrips: cantrips, spells: spells } });
-            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level, character.path.name), cantrips: cantrips, spells: spells } });
+            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level ? character.level : 0, character.charSpecials && character.charSpecials.druidCircle ? character.charSpecials.druidCircle : "", character), cantrips: cantrips, spells: spells } });
+            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level ? character.level : 0, character.path.name), cantrips: cantrips, spells: spells } });
             (character.path.name !== 'Circle of Spores' && character.path.name !== 'Circle of the Land' && character.path.name !== 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { cantrips: cantrips, spells: spells } })
             break;
         case level === 4:
@@ -369,8 +369,8 @@ const Druid = async (level: number, character: CharacterModel) => {
         case level === 5:
             cantrips = 3;
             spells = [4, 3, 2, 0, 0, 0, 0, 0, 0];
-            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level, character.charSpecials.druidCircle, character), cantrips: cantrips, spells: spells } });
-            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level, character.path.name), cantrips: cantrips, spells: spells } });
+            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level ? character.level : 0, character.charSpecials && character.charSpecials.druidCircle ? character.charSpecials.druidCircle : "", character), cantrips: cantrips, spells: spells } });
+            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level ? character.level : 0, character.path.name), cantrips: cantrips, spells: spells } });
             (character.path.name !== 'Circle of Spores' && character.path.name !== 'Circle of the Land' && character.path.name !== 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { cantrips: cantrips, spells: spells } });
             break;
         case level === 6:
@@ -383,8 +383,8 @@ const Druid = async (level: number, character: CharacterModel) => {
         case level === 7:
             cantrips = 3;
             spells = [4, 3, 3, 1, 0, 0, 0, 0, 0];
-            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level, character.charSpecials.druidCircle, character), cantrips: cantrips, spells: spells } });
-            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level, character.path.name), cantrips: cantrips, spells: spells } });
+            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level ? character.level : 0, character.charSpecials && character.charSpecials.druidCircle ? character.charSpecials.druidCircle : "", character), cantrips: cantrips, spells: spells } });
+            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level ? character.level : 0, character.path.name), cantrips: cantrips, spells: spells } });
             (character.path.name !== 'Circle of Spores' && character.path.name !== 'Circle of the Land' && character.path.name !== 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { cantrips: cantrips, spells: spells } });
 
             break;
@@ -398,8 +398,8 @@ const Druid = async (level: number, character: CharacterModel) => {
         case level === 9:
             cantrips = 3;
             spells = [4, 3, 3, 3, 1, 0, 0, 0, 0];
-            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level, character.charSpecials.druidCircle, character), cantrips: cantrips, spells: spells } });
-            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level, character.path.name), cantrips: cantrips, spells: spells } });
+            character.path.name === 'Circle of the Land' && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidCircleSpellsPicker(character.level ? character.level : 0, character.charSpecials && character.charSpecials.druidCircle ? character.charSpecials.druidCircle : "", character), cantrips: cantrips, spells: spells } });
+            (character.path.name === 'Circle of Spores' || character.path.name === 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { notCountAgainstKnown: true, extraSpells: druidPathSpellPicker(character.level ? character.level : 0, character.path.name), cantrips: cantrips, spells: spells } });
             (character.path.name !== 'Circle of Spores' && character.path.name !== 'Circle of the Land' && character.path.name !== 'Circle of Wildfire') && (LevelUpFunction = { operation: true, action: { cantrips: cantrips, spells: spells } })
             break;
         case level === 10:
@@ -520,7 +520,7 @@ const Cleric = async (level: number, character: CharacterModel) => {
             cantrips = 3;
             spells = [4, 2, 0, 0, 0, 0, 0, 0, 0];
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 4:
@@ -534,7 +534,7 @@ const Cleric = async (level: number, character: CharacterModel) => {
             cantrips = 4;
             spells = [4, 3, 2, 0, 0, 0, 0, 0, 0];
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 6:
@@ -548,7 +548,7 @@ const Cleric = async (level: number, character: CharacterModel) => {
             cantrips = 4;
             spells = [4, 3, 3, 1, 0, 0, 0, 0, 0];
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 8:
@@ -562,7 +562,7 @@ const Cleric = async (level: number, character: CharacterModel) => {
             cantrips = 4;
             spells = [4, 3, 3, 3, 1, 0, 0, 0, 0];
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, cantrips: cantrips, spells: spells, extraSpells: clericDomainSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 10:
@@ -794,7 +794,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 5:
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 6:
@@ -814,7 +814,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 9:
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 10:
@@ -834,7 +834,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 13:
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 14:
@@ -854,7 +854,7 @@ const Paladin = async (level: number, character: CharacterModel) => {
             break;
         case level === 17:
             LevelUpFunction = {
-                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level, character.path.name, character) }
+                operation: true, action: { notCountAgainstKnown: true, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], extraSpells: paladinOathSpellsPicker(character.level ? character.level : 0, character.path.name, character) }
             }
             break;
         case level === 18:
@@ -911,7 +911,7 @@ const Ranger = async (level: number, character: CharacterModel) => {
             LevelUpFunction = {
                 operation: true, action: {
                     spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], pathFeature: character.path.name === "Hunter Conclave" ? true : false,
-                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level ? character.level : 0, character.path.name, character) : null
                 }
             }
             break;
@@ -934,7 +934,7 @@ const Ranger = async (level: number, character: CharacterModel) => {
             LevelUpFunction = {
                 operation: true, action: {
                     spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0],
-                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level ? character.level : 0, character.path.name, character) : null
                 }
             }
             break;
@@ -957,7 +957,7 @@ const Ranger = async (level: number, character: CharacterModel) => {
             LevelUpFunction = {
                 operation: true, action: {
                     spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0],
-                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level ? character.level : 0, character.path.name, character) : null
                 }
             }
             break;
@@ -980,7 +980,7 @@ const Ranger = async (level: number, character: CharacterModel) => {
             LevelUpFunction = {
                 operation: true, action: {
                     spellsKnown: parseInt(character.spellsKnown) + 1, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0],
-                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level, character.path.name, character) : null
+                    notCountAgainstKnown: true, extraSpells: (character.path.name === "Monster Slayer Conclave" || character.path.name === "Swarmkeeper Conclave" || character.path.name === "Fey Wanderer Conclave") ? rangerConclaveSpells(character.level ? character.level : 0, character.path.name, character) : null
                 }
             }
             break;

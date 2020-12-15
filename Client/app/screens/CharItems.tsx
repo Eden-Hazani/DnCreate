@@ -40,11 +40,11 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         super(props)
         this.state = {
             isDm: this.props.route.params.isDm ? true : false,
-            newGold: this.props.route.params.isDm ? this.props.route.params.isDm.currency.gold : store.getState().character.currency.gold,
-            newSilver: this.props.route.params.isDm ? this.props.route.params.isDm.currency.silver : store.getState().character.currency.silver,
-            newCopper: this.props.route.params.isDm ? this.props.route.params.isDm.currency.copper : store.getState().character.currency.copper,
+            newGold: 0,
+            newSilver: 0,
+            newCopper: 0,
             changeCurrencyModal: false,
-            newAmount: null,
+            newAmount: 0,
             newItem: '',
             addItemModal: false,
             character: this.props.route.params.isDm ? this.props.route.params.isDm : store.getState().character,
@@ -54,26 +54,40 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         this.UnsubscribeStore = store.subscribe(() => { })
     }
 
+    componentDidMount() {
+        if (this.props.route.params.isDm) {
+            this.setState({ newGold: this.props.route.params.isDm.gold, newSilver: this.props.route.params.isDm.currency.silver, newCopper: this.props.route.params.isDm.currency.copper })
+        }
+        if (!this.props.route.params.isDm) {
+            const charStoreCurr = store.getState().character.currency;
+            if (charStoreCurr) {
+                this.setState({ newGold: charStoreCurr.gold, newSilver: charStoreCurr.silver, newCopper: charStoreCurr.copper })
+            }
+        }
+    }
+
     componentWillUnmount() {
         this.UnsubscribeStore()
     }
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.character._id) {
+                    characters[index] = this.state.character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
 
 
     addItem = () => {
-        if (!this.state.newItem || !this.state.newAmount) {
+        if (!this.state.newItem || this.state.newAmount === 0) {
             alert("Cannot Leave Name Or amount Empty!");
             return;
         }
@@ -135,9 +149,11 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
             return
         }
         const character = { ...this.state.character };
-        character.currency.gold = +this.state.newGold;
-        character.currency.silver = +this.state.newSilver;
-        character.currency.copper = +this.state.newCopper;
+        if (character.currency) {
+            character.currency.gold = +this.state.newGold;
+            character.currency.silver = +this.state.newSilver;
+            character.currency.copper = +this.state.newCopper;
+        }
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
@@ -146,9 +162,11 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
     }
 
     openCurrencyChange = () => {
-        this.setState({ newGold: this.state.character.currency.gold, newSilver: this.state.character.currency.silver, newCopper: this.state.character.currency.copper }, () => {
-            this.setState({ changeCurrencyModal: true })
-        })
+        if (this.state.character.currency) {
+            this.setState({ newGold: this.state.character.currency.gold, newSilver: this.state.character.currency.silver, newCopper: this.state.character.currency.copper }, () => {
+                this.setState({ changeCurrencyModal: true })
+            })
+        }
     }
 
     updateSearch = async (search: string) => {
@@ -170,7 +188,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                     <View style={{ paddingTop: 10, paddingLeft: 25 }}>
                         <AppText fontSize={35} color={Colors.bitterSweetRed}>Currency</AppText>
                         <TouchableOpacity style={styles.currency} onPress={() => { this.openCurrencyChange() }} disabled={this.state.isDm}>
-                            <AppText fontSize={20}>{`Gold ${this.state.character.currency.gold} Silver ${this.state.character.currency.silver} Copper ${this.state.character.currency.copper}`}</AppText>
+                            <AppText fontSize={20}>{`Gold ${this.state.character.currency && this.state.character.currency.gold} Silver ${this.state.character.currency && this.state.character.currency.silver} Copper ${this.state.character.currency && this.state.character.currency.copper}`}</AppText>
                         </TouchableOpacity>
                     </View>
                     <Modal visible={this.state.changeCurrencyModal}>

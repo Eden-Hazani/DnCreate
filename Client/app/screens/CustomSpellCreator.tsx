@@ -174,16 +174,18 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
             level: spellLevel
         }
         const customSpellString = await AsyncStorage.getItem('customSpellList');
-        const customSpellList = JSON.parse(customSpellString);
-        const newCustomSpellList = customSpellList.map((spell: CustomSpellModal) => {
-            if (spell._id === _id) {
-                spell = newSpell
-            }
-            return spell
-        });
-        await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
-            this.props.navigation.navigate('CustomSpellList');
-        })
+        if (customSpellString) {
+            const customSpellList = JSON.parse(customSpellString);
+            const newCustomSpellList = customSpellList.map((spell: CustomSpellModal) => {
+                if (spell._id === _id) {
+                    spell = newSpell
+                }
+                return spell
+            });
+            await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
+                this.props.navigation.navigate('CustomSpellList');
+            })
+        }
     }
 
 

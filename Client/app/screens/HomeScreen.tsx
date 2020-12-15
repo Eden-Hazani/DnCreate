@@ -89,10 +89,12 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 this.setState({ colorModal: true })
             }
             const characters = await userCharApi.getChars(this.context.user._id);
-            this.clearStorageJunk(characters.data)
-            store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
-            this.setState({ loading: false, characters: characters.data });
-            this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
+            if (characters.data) {
+                this.clearStorageJunk(characters.data)
+                store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
+                this.setState({ loading: false, characters: characters.data });
+                this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
+            }
         } catch (err) {
             errorHandler(err)
         }

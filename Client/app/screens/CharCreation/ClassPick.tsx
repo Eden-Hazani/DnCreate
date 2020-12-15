@@ -81,7 +81,9 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
     }
     async componentDidMount() {
         const isOffline = await AsyncStorage.getItem('isOffline');
-        this.setState({ isUserOffline: JSON.parse(isOffline) })
+        if (isOffline) {
+            this.setState({ isUserOffline: JSON.parse(isOffline) })
+        }
         this.getClasses()
     }
 
@@ -127,8 +129,8 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
                                                     <Image style={{ width: 150, height: 150 }} uri={this.dragonClasses[this.state.pickedClass.name]} />
                                                 </View>
                                                 <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
-                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description.replace(/\. /g, '.\n\n')}</AppText>
-                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo.replace(/\. /g, '.\n\n')}</AppText>
+                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description && this.state.pickedClass.description.replace(/\. /g, '.\n\n')}</AppText>
+                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo && this.state.pickedClass.brifInfo.replace(/\. /g, '.\n\n')}</AppText>
                                                 <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
                                                     <View style={{ width: "50%", marginTop: 10 }}>
                                                         <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
@@ -136,10 +138,14 @@ export class ClassPick extends Component<{ route: any, placeholder: string, navi
                                                     </View>
                                                     <View style={{ width: "50%" }}>
                                                         <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Saving Throws</AppText>
-                                                        {this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
+                                                        {this.state.pickedClass.savingThrows && this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
                                                     </View>
                                                     <View style={{ padding: 10 }}>
-                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL(this.state.pickedClass.information) }} />
+                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => {
+                                                            if (this.state.pickedClass.information) {
+                                                                Linking.openURL(this.state.pickedClass.information)
+                                                            }
+                                                        }} />
                                                     </View>
                                                 </View>
                                             </View>

@@ -9,7 +9,9 @@ import { CharacterModel } from "../models/characterModel";
 import jwtDecode from 'jwt-decode';
 import AsyncStorage from "@react-native-community/async-storage";
 
-export function reduce(currentState: AppState, action: Action): AppState {
+const initialState: AppState = new AppState();
+
+export function reduce(currentState: AppState | undefined = initialState, action: Action): AppState {
 
     const newState = { ...currentState }; // Duplicate the old state into a new state.
 
@@ -30,12 +32,13 @@ export function reduce(currentState: AppState, action: Action): AppState {
             break;
         case ActionType.ResetCharSkillsToLowerLevel:
             const char = { ...newState.character };
-            for (let item of char.skills) {
-                if (item[1] === 4) {
-                    item[1] = 4
+            if (char.skills)
+                for (let item of char.skills) {
+                    if (item[1] === 4) {
+                        item[1] = 4
+                    }
+                    item[1] = 0
                 }
-                item[1] = 0
-            }
             newState.character = char;
             break;
         case ActionType.firstLoginAd:
@@ -55,7 +58,7 @@ export function reduce(currentState: AppState, action: Action): AppState {
             break;
 
         case ActionType.Logout:
-            newState.user = null;
+            newState.user = new UserModel();
             newState.character = new CharacterModel();
             newState.characters = [];
             newState.leadingAdv = [];
@@ -105,7 +108,6 @@ export function reduce(currentState: AppState, action: Action): AppState {
             break;
         case ActionType.UpdateSingleAdventure:
             const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
-            console.log(index)
             newState.leadingAdv[index] = action.payload;
             break;
 

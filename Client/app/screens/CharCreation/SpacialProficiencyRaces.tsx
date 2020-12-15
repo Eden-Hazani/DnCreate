@@ -32,7 +32,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
             loading: true,
             abilityClicked: [],
             pickedAbilities: [],
-            totalPoints: null,
+            totalPoints: 0,
             characterInfo: store.getState().character
         }
         this.UnsubscribeStore = store.subscribe(() => { })
@@ -42,12 +42,12 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
 
     onFocus = () => {
         const characterInfo = { ...this.state.characterInfo }
-        characterInfo.strength = this.state.race.abilityBonus.strength;
-        characterInfo.constitution = this.state.race.abilityBonus.constitution;
-        characterInfo.dexterity = this.state.race.abilityBonus.dexterity;
-        characterInfo.charisma = this.state.race.abilityBonus.charisma;
-        characterInfo.wisdom = this.state.race.abilityBonus.wisdom;
-        characterInfo.intelligence = this.state.race.abilityBonus.intelligence;
+        characterInfo.strength = this.state.race.abilityBonus && this.state.race.abilityBonus.strength;
+        characterInfo.constitution = this.state.race.abilityBonus && this.state.race.abilityBonus.constitution;
+        characterInfo.dexterity = this.state.race.abilityBonus && this.state.race.abilityBonus.dexterity;
+        characterInfo.charisma = this.state.race.abilityBonus && this.state.race.abilityBonus.charisma;
+        characterInfo.wisdom = this.state.race.abilityBonus && this.state.race.abilityBonus.wisdom;
+        characterInfo.intelligence = this.state.race.abilityBonus && this.state.race.abilityBonus.intelligence;
         this.setState({ abilityClicked: [], pickedAbilities: [], characterInfo }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
@@ -60,7 +60,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
         setTimeout(() => {
             this.setState({ loading: false })
         }, 1000);
-        this.setState({ totalPoints: spacialRaceProficiency(this.state.characterInfo.race) })
+        this.setState({ totalPoints: spacialRaceProficiency(this.state.characterInfo.race ? this.state.characterInfo.race : "") })
         const abilityClicked = [];
         for (let item of abilities) {
             abilityClicked.push(false);

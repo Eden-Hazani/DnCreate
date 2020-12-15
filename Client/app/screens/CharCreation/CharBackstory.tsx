@@ -81,14 +81,16 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.characterInfo._id) {
-                characters[index] = this.state.characterInfo;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.characterInfo._id) {
+                    characters[index] = this.state.characterInfo;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     render() {

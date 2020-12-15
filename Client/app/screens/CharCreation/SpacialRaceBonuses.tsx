@@ -23,8 +23,9 @@ interface SpacialRaceBonusesState {
     extraLanguages: string[]
     extraLanguagesNumber: number
     race: RaceModel
-
-    secondItemClicked: boolean[],
+    weaponProficiencies: string[]
+    weaponProficienciesNumber: number
+    secondItemClicked: boolean[]
     secondItemPicked: any[]
     secondAmountToPick: number
 }
@@ -34,18 +35,20 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     constructor(props: any) {
         super(props)
         this.state = {
+            weaponProficiencies: [],
+            weaponProficienciesNumber: 0,
             extraLanguages: [],
             confirmed: false,
-            amountToPick: null,
+            amountToPick: 0,
             itemClicked: [],
             itemPicked: [],
             choice: null,
             character: store.getState().character,
-            extraLanguagesNumber: null,
+            extraLanguagesNumber: 0,
             race: this.props.route.params.race,
             secondItemClicked: [],
             secondItemPicked: [],
-            secondAmountToPick: null
+            secondAmountToPick: 0
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -55,6 +58,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         character.languages = [];
         character.skills = [];
         character.addedWeaponProf = [];
+        character.addedArmorProf = [];
         character.tools = [];
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
@@ -63,17 +67,28 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
     componentDidMount() {
         const character = { ...this.state.character };
-        character.languages = [];
-        character.skills = [];
-        character.addedWeaponProf = [];
-        character.tools = [];
         if (this.state.character.race === "DragonBorn") {
             this.setState({ amountToPick: 1 })
+        }
+        if (this.state.character.race === "Lizardfolk") {
+            this.setState({ amountToPick: 2 })
+        }
+        if (this.state.character.race === "Orc") {
+            this.setState({ amountToPick: 2 })
+        }
+        if (this.state.character.race === "Hobgoblin") {
+            this.setState({ weaponProficienciesNumber: 2 })
         }
         if (this.state.character.race === "Warforged") {
             this.setState({ amountToPick: 1, secondAmountToPick: 1, extraLanguagesNumber: 1 })
         }
         if (this.state.character.race === "Human") {
+            this.setState({ extraLanguagesNumber: 1 })
+        }
+        if (this.state.character.race === "Kalashtar") {
+            this.setState({ extraLanguagesNumber: 1 })
+        }
+        if (this.state.character.race === "Tabaxi") {
             this.setState({ extraLanguagesNumber: 1 })
         }
         if (this.state.character.race === "Leonin") {
@@ -148,6 +163,12 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
     insertInfoAndContinue = () => {
         const character = { ...this.state.character };
+        character.languages = [];
+        character.skills = [];
+        character.addedWeaponProf = [];
+        character.addedArmorProf = [];
+        character.tools = [];
+        character.languages = [];
         if (this.state.character.race === "Changeling") {
             character.languages.push("Common")
         }
@@ -169,7 +190,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                 alert('Must pick ancestry')
                 return
             }
-            character.charSpecials.dragonBornAncestry = this.state.itemPicked[0];
+            if (character.charSpecials) {
+                character.charSpecials.dragonBornAncestry = this.state.itemPicked[0];
+            }
             character.languages.push("Common", "Draconic")
         }
         if (this.state.character.race === "Human") {
@@ -192,6 +215,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             character.skills.push(["Perception", 0])
             character.languages.push("Common", "Elven")
         }
+        if (this.state.character.race === "Bugbear") {
+            character.skills.push(["Stealth", 0])
+        }
         if (this.state.character.race === "Half Orc") {
             character.skills.push(["Intimidation", 0])
             character.languages.push("Common", "Orc")
@@ -199,12 +225,43 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         if (this.state.character.race === "Goliath") {
             character.skills.push(["Athletics", 0])
         }
+        if (this.state.character.race === "Tabaxi") {
+            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
+                alert('You can learn another language')
+                return;
+            }
+            character.skills.push(["Perception", 0], ["Stealth", 0])
+        }
+        if (this.state.character.race === "Kalashtar") {
+            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
+                alert('You can learn another language')
+                return;
+            }
+        }
         if (this.state.character.race === "Gnome") {
             character.languages.push("Common", "Gnomish")
         }
         if (this.state.character.race === "Leonin") {
             if (this.state.amountToPick > this.state.itemPicked.length) {
                 alert('Must pick a skill')
+                return;
+            }
+            for (let item of this.state.itemPicked) {
+                character.skills.push([item, 0])
+            }
+        }
+        if (this.state.character.race === "Lizardfolk") {
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('You have 2 skills to pick')
+                return;
+            }
+            for (let item of this.state.itemPicked) {
+                character.skills.push([item, 0])
+            }
+        }
+        if (this.state.character.race === "Orc") {
+            if (this.state.amountToPick > this.state.itemPicked.length) {
+                alert('You have 2 skills to pick')
                 return;
             }
             for (let item of this.state.itemPicked) {
@@ -246,13 +303,26 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                 return
             }
         }
-        for (let language of this.state.race?.languages) {
-            character.languages.push(language)
+        if (this.state.character.race === "Hobgoblin") {
+            if (this.state.weaponProficiencies.length < this.state.weaponProficienciesNumber) {
+                alert("You have another weapon proficiency to add");
+                return;
+            }
+            character.addedArmorProf.push("Light Armor")
+            for (let item of this.state.weaponProficiencies) {
+                character.addedWeaponProf.push(item)
+            }
+        }
+        if (this.state.race?.languages) {
+            for (let language of this.state.race?.languages) {
+                character.languages.push(language)
+            }
         }
         for (let item of this.state.extraLanguages) {
             character.languages.push(item)
         }
         this.setState({ character, confirmed: true }, () => {
+            console.log(this.state.character)
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
             setTimeout(() => {
                 this.props.navigation.navigate("NewCharInfo", { race: this.state.race });
@@ -265,7 +335,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
 
 
     render() {
+        const OrcSkills = ["Animal Handling", "Insight", "Intimidation", "Medicine", "Survival", "Nature", "Perception"]
         const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"];
+        const lizardFolkSkills = ["Animal Handling", "Nature", "Perception", "Stealth", "Survival"]
         const kenkuSkills = ["Acrobatics", "Deception", "Stealth", "Sleight of Hand"]
         const leoninSkills = ["Athletics", "Intimidation", "Perception", "Survival"]
         const fullSkillList = ['Athletics', 'Acrobatics', 'Sleight of Hand', 'Stealth', 'Arcana', 'History', 'Investigation',
@@ -286,14 +358,14 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         </View>
                         <View style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Age:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.age.replace(/\. /g, '.\n\n')}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.age !== undefined) && this.state.race.raceAbilities.age.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Alignment:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.alignment.replace(/\. /g, '.\n\n')}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.alignment !== undefined) && this.state.race.raceAbilities.alignment.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Languages:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.languages.replace(/\. /g, '.\n\n')}</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.languages !== undefined) && this.state.race.raceAbilities.languages.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Size:</AppText>
-                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.race.raceAbilities.size.replace(/\. /g, '.\n\n')}</AppText>
-                            <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities.speed}ft</AppText>
+                            <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.size !== undefined) && this.state.race.raceAbilities.size.replace(/\. /g, '.\n\n')}</AppText>
+                            <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.speed}ft</AppText>
                         </View>
                         {this.state.race.raceAbilities?.uniqueAbilities &&
                             Object.values(this.state.race.raceAbilities.uniqueAbilities)
@@ -332,6 +404,30 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                             </View>
                         }
+                        {this.state.character.race === "Lizardfolk" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>You gain proficiency in 2 skills of your choice</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {lizardFolkSkills.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                                            onPress={() => this.pickItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
+                            </View>
+                        }
+                        {this.state.character.race === "Orc" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>You gain proficiency in 2 skills of your choice</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    {OrcSkills.map((item, index) =>
+                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                                            onPress={() => this.pickItem(item, index)}>
+                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                                        </TouchableOpacity>)}
+                                </View>
+                            </View>
+                        }
                         {this.state.character.race === "DragonBorn" &&
                             <View>
                                 <View style={{ padding: 15 }}>
@@ -353,6 +449,26 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         {this.state.character.race === "Human" &&
                             <View style={{ padding: 15 }}>
                                 <AppText textAlign={'center'} fontSize={18}>As a Human you can read speak and write Common and another extra language of your choice.</AppText>
+                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
+                                    const extraLanguages = this.state.extraLanguages;
+                                    extraLanguages[0] = txt;
+                                    this.setState({ extraLanguages })
+                                }} />
+                            </View>
+                        }
+                        {this.state.character.race === "Kalashtar" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>As a Kalashtar you can read speak and write Common, Quori, and another extra language of your choice.</AppText>
+                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
+                                    const extraLanguages = this.state.extraLanguages;
+                                    extraLanguages[0] = txt;
+                                    this.setState({ extraLanguages })
+                                }} />
+                            </View>
+                        }
+                        {this.state.character.race === "Tabaxi" &&
+                            <View style={{ padding: 15 }}>
+                                <AppText textAlign={'center'} fontSize={18}>As a Tabaxi you can speak, read, and write Common and one other language of your choice.</AppText>
                                 <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
                                     const extraLanguages = this.state.extraLanguages;
                                     extraLanguages[0] = txt;
@@ -405,7 +521,21 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 }} />
                             </View>
                         }
-
+                        {this.state.character.race === "Hobgoblin" &&
+                            <View>
+                                <AppText textAlign={'center'} fontSize={18}>As a Hobgoblin you can pick two martial weapons to be proficient with.</AppText>
+                                <AppTextInput placeholder={"Weapon..."} onChangeText={(txt: string) => {
+                                    const weaponProficiencies = this.state.weaponProficiencies;
+                                    weaponProficiencies[0] = txt;
+                                    this.setState({ weaponProficiencies })
+                                }} />
+                                <AppTextInput placeholder={"Weapon..."} onChangeText={(txt: string) => {
+                                    const weaponProficiencies = this.state.weaponProficiencies;
+                                    weaponProficiencies[1] = txt;
+                                    this.setState({ weaponProficiencies })
+                                }} />
+                            </View>
+                        }
                         {this.state.character.race === "Half Elf" &&
                             <View style={{ padding: 15 }}>
                                 <AppText textAlign={'center'} fontSize={18}>As a Half Elf you can read speak and write Common, Elven and another extra language of your choice.</AppText>

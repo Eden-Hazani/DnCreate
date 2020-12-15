@@ -26,19 +26,21 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
 
     async componentDidMount() {
         let availableMagic = await AsyncStorage.getItem(`${this.props.character._id}availableMagic`);
-        const totalMagic = Object.values(this.props.character.magic);
-        if (availableMagic) {
-            let availableMagicArray = JSON.parse(availableMagic);
-            availableMagicArray = availableMagicArray.filter((item: number) => item !== null);
-            this.setState({ availableMagic: availableMagicArray })
-        }
-        if (!availableMagic) {
-            const newAvailableMagic: number[] = [];
-            for (let item of totalMagic) {
-                newAvailableMagic.push(item)
+        if (this.props.character.magic) {
+            const totalMagic = Object.values(this.props.character.magic);
+            if (availableMagic) {
+                let availableMagicArray = JSON.parse(availableMagic);
+                availableMagicArray = availableMagicArray.filter((item: number) => item !== 0);
+                this.setState({ availableMagic: availableMagicArray })
             }
-            this.setState({ availableMagic: newAvailableMagic })
-            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+            if (!availableMagic) {
+                const newAvailableMagic: number[] = [];
+                for (let item of totalMagic) {
+                    newAvailableMagic.push(item)
+                }
+                this.setState({ availableMagic: newAvailableMagic })
+                await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+            }
         }
     }
 
@@ -54,18 +56,28 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
     }
 
     renewSpellSlot = (index: number) => {
-        const totalMagic = Object.values(this.props.character.magic);
-        const availableMagic = this.state.availableMagic;
-        if (availableMagic[index] === totalMagic[index]) {
-            return;
+        if (this.props.character.magic) {
+            const totalMagic = Object.values(this.props.character.magic);
+            const availableMagic = this.state.availableMagic;
+            if (availableMagic[index] === totalMagic[index]) {
+                return;
+            }
+            availableMagic[index] = availableMagic[index] + 1;
+            this.setState({ availableMagic }, async () => {
+                await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
+            })
         }
-        availableMagic[index] = availableMagic[index] + 1;
-        this.setState({ availableMagic }, async () => {
-            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
-        })
     }
 
     render() {
+        let spellCantripList: any = []
+        let magicCantripList: number = 0
+        if (this.props.character.spells && this.props.character.spells.cantrips) {
+            spellCantripList = this.props.character.spells.cantrips;
+        }
+        if (this.props.character.magic && this.props.character.magic.cantrips) {
+            magicCantripList = this.props.character.magic.cantrips;
+        }
         const { spellcastingAbility, spellSaveDc, spellAttackModifier } = SpellCastingSwitch(this.props.character, this.props.currentProficiency)
         return (
             <View style={styles.container}>
@@ -100,11 +112,20 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                     </View>
                 }
                 <View style={{ padding: 15 }}>
-                    {checkAvailableKnownSpells(this.props.character) > 0 ?
-                        <AppText textAlign={'center'} fontSize={18}>You still have {checkAvailableKnownSpells(this.props.character)} Known spells that you can pick from your spell book</AppText>
-                        :
-                        <AppText textAlign={'center'} fontSize={18}>You know the maximum amount of spells for your level</AppText>
-                    }
+                    <View style={{ padding: 15 }}>
+                        {magicCantripList > spellCantripList.length ?
+                            <AppText textAlign={'center'} fontSize={18}>You still have {magicCantripList - spellCantripList.length} Cantrips that you can pick from your spell book</AppText>
+                            :
+                            <AppText textAlign={'center'} fontSize={18}>You know the maximum amount of cantrips for your level</AppText>
+                        }
+                    </View>
+                    <View style={{ padding: 15 }}>
+                        {checkAvailableKnownSpells(this.props.character) > 0 ?
+                            <AppText textAlign={'center'} fontSize={18}>You still have {checkAvailableKnownSpells(this.props.character)} Known spells that you can pick from your spell book</AppText>
+                            :
+                            <AppText textAlign={'center'} fontSize={18}>You know the maximum amount of spells for your level</AppText>
+                        }
+                    </View>
                     {(this.props.character.characterClass === 'Wizard' || this.props.character.characterClass === 'Cleric'
                         || this.props.character.characterClass === 'Paladin' || this.props.character.characterClass === 'Druid') ?
                         <View>
@@ -125,13 +146,13 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                 </View>
                 <View>
                     <AppText textAlign={'center'} fontSize={30}>Spells:</AppText>
-                    {Object.values(this.props.character.spells).map((spellGroup, index) => <CharMagicLists isDm={this.props.isDm} reloadChar={() => this.props.reloadChar()} character={this.props.character} key={index} level={spellGroup} spells={spellGroup} />)}
+                    {Object.values(this.props.character.spells !== undefined && this.props.character.spells).map((spellGroup, index) => <CharMagicLists isDm={this.props.isDm} reloadChar={() => this.props.reloadChar()} character={this.props.character} key={index} level={spellGroup} spells={spellGroup} />)}
                 </View>
                 {this.props.isDm ?
                     <View>
                         {this.props.character.characterClass === "Warlock" ?
                             <View style={{ marginBottom: 20, padding: 15 }}>
-                                <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
+                                <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials !== undefined && this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials !== undefined && this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
                                 <AppText fontSize={18} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
                                 <AppText fontSize={18} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
                             </View>
@@ -139,7 +160,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                             <View>
                                 <AppText textAlign={'center'} fontSize={20}>Total Spell Slots</AppText>
                                 <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
-                                    {Object.entries(this.props.character.magic).map((item, index) =>
+                                    {Object.entries(this.props.character.magic !== undefined && this.props.character.magic).map((item, index) =>
                                         <TouchableOpacity disabled={this.props.isDm} key={index} style={[styles.spellSlot,
                                         { backgroundColor: Colors.berries }]}
                                             onLongPress={() => {
@@ -160,10 +181,10 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                         {this.props.character.characterClass === "Warlock" ?
                             <View>
                                 <View style={{ marginBottom: 5, padding: 15, paddingBottom: 5 }}>
-                                    <AppText fontSize={18} textAlign={'center'}>You currently have a total of {this.props.character.magic.cantrips} Available</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>You currently have a total of {this.props.character.magic && this.props.character.magic.cantrips} Available</AppText>
                                 </View>
                                 <View style={{ marginBottom: 20, padding: 15 }}>
-                                    <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
+                                    <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
                                 </View>
@@ -177,7 +198,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                                     <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>press reset to reset all your used spells</AppText>
                                     <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
                                         borderRadius={100} width={60} height={60} title={"reset"} onPress={async () => {
-                                            const totalMagic = Object.values(this.props.character.magic);
+                                            const totalMagic = Object.values(this.props.character.magic !== undefined && this.props.character.magic);
                                             const newAvailableMagic = []
                                             for (let item of totalMagic) {
                                                 newAvailableMagic.push(item)
@@ -188,7 +209,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
 
                                 </View>
                                 <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
-                                    {Object.entries(this.props.character.magic).map((item, index) =>
+                                    {Object.entries(this.props.character.magic !== undefined && this.props.character.magic).map((item, index) =>
                                         <View key={index}>
                                             {item[0] === "cantrips" ?
                                                 <View style={[styles.spellSlot, { backgroundColor: Colors.metallicBlue }]}>

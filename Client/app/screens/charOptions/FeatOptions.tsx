@@ -36,12 +36,12 @@ export class FeatOptions extends Component<{ featName: any, featDescription: any
             armorProfWindow: false,
             abilityPointsImprove: false,
             character: this.props.character,
-            strength: this.props.character.strength,
-            dexterity: this.props.character.dexterity,
-            constitution: this.props.character.constitution,
-            intelligence: this.props.character.intelligence,
-            wisdom: this.props.character.wisdom,
-            charisma: this.props.character.charisma,
+            strength: this.props.character.strength ? this.props.character.strength : 0,
+            dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
+            constitution: this.props.character.constitution ? this.props.character.constitution : 0,
+            intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
+            wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
+            charisma: this.props.character.charisma ? this.props.character.charisma : 0,
         }
     }
 
@@ -84,12 +84,12 @@ export class FeatOptions extends Component<{ featName: any, featDescription: any
 
     resetAbilityScore = () => {
         this.setState({
-            strength: this.props.character.strength,
-            dexterity: this.props.character.dexterity,
-            constitution: this.props.character.constitution,
-            intelligence: this.props.character.intelligence,
-            wisdom: this.props.character.wisdom,
-            charisma: this.props.character.charisma
+            strength: this.props.character.strength ? this.props.character.strength : 0,
+            dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
+            constitution: this.props.character.constitution ? this.props.character.constitution : 0,
+            intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
+            wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
+            charisma: this.props.character.charisma ? this.props.character.charisma : 0
         }, () => {
             this.props.resetAbilityScore()
         })

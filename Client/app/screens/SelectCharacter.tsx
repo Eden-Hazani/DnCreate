@@ -70,8 +70,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             currentHp: '',
             levelUpFunctionActive: false,
             levelUpFunction: null,
-            currentProficiency: null,
-            currentLevel: null,
+            currentProficiency: 0,
+            currentLevel: 0,
             loading: true,
             backGroundStoryVisible: false,
             statsVisible: false,
@@ -91,25 +91,33 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     refreshData = async () => {
-        this.setState({ loading: true })
-        if (await AsyncStorage.getItem('isOffline')) {
-            const stringChars = await AsyncStorage.getItem('offLineCharacterList');
-            const characters = JSON.parse(stringChars);
-            const character = characters.find((char: CharacterModel) => char._id === this.state.character._id)
-            this.setState({ character }, () => {
-                this.setState({ loading: false })
-            });
-            return;
+        try {
+            this.setState({ loading: true })
+            if (await AsyncStorage.getItem('isOffline')) {
+                const stringChars = await AsyncStorage.getItem('offLineCharacterList');
+                if (stringChars) {
+                    const characters = JSON.parse(stringChars);
+                    const character = characters.find((char: CharacterModel) => char._id === this.state.character._id)
+                    this.setState({ character }, () => {
+                        this.setState({ loading: false })
+                    });
+                }
+                return;
+            }
+            const response = await userCharApi.getChar(this.state.character._id ? this.state.character._id : "");
+            if (!response.ok) {
+                errorHandler(response);
+                return;
+            }
+            const character = response.data;
+            if (character) {
+                this.setState({ character }, () => {
+                    this.setState({ loading: false })
+                });
+            }
+        } catch (err) {
+            errorHandler(err)
         }
-        const response = await userCharApi.getChar(this.state.character._id);
-        if (!response.ok) {
-            errorHandler(response);
-            return;
-        }
-        const character = response.data;
-        this.setState({ character }, () => {
-            this.setState({ loading: false })
-        });
     }
 
     onFocus = async () => {
@@ -122,7 +130,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
 
     componentDidMount() {
-        let startCharInfo: CharacterModel = null;
+        let startCharInfo: CharacterModel = new CharacterModel();
         if (this.state.isDm) {
             startCharInfo = this.props.route.params.character;
         }
@@ -139,8 +147,10 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
             this.maxHpCheck();
-            this.setState({ currentLevel: this.state.character.level })
-            this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
+            if (this.state.character.level) {
+                this.setState({ currentLevel: this.state.character.level })
+                this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
+            }
 
         })
     }
@@ -154,31 +164,36 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     listStats = () => {
         const char = this.state.character;
-        const modifiers: any[] = Object.entries(this.state.character.modifiers);
-        modifiers[0].push(char.strength);
-        modifiers[1].push(char.constitution);
-        modifiers[2].push(char.dexterity);
-        modifiers[3].push(char.intelligence);
-        modifiers[4].push(char.wisdom);
-        modifiers[5].push(char.charisma);
-        return modifiers;
+        if (this.state.character.modifiers) {
+            const modifiers: any[] = Object.entries(this.state.character.modifiers);
+            modifiers[0].push(char.strength);
+            modifiers[1].push(char.constitution);
+            modifiers[2].push(char.dexterity);
+            modifiers[3].push(char.intelligence);
+            modifiers[4].push(char.wisdom);
+            modifiers[5].push(char.charisma);
+            return modifiers;
+        }
+        return []
     }
 
     updateOfflineChar = async (character: CharacterModel) => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === character._id) {
-                characters[index] = character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === character._id) {
+                    characters[index] = character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     setLevel = (level: number) => {
         let validLevel: number = level;
-        if (level < this.state.character.level) {
+        if (this.state.character.level && level < this.state.character.level) {
             if (level === 0) {
                 return;
             }
@@ -188,20 +203,22 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         validLevel = 1;
                     }
                     const character = await AsyncStorage.getItem(`current${this.state.character._id}level${level}`);
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: JSON.parse(character) })
-                    this.setState({ character: JSON.parse(character), currentLevel: validLevel }, () => {
-                        this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
-                        if (this.context.user._id === "Offline") {
-                            this.updateOfflineChar(this.state.character);
-                            this.setState({ currentHp: this.state.character.maxHp.toString() });
-                            this.refreshData();
-                            return;
-                        }
-                        userCharApi.updateChar(this.state.character).then(() => {
-                            this.setState({ currentHp: this.state.character.maxHp.toString() });
-                            this.refreshData();
+                    if (character) {
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: JSON.parse(character) })
+                        this.setState({ character: JSON.parse(character), currentLevel: validLevel }, () => {
+                            this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
+                            if (this.context.user._id === "Offline") {
+                                this.updateOfflineChar(this.state.character);
+                                this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" });
+                                this.refreshData();
+                                return;
+                            }
+                            userCharApi.updateChar(this.state.character).then(() => {
+                                this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" });
+                                this.refreshData();
+                            })
                         })
-                    })
+                    }
                 }
             }, {
                 text: 'No'
@@ -240,11 +257,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     skillCheck = (skill: string) => {
-        const modifiers = Object.entries(this.state.character.modifiers)
-        const skillGroup = skillModifier(skill);
-        for (let item of modifiers) {
-            if (item[0] === skillGroup) {
-                return item[1]
+        if (this.state.character.modifiers) {
+            const modifiers = Object.entries(this.state.character.modifiers)
+            const skillGroup = skillModifier(skill);
+            for (let item of modifiers) {
+                if (item[0] === skillGroup) {
+                    return item[1]
+                }
             }
         }
     }
@@ -253,12 +272,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     levelUp = async () => {
         const character = { ...this.state.character };
         const hitDice = hitDiceSwitch(this.state.character.characterClass);
-        let maxHp: number = this.state.character.maxHp;
-        maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + this.state.character.modifiers.constitution;
+        let maxHp: number = this.state.character.maxHp ? this.state.character.maxHp : 0;
+        maxHp = (maxHp + Math.floor(Math.random() * hitDice) + 1) + (this.state.character.modifiers && this.state.character.modifiers.constitution ? this.state.character.modifiers.constitution : 0);
         if (this.state.character.path?.name === "Draconic Bloodline") {
             maxHp = maxHp + 1
         }
-        if (this.state.character.characterClass === "Paladin") {
+        if (this.state.character.characterClass === "Paladin" && character.level) {
             let layOnHandsAmount = 5 * character.level;
             await AsyncStorage.setItem(`layOnHands${character._id}`, JSON.stringify(layOnHandsAmount));
         }
@@ -270,7 +289,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 const { operation, action } = levelUpTreeFunc;
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
-            this.setState({ currentHp: this.state.character.maxHp.toString() }, async () => {
+            this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" }, async () => {
                 await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
             });
         })
@@ -282,19 +301,19 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     maxHpCheck = async () => {
         if (!this.state.character.maxHp) {
             const character = { ...this.state.character };
-            let maxHp = hitDiceSwitch(this.state.character.characterClass) + this.state.character.modifiers.constitution;
+            let maxHp = hitDiceSwitch(this.state.character.characterClass) + (this.state.character.modifiers && this.state.character.modifiers.constitution ? this.state.character.modifiers.constitution : 0);
             if (this.state.character.path?.name === "Draconic Bloodline") {
                 maxHp = maxHp + 1
             }
             character.maxHp = maxHp;
             this.setState({ character }, async () => {
                 const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
-                currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp.toString() });
+                currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" });
                 this.context.user._id === "Offline" ? this.updateOfflineChar(this.state.character) : userCharApi.updateChar(this.state.character);
             })
         }
         const currentHp = await AsyncStorage.getItem(`${this.state.character._id}currentHp`);
-        currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp.toString() });
+        currentHp ? this.setState({ currentHp: currentHp }) : this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" });
         return this.state.character.maxHp;
     }
 
@@ -333,7 +352,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Initiative</AppText>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
-                                                    <AppText color={Colors.totalWhite} fontSize={25} >{this.state.character.modifiers.dexterity}</AppText>
+                                                    <AppText color={Colors.totalWhite} fontSize={25} >{this.state.character.modifiers && this.state.character.modifiers.dexterity}</AppText>
                                                 </View>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
@@ -341,11 +360,15 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 <TouchableOpacity disabled={isDm} style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}
                                                     onPress={() => {
                                                         Vibration.vibrate(400)
-                                                        this.setLevel(this.state.character.level + 1)
+                                                        if (this.state.character.level) {
+                                                            this.setLevel(this.state.character.level + 1)
+                                                        }
                                                     }}
                                                     onLongPress={() => {
                                                         Vibration.vibrate(400)
-                                                        this.setLevel(this.state.character.level - 1)
+                                                        if (this.state.character.level) {
+                                                            this.setLevel(this.state.character.level - 1)
+                                                        }
                                                     }}>
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{this.state.character.level}</AppText>
                                                 </TouchableOpacity>
@@ -367,12 +390,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{
-                                                        armorBonusCalculator(this.state.character, this.state.character.equippedArmor.ac, this.state.character.equippedArmor.armorBonusesCalculationType) + racialArmorBonuses(this.state.character.race)}</AppText>
+                                                        armorBonusCalculator(this.state.character, this.state.character.equippedArmor && this.state.character.equippedArmor.ac ? this.state.character.equippedArmor.ac : 0,
+                                                            this.state.character.equippedArmor ? this.state.character.equippedArmor.armorBonusesCalculationType : "") + racialArmorBonuses(this.state.character.race ? this.state.character.race : "")}</AppText>
                                                 </View>
                                                 <AppText>AC</AppText>
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
-                                                <TouchableOpacity disabled={this.state.isDm} onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: Colors.whiteInDarkMode, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp) }]}>
+                                                <TouchableOpacity disabled={this.state.isDm} onPress={() => { this.setState({ setCurrentHpModal: true }) }} style={[styles.triContainer, { borderColor: Colors.whiteInDarkMode, backgroundColor: hpColors(parseInt(this.state.currentHp), this.state.character.maxHp ? this.state.character.maxHp : 0) }]}>
                                                     <AppText color={Colors.black} fontSize={25}>{this.state.currentHp}</AppText>
                                                 </TouchableOpacity>
                                                 <AppText>Current Hp</AppText>
@@ -403,17 +427,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
                                     </View>
                                     <View style={{ flex: .1, padding: 25 }}>
-                                        <AppText textAlign={"left"} fontSize={25}>{this.state.character.background.backgroundName}</AppText>
+                                        <AppText textAlign={"left"} fontSize={25}>{this.state.character.background && this.state.character.background.backgroundName}</AppText>
                                         <View>
-                                            {this.state.character.background.backgroundFeatureName === '' ?
+                                            {this.state.character.background && this.state.character.background.backgroundFeatureName === '' ?
                                                 <View>
                                                     <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>No background feature.</AppText>
                                                 </View>
                                                 :
                                                 <View>
                                                     <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
-                                                    <AppText textAlign={"left"} fontSize={20}>{this.state.character.background.backgroundFeatureName}</AppText>
-                                                    <AppText textAlign={"left"} fontSize={17}>{this.state.character.background.backgroundFeatureDescription}</AppText>
+                                                    <AppText textAlign={"left"} fontSize={20}>{this.state.character.background && this.state.character.background.backgroundFeatureName}</AppText>
+                                                    <AppText textAlign={"left"} fontSize={17}>{this.state.character.background && this.state.character.background.backgroundFeatureDescription}</AppText>
                                                 </View>
                                             }
                                         </View>
@@ -541,7 +565,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={18} width={100} height={50} borderRadius={25} title={'complete skill list'}
                                         onPress={() => { this.setState({ completeSkillModel: true }) }} />
                                     <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
-                                    {this.state.character.skills.map(skill =>
+                                    {this.state.character.skills && this.state.character.skills.map((skill: any) =>
                                         <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
                                             <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
                                             <AppText fontSize={20} color={Colors.bitterSweetRed}
@@ -563,19 +587,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText fontSize={25} color={Colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
                                     <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
                                     <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers.strength} for melee weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.strength && this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.strength} for melee weapons</AppText>
                                     </View>
                                     <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers.dexterity} for ranged weapons</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.dexterity && this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.dexterity} for ranged weapons</AppText>
                                     </View>
                                     <AppText textAlign={'center'} fontSize={18}>Proficient weapons {'\n'} (add to attack roll)</AppText>
                                     <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                         <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
                                             <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
                                         </View>
-                                        <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
+                                        <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId && this.state.character.characterClassId.weaponProficiencies &&
+                                            this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                     </View>
-                                    {this.state.character.addedWeaponProf.length > 0 &&
+                                    {this.state.character.addedWeaponProf && this.state.character.addedWeaponProf.length > 0 &&
                                         <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                             <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
                                                 <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
@@ -602,7 +627,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             }
                             <View style={[styles.list, { width: '100%' }]}>
                                 <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Tools:</AppText>
-                                {this.state.character.tools.map((tool, index) =>
+                                {this.state.character.tools && this.state.character.tools.map((tool, index) =>
                                     <View key={index} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
                                         <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
                                     </View>
@@ -616,24 +641,24 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
                                         <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Traits:</AppText>
                                     </TouchableOpacity>
-                                    {this.state.character.personalityTraits.map((trait, index) => <AppText key={index}>{`${index + 1}. ${trait}`}</AppText>)}
+                                    {this.state.character.personalityTraits && this.state.character.personalityTraits.map((trait, index) => <AppText key={index}>{`${index + 1}. ${trait}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharIdeals", { updateIdeals: true, character: this.state.character }) }}>
                                         <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Ideals:</AppText>
                                     </TouchableOpacity>
-                                    {this.state.character.ideals.map((ideal, index) => <AppText key={index}>{`${index + 1}. ${ideal}`}</AppText>)}
+                                    {this.state.character.ideals && this.state.character.ideals.map((ideal, index) => <AppText key={index}>{`${index + 1}. ${ideal}`}</AppText>)}
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharFlaws", { updateFlaws: true, character: this.state.character }) }}>
                                         <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Flaws:</AppText>
-                                        {this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
+                                        {this.state.character.flaws && this.state.character.flaws.map((flaw, index) => <AppText key={index}>{`${index + 1}. ${flaw}`}</AppText>)}
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharBonds", { updateBonds: true, character: this.state.character }) }}>
                                         <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Bonds:</AppText>
-                                        {this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
+                                        {this.state.character.bonds && this.state.character.bonds.map((bond, index) => <AppText key={index}>{`${index + 1}. ${bond}`}</AppText>)}
                                     </TouchableOpacity>
                                 </View>
                             </View>

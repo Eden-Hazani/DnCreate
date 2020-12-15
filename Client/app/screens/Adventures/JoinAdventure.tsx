@@ -36,7 +36,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
         super(props)
         this.state = {
             loading: false,
-            confirmedAdventure: null,
+            confirmedAdventure: new AdventureModel(),
             pickedCharacter: new CharacterModel(),
             characters: []
         }
@@ -47,8 +47,14 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
         this.setState({ characters: characters })
     }
     async componentDidMount() {
-        const characters = await userCharApi.getChars(this.context.user._id);
-        this.setState({ characters: characters.data })
+        try {
+            const characters = await userCharApi.getChars(this.context.user._id);
+            if (characters.data !== undefined && characters.ok) {
+                this.setState({ characters: characters.data })
+            }
+        } catch (err) {
+            errorHandler(err)
+        }
     }
 
     findAdventure = async (values: any) => {
@@ -59,7 +65,9 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                 alert(confirmedAdventure.data);
                 return;
             }
-            this.setState({ confirmedAdventure: confirmedAdventure.data[0], loading: false })
+            if (confirmedAdventure.data !== undefined && confirmedAdventure.ok) {
+                this.setState({ confirmedAdventure: confirmedAdventure.data[0], loading: false })
+            }
         })
     }
 
@@ -72,19 +80,21 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
         }
         const confirmedAdventure = { ...this.state.confirmedAdventure };
         const pickedChar: any = this.state.pickedCharacter._id;
-        confirmedAdventure.participants_id.push(pickedChar);
-        this.setState({ confirmedAdventure }, async () => {
-            adventureApi.addAdventureParticipant(this.state.confirmedAdventure).then(adventure => {
-                if (!adventure.ok) {
+        if (confirmedAdventure.participants_id !== undefined) {
+            confirmedAdventure.participants_id.push(pickedChar);
+            this.setState({ confirmedAdventure }, async () => {
+                adventureApi.addAdventureParticipant(this.state.confirmedAdventure).then(adventure => {
+                    if (!adventure.ok) {
+                        this.setState({ loading: false })
+                        alert(adventure.data);
+                        return;
+                    }
+                    store.dispatch({ type: ActionType.UpdateParticipatingAdv, payload: adventure.data })
                     this.setState({ loading: false })
-                    alert(adventure.data);
-                    return;
-                }
-                store.dispatch({ type: ActionType.UpdateParticipatingAdv, payload: adventure.data })
-                this.setState({ loading: false })
-                this.props.navigation.navigate("Adventures")
-            });
-        })
+                    this.props.navigation.navigate("Adventures")
+                });
+            })
+        }
     }
 
     render() {

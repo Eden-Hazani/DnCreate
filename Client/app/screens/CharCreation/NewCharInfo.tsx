@@ -40,12 +40,15 @@ const ValidationSchema = Yup.object().shape({
             return true;
         }
         if (store.getState().nonUser) { return true }
-        const response = await userCharApi.validateCharName(value, this.parent.user_id);
-        if (response.data) {
-            return false
-        } else {
-            return true
+        if (value) {
+            const response = await userCharApi.validateCharName(value, this.parent.user_id);
+            if (response.data) {
+                return false
+            } else {
+                return true
+            }
         }
+        return true
 
     }).label("Full Name"),
     eyes: Yup.string().required().label("Eye Color"),

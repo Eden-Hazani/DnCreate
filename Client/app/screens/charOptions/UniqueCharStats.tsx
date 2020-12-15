@@ -45,11 +45,13 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
             monkElementModel: false
         }
     }
-    test = () => {
+    userFeatureChoices = () => {
         let choices: any[] = []
-        for (let charChoice of this.props.character.pathFeatures) {
-            if (charChoice.choice) {
-                charChoice.choice.forEach((item: any) => choices.push(item))
+        if (this.props.character.pathFeatures) {
+            for (let charChoice of this.props.character.pathFeatures) {
+                if (charChoice.choice) {
+                    charChoice.choice.forEach((item: any) => choices.push(item))
+                }
             }
         }
         return choices;
@@ -71,8 +73,8 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                 {this.props.character.path?.name === "Wild Magic" &&
                     <UniqueRollLists modalContacts={wildSurge.wildMagic} title={"Wild Magic"} />
                 }
-                {(this.props.character.path?.name === "College of Creation" && this.props.character.level >= 6 ||
-                    this.props.character.path?.name === "Circle of Wildfire" && this.props.character.level >= 2)
+                {(this.props.character.path?.name === "College of Creation" && this.props.character.level && this.props.character.level >= 6 ||
+                    this.props.character.path?.name === "Circle of Wildfire" && this.props.character.level && this.props.character.level >= 2)
                     ?
                     <View>
                         <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={pathCreatedCompanion[this.props.character.path?.name].name}
@@ -98,7 +100,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     <UniqueRollLists modalContacts={talesFromTheBeyond.inspirationRolls} title={"Spirits' Tales"} />
                 }
 
-                {this.props.character.charSpecials.fightingStyle.length > 0 ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.fightingStyle && this.props.character.charSpecials.fightingStyle.length > 0 ?
                     <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Fighting Style:</AppText>
                         {this.props.character.charSpecials.fightingStyle.map(fight =>
@@ -112,7 +114,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     : null
                 }
                 {this.props.character.path?.name === "Arcane Archer" ?
-                    this.test().map((arrow: any, index: any) => <TouchableOpacity key={index} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
+                    this.userFeatureChoices().map((arrow: any, index: any) => <TouchableOpacity key={index} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
                         onPress={() => { this.setState({ maneuversModal: true, pickedManeuver: arrow }) }}>
                         <AppText fontSize={20} color={Colors.bitterSweetRed}>{arrow.name}</AppText>
                         <View style={{ paddingRight: 10 }}>
@@ -120,7 +122,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </View>
                     </TouchableOpacity>)
                     : null}
-                {this.props.character.charSpecials.battleMasterManeuvers.length > 0 ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.battleMasterManeuvers && this.props.character.charSpecials.battleMasterManeuvers.length > 0 ?
                     <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginTop: 15 }]}>
                         <AppText textAlign={'left'} color={Colors.bitterSweetRed} fontSize={22}>Maneuvers:</AppText>
                         {this.props.character.charSpecials.battleMasterManeuvers.map(maneuver =>
@@ -147,7 +149,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </View>
                     }
                 </Modal>
-                {this.props.character.charSpecials.rageAmount ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.rageAmount ?
                     <BarbarianRageCounter character={this.props.character} />
                     : null
                 }
@@ -160,7 +162,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                 {this.props.character.characterClass === "Paladin" ?
                     <PaladinLayOnHandsCounter character={this.props.character} />
                     : null}
-                {this.props.character.charSpecials.martialPoints ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.martialPoints ?
                     <View>
                         {this.props.character.charSpecials.kiPoints ?
                             <MonkKiPointCounter character={this.props.character} />
@@ -170,7 +172,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </View>
                     </View>
                     : null}
-                {this.props.character.charSpecials.monkElementsDisciplines.length > 0 ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.monkElementsDisciplines && this.props.character.charSpecials.monkElementsDisciplines.length > 0 ?
                     <View>
                         <AppText color={Colors.bitterSweetRed} textAlign={'center'} fontSize={25}>Elements Disciplines:</AppText>
                         {this.props.character.charSpecials.monkElementsDisciplines.map(elements =>
@@ -196,26 +198,26 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </Modal>
                     </View>
                     : null}
-                {this.props.character.charSpecials.sneakAttackDie ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.sneakAttackDie ?
                     <View style={{ flexDirection: 'row' }}>
                         <AppText fontSize={20}>Sneak Attack Die -</AppText>
                         <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.sneakAttackDie}D6</AppText>
                     </View>
                     : null}
-                {this.props.character.charSpecials.sorceryPoints ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.sorceryPoints ?
                     <View style={{ flexDirection: 'row' }}>
                         <AppText fontSize={20}>Your max sorcery points -</AppText>
                         <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.sorceryPoints}</AppText>
                     </View>
                     : null}
-                {this.props.character.charSpecials.sorcererMetamagic.length > 0 ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.sorcererMetamagic && this.props.character.charSpecials.sorcererMetamagic.length > 0 ?
                     this.props.character.charSpecials.sorcererMetamagic.map((magic: any, index: number) =>
                         <View key={index} style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginBottom: 10 }]}>
                             <AppText fontSize={20}>{magic.name}</AppText>
                             <AppText>{magic.description}</AppText>
                         </View>)
                     : null}
-                {this.props.character.charSpecials.eldritchInvocations.length > 0 ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.eldritchInvocations && this.props.character.charSpecials.eldritchInvocations.length > 0 ?
                     <View>
                         <AppText fontSize={20} color={Colors.bitterSweetRed}>Eldritch Invocations</AppText>
                         {this.props.character.charSpecials.eldritchInvocations.map((invocation: any, index: number) =>
@@ -225,7 +227,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                             </View>)}
                     </View>
                     : null}
-                {this.props.character.charSpecials.warlockPactBoon ?
+                {this.props.character.charSpecials && this.props.character.charSpecials.warlockPactBoon ?
                     <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <AppText>Pact:</AppText>
                         <AppText fontSize={20} color={Colors.bitterSweetRed}>{this.props.character.charSpecials.warlockPactBoon.name}</AppText>

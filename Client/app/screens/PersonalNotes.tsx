@@ -53,15 +53,19 @@ export class PersonalNotes extends Component<{ navigation: any, route: any }, Pe
     }
     async componentDidMount() {
         const storedNotes = await AsyncStorage.getItem(`notes${this.state.character._id}`)
-        this.setState({ notes: JSON.parse(storedNotes) }, () => {
-            this.setState({ loading: false })
-        });
+        if (storedNotes) {
+            this.setState({ notes: JSON.parse(storedNotes) }, () => {
+            });
+        }
+        this.setState({ loading: false })
     }
     deleteNote = async (noteToDel: string) => {
         const storedNotes = await AsyncStorage.getItem(`notes${this.state.character._id}`);
-        const newNotes = JSON.parse(storedNotes).filter((note: any) => note._id !== noteToDel);
-        await AsyncStorage.setItem(`notes${this.state.character._id}`, JSON.stringify(newNotes));
-        this.setState({ notes: newNotes })
+        if (storedNotes) {
+            const newNotes = JSON.parse(storedNotes).filter((note: any) => note._id !== noteToDel);
+            await AsyncStorage.setItem(`notes${this.state.character._id}`, JSON.stringify(newNotes));
+            this.setState({ notes: newNotes })
+        }
     }
 
     addNote = async (values: any) => {
@@ -85,11 +89,13 @@ export class PersonalNotes extends Component<{ navigation: any, route: any }, Pe
 
     updateNote = async (values: any) => {
         const storedNotes = await AsyncStorage.getItem(`notes${this.state.character._id}`)
-        let oldNotes = JSON.parse(storedNotes);
-        const index = oldNotes.map((item: any) => { return item._id }).indexOf(values._id)
-        oldNotes[index] = values
-        await AsyncStorage.setItem(`notes${this.state.character._id}`, JSON.stringify(oldNotes));
-        this.setState({ timedNoteDesc: '', timedNoteName: '', notes: oldNotes, pickedNote: null, noteViewModal: false, editMode: false })
+        if (storedNotes) {
+            let oldNotes = JSON.parse(storedNotes);
+            const index = oldNotes.map((item: any) => { return item._id }).indexOf(values._id)
+            oldNotes[index] = values
+            await AsyncStorage.setItem(`notes${this.state.character._id}`, JSON.stringify(oldNotes));
+            this.setState({ timedNoteDesc: '', timedNoteName: '', notes: oldNotes, pickedNote: null, noteViewModal: false, editMode: false })
+        }
     }
 
 

@@ -78,9 +78,11 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           if (user === null) {
             const isOffline = await AsyncStorage.getItem("isOffline");
             const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
-            if (JSON.parse(isOffline)) {
-              store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
-              this.setState({ user: offlineUser })
+            if (isOffline) {
+              if (JSON.parse(isOffline)) {
+                store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
+                this.setState({ user: offlineUser })
+              }
             }
           }
           Font.loadAsync({
@@ -120,8 +122,10 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
 
   isUserLogged = async () => {
     const isOffline = await AsyncStorage.getItem('isOffline');
-    if (JSON.parse(isOffline)) {
-      return;
+    if (isOffline) {
+      if (JSON.parse(isOffline)) {
+        return;
+      }
     }
     const result = await authApi.isUserLogged();
     if (result.status === 403) {

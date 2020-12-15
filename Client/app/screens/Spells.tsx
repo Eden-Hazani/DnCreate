@@ -23,6 +23,7 @@ import { AppConfirmation } from '../components/AppConfirmation';
 import { spellLevelReadingChanger } from './charOptions/helperFunctions/spellLevelReadingChanger';
 import AuthContext from '../auth/context';
 import AsyncStorage from '@react-native-community/async-storage';
+import { charCanSpellCast } from './charOptions/helperFunctions/charCanSpellCast';
 
 
 interface SpellsState {
@@ -52,7 +53,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             contentLoading: true,
             spellsJSON: null,
             confirmed: false,
-            sliderLevelVal: null,
+            sliderLevelVal: 0,
             sliderLevelFilter: false,
             loading: false,
             pickSpellModal: false,
@@ -86,11 +87,11 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
     filterByClass = (shownSpells: any, newSpells: any) => {
         const searchedSpells = shownSpells;
         if (this.state.search !== '') {
-            const fullList = searchedSpells.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+            const fullList = searchedSpells.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
             newSpells = fullList;
         } else {
             newSpells = [];
-            const fullList = this.state.spellsJSON.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+            const fullList = this.state.spellsJSON.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
             for (let item = 0; item < this.state.loadNumber; item++) {
                 newSpells.push(fullList[item])
             }
@@ -118,15 +119,15 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             const result: any = filterMagicLevel(this.state.character, newSpells);
             newSpells = result;
         }
-        if (this.state.sliderLevelFilter && this.state.sliderLevelVal !== null) {
+        if (this.state.sliderLevelFilter && this.state.sliderLevelVal !== 0) {
             let fullList = this.state.spellsJSON.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString())
             if (this.state.filterByClass) {
                 const searchedSpells = shownSpells;
                 if (this.state.search !== '') {
-                    fullList = searchedSpells.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString() && spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+                    fullList = searchedSpells.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString() && spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
                     newSpells = fullList;
                 } else {
-                    fullList = fullList.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass.toLowerCase()))
+                    fullList = fullList.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
                 }
             }
             newSpells = fullList
@@ -167,35 +168,39 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.character._id) {
+                    characters[index] = this.state.character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     addSpellToChar = () => {
         const character = { ...this.state.character };
-        if (character.unrestrictedKnownSpells > 0 && !this.state.pickedSpell.classes.includes(character.spellCastingClass.toLowerCase())) {
+        if (character.unrestrictedKnownSpells && character.unrestrictedKnownSpells > 0 && !this.state.pickedSpell.classes.includes(character.spellCastingClass ? character.spellCastingClass.toLowerCase() : "")) {
             const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
             if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
                 alert('You already possess this spell');
                 return;
             }
-            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-            character.unrestrictedKnownSpells = character.unrestrictedKnownSpells - 1;
-            character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString();
-            this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)
-                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            })
-            return;
+            if (character.spells) {
+                character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                character.unrestrictedKnownSpells = character.unrestrictedKnownSpells - 1;
+                character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString();
+                this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)
+                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                })
+                return;
+            }
         }
-        if (character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
+        if (character.differentClassSpellsToPick && character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
             let index = 0;
             for (let item of character.differentClassSpellsToPick) {
                 if (this.state.pickedSpell.classes.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
@@ -204,20 +209,22 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         alert('You already possess this spell');
                         return;
                     }
-                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-                    item.numberOfSpells = item.numberOfSpells - 1;
-                    if (item.numberOfSpells === 0) {
+                    if (character.spells) {
+                        character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                        item.numberOfSpells = item.numberOfSpells - 1;
+                        if (item.numberOfSpells === 0) {
 
-                        character.differentClassSpellsToPick.splice(index, 1);
+                            character.differentClassSpellsToPick.splice(index, 1);
+                        }
+                        this.setState({ character, confirmed: true }, () => {
+                            setTimeout(() => {
+                                this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                            }, 1200);
+                            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                        })
+                        return;
                     }
-                    this.setState({ character, confirmed: true }, () => {
-                        setTimeout(() => {
-                            this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                        }, 1200);
-                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-                    })
-                    return;
                 }
                 if (this.state.pickedSpell.school.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
                     const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
@@ -225,20 +232,22 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         alert('You already possess this spell');
                         return;
                     }
-                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-                    item.numberOfSpells = item.numberOfSpells - 1;
-                    if (item.numberOfSpells === 0) {
+                    if (character.spells) {
+                        character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                        item.numberOfSpells = item.numberOfSpells - 1;
+                        if (item.numberOfSpells === 0) {
 
-                        character.differentClassSpellsToPick.splice(index, 1);
+                            character.differentClassSpellsToPick.splice(index, 1);
+                        }
+                        this.setState({ character, confirmed: true }, () => {
+                            setTimeout(() => {
+                                this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                            }, 1200);
+                            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                        })
+                        return;
                     }
-                    this.setState({ character, confirmed: true }, () => {
-                        setTimeout(() => {
-                            this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                        }, 1200);
-                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-                    })
-                    return;
                 }
                 index++
             }
@@ -273,14 +282,16 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             alert(`You Have reached the maximum number of available cantrips, Level up to unlock more`);
             return;
         }
-        character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-        this.setState({ character, confirmed: true }, () => {
-            setTimeout(() => {
-                this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-            }, 1200);
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-        })
+        if (character.spells) {
+            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+            this.setState({ character, confirmed: true }, () => {
+                setTimeout(() => {
+                    this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                }, 1200);
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+            })
+        }
 
     }
 
@@ -317,33 +328,39 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                             </View>
                             <Modal visible={this.state.filterModel}>
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 25, backgroundColor: Colors.pageBackground }}>
-                                    <View style={{ flexDirection: 'row', backgroundColor: Colors.pageBackground }}>
-                                        <AppText>Only show spells for your class?</AppText>
-                                        <Switch value={this.state.filterByClass} onValueChange={() => {
-                                            if (this.state.filterByClass) {
-                                                this.setState({ filterByClass: false, loadNumber: 10 }, () => {
-                                                    this.resetList()
-                                                })
-                                                return;
-                                            }
-                                            this.setState({ filterByClass: true, loadNumber: 10 }, () => {
-                                                this.resetList()
-                                            })
-                                        }} />
-                                    </View>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <AppText>Only show spells that you can learn?</AppText>
-                                        <Switch value={this.state.filterByLevel} onValueChange={() => {
-                                            if (this.state.filterByLevel) {
-                                                this.setState({ filterByLevel: false })
-                                                this.resetList()
-                                                return;
-                                            }
-                                            this.setState({ filterByLevel: true }, () => {
-                                                this.resetList()
-                                            })
-                                        }} />
-                                    </View>
+                                    {charCanSpellCast(this.state.character.spellCastingClass ? this.state.character.spellCastingClass : "")
+                                        &&
+                                        <View>
+                                            {console.log(this.state.character.spellCastingClass === "Wizard")}
+                                            <View style={{ flexDirection: 'row', backgroundColor: Colors.pageBackground }}>
+                                                <AppText>Only show spells for your class?</AppText>
+                                                <Switch value={this.state.filterByClass} onValueChange={() => {
+                                                    if (this.state.filterByClass) {
+                                                        this.setState({ filterByClass: false, loadNumber: 10 }, () => {
+                                                            this.resetList()
+                                                        })
+                                                        return;
+                                                    }
+                                                    this.setState({ filterByClass: true, loadNumber: 10 }, () => {
+                                                        this.resetList()
+                                                    })
+                                                }} />
+                                            </View>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <AppText>Only show spells that you can learn?</AppText>
+                                                <Switch value={this.state.filterByLevel} onValueChange={() => {
+                                                    if (this.state.filterByLevel) {
+                                                        this.setState({ filterByLevel: false })
+                                                        this.resetList()
+                                                        return;
+                                                    }
+                                                    this.setState({ filterByLevel: true }, () => {
+                                                        this.resetList()
+                                                    })
+                                                }} />
+                                            </View>
+                                        </View>
+                                    }
                                     <View style={{ marginTop: 50, justifyContent: "center", alignItems: "center", backgroundColor: Colors.pageBackground }}>
                                         <AppText>Enable Level filter?</AppText>
                                         <Switch value={this.state.sliderLevelFilter} onValueChange={() => {
@@ -357,7 +374,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                             })
                                         }} />
                                         <AppText>Use the slider to filter the highest spell level you want.</AppText>
-                                        {this.state.sliderLevelVal && <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
+                                        {this.state.sliderLevelVal > 0 && <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
                                         <Slider
                                             disabled={!this.state.sliderLevelFilter}
                                             style={{ width: 200, height: 40 }}

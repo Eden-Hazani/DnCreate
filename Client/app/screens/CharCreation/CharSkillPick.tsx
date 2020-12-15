@@ -56,7 +56,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             confirmed: false,
             skillClicked: [],
             loading: true,
-            amountToPick: null,
+            amountToPick: 0,
             availableSkills: [],
             pickedSkills: [],
             characterInfo: store.getState().beforeRegisterChar.name ? store.getState().beforeRegisterChar : store.getState().character
@@ -79,11 +79,13 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             skillClicked.push(false);
         }
         this.setState({ availableSkills: skillList, amountToPick: amount, skillClicked }, () => {
-            for (let item of this.state.characterInfo.skills) {
-                if (this.state.availableSkills.includes(item[0])) {
-                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                    alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
-                    this.setState({ alreadyPickedSkills })
+            if (this.state.characterInfo.skills) {
+                for (let item of this.state.characterInfo.skills) {
+                    if (this.state.availableSkills.includes(item[0])) {
+                        const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                        alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
+                        this.setState({ alreadyPickedSkills })
+                    }
                 }
             }
         })
@@ -99,11 +101,13 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             return;
         }
         for (let skill of this.state.pickedSkills) {
-            characterInfo.skills.push(skill)
+            if (characterInfo.skills)
+                characterInfo.skills.push(skill)
         }
         characterInfo.spellCastingClass = this.state.characterInfo.characterClass;
         for (let item of startingToolsSwitch(this.state.characterInfo.characterClass)) {
-            characterInfo.tools.push(item)
+            if (characterInfo.tools)
+                characterInfo.tools.push(item)
         }
         characterInfo.equippedArmor = {
             id: '1',
@@ -116,14 +120,18 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         }
         characterInfo.charSpecials = new CharSpacialModel();
         Object.keys(characterInfo.charSpecials).forEach(v => {
-            characterInfo.charSpecials[v] = false
-            characterInfo.charSpecials.sorcererMetamagic = []
-            characterInfo.charSpecials.eldritchInvocations = []
-            characterInfo.charSpecials.battleMasterManeuvers = []
-            characterInfo.charSpecials.fightingStyle = []
-            characterInfo.charSpecials.monkElementsDisciplines = []
-            characterInfo.charSpecials.companion = []
-            characterInfo.charSpecials.dragonBornAncestry = store.getState().character.charSpecials.dragonBornAncestry
+            if (characterInfo.charSpecials) {
+                characterInfo.charSpecials[v] = false
+                characterInfo.charSpecials.sorcererMetamagic = []
+                characterInfo.charSpecials.eldritchInvocations = []
+                characterInfo.charSpecials.battleMasterManeuvers = []
+                characterInfo.charSpecials.fightingStyle = []
+                characterInfo.charSpecials.monkElementsDisciplines = []
+                characterInfo.charSpecials.companion = []
+                let storeChar = store.getState().character.charSpecials;
+                if (storeChar)
+                    characterInfo.charSpecials.dragonBornAncestry = storeChar.dragonBornAncestry
+            }
         })
         if (store.getState().nonUser) {
             if (this.context.user && this.context.user.username) {
@@ -146,16 +154,16 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             characterInfo.backStory = "";
             characterInfo.ideals = [];
             characterInfo.magic = {
-                cantrips: null,
-                firstLevelSpells: null,
-                secondLevelSpells: null,
-                thirdLevelSpells: null,
-                forthLevelSpells: null,
-                fifthLevelSpells: null,
-                sixthLevelSpells: null,
-                seventhLevelSpells: null,
-                eighthLevelSpells: null,
-                ninthLevelSpells: null,
+                cantrips: 0,
+                firstLevelSpells: 0,
+                secondLevelSpells: 0,
+                thirdLevelSpells: 0,
+                forthLevelSpells: 0,
+                fifthLevelSpells: 0,
+                sixthLevelSpells: 0,
+                seventhLevelSpells: 0,
+                eighthLevelSpells: 0,
+                ninthLevelSpells: 0,
             }
             characterInfo.level = 1;
             characterInfo.items = [];
@@ -177,8 +185,6 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             characterInfo.spells.seventhLevelSpells = [];
             characterInfo.spells.eighthLevelSpells = [];
             characterInfo.spells.ninthLevelSpells = [];
-            characterInfo.addedWeaponProf = [];
-            characterInfo.addedArmorProf = [];
             characterInfo.differentClassSpellsToPick = [];
             characterInfo.nonClassAvailableSpells = [];
             characterInfo._id = Math.floor(100000000 + Math.random() * 900000000).toString();
@@ -213,7 +219,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             await AsyncStorage.removeItem(`${this.state.characterInfo.name}AttributeStage`);
             await AsyncStorage.removeItem(`${this.state.characterInfo.name}DicePool`);
             await AsyncStorage.removeItem(`${this.state.characterInfo.name}BackstoryStage`);
-            userCharApi.saveChar(this.state.characterInfo).then(result => {
+            userCharApi.saveChar(this.state.characterInfo).then((result: any) => {
                 let characterInfo: CharacterModel;
                 result.data === 'Character Already exists in system!' ? characterInfo = this.state.characterInfo : characterInfo = result.data;
                 this.setState({ confirmed: true })

@@ -43,28 +43,40 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     onFocus = async () => {
         const leadingAdv = store.getState().leadingAdv;
         const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
-        this.setState({ adventure })
+        if (adventure !== undefined) {
+            this.setState({ adventure })
+        }
     }
 
     reloadAdventureAfterQuest = () => {
         const leadingAdv = store.getState().leadingAdv;
         const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
-        this.setState({ adventure })
+        if (adventure !== undefined) {
+            this.setState({ adventure })
+        }
     }
 
     async componentDidMount() {
-        let userArray: string[] = []
-        for (let item of this.state.adventure.participants_id) {
-            userArray.push(item.user_id)
+        try {
+            let userArray: string[] = []
+            if (this.state.adventure.participants_id !== undefined) {
+                for (let item of this.state.adventure.participants_id) {
+                    if (item.user_id !== undefined) {
+                        userArray.push(item.user_id)
+                    }
+                }
+                const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+                const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+                this.setState({ profilePicList: picList }, () => {
+                    this.setState({ loading: false })
+                })
+            }
+            this.props.navigation.addListener('beforeRemove', (e: any) => {
+                e.preventDefault();
+            })
+        } catch (err) {
+            errorHandler(err)
         }
-        const userPicList: any = await adventureApi.getUserProfileImages(userArray)
-        const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
-        this.setState({ profilePicList: picList }, () => {
-            this.setState({ loading: false })
-        })
-        this.props.navigation.addListener('beforeRemove', (e: any) => {
-            e.preventDefault();
-        })
     }
     back = () => {
         this.props.navigation.addListener('beforeRemove', (e: any) => {
@@ -75,12 +87,14 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
 
     removeFromAdventure = (item: any) => {
         const adventure = { ...this.state.adventure };
-        const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
-        adventure.participants_id = participants_id;
-        this.setState({ adventure }, () => {
-            store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure })
-            adventureApi.leaveAdventure(this.state.adventure)
-        })
+        if (adventure.participants_id !== undefined) {
+            const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
+            adventure.participants_id = participants_id;
+            this.setState({ adventure }, () => {
+                store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure })
+                adventureApi.leaveAdventure(this.state.adventure)
+            })
+        }
     }
 
     characterWindow = async (character: any) => {
@@ -97,32 +111,48 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     }
 
     deleteAdventure = async () => {
-        const response = await adventureApi.deleteAdventure(this.state.adventure.adventureIdentifier, this.state.adventure.leader_id);
-        if (!response.ok) {
-            errorHandler(response.status);
-            return;
+        try {
+            if (this.state.adventure.adventureIdentifier !== undefined && this.state.adventure.leader_id !== undefined) {
+                const response = await adventureApi.deleteAdventure(this.state.adventure.adventureIdentifier, this.state.adventure.leader_id);
+                if (!response.ok) {
+                    errorHandler(response.status);
+                    return;
+                }
+                store.dispatch({ type: ActionType.DeleteAdventure, payload: this.state.adventure._id });
+                this.back();
+            }
+        } catch (err) {
+            errorHandler(err)
         }
-        store.dispatch({ type: ActionType.DeleteAdventure, payload: this.state.adventure._id });
-        this.back();
     }
 
     reloadAdventure = async (adventureIdentifier: string) => {
-        this.setState({ loading: true })
-        await adventureApi.getSingleLeadingAdventure(this.context.user._id, adventureIdentifier).then(confirmedAdventure => {
-            if (!confirmedAdventure.ok) {
-                alert(confirmedAdventure.data);
-                return;
-            }
-            this.setState({ adventure: confirmedAdventure.data[0] }, async () => {
-                let userArray: string[] = []
-                for (let item of this.state.adventure.participants_id) {
-                    userArray.push(item.user_id)
+        try {
+            this.setState({ loading: true })
+            await adventureApi.getSingleLeadingAdventure(this.context.user._id, adventureIdentifier).then(confirmedAdventure => {
+                if (!confirmedAdventure.ok) {
+                    alert(confirmedAdventure.data);
+                    return;
                 }
-                const userPicList: any = await adventureApi.getUserProfileImages(userArray)
-                const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
-                this.setState({ profilePicList: picList, loading: false })
+                if (confirmedAdventure.data !== undefined && confirmedAdventure.ok) {
+                    this.setState({ adventure: confirmedAdventure.data[0] }, async () => {
+                        let userArray: string[] = []
+                        if (this.state.adventure.participants_id !== undefined) {
+                            for (let item of this.state.adventure.participants_id) {
+                                if (item.user_id !== undefined) {
+                                    userArray.push(item.user_id)
+                                }
+                            }
+                        }
+                        const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+                        const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+                        this.setState({ profilePicList: picList, loading: false })
+                    })
+                }
             })
-        })
+        } catch (err) {
+            errorHandler(err)
+        }
     }
 
     render() {
@@ -137,7 +167,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                             <AppText>Setting: {adventure.adventureSetting}</AppText>
                         </View>
                         <AppText color={Colors.bitterSweetRed} fontSize={20}>Participants</AppText>
-                        {adventure.participants_id.length === 0 ?
+                        {adventure.participants_id !== undefined && adventure.participants_id.length === 0 ?
                             <View style={styles.main}>
                                 <AppText textAlign={'center'} fontSize={15}>No one is currently participating in this adventure.</AppText>
                                 <AppText textAlign={'center'} fontSize={15}>Share the adventure identifier with your friends to let them join.</AppText>
@@ -165,7 +195,9 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                     ItemSeparatorComponent={ListItemSeparator}
                                     refreshing={this.state.refreshing}
                                     onRefresh={() => {
-                                        this.reloadAdventure(adventure.adventureIdentifier)
+                                        if (adventure.adventureIdentifier) {
+                                            this.reloadAdventure(adventure.adventureIdentifier)
+                                        }
                                     }} />
                             </View>
                         }

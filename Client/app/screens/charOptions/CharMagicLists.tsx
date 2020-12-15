@@ -35,24 +35,28 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
     removeSpell = () => {
         const character = { ...this.state.character }
         const spellLevel = spellLevelChanger(this.state.pickedSpellDetail.level)
-        character.spells[spellLevel] = character.spells[spellLevel].filter((item: any) => item.spell.name !== this.state.pickedSpellDetail.name)
-        this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            this.props.reloadChar()
-            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-        })
+        if (character.spells) {
+            character.spells[spellLevel] = character.spells[spellLevel].filter((item: any) => item.spell.name !== this.state.pickedSpellDetail.name)
+            this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                this.props.reloadChar()
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+            })
+        }
     }
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.character._id) {
+                    characters[index] = this.state.character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     render() {
@@ -94,7 +98,7 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
                             </View>
                             <View>
                                 <AppButton fontSize={18} backgroundColor={Colors.shadowBlue} borderRadius={100}
-                                    width={100} height={100} title={"Close"} onPress={() => { this.setState({ pickedSpellDetail: false, spellDetailModal: null }) }} />
+                                    width={100} height={100} title={"Close"} onPress={() => { this.setState({ pickedSpellDetail: false, spellDetailModal: false }) }} />
                                 {this.state.isRemovable ?
                                     this.state.pickedSpellDetail.level === 'cantrip' ?
                                         <View>

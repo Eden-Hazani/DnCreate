@@ -20,7 +20,7 @@ export class CreateChoice extends Component<{ sendChoiceArrayBack: any }, Create
     constructor(props: any) {
         super(props)
         this.state = {
-            currentIndex: null,
+            currentIndex: 0,
             skillListOn: false,
             skillList: [],
             choiceOn: false,
@@ -105,7 +105,7 @@ export class CreateChoice extends Component<{ sendChoiceArrayBack: any }, Create
                                                     item.skillList = skills.skills;
                                                     item.amountToPick = skills.amountToPick;
                                                     choiceList[this.state.currentIndex] = item;
-                                                    this.setState({ skillListOn: false, choiceList, currentIndex: null })
+                                                    this.setState({ skillListOn: false, choiceList, currentIndex: 0 })
                                                 }} />
                                             </Modal>
                                             {this.state.choiceList[index].choiceSkillList &&

@@ -2,7 +2,7 @@
   "expo": {
     "name": "DnCreate",
     "slug": "DnCreate",
-    "version": "1.8.6.11",
+    "version": "1.8.6.21",
     "orientation": "portrait",
     "icon": "./assets/appIcon.png",
     "splash": {
@@ -30,7 +30,7 @@
       ],
       "useNextNotificationsApi": true,
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.DnCreate",
-      "versionCode": 41,
+      "versionCode": 43,
       "enableDangerousExperimentalLeanBuilds": true,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5186238714913357~1441201925"

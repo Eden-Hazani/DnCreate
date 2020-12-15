@@ -54,12 +54,13 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
 
     handleDelete = async (item: CustomSpellModal) => {
         const stringCustomSpellList = await AsyncStorage.getItem('customSpellList');
-        const customSpellList = JSON.parse(stringCustomSpellList);
-        const newCustomSpellList = customSpellList.filter((spell: CustomSpellModal) => spell._id !== item._id);
-        await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
-            this.setState({ customSpellList: newCustomSpellList })
-        });
-
+        if (stringCustomSpellList) {
+            const customSpellList = JSON.parse(stringCustomSpellList);
+            const newCustomSpellList = customSpellList.filter((spell: CustomSpellModal) => spell._id !== item._id);
+            await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
+                this.setState({ customSpellList: newCustomSpellList })
+            });
+        }
     }
 
     render() {

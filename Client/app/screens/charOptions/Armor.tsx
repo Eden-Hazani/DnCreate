@@ -55,7 +55,9 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
     }
     async componentDidMount() {
         const armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        this.setState({ armorList: JSON.parse(armorList) })
+        if (armorList) {
+            this.setState({ armorList: JSON.parse(armorList) })
+        }
     }
 
     validateArmor = () => {
@@ -98,10 +100,12 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
     }
     removeSet = async (setId: string) => {
         let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        let newArmorList = JSON.parse(armorList)
-        newArmorList = newArmorList.filter((armor: any) => armor.id !== setId);
-        AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
-        this.setState({ armorList: newArmorList });
+        if (armorList) {
+            let newArmorList = JSON.parse(armorList)
+            newArmorList = newArmorList.filter((armor: any) => armor.id !== setId);
+            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
+            this.setState({ armorList: newArmorList });
+        }
     }
     removeEquippedSet = () => {
         const character = { ...this.state.character };
@@ -126,29 +130,33 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.character._id) {
+                    characters[index] = this.state.character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     equipSet = (set: EquippedArmorModel) => {
-        const newSet = JSON.parse(JSON.stringify(set))
-        const character = { ...this.state.character };
-        newSet.ac = +set.baseAc;
-        character.equippedArmor = newSet;
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
-            }
-            userCharApi.updateChar(this.state.character)
-        });
+        if (set.baseAc) {
+            const newSet = JSON.parse(JSON.stringify(set))
+            const character = { ...this.state.character };
+            newSet.ac = +set.baseAc;
+            character.equippedArmor = newSet;
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter();
+                    return;
+                }
+                userCharApi.updateChar(this.state.character)
+            });
+        }
     }
 
 
@@ -186,16 +194,16 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                 <AppText fontSize={20} textAlign={'center'}>As a {this.state.character.characterClass} you have the following armor proficiencies:</AppText>
                             </View>
                             <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
-                                {this.state.character.characterClassId.armorProficiencies.map((item: any) =>
+                                {this.state.character.characterClassId && this.state.character.characterClassId.armorProficiencies && this.state.character.characterClassId.armorProficiencies.map((item: any) =>
                                     <View key={item} style={{ margin: 5, backgroundColor: Colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                         <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
                                     </View>)}
                             </View>
                             <View style={{ marginTop: 20, marginBottom: 20 }}>
-                                <AppText fontSize={20} textAlign={'center'}>You also gained the following armor proficiencies from your path or special events in your adventure:</AppText>
+                                <AppText fontSize={20} textAlign={'center'}>You also gained the following armor proficiencies from your path, race, or special events in your adventure:</AppText>
                             </View>
                             <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 10, flexDirection: "row", backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
-                                {this.state.character.addedArmorProf.map((item: any, index: number) =>
+                                {this.state.character.addedArmorProf && this.state.character.addedArmorProf.map((item: any, index: number) =>
                                     <View key={index} style={{ margin: 5, backgroundColor: Colors.bitterSweetRed, padding: 5, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                                         <AppText fontSize={18} textAlign={'center'}>{item}</AppText>
                                     </View>)}
@@ -213,7 +221,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                                 <View style={{ marginTop: 20, alignItems: "center" }}>
                                     <AppText textAlign={'center'}>You can only ware armor types you are proficient with.</AppText>
                                     <AppText textAlign={'center'}>Your class, the {this.state.character.characterClass} offers the following armor proficiencies:</AppText>
-                                    <AppText fontSize={16}>{this.state.character.characterClassId.armorProficiencies} {this.state.character.addedArmorProf}</AppText>
+                                    <AppText fontSize={16}>{this.state.character.characterClassId && this.state.character.characterClassId.armorProficiencies} {this.state.character.addedArmorProf}</AppText>
                                 </View>
                                 <AppText padding={20} textAlign={'center'}>You can unlock new proficiencies with some class paths or your DM might give you spacial proficiencies during your adventure.</AppText>
                                 <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}

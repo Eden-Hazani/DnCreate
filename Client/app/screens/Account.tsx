@@ -85,9 +85,11 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
         Alert.alert("Delete Account", "Are you sure you want to delete your account (this action is irreversible)?",
             [{
                 text: 'Yes', onPress: () => {
-                    authApi.deleteAccount(this.state.userInfo._id).then(() => {
-                        this.logout()
-                    })
+                    if (this.state.userInfo._id) {
+                        authApi.deleteAccount(this.state.userInfo._id).then(() => {
+                            this.logout()
+                        })
+                    }
                 }
             },
             { text: 'No' }])

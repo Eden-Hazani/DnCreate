@@ -1,7 +1,7 @@
 
 
 const switchProficiency = (level: number) => {
-    let bonus = null;
+    let bonus = 0;
     switch (true) {
         case level < 5:
             bonus = 2;

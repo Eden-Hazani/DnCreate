@@ -17,7 +17,7 @@ export class CustomSkillPick extends Component<{ sendSkillsBack: any }, CustomSk
         super(props)
         this.state = {
             pickedSkills: [],
-            amountToPick: null,
+            amountToPick: 0,
             skillClicked: []
         }
     }

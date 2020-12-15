@@ -61,7 +61,11 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             refreshing: false,
             error: false
         }
-        this.NetUnSub = NetInfo.addEventListener(netInfo => { this.setState({ isInternet: netInfo.isInternetReachable }) })
+        this.NetUnSub = NetInfo.addEventListener(netInfo => {
+            if (netInfo.isInternetReachable) {
+                this.setState({ isInternet: netInfo.isInternetReachable })
+            }
+        })
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
             this.setState({ searchColor: Colors.pageBackground })
@@ -69,7 +73,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     }
     async componentDidMount() {
         const isOffline = await AsyncStorage.getItem('isOffline');
-        this.setState({ isUserOffline: JSON.parse(isOffline) })
+        if (isOffline) {
+            this.setState({ isUserOffline: JSON.parse(isOffline) })
+        }
         this.getRacesFromServer();
     }
     componentWillUnmount() {
@@ -119,22 +125,24 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         }
         const races = [];
         const cachedRaces = await AsyncStorage.getItem('raceList');
-        for (let race of JSON.parse(cachedRaces)) {
-            if (race.name.includes(search)) {
-                races.push(race);
+        if (cachedRaces) {
+            for (let race of JSON.parse(cachedRaces)) {
+                if (race.name.includes(search)) {
+                    races.push(race);
+                }
             }
+            this.setState({ races })
         }
-        this.setState({ races })
     }
 
     pickRace = (race: RaceModel) => {
         const characterInfo = { ...this.state.characterInfo }
-        characterInfo.strength = race.abilityBonus.strength;
-        characterInfo.constitution = race.abilityBonus.constitution;
-        characterInfo.dexterity = race.abilityBonus.dexterity;
-        characterInfo.charisma = race.abilityBonus.charisma;
-        characterInfo.wisdom = race.abilityBonus.wisdom;
-        characterInfo.intelligence = race.abilityBonus.intelligence;
+        characterInfo.strength = race.abilityBonus && race.abilityBonus.strength;
+        characterInfo.constitution = race.abilityBonus && race.abilityBonus.constitution;
+        characterInfo.dexterity = race.abilityBonus && race.abilityBonus.dexterity;
+        characterInfo.charisma = race.abilityBonus && race.abilityBonus.charisma;
+        characterInfo.wisdom = race.abilityBonus && race.abilityBonus.wisdom;
+        characterInfo.intelligence = race.abilityBonus && race.abilityBonus.intelligence;
         this.state.isUserOffline ? characterInfo.raceId = race : characterInfo.raceId = race._id as any
         characterInfo.race = race.name;
         characterInfo.image = race.image;

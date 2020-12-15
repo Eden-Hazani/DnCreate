@@ -14,6 +14,7 @@ import AuthContext from '../../../auth/context';
 import { store } from '../../../redux/store';
 import { ActionType } from '../../../redux/action-type';
 import { AppButton } from '../../../components/AppButton';
+import errorHandler from '../../../../utility/errorHander';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -49,63 +50,83 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
     }
 
     componentDidMount() {
-        if (this.props.edit?.true) {
+        if (this.props.edit?.true && this.props.adventure.quests) {
             const quest = this.props.adventure.quests.filter((item: QuestModal) => item._id === this.props.edit.quest._id);
             this.setState({ oldQuestValues: quest[0] })
         }
     }
     createQuest = async (values: any) => {
-        const quest: QuestModal = {
-            _id: `${Math.floor((Math.random() * 1000000) + 1)}`,
-            active: true,
-            questName: values.questName,
-            questGiver: values.questGiver,
-            questDescription: values.questDescription,
-            questLocation: values.questLocation,
-            reward: values.reward,
-            ImageUri: this.state.difficultyPicked
+        try {
+            const quest: QuestModal = {
+                _id: `${Math.floor((Math.random() * 1000000) + 1)}`,
+                active: true,
+                questName: values.questName,
+                questGiver: values.questGiver,
+                questDescription: values.questDescription,
+                questLocation: values.questLocation,
+                reward: values.reward,
+                ImageUri: this.state.difficultyPicked
+            }
+            if (this.state.adventure.adventureIdentifier) {
+                const adventureObj = await adventureApi.getSingleLeadingAdventure(this.context.user._id, this.state.adventure.adventureIdentifier);
+                if (!adventureObj.ok) {
+                    alert(adventureObj.ok);
+                    return;
+                }
+                const adventure = adventureObj.data ? adventureObj.data[0] : new AdventureModel();
+                adventure.quests.push(quest);
+                this.setState({ adventure, completed: true }, () => {
+                    store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
+                    adventureApi.updateAdventure(this.state.adventure).then(() => {
+                        setTimeout(() => {
+                            this.props.close(false)
+                        }, 1200);
+                    })
+                })
+            }
+        } catch (err) {
+            errorHandler(err)
         }
-        const adventureObj = await adventureApi.getSingleLeadingAdventure(this.context.user._id, this.state.adventure.adventureIdentifier);
-        const adventure = adventureObj.data[0];
-        adventure.quests.push(quest);
-        this.setState({ adventure, completed: true }, () => {
-            store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
-            adventureApi.updateAdventure(this.state.adventure).then(() => {
-                setTimeout(() => {
-                    this.props.close(false)
-                }, 1200);
-            })
-        })
     }
 
     editQuest = async (values: any, _id: string) => {
-        const oldQuest = this.props.edit?.quest;
-        const newQuest: QuestModal = {
-            active: true,
-            questName: values.questName,
-            questGiver: values.questGiver,
-            questDescription: values.questDescription,
-            questLocation: values.questLocation,
-            reward: values.reward,
-            ImageUri: (oldQuest && this.state.difficultyPicked.length === 0) ? oldQuest.ImageUri : this.state.difficultyPicked,
-        }
-        const adventureObj = await adventureApi.getSingleLeadingAdventure(this.context.user._id, this.state.adventure.adventureIdentifier);
-        const adventure = adventureObj.data[0];
-        const newQuestList = adventure.quests.map((quest: QuestModal) => {
-            if (quest._id === _id) {
-                quest = newQuest
+        try {
+            const oldQuest = this.props.edit?.quest;
+            const newQuest: QuestModal = {
+                active: true,
+                questName: values.questName,
+                questGiver: values.questGiver,
+                questDescription: values.questDescription,
+                questLocation: values.questLocation,
+                reward: values.reward,
+                ImageUri: (oldQuest && this.state.difficultyPicked.length === 0) ? oldQuest.ImageUri : this.state.difficultyPicked,
             }
-            return quest
-        });
-        adventure.quests = newQuestList
-        this.setState({ adventure, completed: true }, () => {
-            store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
-            adventureApi.updateAdventure(this.state.adventure).then(() => {
-                setTimeout(() => {
-                    this.props.close({ isDone: false, info: this.state.adventure })
-                }, 1200);
-            })
-        })
+            if (this.state.adventure.adventureIdentifier) {
+                const adventureObj = await adventureApi.getSingleLeadingAdventure(this.context.user._id, this.state.adventure.adventureIdentifier);
+                if (!adventureObj.ok) {
+                    alert(adventureObj.ok);
+                    return;
+                }
+                const adventure = adventureObj.data ? adventureObj.data[0] : new AdventureModel();
+                const newQuestList = adventure.quests.map((quest: QuestModal) => {
+                    if (quest._id === _id) {
+                        quest = newQuest
+                    }
+                    return quest
+                });
+                adventure.quests = newQuestList
+                this.setState({ adventure, completed: true }, () => {
+                    store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
+                    adventureApi.updateAdventure(this.state.adventure).then(() => {
+                        setTimeout(() => {
+                            this.props.close({ isDone: false, info: this.state.adventure })
+                        }, 1200);
+                    })
+                })
+            }
+        } catch (err) {
+            errorHandler(err)
+        }
     }
 
     pickDifficulty = (difficulty: string, index: number) => {

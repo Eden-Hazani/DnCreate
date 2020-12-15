@@ -34,8 +34,8 @@ interface LevelUpOptionsState {
     beforeAnyChanges: CharacterModel,
     beforeLevelUp: CharacterModel
     skillsClicked: any[]
-    newSkills: any[]
-    newTools: any[]
+    newSkills: any
+    newTools: any
     pathClicked: boolean[]
     extraPathChoiceClicked: boolean[]
     pathChosen: any
@@ -73,8 +73,8 @@ interface LevelUpOptionsState {
     reloadingSkills: boolean
     maneuversToPick: boolean
     ElementsToPick: boolean
-    maneuvers: any[]
-    elements: any[]
+    maneuvers: any
+    elements: any
     pathFightingStyle: boolean
     pathPickDruidCircle: boolean
     languageToPick: boolean
@@ -104,8 +104,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             languageToPick: false,
             pathPickDruidCircle: false,
             pathFightingStyle: false,
-            maneuvers: this.props.character.charSpecials.battleMasterManeuvers,
-            elements: this.props.character.charSpecials.monkElementsDisciplines,
+            maneuvers: this.props.character.charSpecials && this.props.character.charSpecials.battleMasterManeuvers,
+            elements: this.props.character.charSpecials && this.props.character.charSpecials.monkElementsDisciplines,
             maneuversToPick: false,
             beforeAnyChanges: new CharacterModel,
             reloadingSkills: false,
@@ -128,29 +128,29 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             fightingStyle: [],
             pact: null,
             skillsClicked: [],
-            newTools: this.props.character.tools,
-            newSkills: this.props.character.skills,
+            newTools: this.props.character.tools && this.props.character.tools,
+            newSkills: this.props.character.skills && this.props.character.skills,
             spellSlots: [],
             load: true,
-            strength: this.props.character.strength,
-            dexterity: this.props.character.dexterity,
-            constitution: this.props.character.constitution,
-            intelligence: this.props.character.intelligence,
-            wisdom: this.props.character.wisdom,
-            charisma: this.props.character.charisma,
-            totalAbilityPoints: null,
+            strength: this.props.character.strength ? this.props.character.strength : 0,
+            dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
+            constitution: this.props.character.constitution ? this.props.character.constitution : 0,
+            intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
+            wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
+            charisma: this.props.character.charisma ? this.props.character.charisma : 0,
+            totalAbilityPoints: 0,
             abilityClicked: [0, 0, 0, 0, 0, 0],
             character: this.props.character,
             pathChosen: null,
             pathClicked: [],
-            totalMetaMagicPoints: null,
+            totalMetaMagicPoints: 0,
             invocationsClicked: [],
-            invocations: this.props.character.charSpecials.eldritchInvocations,
-            totalInvocationPoints: null,
+            invocations: this.props.character.charSpecials !== undefined && this.props.character.charSpecials.eldritchInvocations ? this.props.character.charSpecials.eldritchInvocations : [],
+            totalInvocationPoints: 0,
             newSpellAvailabilityList: [],
             newPathChoice: null,
             customPathFeatureList: [],
-            numberOfChoices: null,
+            numberOfChoices: 0,
             spellListToLoad: null
         }
     }
@@ -161,20 +161,26 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         setTimeout(() => {
             this.setState({ load: false })
         }, 1000);
+        let beforeLevelUpString: string = JSON.stringify(character);
         const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
-        const beforeLevelUpString = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
+        if (this.state.character.level) {
+            const result = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
+            if (result) {
+                beforeLevelUpString = result;
+            }
+        }
         this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
         character.magic = new MagicModel()
         this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
         if (this.props.options.spells || this.props.options.spellsKnown) {
             const character = { ...this.props.character };
-            if (this.props.options.spellSlotLevel) {
+            if (this.props.options.spellSlotLevel && character.charSpecials !== undefined) {
                 character.charSpecials.warlockSpellSlotLevel = this.props.options.spellSlotLevel;
             }
-            if (this.props.options.spellSlots) {
+            if (this.props.options.spellSlots && character.charSpecials !== undefined) {
                 character.charSpecials.warlockSpellSlots = this.props.options.spellSlots;
             }
-            if (this.props.options.sorceryPoints) {
+            if (this.props.options.sorceryPoints && character.charSpecials !== undefined) {
                 character.charSpecials.sorceryPoints = this.props.options.sorceryPoints;
             }
             if (this.props.options.spellsKnown) {
@@ -199,17 +205,32 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             const beforeAnyChanges = JSON.parse(JSON.stringify(character))
             this.setState({ character, beforeAnyChanges }, async () => {
+                if (this.props.character.level === 1 && this.props.character.race !== undefined) {
+                    addRacialSpells(this.props.character.race).forEach(item => {
+                        const spell = spellsJSON.find(spell => spell.name === item)
+                        if (spell && character.spells !== undefined && character.magic !== undefined && this.state.character.magic !== undefined) {
+                            const spellLevel = spellLevelChanger(spell.level)
+                            character.spells[spellLevel].push({ spell: spell, removable: false });
+                            character.magic[spellLevel] = this.state.character.magic[spellLevel] + 1;
+                        }
+                    })
+                    this.setState({ character })
+                }
                 this.setAvailableMagicSlots()
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
                 this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
             })
         }
-        if (this.props.character.level === 1) {
-            addRacialSpells(this.props.character.race).forEach(item => {
-                const spell = spellsJSON.find(spell => spell.name === item)
-                const spellLevel = spellLevelChanger(spell.level)
-                character.spells[spellLevel].push({ spell: spell, removable: false });
-            })
+        if (this.props.character.level === 1 && !(this.props.options.spells || this.props.options.spellsKnown)) {
+            if (this.props.character.race) {
+                addRacialSpells(this.props.character.race).forEach(item => {
+                    const spell = spellsJSON.find(spell => spell.name === item)
+                    if (spell && character.spells !== undefined) {
+                        const spellLevel = spellLevelChanger(spell.level)
+                        character.spells[spellLevel].push({ spell: spell, removable: false });
+                    }
+                })
+            }
             this.setState({ character })
         }
         if (this.props.options.abilityPointIncrease) {
@@ -222,7 +243,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             this.setState({ totalInvocationPoints: this.props.options.eldritchInvocations })
         }
         if (this.state.invocations.length > 0) {
-            this.setState({ invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            if (this.props.character.level) {
+                this.setState({ invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            }
         }
         if (Array.isArray(this.props.options)) {
             const pathClicked = [];
@@ -233,12 +256,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     }
 
     setAvailableMagicSlots = async () => {
-        const totalMagic = Object.values(this.state.character.magic);
-        const newAvailableMagic = []
-        for (let item of totalMagic) {
-            newAvailableMagic.push(item)
+        if (this.state.character.magic) {
+            const totalMagic = Object.values(this.state.character.magic);
+            const newAvailableMagic = []
+            for (let item of totalMagic) {
+                newAvailableMagic.push(item)
+            }
+            await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
         }
-        await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
     }
 
     pickPath = (path: any, index: number) => {
@@ -285,10 +310,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             const newTools = this.state.newTools;
-            const newSkills = store.getState().character.skills;
+            let newSkills: any = [];
+            const storeCharSkills = store.getState().character.skills;
+            if (storeCharSkills) {
+                newSkills = storeCharSkills
+            }
             const skillsClicked = this.state.skillsClicked;
-            newTools.filter((item, index) => {
-                if (item.includes(skill[0])) {
+            newTools.filter((item: any, index: number) => {
+                if (item.includes(skill[0]) && this.state.character.skills) {
                     if (item[1] === 2) {
                         alert('You already have expertise in this skill, you cannot double stack that same skill.');
                         return;
@@ -299,7 +328,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     return;
                 }
             })
-            newSkills.filter((item, index) => {
+            newSkills.filter((item: any, index: number) => {
                 if (item.includes(skill[0])) {
                     if (item[1] === 2) {
                         alert('You already have expertise in this skill, you cannot double stack that same skill.');
@@ -314,17 +343,21 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         }
         else if (this.state.skillsClicked[index]) {
             const skillsClicked = this.state.skillsClicked;
-            const newSkills = store.getState().character.skills;
+            let newSkills: any = [];
+            const storeCharSkills = store.getState().character.skills;
+            if (storeCharSkills) {
+                newSkills = storeCharSkills
+            }
             const newTools = this.state.newTools;
-            newTools.filter((item, index) => {
-                if (item.includes(skill[0])) {
+            newTools.filter((item: any, index: number) => {
+                if (item.includes(skill[0]) && this.state.character.skills) {
                     skillsClicked[index + this.state.character.skills.length] = false
                     item[1] = item[1] - 2
                     this.setState({ skillsClicked });
                     return;
                 }
             })
-            newSkills.filter((item, index) => {
+            newSkills.filter((item: any, index: number) => {
                 if (item.includes(skill[0])) {
                     skillsClicked[index] = false
                     item[1] = item[1] - 2;
@@ -463,8 +496,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
         if (!this.state.beforeLevelUp) {
             return;
         }
-        const difference = this.state.character.magic[spellSlot] - this.state.beforeLevelUp.magic[spellSlot];
-        return difference === 0 ? '' : ` + ${difference} new!`;
+        if (this.state.character.magic && this.state.beforeLevelUp.magic) {
+            const difference = this.state.character.magic[spellSlot] - this.state.beforeLevelUp.magic[spellSlot];
+            return difference === 0 ? '' : ` + ${difference} new!`;
+        }
     }
 
 
@@ -505,14 +540,18 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             const pactClicked = this.state.pactClicked;
             pactClicked[index] = true;
-            character.charSpecials.warlockPactBoon = pact
-            this.setState({ pact: pact, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            if (character.charSpecials && this.props.character.level) {
+                character.charSpecials.warlockPactBoon = pact
+                this.setState({ pact: pact, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            }
         }
         else if (this.state.pactClicked[index]) {
             const pactClicked = this.state.pactClicked;
             pactClicked[index] = false;
-            character.charSpecials.warlockPactBoon = { name: '', description: "" };
-            this.setState({ pact: null, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            if (character.charSpecials && this.props.character.level) {
+                character.charSpecials.warlockPactBoon = { name: '', description: "" };
+                this.setState({ pact: null, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            }
         }
     }
 
@@ -526,12 +565,12 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
     resetAbilityScoresToCurrentLevel = () => {
         this.setState({
-            strength: this.props.character.strength,
-            dexterity: this.props.character.dexterity,
-            constitution: this.props.character.constitution,
-            intelligence: this.props.character.intelligence,
-            wisdom: this.props.character.wisdom,
-            charisma: this.props.character.charisma
+            strength: this.props.character.strength ? this.props.character.strength : 0,
+            dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
+            constitution: this.props.character.constitution ? this.props.character.constitution : 0,
+            intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
+            wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
+            charisma: this.props.character.charisma ? this.props.character.charisma : 0
         })
     }
     disableExtraPathChoice = () => {
@@ -584,29 +623,43 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     }
 
     armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
-        let newArmorAc: number = null;
+        let newArmorAc: number = 0;
+        let dex: number = 0
+        let wiz: number = 0
+        let con: number = 0
+        if (this.state.character.modifiers) {
+            if (this.state.character.modifiers.dexterity) {
+                dex = this.state.character.modifiers.dexterity
+            }
+            if (this.state.character.modifiers.wisdom) {
+                wiz = this.state.character.modifiers.wisdom
+            }
+            if (this.state.character.modifiers.constitution) {
+                con = this.state.character.modifiers.constitution
+            }
+        }
         if (armorBonusesCalculationType === "Medium Armor") {
-            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity >= 2 ? 2 : this.state.character.modifiers.dexterity)
+            newArmorAc = +armorAc + (dex >= 2 ? 2 : dex)
         }
         if (armorBonusesCalculationType === "Light Armor") {
-            newArmorAc = +armorAc + (this.state.character.modifiers.dexterity)
+            newArmorAc = +armorAc + (dex)
         }
         if (armorBonusesCalculationType === "Heavy Armor") {
             newArmorAc = +armorAc
         }
         if (armorBonusesCalculationType === "none") {
-            newArmorAc = 10 + +this.state.character.modifiers.dexterity
+            newArmorAc = 10 + +dex
         }
         if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.constitution)
+            newArmorAc = (10 + +dex + +con)
         }
         if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +this.state.character.modifiers.dexterity + +this.state.character.modifiers.wisdom)
+            newArmorAc = (10 + +dex + +wiz)
         }
-        if (this.state.character.pathFeatures?.length > 0) {
+        if (this.state.character.pathFeatures && this.state.character.pathFeatures?.length > 0) {
             this.state.character.pathFeatures.forEach(item => {
                 if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
-                    newArmorAc = (13 + +this.state.character.modifiers.dexterity)
+                    newArmorAc = (13 + +dex)
                 }
             })
         }
@@ -656,13 +709,15 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 alert('You have additional Elements to pick from')
                 return;
             }
-            character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
-            character.charSpecials.monkElementsDisciplines = this.state.elements;
-            character.path = this.state.pathChosen;
-            const officialOrCustom = Path[this.state.character.characterClass][this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
-            const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
-            for (let item of pathResult) {
-                character.pathFeatures.push(item)
+            if (character.charSpecials && character.pathFeatures) {
+                character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+                character.charSpecials.monkElementsDisciplines = this.state.elements;
+                character.path = this.state.pathChosen;
+                const officialOrCustom = Path[this.state.character.characterClass][this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
+                const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
+                for (let item of pathResult) {
+                    character.pathFeatures.push(item)
+                }
             }
 
         }
@@ -697,20 +752,24 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 alert('You have additional Elements to pick from')
                 return;
             }
-            character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
-            character.charSpecials.monkElementsDisciplines = this.state.elements;
-            const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
-            const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
-            for (let item of pathResult) {
-                character.pathFeatures.push(item)
+            if (character.charSpecials && character.pathFeatures) {
+                character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+                character.charSpecials.monkElementsDisciplines = this.state.elements;
+                const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
+                const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
+                for (let item of pathResult) {
+                    character.pathFeatures.push(item)
+                }
             }
 
         }
         if (this.props.options.extraSpells) {
             for (let item of this.props.options.extraSpells) {
                 const spell = spellsJSON.find(spell => spell.name === item)
-                const spellLevel = spellLevelChanger(spell.level)
-                character.spells[spellLevel].push({ spell: spell, removable: false });
+                if (spell && character.spells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
             }
             if (this.props.options.notCountAgainstKnown) {
                 character.spellsKnown = parseInt(character.spellsKnown + this.props.options.extraSpells.length).toString()
@@ -736,9 +795,20 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 alert('You must provide a name and description for your feat.');
                 return;
             }
-            this.state.weaponProfArray.forEach(item => { character.addedWeaponProf.push(item) });
-            this.state.armorProfArray.forEach(item => { character.addedArmorProf.push(item) });
-            character.feats.push({ name: this.state.featName, description: this.state.featDescription })
+            this.state.weaponProfArray.forEach(item => {
+                if (character.addedWeaponProf !== undefined) {
+                    character.addedWeaponProf.push(item)
+                }
+            });
+            this.state.armorProfArray.forEach(item => {
+                if (character.addedArmorProf) {
+                    character.addedArmorProf.push(item)
+                }
+            });
+            if (character.feats) {
+                character.feats.push({ name: this.state.featName, description: this.state.featDescription })
+            }
+
             character.strength = this.state.strength;
             character.constitution = this.state.constitution;
             character.dexterity = this.state.dexterity;
@@ -753,17 +823,23 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             for (let item of this.state.spellListToLoad.spells) {
                 const spell = spellsJSON.find(spell => spell.name === item)
-                const spellLevel = spellLevelChanger(spell.level)
-                character.spells[spellLevel].push({ spell: spell, removable: false });
+                if (spell && character.spells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
             }
         }
         if (this.state.specificSpellToLoad) {
             if (this.state.specificSpell.notCountAgainstKnownCantrips) {
-                character.magic.cantrips = character.magic.cantrips + 1;
+                if (character.magic && character.magic.cantrips) {
+                    character.magic.cantrips = character.magic.cantrips + 1;
+                }
             }
             const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell.name)
-            const spellLevel = spellLevelChanger(spell.level)
-            character.spells[spellLevel].push({ spell: spell, removable: false });
+            if (spell && character.spells) {
+                const spellLevel = spellLevelChanger(spell.level)
+                character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
         }
         if (this.props.options.expertise) {
             if (!this.addSkills()) {
@@ -777,12 +853,16 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             for (let item of this.state.fightingStyle) {
-                character.charSpecials.fightingStyle.push(item)
+                if (character.charSpecials && character.charSpecials.fightingStyle) {
+                    character.charSpecials.fightingStyle.push(item)
+                }
             }
         }
         if (this.state.langHolder.length > 0) {
             for (let item of this.state.langHolder) {
-                character.languages.push(item)
+                if (character.languages) {
+                    character.languages.push(item)
+                }
             }
         }
         if (this.props.options.metamagic) {
@@ -790,10 +870,12 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return;
             }
             for (let item of this.state.metaMagic) {
-                character.charSpecials.sorcererMetamagic.push(item)
+                if (character.charSpecials && character.charSpecials.sorcererMetamagic) {
+                    character.charSpecials.sorcererMetamagic.push(item)
+                }
             }
         }
-        if (this.props.options.rageAmount) {
+        if (this.props.options.rageAmount && character.charSpecials) {
             character.charSpecials.rageAmount = this.props.options.rageAmount;
             character.charSpecials.rageDamage = this.props.options.rageDamage;
         }
@@ -801,27 +883,33 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.addEldritchInvocations()) {
                 return;
             }
-            character.charSpecials.eldritchInvocations = this.state.invocations
+            if (character.charSpecials) {
+                character.charSpecials.eldritchInvocations = this.state.invocations
+            }
         }
         if (this.state.newSpellAvailabilityList.length > 0) {
             for (let item of this.state.newSpellAvailabilityList) {
-                character.differentClassSpellsToPick.push(item)
+                if (character.differentClassSpellsToPick) {
+                    character.differentClassSpellsToPick.push(item)
+                }
             }
         }
-        if (this.props.options.monkMartialArts) {
+        if (this.props.options.monkMartialArts && character.charSpecials) {
             character.charSpecials.kiPoints = this.props.options.kiPoints
             character.charSpecials.martialPoints = this.props.options.monkMartialArts
         }
-        if (this.props.options.sneakAttackDie) {
+        if (this.props.options.sneakAttackDie && character.charSpecials) {
             character.charSpecials.sneakAttackDie = this.props.options.sneakAttackDie
         }
         if (this.state.armorToLoad !== null) {
             this.addArmor()
         }
         if (this.state.newPathChoice !== null) {
-            for (let item of character.pathFeatures) {
-                if (pathChoiceChangePicker(character) === item.name) {
-                    item.choice[0] = this.state.newPathChoice;
+            if (character.pathFeatures) {
+                for (let item of character.pathFeatures) {
+                    if (pathChoiceChangePicker(character) === item.name) {
+                        item.choice[0] = this.state.newPathChoice;
+                    }
                 }
             }
         }
@@ -829,22 +917,26 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             if (!this.addWarlockPact()) {
                 return;
             }
-            character.charSpecials.warlockPactBoon = this.state.pact;
+            if (character.charSpecials) {
+                character.charSpecials.warlockPactBoon = this.state.pact;
+            }
         }
         this.setState({ character }, async () => {
             const character = { ...this.state.character };
             const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
-            const modifiers = Object.values(this.state.character.modifiers);
-            attributePoints.forEach((item: number, index: number) => {
-                modifiers[index] = switchModifier(item);
-            })
-            character.modifiers.strength = modifiers[0];
-            character.modifiers.constitution = modifiers[1];
-            character.modifiers.dexterity = modifiers[2];
-            character.modifiers.intelligence = modifiers[3];
-            character.modifiers.wisdom = modifiers[4];
-            character.modifiers.charisma = modifiers[5];
-            if (character.equippedArmor) {
+            if (this.state.character.modifiers && character.modifiers) {
+                const modifiers = Object.values(this.state.character.modifiers);
+                attributePoints.forEach((item: any, index: number) => {
+                    modifiers[index] = switchModifier(item);
+                })
+                character.modifiers.strength = modifiers[0];
+                character.modifiers.constitution = modifiers[1];
+                character.modifiers.dexterity = modifiers[2];
+                character.modifiers.intelligence = modifiers[3];
+                character.modifiers.wisdom = modifiers[4];
+                character.modifiers.charisma = modifiers[5];
+            }
+            if (character.equippedArmor && character.equippedArmor.baseAc) {
                 character.equippedArmor.ac = this.armorBonuses(character.equippedArmor.baseAc, character.equippedArmor.armorBonusesCalculationType)
                 this.setState({ character })
             }
@@ -864,14 +956,16 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.character._id) {
+                    characters[index] = this.state.character;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     extractCustomPathJson = async (pathName: any) => {
@@ -880,8 +974,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             const strArray = JSON.parse(json);
             let levelFeatures: any = [];
             for (let item of strArray) {
-                if (pathName === Object.keys(JSON.parse(item))[0]) {
-                    const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level])
+                if (pathName === Object.keys(JSON.parse(item))[0] && this.state.character.level) {
+                    const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level ? this.state.character.level : 0])
                     currentLevel[this.state.character.level].forEach((feature: any, index: number) => levelFeatures.push(feature))
                 }
                 // Pathname
@@ -901,6 +995,11 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     }
 
     render() {
+        let CharSkillsFromStore: any = []
+        const storeCharSkills = store.getState().character.skills;
+        if (storeCharSkills) {
+            CharSkillsFromStore = storeCharSkills
+        }
         return (
             <View style={styles.container} >
                 {this.state.load ?
@@ -1063,7 +1162,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                             loadWeapons={(weapons: any) => {
                                                                 const character = { ...this.state.character };
                                                                 for (let item of weapons) {
-                                                                    character.addedWeaponProf.push(item)
+                                                                    if (character.addedWeaponProf) {
+                                                                        character.addedWeaponProf.push(item)
+                                                                    }
                                                                 }
                                                                 this.setState({ character })
                                                             }}
@@ -1071,7 +1172,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                             loadArmors={(armors: any) => {
                                                                 const character = { ...this.state.character };
                                                                 for (let item of armors) {
-                                                                    character.addedArmorProf.push(item)
+                                                                    if (character.addedArmorProf) {
+                                                                        character.addedArmorProf.push(item)
+                                                                    }
                                                                 }
                                                                 this.setState({ character })
                                                             }}
@@ -1103,7 +1206,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                             :
                             null}
 
-                        {this.state.character.level > 3 && allowedChangingPaths(this.state.character) ?
+                        {this.state.character.level && this.state.character.level > 3 && allowedChangingPaths(this.state.character) ?
                             <AppChangePathChoiceAtLevelUp character={this.props.character} newPathChoice={(val: any) => { this.setState({ newPathChoice: val }) }} />
                             : null}
 
@@ -1113,14 +1216,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     <View style={{ alignItems: "center", justifyContent: "center" }}>
                                         <AppText color={Colors.bitterSweetRed} fontSize={20}>As a level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                         <AppText textAlign={"center"}>You have the option to choose two of your skill proficiencies, your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.</AppText>
-                                        {store.getState().character.skills.map((skill, index) =>
+                                        {CharSkillsFromStore.map((skill: any, index: number) =>
                                             <TouchableOpacity key={index} onPress={() => this.pickSkill(skill, index)} style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                                 <AppText>{skill[0]}</AppText>
                                             </TouchableOpacity>)}
-                                        {this.props.character.characterClass === 'Rogue' &&
+                                        {this.props.character.characterClass === 'Rogue' && this.props.character.tools &&
                                             this.props.character.tools.map((tool, index) =>
-                                                <TouchableOpacity key={index} onPress={() => this.pickSkill(tool, index + this.state.character.skills.length)}
-                                                    style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index + this.state.character.skills.length] ? Colors.bitterSweetRed : Colors.lightGray }]}>
+                                                <TouchableOpacity key={index} onPress={() => this.pickSkill(tool, index + (this.state.character.skills ? this.state.character.skills.length : 0))}
+                                                    style={[styles.item, { padding: 15, backgroundColor: this.state.skillsClicked[index + (this.state.character.skills ? this.state.character.skills.length : 0)] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                                     <AppText>{tool[0]}</AppText>
                                                 </TouchableOpacity>)}
                                     </View>
@@ -1134,22 +1237,22 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 {this.props.character.characterClass === "Warlock" ?
                                     <View>
                                         <AppText fontSize={18} textAlign={'center'}>You posses the following magical abilities</AppText>
-                                        <AppText fontSize={18} textAlign={'center'}>You can now cast {this.state.character.magic.cantrips} cantrips</AppText>
+                                        <AppText fontSize={18} textAlign={'center'}>You can now cast {this.state.character.magic && this.state.character.magic.cantrips} cantrips</AppText>
                                         <AppText fontSize={18} textAlign={'center'}>You can now cast {this.props.options.spellSlots} spells at {this.props.options.spellSlotLevel} Level</AppText>
                                     </View>
                                     :
                                     <View>
                                         <AppText fontSize={20}>You gain the following spell slots:</AppText>
-                                        <AppText fontSize={18}>- Cantrips: {this.state.character.magic.cantrips} {this.checkSpellSlotImprove('cantrips')}</AppText>
-                                        <AppText fontSize={18}>- 1st level spells: {this.state.character.magic.firstLevelSpells} {this.checkSpellSlotImprove('firstLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 2nd level spells: {this.state.character.magic.secondLevelSpells} {this.checkSpellSlotImprove('secondLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 3rd level spells: {this.state.character.magic.thirdLevelSpells} {this.checkSpellSlotImprove('thirdLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 4th level spells: {this.state.character.magic.forthLevelSpells} {this.checkSpellSlotImprove('forthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 5th level spells: {this.state.character.magic.fifthLevelSpells} {this.checkSpellSlotImprove('fifthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 6th level spells: {this.state.character.magic.sixthLevelSpells} {this.checkSpellSlotImprove('sixthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 7th level spells: {this.state.character.magic.seventhLevelSpells} {this.checkSpellSlotImprove('seventhLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 8th level spells: {this.state.character.magic.eighthLevelSpells} {this.checkSpellSlotImprove('eighthLevelSpells')}</AppText>
-                                        <AppText fontSize={18}>- 9th level spells: {this.state.character.magic.ninthLevelSpells} {this.checkSpellSlotImprove('ninthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- Cantrips: {this.state.character.magic !== undefined && this.state.character.magic.cantrips} {this.checkSpellSlotImprove('cantrips')}</AppText>
+                                        <AppText fontSize={18}>- 1st level spells: {this.state.character.magic !== undefined && this.state.character.magic.firstLevelSpells} {this.checkSpellSlotImprove('firstLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 2nd level spells: {this.state.character.magic !== undefined && this.state.character.magic.secondLevelSpells} {this.checkSpellSlotImprove('secondLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 3rd level spells: {this.state.character.magic !== undefined && this.state.character.magic.thirdLevelSpells} {this.checkSpellSlotImprove('thirdLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 4th level spells: {this.state.character.magic !== undefined && this.state.character.magic.forthLevelSpells} {this.checkSpellSlotImprove('forthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 5th level spells: {this.state.character.magic !== undefined && this.state.character.magic.fifthLevelSpells} {this.checkSpellSlotImprove('fifthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 6th level spells: {this.state.character.magic !== undefined && this.state.character.magic.sixthLevelSpells} {this.checkSpellSlotImprove('sixthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 7th level spells: {this.state.character.magic !== undefined && this.state.character.magic.seventhLevelSpells} {this.checkSpellSlotImprove('seventhLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 8th level spells: {this.state.character.magic !== undefined && this.state.character.magic.eighthLevelSpells} {this.checkSpellSlotImprove('eighthLevelSpells')}</AppText>
+                                        <AppText fontSize={18}>- 9th level spells: {this.state.character.magic !== undefined && this.state.character.magic.ninthLevelSpells} {this.checkSpellSlotImprove('ninthLevelSpells')}</AppText>
                                     </View>
                                 }
                             </View>
@@ -1190,7 +1293,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
                                 <AppText textAlign={'center'}>You now gain the ability to twist your spells to suit your needs.</AppText>
                                 <AppText textAlign={'center'}>You gain two of the following Metamagic options of your choice. You gain another one at 10th and 17th level.</AppText>
-                                {filterAlreadyPicked(this.props.options.metamagic.value, this.state.character.charSpecials.sorcererMetamagic).map((magic: any, index: number) =>
+                                {filterAlreadyPicked(this.props.options.metamagic.value, this.state.character.charSpecials && this.state.character.charSpecials.sorcererMetamagic ? this.state.character.charSpecials.sorcererMetamagic : []).map((magic: any, index: number) =>
                                     <TouchableOpacity key={index} onPress={() => { this.pickMetaMagic(magic, index) }} style={[styles.longTextItem, { backgroundColor: this.state.metamagicClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                         <AppText fontSize={20} color={this.state.metamagicClicked[index] ? Colors.black : Colors.bitterSweetRed}>{magic.name}</AppText>
                                         <AppText>{magic.description}</AppText>
@@ -1207,7 +1310,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 <AppText textAlign={'center'}>You now gain the ability to use Eldritch Invocations, these are powerful abilities you will unlock throughout leveling up</AppText>
                                 <AppText textAlign={'center'}>Remember that every time you level up you can choose to replace old invocations with new ones to suit your needs.</AppText>
                                 <AppText textAlign={'center'} fontSize={18}>You have a total of {this.state.totalInvocationPoints} Invocations.</AppText>
-                                {eldritchInvocations(this.props.character.level, this.props.character).map((invocation: any, index: number) =>
+                                {eldritchInvocations(this.props.character.level ? this.props.character.level : 0, this.props.character).map((invocation: any, index: number) =>
                                     <TouchableOpacity key={index} onPress={() => { this.pickEldritchInvocations(invocation, index) }} style={[styles.longTextItem, { backgroundColor: this.state.invocationsClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
                                         <AppText fontSize={20} color={this.state.invocationsClicked[index] ? Colors.black : Colors.bitterSweetRed}>{invocation.name}</AppText>
                                         <AppText>{invocation.entries}</AppText>
@@ -1230,7 +1333,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                         {this.props.options.extraSpells ?
                             <View>
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 10, marginTop: 15 }}>
-                                    <AppText textAlign={'center'} fontSize={22}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.state.character.path.name} {this.state.character.charSpecials.druidCircle !== "false" ? `with the ${this.state.character.charSpecials.druidCircle} attribute` : null}</AppText>
+                                    <AppText textAlign={'center'} fontSize={22}>As a level {this.state.character.level} {this.state.character.characterClass} of the {this.state.character.path.name} {this.state.character.charSpecials && this.state.character.charSpecials.druidCircle !== "false" ? `with the ${this.state.character.charSpecials.druidCircle} attribute` : null}</AppText>
                                     <AppText color={Colors.bitterSweetRed} fontSize={22}>You gain the following spells</AppText>
                                 </View>
                                 {this.props.options.extraSpells.map((spell: any, index: number) =>

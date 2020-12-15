@@ -18,20 +18,36 @@ export class PaladinLayOnHandsCounter extends Component<{ character: CharacterMo
     constructor(props: any) {
         super(props)
         this.state = {
-            newValue: null,
+            newValue: 0,
             changeWindow: false,
-            layOnHandsTotal: null,
-            layOnHandsRemaining: null
+            layOnHandsTotal: 0,
+            layOnHandsRemaining: 0
         }
     }
     async componentDidMount() {
-        layOnHandsInitiator(this.props.character._id, this.props.character.level).then(result => {
+        let _id: string = "";
+        if (this.props.character._id !== undefined) {
+            _id = this.props.character._id
+        }
+        let level: number = 1;
+        if (this.props.character.level !== undefined) {
+            level = this.props.character.level
+        }
+        layOnHandsInitiator(_id, level).then(result => {
             this.setState({ layOnHandsTotal: result.layOnHandsAmount, layOnHandsRemaining: parseInt(result.storedNumber) })
         })
     }
 
     pushChange = () => {
-        changeLayOnHands(this.props.character._id, this.state.newValue, this.props.character.level).then(result => {
+        let _id: string = "";
+        if (this.props.character._id !== undefined) {
+            _id = this.props.character._id
+        }
+        let level: number = 1;
+        if (this.props.character.level !== undefined) {
+            level = this.props.character.level
+        }
+        changeLayOnHands(_id, this.state.newValue, level).then(result => {
             this.setState({ changeWindow: result.stayOpen, layOnHandsRemaining: result.newNumber })
         })
     }

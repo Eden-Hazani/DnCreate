@@ -26,7 +26,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
     constructor(props: any) {
         super(props)
         this.state = {
-            baseState: null,
+            baseState: '',
             updateIdeals: this.props.route.params.updateIdeals,
             confirmed: false,
             characterInfo: store.getState().character
@@ -74,7 +74,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
                 }
             }, { text: 'No' }])
         } else {
-            characterInfo.ideals = characterInfo.ideals.filter(ideal => { return ideal !== undefined });
+            characterInfo.ideals = characterInfo.ideals && characterInfo.ideals.filter(ideal => { return ideal !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
@@ -100,7 +100,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
                 }
             }, { text: 'No' }])
         } else {
-            characterInfo.ideals = characterInfo.ideals.filter(ideal => { return ideal !== undefined });
+            characterInfo.ideals = characterInfo.ideals && characterInfo.ideals.filter(ideal => { return ideal !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
@@ -117,14 +117,16 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
 
     updateOfflineCharacter = async () => {
         const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.characterInfo._id) {
-                characters[index] = this.state.characterInfo;
-                break;
+        if (stringifiedChars) {
+            const characters = JSON.parse(stringifiedChars);
+            for (let index in characters) {
+                if (characters[index]._id === this.state.characterInfo._id) {
+                    characters[index] = this.state.characterInfo;
+                    break;
+                }
             }
+            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     cancelUpdate = () => {

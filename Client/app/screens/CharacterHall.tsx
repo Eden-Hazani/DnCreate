@@ -35,7 +35,6 @@ interface CharacterHallState {
 export class CharacterHall extends Component<{ props: any, navigation: any }, CharacterHallState> {
     navigationSubscription: any;
     public interstitialAd: string;
-    public bannerAd: string;
     static contextType = AuthContext;
     private NetUnSub: any;
     constructor(props: any) {
@@ -49,7 +48,11 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             userInfo: this.context,
             characters: [],
         }
-        this.NetUnSub = NetInfo.addEventListener(netInfo => { this.setState({ isInternet: netInfo.isInternetReachable }) })
+        this.NetUnSub = NetInfo.addEventListener(netInfo => {
+            if (netInfo.isInternetReachable) {
+                this.setState({ isInternet: netInfo.isInternetReachable })
+            }
+        })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
         this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     }
@@ -69,8 +72,10 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                         }
                         if (this.context.user._id !== "Offline") {
                             const response = await userCharApi.getChars(this.context.user._id);
-                            const characters = response.data;
-                            this.setState({ characters, error: errorHandler(response) });
+                            if (response.data) {
+                                const characters = response.data;
+                                this.setState({ characters, error: errorHandler(response) });
+                            }
                         }
                         store.dispatch({ type: ActionType.firstLoginAd });
                     }).catch((err) => console.log(err))
@@ -82,8 +87,10 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                 }
                 if (this.context.user._id !== "Offline") {
                     const response = await userCharApi.getChars(this.context.user._id);
-                    const characters = response.data;
-                    this.setState({ characters, error: errorHandler(response) });
+                    if (response.data) {
+                        const characters = response.data;
+                        this.setState({ characters, error: errorHandler(response) });
+                    }
                 }
                 this.setState({ loading: false })
             }
@@ -102,17 +109,23 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     }
 
     onFocus = async () => {
-        if (!this.state.showAds) {
-            this.setState({ loading: true })
-            if (this.context.user._id === "Offline") {
-                this.loadOfflineChars()
+        try {
+            if (!this.state.showAds) {
+                this.setState({ loading: true })
+                if (this.context.user._id === "Offline") {
+                    this.loadOfflineChars()
+                }
+                if (this.context.user._id !== "Offline") {
+                    const response = await userCharApi.getChars(this.context.user._id);
+                    if (response.data) {
+                        const characters = response.data;
+                        this.setState({ characters, error: errorHandler(response) });
+                    }
+                }
+                this.setState({ loading: false })
             }
-            if (this.context.user._id !== "Offline") {
-                const response = await userCharApi.getChars(this.context.user._id);
-                const characters = response.data;
-                this.setState({ characters, error: errorHandler(response) });
-            }
-            this.setState({ loading: false })
+        } catch (err) {
+            errorHandler(err)
         }
     }
 
@@ -126,13 +139,16 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                 }
             }
             const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-            const characters = JSON.parse(stringifiedChars);
-            const newCharacters = characters.filter((char: CharacterModel) => char._id !== character._id);
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(newCharacters))
-            for (let level = 1; level < 20; level++) {
-                await AsyncStorage.removeItem(`current${character._id}level${level}`)
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                const newCharacters = characters.filter((char: CharacterModel) => char._id !== character._id);
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(newCharacters))
+                for (let level = 1; level < 20; level++) {
+                    await AsyncStorage.removeItem(`current${character._id}level${level}`)
+                }
+                AsyncStorage.removeItem(`notes${character._id}`)
+                return;
             }
-            AsyncStorage.removeItem(`notes${character._id}`)
             return;
         }
         for (let item of this.state.characters) {
@@ -145,7 +161,9 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             await AsyncStorage.removeItem(`current${character._id}level${level}`)
         }
         AsyncStorage.removeItem(`notes${character._id}`)
-        userCharApi.deleteChar(character._id)
+        if (character._id) {
+            userCharApi.deleteChar(character._id)
+        }
 
     }
 
@@ -183,7 +201,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                                             <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
                                         </View> :
                                         <FlatList
-                                            data={this.state.characters}
+                                            data={this.state.characters as any}
                                             keyExtractor={characters => characters._id.toString()}
                                             renderItem={({ item }) => <ListItem
                                                 title={item.name}

@@ -14,23 +14,24 @@ export class MonkKiPointCounter extends Component<{ character: CharacterModel },
     constructor(props: any) {
         super(props)
         this.state = {
-            kiTotal: this.props.character.charSpecials.kiPoints,
-            kiRemaining: null
+            kiTotal: this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0,
+            kiRemaining: 0
         }
     }
     async componentDidMount() {
-        kiPointInitiator(this.props.character.charSpecials.kiPoints, this.props.character._id).then(result => {
+
+        kiPointInitiator(this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0, this.props.character._id ? this.props.character._id : '').then(result => {
             this.setState({ kiRemaining: parseInt(result) })
         })
     }
 
     increase = () => {
-        increaseKiPoints(this.props.character._id, this.props.character.charSpecials.kiPoints).then((result: any) => {
+        increaseKiPoints(this.props.character._id ? this.props.character._id : '', this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0).then((result: any) => {
             this.setState({ kiRemaining: result })
         })
     }
     decrease = () => {
-        decreaseKiPoint(this.props.character._id).then((result: any) => {
+        decreaseKiPoint(this.props.character._id ? this.props.character._id : '').then((result: any) => {
             this.setState({ kiRemaining: result })
         })
     }

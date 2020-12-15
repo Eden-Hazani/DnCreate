@@ -72,11 +72,17 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     getLeadingAdv = async () => {
-        if (this.state.leadingAdventures.length === 0) {
-            const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
-            this.setState({ leadingAdventures: leadingAdventures.data }, () => {
-                store.dispatch({ type: ActionType.SetLeadingAdv, payload: this.state.leadingAdventures })
-            })
+        try {
+            if (this.state.leadingAdventures.length === 0) {
+                const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
+                if (leadingAdventures.data !== undefined && leadingAdventures.ok) {
+                    this.setState({ leadingAdventures: leadingAdventures.data }, () => {
+                        store.dispatch({ type: ActionType.SetLeadingAdv, payload: this.state.leadingAdventures })
+                    })
+                }
+            }
+        } catch (err) {
+            errorHandler(err)
         }
     }
 
@@ -85,7 +91,9 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             if (this.state.participatingAdventures.length === 0) {
                 let charIds = [];
                 for (let character of this.state.characters) {
-                    charIds.push(character._id)
+                    if (character._id !== undefined) {
+                        charIds.push(character._id)
+                    }
                 }
                 const adventures = await adventureApi.getParticipationAdventures(charIds);
                 let participatingAdventures: any = []
@@ -113,10 +121,16 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     getLeadingFromServer = async () => {
-        const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
-        this.setState({ leadingAdventures: leadingAdventures.data }, () => {
-            store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })
-        })
+        try {
+            const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
+            if (leadingAdventures.data !== undefined && leadingAdventures.ok) {
+                this.setState({ leadingAdventures: leadingAdventures.data }, () => {
+                    store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })
+                })
+            }
+        } catch (err) {
+            errorHandler(err)
+        }
     }
 
 
@@ -124,7 +138,9 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
         try {
             let charIds = [];
             for (let character of this.state.characters) {
-                charIds.push(character._id)
+                if (character._id !== undefined) {
+                    charIds.push(character._id)
+                }
             }
             const adventures = await adventureApi.getParticipationAdventures(charIds);
             let participatingAdventures: any = []

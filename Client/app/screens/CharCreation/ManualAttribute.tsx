@@ -40,13 +40,15 @@ export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any
     applyChanges = (values: any) => {
         const character = { ...this.state.character }
         const attributeArray = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
-        for (let attribute of attributeArray) {
-            character[attribute] = +values[attribute] + +this.props.race.abilityBonus[attribute]
-            character.modifiers[attribute] = (switchModifier(parseInt(character[attribute])));
+        if (this.props.race.abilityBonus && character.modifiers) {
+            for (let attribute of attributeArray) {
+                character[attribute] = +values[attribute] + +this.props.race.abilityBonus[attribute]
+                character.modifiers[attribute] = (switchModifier(parseInt(character[attribute])));
+            }
+            this.setState({ visible: false, character }, () => {
+                this.props.finishedRollsAndInsertInfo(true, this.state.character)
+            })
         }
-        this.setState({ visible: false, character }, () => {
-            this.props.finishedRollsAndInsertInfo(true, this.state.character)
-        })
     }
     render() {
         return (

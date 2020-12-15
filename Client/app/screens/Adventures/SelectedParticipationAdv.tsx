@@ -27,9 +27,11 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
     }
     async componentDidMount() {
         let userArray: string[] = []
-        for (let item of this.state.adventure.participants_id) {
-            if (item.user_id) {
-                userArray.push(item.user_id)
+        if (this.state.adventure.participants_id) {
+            for (let item of this.state.adventure.participants_id) {
+                if (item.user_id) {
+                    userArray.push(item.user_id)
+                }
             }
         }
         if (userArray.length === 0) {
