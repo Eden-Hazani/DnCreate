@@ -94,7 +94,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
             characterInfo = JSON.parse(item)
         }
         for (let att of attributes) {
-            if (characterInfo[att] !== this.state.pickedRace.abilityBonus[att]) {
+            if (this.state.pickedRace.abilityBonus && characterInfo[att] !== this.state.pickedRace.abilityBonus[att]) {
                 let diceScore = characterInfo[att] - this.state.pickedRace.abilityBonus[att];
                 let indexes = dicePool.map((dice, i) => dice === diceScore ? i : -1)
                     .filter(index => index !== -1);
@@ -110,7 +110,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         if (dicePool.length === 6) {
             this.setState({ finishRolls: true })
         }
-        if (this.state.characterInfo.modifiers.strength !== undefined
+        if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength !== undefined
             && this.state.characterInfo.modifiers.constitution !== undefined
             && this.state.characterInfo.modifiers.dexterity !== undefined
             && this.state.characterInfo.modifiers.intelligence !== undefined
@@ -179,11 +179,13 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         const characterInfo = { ...this.state.characterInfo }
         const baseAtt = characterInfo[attribute]
         characterInfo[attribute] = characterInfo[attribute] + this.state.sumOfDice;
-        characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
-        this.setState({ characterInfo }, () => {
-            AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
-            this.setState({ jiggleOn: false, sumOfDice: 0 })
-        })
+        if (characterInfo.modifiers) {
+            characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
+            this.setState({ characterInfo }, () => {
+                AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
+                this.setState({ jiggleOn: false, sumOfDice: 0 })
+            })
+        }
     }
     updatePool = () => {
         let dicePool = this.state.dicePool;
@@ -201,7 +203,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     }
 
     insertInfoAndContinue = () => {
-        if (this.state.characterInfo.modifiers.strength !== undefined
+        if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength !== undefined
             && this.state.characterInfo.modifiers.constitution !== undefined
             && this.state.characterInfo.modifiers.dexterity !== undefined
             && this.state.characterInfo.modifiers.intelligence !== undefined
@@ -227,21 +229,23 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     returnScores = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
         const rollDisabled = this.state.rollDisabled;
-        const diceScore = characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute];
-        characterInfo[attribute] = this.state.pickedRace.abilityBonus[attribute];
-        characterInfo.modifiers[attribute] = undefined;
-        let indexes = this.state.dicePool.map((dice, i) => dice === diceScore ? i : -1)
-            .filter(index => index !== -1);
-        for (let index of indexes) {
-            if (rollDisabled[index] !== false) {
-                rollDisabled[index] = false;
-                break;
+        if (this.state.pickedRace.abilityBonus && characterInfo.modifiers) {
+            const diceScore = characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute];
+            characterInfo[attribute] = this.state.pickedRace.abilityBonus[attribute];
+            characterInfo.modifiers[attribute] = undefined;
+            let indexes = this.state.dicePool.map((dice, i) => dice === diceScore ? i : -1)
+                .filter(index => index !== -1);
+            for (let index of indexes) {
+                if (rollDisabled[index] !== false) {
+                    rollDisabled[index] = false;
+                    break;
+                }
             }
+            this.setState({ characterInfo, rollDisabled }, () => {
+                AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
+                this.setState({ jiggleOn: false, sumOfDice: 0 })
+            })
         }
-        this.setState({ characterInfo, rollDisabled }, () => {
-            AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
-            this.setState({ jiggleOn: false, sumOfDice: 0 })
-        })
     }
 
     render() {
@@ -272,11 +276,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             isOn={this.state.jiggleOn}
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[0] : null}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.strength && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength && this.state.sumOfDice === 0) {
                                                     this.returnScores('strength');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.strength ? this.updateStat('strength') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -291,11 +295,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[1] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.constitution && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.constitution && this.state.sumOfDice === 0) {
                                                     this.returnScores('constitution');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.constitution ? this.updateStat('constitution') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -310,11 +314,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[2] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.dexterity && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.dexterity && this.state.sumOfDice === 0) {
                                                     this.returnScores('dexterity');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.dexterity ? this.updateStat('dexterity') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -329,11 +333,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[3] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.intelligence && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.intelligence && this.state.sumOfDice === 0) {
                                                     this.returnScores('intelligence');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.intelligence ? this.updateStat('intelligence') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -348,11 +352,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[4] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.wisdom && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.wisdom && this.state.sumOfDice === 0) {
                                                     this.returnScores('wisdom');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.wisdom ? this.updateStat('wisdom') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -367,11 +371,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[5] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers.charisma && this.state.sumOfDice === 0) {
+                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.charisma && this.state.sumOfDice === 0) {
                                                     this.returnScores('charisma');
                                                     return;
                                                 }
-                                                this.state.sumOfDice > 0 && this.state.finishRolls && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null
+                                                this.state.sumOfDice > 0 && this.state.finishRolls && this.state.characterInfo.modifiers && !this.state.characterInfo.modifiers.charisma ? this.updateStat('charisma') : null
                                             }} />
                                         <View style={[styles.modifierBox, { backgroundColor: Colors.lightGray }]}>
                                             <AppText textAlign="center">Modifier</AppText>
@@ -484,11 +488,10 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                                <View style={{ marginTop: 20 }}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} title={"Continue"} height={50} width={120} borderRadius={50} onPress={() => { this.insertInfoAndContinue() }} />
-                                </View>
                             </View>
                         </View>
+                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                            height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                     </View>}
             </ScrollView>
 
@@ -517,7 +520,6 @@ const styles = StyleSheet.create({
     },
 
     rollingDice: {
-        height: Dimensions.get('screen').height,
         width: Dimensions.get('screen').width,
     },
     rolledDice: {

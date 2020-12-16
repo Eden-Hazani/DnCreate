@@ -14,25 +14,28 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
     constructor(props: any) {
         super(props)
         this.state = {
-            inspectionTotal: this.props.character.modifiers.charisma >= 1 ? this.props.character.modifiers.charisma : 1,
-            inspectionRemaining: null
+            inspectionTotal: this.props.character.modifiers && this.props.character.modifiers.charisma && this.props.character.modifiers.charisma >= 1 ? this.props.character.modifiers.charisma : 1,
+            inspectionRemaining: 0
         }
     }
     async componentDidMount() {
-        inspirationInitiator(this.props.character._id, this.props.character.modifiers.charisma).then(result => {
-            this.setState({ inspectionRemaining: parseInt(result) })
-        })
+        if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
+            inspirationInitiator(this.props.character._id, this.props.character.modifiers.charisma).then(result => {
+                this.setState({ inspectionRemaining: parseInt(result) })
+            })
     }
 
     increase = () => {
-        increaseInspiration(this.props.character._id, this.props.character.modifiers.charisma).then((result: any) => {
-            this.setState({ inspectionRemaining: result })
-        })
+        if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
+            increaseInspiration(this.props.character._id, this.props.character.modifiers.charisma).then((result: any) => {
+                this.setState({ inspectionRemaining: result })
+            })
     }
     decrease = () => {
-        decreaseInspiration(this.props.character._id).then((result: any) => {
-            this.setState({ inspectionRemaining: result })
-        })
+        if (this.props.character._id)
+            decreaseInspiration(this.props.character._id).then((result: any) => {
+                this.setState({ inspectionRemaining: result })
+            })
     }
 
     render() {

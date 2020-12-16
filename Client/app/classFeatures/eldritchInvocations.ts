@@ -6,7 +6,7 @@ export function eldritchInvocations(level: number, character: CharacterModel) {
     let eldritchInvocationsArray: any[] = []
     invocationsJson.invocation.forEach((inv, index) => {
         let flag = true
-        if (inv.prerequisites) {
+        if (inv.prerequisites && character.charSpecials && character.charSpecials.warlockPactBoon && character.spells && character.spells.cantrips) {
             if (inv.prerequisites.level && level < inv.prerequisites.level) {
                 flag = false;
             }

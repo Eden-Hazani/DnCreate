@@ -58,7 +58,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             alreadyPickedSkills: [],
             officialClicked: [],
             pickedOfficial: null,
-            maxTools: null,
+            maxTools: 0,
             addedLanguages: [],
             pickedTools: [],
             toolsClicked: [],
@@ -94,11 +94,13 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
 
     componentDidMount() {
         this.setState({ availableSkills: skillJson.skillList }, () => {
-            for (let item of this.state.characterInfo.skills) {
-                if (this.state.availableSkills.includes(item[0])) {
-                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                    alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
-                    this.setState({ alreadyPickedSkills })
+            if (this.state.characterInfo.skills) {
+                for (let item of this.state.characterInfo.skills) {
+                    if (this.state.availableSkills.includes(item[0])) {
+                        const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                        alreadyPickedSkills[this.state.availableSkills.indexOf(item[0])] = true;
+                        this.setState({ alreadyPickedSkills })
+                    }
                 }
             }
         })
@@ -227,21 +229,23 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             characterInfo.background.backgroundName = this.state.pickedOfficial.name;
             characterInfo.background.backgroundFeatureName = this.state.pickedOfficial.featureName;
             characterInfo.background.backgroundFeatureDescription = this.state.pickedOfficial.featureDescription;
-            for (let language of this.state.addedLanguages) {
-                characterInfo.languages.push(language)
-            }
-            for (let skill of this.state.characterInfo.skills) {
-                existingCharSkills.push(skill[0])
-            }
-            for (let skill of this.state.pickedOfficial.skills) {
-                additionSkills.push(skill[0])
-            }
-            for (let item of existingCharSkills.concat(additionSkills.filter((item: any) => existingCharSkills.indexOf(item) < 0))) {
-                newSkills.push([item, 0])
-            }
-            characterInfo.skills = newSkills;
-            for (let tool of this.state.pickedOfficial.tools) {
-                characterInfo.tools.push(tool)
+            if (characterInfo.languages && this.state.characterInfo.skills && characterInfo.tools) {
+                for (let language of this.state.addedLanguages) {
+                    characterInfo.languages.push(language)
+                }
+                for (let skill of this.state.characterInfo.skills) {
+                    existingCharSkills.push(skill[0])
+                }
+                for (let skill of this.state.pickedOfficial.skills) {
+                    additionSkills.push(skill[0])
+                }
+                for (let item of existingCharSkills.concat(additionSkills.filter((item: any) => existingCharSkills.indexOf(item) < 0))) {
+                    newSkills.push([item, 0])
+                }
+                characterInfo.skills = newSkills;
+                for (let tool of this.state.pickedOfficial.tools) {
+                    characterInfo.tools.push(tool)
+                }
             }
         }
         if (this.state.makeYourOwnWindow) {
@@ -253,14 +257,16 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             characterInfo.background.backgroundName = values.backgroundName;
             characterInfo.background.backgroundFeatureName = values.featureName;
             characterInfo.background.backgroundFeatureDescription = values.featureDescription;
-            for (let language of this.state.addedLanguages) {
-                characterInfo.languages.push(language)
-            }
-            for (let skill of this.state.pickedSkills) {
-                characterInfo.skills.push(skill)
-            }
-            for (let tool of this.state.pickedTools) {
-                characterInfo.tools.push(tool)
+            if (characterInfo.languages && characterInfo.skills) {
+                for (let language of this.state.addedLanguages) {
+                    characterInfo.languages.push(language)
+                }
+                for (let skill of this.state.pickedSkills) {
+                    characterInfo.skills.push(skill)
+                }
+                for (let tool of this.state.pickedTools) {
+                    characterInfo.tools.push(tool)
+                }
             }
         }
         this.setState({ characterInfo, confirmed: true }, () => {

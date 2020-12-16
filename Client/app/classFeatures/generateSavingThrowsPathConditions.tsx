@@ -4,15 +4,17 @@ import { CharacterModel } from "../models/characterModel";
 export function generateSavingThrowsPathConditions(character: CharacterModel, items: any, path: any, extraSavingThrowsTotal: number) {
     let extraSavingThrowsToPick: number = extraSavingThrowsTotal
     let pickedSkillFromStart: any = null
-    const savingThrows = character.characterClassId.savingThrows;
+    const savingThrows = character.characterClassId ? character.characterClassId.savingThrows : [];
     switch (true) {
         case path === "Samurai":
-            for (let item of savingThrows) {
-                if (items.includes(item)) {
-                    extraSavingThrowsToPick = extraSavingThrowsToPick
-                } else {
-                    pickedSkillFromStart = "Wisdom"
-                    extraSavingThrowsToPick = extraSavingThrowsToPick - 1
+            if (savingThrows) {
+                for (let item of savingThrows) {
+                    if (items.includes(item)) {
+                        extraSavingThrowsToPick = extraSavingThrowsToPick
+                    } else {
+                        pickedSkillFromStart = "Wisdom"
+                        extraSavingThrowsToPick = extraSavingThrowsToPick - 1
+                    }
                 }
             }
             break;

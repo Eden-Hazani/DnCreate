@@ -1,8 +1,9 @@
 import { CharacterModel } from "../../../models/characterModel";
+import { addRacialSpells } from "./addRacialSpells";
 
 
 export function charHasMagic(character: CharacterModel) {
-    if (character.spells && character.magic) {
+    if (character.spells && character.magic && character.race) {
         const spells = Object.values(character.spells);
         const magic = Object.values(character.magic);
         for (let item of spells) {
@@ -11,7 +12,7 @@ export function charHasMagic(character: CharacterModel) {
             }
         }
         for (let item of magic) {
-            if (item !== null) {
+            if (item !== 0) {
                 return true
             }
         }

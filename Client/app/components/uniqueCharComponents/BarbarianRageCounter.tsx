@@ -15,25 +15,28 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
     constructor(props: any) {
         super(props)
         this.state = {
-            rageTotal: this.props.character.charSpecials.rageAmount,
-            rageRemaining: null
+            rageTotal: this.props.character.charSpecials && this.props.character.charSpecials.rageAmount ? this.props.character.charSpecials.rageAmount : 0,
+            rageRemaining: 0
         }
     }
     async componentDidMount() {
-        rageInitiator(this.props.character._id, this.props.character.charSpecials.rageAmount).then(result => {
-            this.setState({ rageRemaining: parseInt(result) })
-        })
+        if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
+            rageInitiator(this.props.character._id, this.props.character.charSpecials.rageAmount).then(result => {
+                this.setState({ rageRemaining: parseInt(result) })
+            })
     }
 
     increase = () => {
-        increaseRage(this.props.character._id, this.props.character.charSpecials.rageAmount).then((result: any) => {
-            this.setState({ rageRemaining: result })
-        })
+        if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
+            increaseRage(this.props.character._id, this.props.character.charSpecials.rageAmount).then((result: any) => {
+                this.setState({ rageRemaining: result })
+            })
     }
     decrease = () => {
-        decreaseRage(this.props.character._id).then((result: any) => {
-            this.setState({ rageRemaining: result })
-        })
+        if (this.props.character._id)
+            decreaseRage(this.props.character._id).then((result: any) => {
+                this.setState({ rageRemaining: result })
+            })
     }
 
     render() {

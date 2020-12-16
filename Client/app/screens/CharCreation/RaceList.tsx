@@ -106,7 +106,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
     getRacesFromServer = async () => {
         let raceColors = [];
-        const result = await racesApi.getRaceList();
+        const result: any = await racesApi.getRaceList();
         await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
         const races: any = result.data;
         for (let item of races) {
@@ -180,7 +180,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                         <View style={{
                                             width: width / 2, position: "absolute", zIndex: 10,
                                             alignSelf: 'center',
-                                            top: '1%',
+                                            top: '4%',
                                         }}>
                                             <SearchBar
                                                 searchIcon={false}

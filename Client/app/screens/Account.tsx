@@ -21,8 +21,7 @@ import { AppActivityIndicator } from '../components/AppActivityIndicator';
 //Account with profileImages
 
 const ValidationSchema = Yup.object().shape({
-    profileImg: Yup.string().required().label("Profile Image"),
-
+    profileImg: Yup.string().required().label("Profile Image").typeError("Must Choose A picture, Press on the camera Icon"),
 })
 
 interface AccountState {

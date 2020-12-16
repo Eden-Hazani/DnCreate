@@ -6,6 +6,7 @@ import { Colors } from '../config/colors';
 import { store } from '../redux/store';
 import { AppText } from './AppText';
 import { Image } from 'react-native-expo-image-cache';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -17,7 +18,7 @@ const Indicator = ({ scrollX, races }: any) => {
         , [])
     const [newColor, setColor] = useState(baseColor)
     return (
-        <View style={{ flexDirection: 'row', position: 'absolute', top: height / 1.3, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-start", alignItems: "flex-start", }}>
             {races.map((_: any, i: any) => {
                 const inputRange = [(i - 1) * width, i * width, (i + 1) * width]
                 const scale: any = scrollX.interpolate({
@@ -104,13 +105,18 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
                 renderItem={({ item }: any) =>
                     <View style={{ height, width, justifyContent: "center", alignItems: "center", padding: 25 }}>
                         <TouchableOpacity style={{ flex: .3 }} onPress={() => onPress(item)}>
-                            <Image uri={`${Config.serverUrl}/assets/${item.image}`} style={{ borderRadius: 100, resizeMode: 'contain', width: width / 1.8, height: height / 4 }} />
+                            <Image uri={`${Config.serverUrl}/assets/${item.image}`} style={{
+                                borderRadius: 100, resizeMode: "contain",
+                                width: Dimensions.get('screen').scale < 3 ? width / 2.5 : width / 1.8, height: Dimensions.get('screen').scale < 3 ? height / 4.5 : height / 4
+                            }} />
                         </TouchableOpacity>
-                        <View style={{ flex: .1 }}>
+                        <View style={{ flex: .05 }}>
                             <AppText color={Colors.black} fontWeight={"800"} fontSize={25}>{item.name}</AppText>
                         </View>
-                        <View style={{ flex: .4 }}>
-                            <AppText color={Colors.black} fontSize={17} textAlign={'center'}>{item.description}</AppText>
+                        <View style={{ flex: .45 }}>
+                            <ScrollView style={{}}>
+                                <AppText paddingBottom={110} color={Colors.black} fontSize={17} textAlign={'center'}>{item.description}</AppText>
+                            </ScrollView>
                         </View>
                     </View>} />
             <Indicator scrollX={scrollX} races={data} />

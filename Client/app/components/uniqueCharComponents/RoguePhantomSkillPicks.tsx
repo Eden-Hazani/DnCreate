@@ -33,7 +33,7 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
         }
     }
     skillCheck = (skill: string) => {
-        if (JsonSkills.skillList.includes(skill)) {
+        if (JsonSkills.skillList.includes(skill) && this.props.character.modifiers) {
             const modifiers = Object.entries(this.props.character.modifiers)
             const skillGroup = skillModifier(skill);
             for (let item of modifiers) {
