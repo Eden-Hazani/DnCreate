@@ -11,7 +11,6 @@ function register(user) {
 }
 
 function validateRegister(username) {
-    console.log(username)
     return User.findOne({ username: { $eq: username } });
 }
 

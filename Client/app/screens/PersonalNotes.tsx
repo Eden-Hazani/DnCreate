@@ -120,14 +120,16 @@ export class PersonalNotes extends Component<{ navigation: any, route: any }, Pe
                                         validationSchema={ValidationSchema}>
                                         <View >
                                             <AppFormField
-                                                style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                                width={Dimensions.get('screen').width / 1.4}
+                                                internalWidth={Dimensions.get('screen').width / 0.9}
                                                 fieldName={"name"}
                                                 name="name"
                                                 iconName={"fountain-pen"}
                                                 placeholder={"Name..."} />
 
                                             <AppFormField
-                                                style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                                width={Dimensions.get('screen').width / 1.4}
+                                                internalWidth={Dimensions.get('screen').width / 0.9}
                                                 fieldName={"description"}
                                                 name="description"
                                                 iconName={"card-text-outline"}

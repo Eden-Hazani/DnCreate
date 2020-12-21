@@ -12,7 +12,7 @@ export function charHasMagic(character: CharacterModel) {
             }
         }
         for (let item of magic) {
-            if (item !== 0) {
+            if (item !== null && item !== 0) {
                 return true
             }
         }

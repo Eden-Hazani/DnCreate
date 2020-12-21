@@ -13,6 +13,17 @@ function removeEmptySpecificObj(mainObj) {
         eighthLevelSpells: null,
         ninthLevelSpells: null,
     }
+    let unSetCurrentWeapon = {
+        _id: null,
+        dice: null,
+        name: null,
+        description: null,
+        specialAbilities: null,
+        removable: null,
+    }
+    if (!mainObj.currentWeapon.name) {
+        mainObj.currentWeapon = unSetCurrentWeapon;
+    }
     if (!mainObj.magic) {
         mainObj.magic = unSetMagic;
     }

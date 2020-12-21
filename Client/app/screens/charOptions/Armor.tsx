@@ -234,12 +234,14 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                             validationSchema={ValidationSchema}>
                             <View style={{ marginBottom: 40, justifyContent: "center", alignItems: "center" }}>
                                 <AppFormField
-                                    style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                    width={Dimensions.get('screen').width / 1.4}
+                                    internalWidth={Dimensions.get('screen').width / 0.9}
                                     fieldName={"armorName"}
                                     iconName={"text-short"}
                                     placeholder={"Armor name..."} />
                                 <AppFormField
-                                    style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                    width={Dimensions.get('screen').width / 1.4}
+                                    internalWidth={Dimensions.get('screen').width / 0.9}
                                     keyboardType={'numeric'}
                                     fieldName={"armorAc"}
                                     iconName={"lock-outline"}

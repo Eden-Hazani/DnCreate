@@ -101,7 +101,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
         return (
             <View style={styles.container}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                    !this.state.confirmedAdventure ?
+                    !this.state.confirmedAdventure.adventureName ?
                         <AppForm
                             initialValues={{ adventureIdentifier: '' }}
                             onSubmit={(values: any) => this.findAdventure(values)}

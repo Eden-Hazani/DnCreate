@@ -73,20 +73,23 @@ export class ResetPassword extends Component<{ props: any, navigation: any }, Re
                                 validationSchema={ValidationSchema}>
                                 <View style={{ marginBottom: 40 }}>
                                     <AppFormField
-                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        width={Dimensions.get('screen').width / 1.4}
+                                        internalWidth={Dimensions.get('screen').width / 0.9}
                                         fieldName={"validationCode"}
                                         name="validationCode"
                                         iconName={"lock-outline"}
                                         placeholder={"Validation Code..."} />
                                     <AppFormField
-                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        width={Dimensions.get('screen').width / 1.4}
+                                        internalWidth={Dimensions.get('screen').width / 0.9}
                                         secureTextEntry
                                         fieldName={"password"}
                                         name="password"
                                         iconName={"lock-outline"}
                                         placeholder={"password..."} />
                                     <AppFormField
-                                        style={{ width: Dimensions.get('screen').width / 1.2 }}
+                                        width={Dimensions.get('screen').width / 1.4}
+                                        internalWidth={Dimensions.get('screen').width / 0.9}
                                         secureTextEntry
                                         fieldName={"passwordConfirmation"}
                                         name="confirmPassword"

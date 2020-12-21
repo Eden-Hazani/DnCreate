@@ -322,7 +322,6 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             character.languages.push(item)
         }
         this.setState({ character, confirmed: true }, () => {
-            console.log(this.state.character)
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
             setTimeout(() => {
                 this.props.navigation.navigate("NewCharInfo", { race: this.state.race });

@@ -182,6 +182,15 @@ const CharacterSchema = mongoose.Schema({
         armorType: { type: String },
         armorBonusesCalculationType: { type: String }
     },
+    currentWeapon: {
+        _id: { type: String },
+        dice: { type: String },
+        diceAmount: { type: Number },
+        name: { type: String },
+        description: { type: String },
+        specialAbilities: { type: String },
+        removable: { type: Boolean }
+    },
     background: {
         backgroundName: { type: String },
         backgroundFeatureName: { type: String },

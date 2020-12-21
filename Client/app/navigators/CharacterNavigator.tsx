@@ -30,6 +30,7 @@ import { CreatePDF } from '../screens/CreatePDF';
 import { PersonalNotes } from '../screens/PersonalNotes';
 import { CustomSpellCreator } from '../screens/CustomSpellCreator';
 import { CustomSpellList } from '../screens/CustomSpellList';
+import { CharWeapons } from '../screens/charOptions/CharWeapons';
 
 const Stack = createStackNavigator();
 
@@ -81,6 +82,7 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="PersonalNotes" component={PersonalNotes} />
         <Stack.Screen options={{ title: "" }} name="CustomSpellCreator" component={CustomSpellCreator} />
         <Stack.Screen options={{ title: "" }} name="CustomSpellList" component={CustomSpellList} />
+        <Stack.Screen options={{ title: "" }} name="CharWeapons" component={CharWeapons} />
 
     </Stack.Navigator>
 }

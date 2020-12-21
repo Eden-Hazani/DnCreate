@@ -331,7 +331,6 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                     {charCanSpellCast(this.state.character.spellCastingClass ? this.state.character.spellCastingClass : "")
                                         &&
                                         <View>
-                                            {console.log(this.state.character.spellCastingClass === "Wizard")}
                                             <View style={{ flexDirection: 'row', backgroundColor: Colors.pageBackground }}>
                                                 <AppText>Only show spells for your class?</AppText>
                                                 <Switch value={this.state.filterByClass} onValueChange={() => {

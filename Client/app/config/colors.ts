@@ -25,6 +25,7 @@ export class Colors {
     public static inactiveTint: string;
     public static whiteInDarkMode: string;
     public static burgundy: string;
+    public static pastelPink: string;
     public static async InitializeAsync() {
         await AsyncStorage.getItem('colorScheme').then(scheme => {
             if (scheme === "firstUse") {
@@ -50,6 +51,7 @@ export class Colors {
                 Colors.inactiveTint = "#000000"
                 Colors.whiteInDarkMode = "#000000"
                 Colors.burgundy = "#7B0D1E"
+                Colors.pastelPink = "#EFA7A7"
             }
             if (scheme === "light") {
                 Colors.primary = '#F2A65A'
@@ -74,6 +76,7 @@ export class Colors {
                 Colors.inactiveTint = "#000000"
                 Colors.whiteInDarkMode = "#000000"
                 Colors.burgundy = "#7B0D1E"
+                Colors.pastelPink = "#EFA7A7"
 
             }
             if (scheme === "dark") {
@@ -99,6 +102,7 @@ export class Colors {
                 Colors.inactiveTint = "#FFFFFF"
                 Colors.whiteInDarkMode = "#FFFFFF"
                 Colors.burgundy = "#7B0D1E"
+                Colors.pastelPink = "#EFA7A7"
 
             }
         })

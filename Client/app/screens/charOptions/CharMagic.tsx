@@ -217,7 +217,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                                                     <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={20}>Cantrips have unlimited uses</AppText>
                                                 </View>
                                                 :
-                                                <TouchableOpacity style={[styles.spellSlot,
+                                                <TouchableOpacity disabled={item[1] === 0} style={[styles.spellSlot,
                                                 { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
                                                     onLongPress={() => {
                                                         Vibration.vibrate(400)

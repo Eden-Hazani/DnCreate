@@ -546,6 +546,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
                                 </View>
                             </TouchableOpacity>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharWeapons", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={Colors.pastelPink} name={"sword-cross"} iconColor={Colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Weapons</AppText>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View>
                             <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
@@ -583,7 +589,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     </Modal>
                                 </View>
                                 <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
-                                    <AppText fontSize={25}>Hit Dice</AppText>
+                                    {this.state.character.currentWeapon && this.state.character.currentWeapon.name ?
+                                        <View style={{ borderColor: Colors.whiteInDarkMode, borderRadius: 15, borderWidth: 1 }}>
+                                            <AppText fontSize={25} textAlign={'center'}>Weapon Hit Dice</AppText>
+                                            <AppText fontSize={15} textAlign={'center'}>Your currently equipped weapon does the following damage</AppText>
+                                            <AppText fontSize={25} textAlign={'center'} color={Colors.bitterSweetRed}>{this.state.character.currentWeapon.diceAmount}-{this.state.character.currentWeapon.dice}</AppText>
+                                        </View>
+                                        : null}
+                                    <AppText fontSize={25}>Base Hit Dice</AppText>
                                     <AppText fontSize={25} color={Colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
                                     <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
                                     <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
