@@ -32,7 +32,7 @@ import { CompleteSkillList } from '../components/CompleteSkillList';
 import { racialArmorBonuses } from './charOptions/helperFunctions/racialArmorBonuses';
 import { armorBonusCalculator } from './charOptions/helperFunctions/armorBonusCalculator';
 import AuthContext from '../auth/context';
-
+import * as modifierNameList from '../../jsonDump/modifierNamingList.json'
 /**
  * 
  * @param  image: image url-string || URI
@@ -53,7 +53,7 @@ interface SelectCharacterState {
     isDm: boolean
     setCurrentHpModal: boolean
     completeSkillModel: boolean
-    cashedSavingThrows: []
+    cashedSavingThrows: any[]
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -327,6 +327,23 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         this.setState({ setCurrentHpModal: false })
     }
 
+
+    setSavingThrows = () => {
+        let midRes = '';
+        const list = modifierNameList.list.map((modifierName, index) => {
+            if (this.state.cashedSavingThrows.includes(modifierName) && this.state.character.modifiers) {
+                midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : null} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
+            }
+            if ((!this.state.cashedSavingThrows.includes(modifierName)) && this.state.character.modifiers) {
+                midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : null} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
+            }
+            return <View key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
+                <AppText textAlign={'center'} fontSize={18}>{midRes} </AppText>
+            </View>
+        })
+        return list
+    }
+
     render() {
         const isDm = this.state.isDm;
         return (
@@ -557,12 +574,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
                         </View>
                         <View>
-                            <AppText textAlign={'center'}>Saving Throws</AppText>
-                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-                                {this.state.cashedSavingThrows.map(saveThrow =>
-                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5 }} key={saveThrow}>
-                                        <AppText fontSize={18}>{saveThrow} </AppText>
+                            <AppText fontSize={20} textAlign={'center'}>Saving Throws</AppText>
+                            <View style={{ borderWidth: 1, borderRadius: 15, borderColor: Colors.bitterSweetRed, margin: 20, padding: 15 }}>
+                                <AppText fontSize={18} padding={5} textAlign={'center'}>Proficient Saving Throws</AppText>
+                                <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
+                                    {this.state.cashedSavingThrows.map((sThrow, index) => <View key={index}>
+                                        <AppText>{sThrow}</AppText>
                                     </View>)}
+                                </View>
+                            </View>
+                            <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
+                                {this.setSavingThrows()}
                             </View>
                         </View>
                         <View style={styles.infoContainer}>
