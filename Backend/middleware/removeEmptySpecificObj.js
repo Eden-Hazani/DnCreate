@@ -21,7 +21,7 @@ function removeEmptySpecificObj(mainObj) {
         specialAbilities: null,
         removable: null,
     }
-    if (!mainObj.currentWeapon.name) {
+    if (!mainObj.currentWeapon || !mainObj.currentWeapon.name) {
         mainObj.currentWeapon = unSetCurrentWeapon;
     }
     if (!mainObj.magic) {

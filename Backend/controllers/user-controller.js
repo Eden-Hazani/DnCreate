@@ -29,6 +29,7 @@ router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, re
     try {
         const cleanChar = removeEmptySpecificObj(JSON.parse(request.body.charInfo))
         const char = new Character(cleanChar);
+        console.log(char)
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)

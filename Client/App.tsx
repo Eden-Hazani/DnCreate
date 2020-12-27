@@ -24,6 +24,7 @@ import { Colors } from './app/config/colors';
 import { I18nManager } from "react-native";
 import { StartAnimation } from './app/animations/StartAnimation';
 import OfflineNavigator from './app/navigators/OfflineNavigator';
+import * as Updates from 'expo-updates';
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
@@ -60,9 +61,20 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     this.bannerAd = Platform.OS === 'ios' ? Config.iosBanner : Config.androidBanner
   }
 
+  checkForUpdates = async () => {
+    if ((await Updates.checkForUpdateAsync()).isAvailable) {
+      Updates.fetchUpdateAsync().then(() => {
+        Updates.reloadAsync();
+      })
+    }
+  }
+
 
   async componentDidMount() {
     try {
+      if (!__DEV__) {
+        await this.checkForUpdates()
+      }
       this.loadColors().then(async () => {
         store.dispatch({ type: ActionType.CleanCreator })
         await TokenHandler().then(async (user) => {

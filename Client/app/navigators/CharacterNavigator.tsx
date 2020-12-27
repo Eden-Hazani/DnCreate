@@ -31,6 +31,7 @@ import { PersonalNotes } from '../screens/PersonalNotes';
 import { CustomSpellCreator } from '../screens/CustomSpellCreator';
 import { CustomSpellList } from '../screens/CustomSpellList';
 import { CharWeapons } from '../screens/charOptions/CharWeapons';
+import { CharEquipment } from '../screens/charOptions/CharEquipment';
 
 const Stack = createStackNavigator();
 
@@ -83,6 +84,7 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="CustomSpellCreator" component={CustomSpellCreator} />
         <Stack.Screen options={{ title: "" }} name="CustomSpellList" component={CustomSpellList} />
         <Stack.Screen options={{ title: "" }} name="CharWeapons" component={CharWeapons} />
+        <Stack.Screen options={{ title: "" }} name="CharEquipment" component={CharEquipment} />
 
     </Stack.Navigator>
 }

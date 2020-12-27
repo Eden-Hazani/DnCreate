@@ -45,7 +45,8 @@
     "redux": "^4.0.5",
     "yup": "^0.29.3",
     "expo-blur": "~8.1.2",
-    "expo-store-review": "~2.1.2"
+    "expo-store-review": "~2.1.2",
+    "expo-updates": "~0.2.8"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

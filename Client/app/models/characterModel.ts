@@ -5,6 +5,7 @@ import { EquippedArmorModel } from "./EquippedArmorModel";
 import { MagicModel } from "./magicModel";
 import { ModifiersModel } from "./modifiersModel";
 import { RaceModel } from "./raceModel";
+import { EquipmentModal } from "./EquipmentModal";
 import { SpellsModel } from "./spellsModel";
 import { WeaponModal } from "./WeaponModal";
 
@@ -63,6 +64,7 @@ export class CharacterModel {
         public nonClassAvailableSpells?: string[],
         public background?: BackgroundModal,
         public currentWeapon?: WeaponModal,
+        public equipment?: EquipmentModal[]
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();

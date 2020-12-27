@@ -33,6 +33,7 @@ import { racialArmorBonuses } from './charOptions/helperFunctions/racialArmorBon
 import { armorBonusCalculator } from './charOptions/helperFunctions/armorBonusCalculator';
 import AuthContext from '../auth/context';
 import * as modifierNameList from '../../jsonDump/modifierNamingList.json'
+import { CharEquipmentTree } from '../components/characterEquipment/CharEquipmentTree';
 /**
  * 
  * @param  image: image url-string || URI
@@ -434,7 +435,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
                                 <IconGen size={80} backgroundColor={Colors.primary} name={"book-open-page-variant"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Background Story</AppText>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}'s Story</AppText>
                                 </View>
                             </TouchableOpacity>
                             <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
@@ -557,18 +558,29 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Generate Pdf</AppText>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
-                                </View>
-                            </TouchableOpacity>
                             <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharWeapons", { char: this.state.character }) }}>
                                 <IconGen size={80} backgroundColor={Colors.pastelPink} name={"sword-cross"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Weapons</AppText>
                                 </View>
                             </TouchableOpacity>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharEquipment", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={Colors.earthYellow} name={"necklace"} iconColor={Colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Wearable Equipment</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.secRowIconContainer}>
+                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
+                                <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
+                                <View style={{ width: 90, marginTop: 10 }}>
+                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View>
+                            <CharEquipmentTree character={this.state.character} />
                         </View>
                         <View>
                             <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />

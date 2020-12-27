@@ -182,6 +182,7 @@ const CharacterSchema = mongoose.Schema({
         armorType: { type: String },
         armorBonusesCalculationType: { type: String }
     },
+    equipment: { type: Array },
     currentWeapon: {
         _id: { type: String },
         dice: { type: String },

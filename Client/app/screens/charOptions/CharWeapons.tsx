@@ -284,7 +284,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                     </TouchableOpacity>
                                     :
                                     <View>
-                                        <AppText color={Colors.danger} fontSize={16}>This armor is not removable</AppText>
+                                        <AppText color={Colors.danger} fontSize={16}>This Weapon is not removable</AppText>
                                     </View>
                                 }
                                 <TouchableOpacity style={{ width: '65%' }} onPress={() => { this.setState({ pickedWeapon: weapon, weaponInfoModal: true }) }}>
