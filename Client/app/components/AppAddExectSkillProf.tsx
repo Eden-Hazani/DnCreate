@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { ActionType } from '../redux/action-type';
@@ -19,15 +20,21 @@ export class AppAddExactSkillProf extends Component<{ character: CharacterModel,
     }
 
     componentDidMount() {
-        const character = { ...this.state.character }
-        const charSkills = this.props.character.skills.map(skill => { return skill[0] });
-        for (let skill of this.props.skillList) {
-            if (!charSkills.includes(skill)) {
-                this.props.skillsStartAsExpertise ? character.skills.push([skill, 2]) : character.skills.push([skill, 0])
-                this.setState({ character }, () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-                })
+        try {
+            if (this.props.character.skills) {
+                const character = { ...this.state.character }
+                const charSkills = this.props.character.skills.map(skill => { return skill[0] });
+                for (let skill of this.props.skillList) {
+                    if (!charSkills.includes(skill) && character.skills) {
+                        this.props.skillsStartAsExpertise ? character.skills.push([skill, 2]) : character.skills.push([skill, 0])
+                        this.setState({ character }, () => {
+                            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                        })
+                    }
+                }
             }
+        } catch (err) {
+            logger.log(err)
         }
 
     }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import logger from '../../../utility/logger';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { changeLayOnHands, layOnHandsInitiator } from '../../screens/charOptions/UniqueCharFunctions/paladinFunctions';
@@ -25,31 +26,39 @@ export class PaladinLayOnHandsCounter extends Component<{ character: CharacterMo
         }
     }
     async componentDidMount() {
-        let _id: string = "";
-        if (this.props.character._id !== undefined) {
-            _id = this.props.character._id
+        try {
+            let _id: string = "";
+            if (this.props.character._id !== undefined) {
+                _id = this.props.character._id
+            }
+            let level: number = 1;
+            if (this.props.character.level !== undefined) {
+                level = this.props.character.level
+            }
+            layOnHandsInitiator(_id, level).then(result => {
+                this.setState({ layOnHandsTotal: result.layOnHandsAmount, layOnHandsRemaining: parseInt(result.storedNumber) })
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        let level: number = 1;
-        if (this.props.character.level !== undefined) {
-            level = this.props.character.level
-        }
-        layOnHandsInitiator(_id, level).then(result => {
-            this.setState({ layOnHandsTotal: result.layOnHandsAmount, layOnHandsRemaining: parseInt(result.storedNumber) })
-        })
     }
 
     pushChange = () => {
-        let _id: string = "";
-        if (this.props.character._id !== undefined) {
-            _id = this.props.character._id
+        try {
+            let _id: string = "";
+            if (this.props.character._id !== undefined) {
+                _id = this.props.character._id
+            }
+            let level: number = 1;
+            if (this.props.character.level !== undefined) {
+                level = this.props.character.level
+            }
+            changeLayOnHands(_id, this.state.newValue, level).then(result => {
+                this.setState({ changeWindow: result.stayOpen, layOnHandsRemaining: result.newNumber })
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        let level: number = 1;
-        if (this.props.character.level !== undefined) {
-            level = this.props.character.level
-        }
-        changeLayOnHands(_id, this.state.newValue, level).then(result => {
-            this.setState({ changeWindow: result.stayOpen, layOnHandsRemaining: result.newNumber })
-        })
     }
 
     render() {

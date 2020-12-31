@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Modal, ScrollView, Platform, Dimensions } from 'react-native';
 import switchModifier from '../../utility/abillityModifierSwitch';
+import logger from '../../utility/logger';
 import skillModifier from '../../utility/skillModifier';
 import userCharApi from '../api/userCharApi';
 import AuthContext from '../auth/context';
@@ -44,159 +45,226 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
         }
     }
     listStats = () => {
-        const char = this.state.character;
-        const modifiers: any[] = Object.entries(this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers);
-        modifiers[0].push(char.charSpecials.companion[this.props.pickedIndex].strength);
-        modifiers[1].push(char.charSpecials.companion[this.props.pickedIndex].constitution);
-        modifiers[2].push(char.charSpecials.companion[this.props.pickedIndex].dexterity);
-        modifiers[3].push(char.charSpecials.companion[this.props.pickedIndex].intelligence);
-        modifiers[4].push(char.charSpecials.companion[this.props.pickedIndex].wisdom);
-        modifiers[5].push(char.charSpecials.companion[this.props.pickedIndex].charisma);
-        return modifiers;
+        try {
+            const char = this.state.character;
+            if (this.state.character.charSpecials && this.state.character.charSpecials.companion) {
+                const modifiersLists = this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers;
+                if (char && char.charSpecials?.companion && modifiersLists) {
+                    const modifiers: any[] = Object.entries(modifiersLists);
+                    modifiers[0].push(char.charSpecials.companion[this.props.pickedIndex].strength);
+                    modifiers[1].push(char.charSpecials.companion[this.props.pickedIndex].constitution);
+                    modifiers[2].push(char.charSpecials.companion[this.props.pickedIndex].dexterity);
+                    modifiers[3].push(char.charSpecials.companion[this.props.pickedIndex].intelligence);
+                    modifiers[4].push(char.charSpecials.companion[this.props.pickedIndex].wisdom);
+                    modifiers[5].push(char.charSpecials.companion[this.props.pickedIndex].charisma);
+                    return modifiers;
+                }
+            }
+            return []
+        } catch (err) {
+            logger.log(err)
+            return []
+        }
     }
 
     setModifiers = () => {
-        const character = { ...this.state.character }
-        const attributePoints = [character.charSpecials.companion[this.props.pickedIndex].strength,
-        character.charSpecials.companion[this.props.pickedIndex].constitution, character.charSpecials.companion[this.props.pickedIndex].dexterity,
-        character.charSpecials.companion[this.props.pickedIndex].intelligence,
-        character.charSpecials.companion[this.props.pickedIndex].wisdom, character.charSpecials.companion[this.props.pickedIndex].charisma]
-        const modifiers = Object.values(this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers);
-        attributePoints.forEach((item: number, index: number) => {
-            modifiers[index] = switchModifier(item);
-        })
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.strength = modifiers[0];
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.constitution = modifiers[1];
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.dexterity = modifiers[2];
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.intelligence = modifiers[3];
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.wisdom = modifiers[4];
-        character.charSpecials.companion[this.props.pickedIndex].modifiers.charisma = modifiers[5];
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
+        try {
+            const character = { ...this.state.character }
+            if (character.charSpecials && character.charSpecials.companion && this.state.character.charSpecials && this.state.character.charSpecials.companion) {
+                const attributePoints: any = [character.charSpecials.companion[this.props.pickedIndex].strength,
+                character.charSpecials.companion[this.props.pickedIndex].constitution, character.charSpecials.companion[this.props.pickedIndex].dexterity,
+                character.charSpecials.companion[this.props.pickedIndex].intelligence,
+                character.charSpecials.companion[this.props.pickedIndex].wisdom, character.charSpecials.companion[this.props.pickedIndex].charisma];
+                const modifiersLists = this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers;
+                let characterModifiers = character.charSpecials.companion[this.props.pickedIndex].modifiers;
+                if (modifiersLists && characterModifiers) {
+                    const modifiers = Object.values(modifiersLists);
+                    attributePoints.forEach((item: number, index: number) => {
+                        modifiers[index] = switchModifier(item);
+                    })
+                    characterModifiers.strength = modifiers[0];
+                    characterModifiers.constitution = modifiers[1];
+                    characterModifiers.dexterity = modifiers[2];
+                    characterModifiers.intelligence = modifiers[3];
+                    characterModifiers.wisdom = modifiers[4];
+                    characterModifiers.charisma = modifiers[5];
+
+                }
             }
-            userCharApi.updateChar(this.state.character)
-        })
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter();
+                    return;
+                }
+                userCharApi.updateChar(this.state.character)
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        const characters = JSON.parse(stringifiedChars);
-        for (let index in characters) {
-            if (characters[index]._id === this.state.character._id) {
-                characters[index] = this.state.character;
-                break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
+                }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
+        } catch (err) {
+            logger.log(err)
         }
-        await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
     }
 
     componentDidMount() {
-        const character = { ...this.state.character };
-        const clickedSkills = { ...this.state.clickedSkills };
-        if (this.state.character.charSpecials.companion[this.props.pickedIndex]?.skills?.length > 0) {
-            for (let skill of this.state.character.charSpecials.companion[this.props.pickedIndex].skills) {
-                skillList.forEach((item, index) => {
-                    if (item === skill[0]) {
-                        clickedSkills[index] = true
+        try {
+            const character = { ...this.state.character };
+            const clickedSkills = { ...this.state.clickedSkills };
+            if (this.state.character.charSpecials && this.state.character.charSpecials.companion
+                && character.charSpecials && character.charSpecials.companion) {
+                if (this.state.character.charSpecials.companion[this.props.pickedIndex]) {
+                    const skills = this.state.character.charSpecials.companion[this.props.pickedIndex].skills;
+                    const companionLength = this.state.character.charSpecials.companion[this.props.pickedIndex]?.skills?.length;
+                    if (skills && companionLength && companionLength > 0) {
+                        for (let skill of skills) {
+                            skillList.forEach((item, index) => {
+                                if (item === skill[0]) {
+                                    clickedSkills[index] = true
+                                }
+                            });
+                        }
                     }
-                });
+                }
+                if (!this.state.character.charSpecials.companion[this.props.pickedIndex] && character.charSpecials && character.charSpecials.companion) {
+                    this.state.character.charSpecials.companion[this.props.pickedIndex] = new CompanionModel()
+                    character.charSpecials.companion[this.props.pickedIndex].name = `new Companion ${this.props.pickedIndex + 1}`;
+                    character.charSpecials.companion[this.props.pickedIndex].animalType = 'Type';
+                    character.charSpecials.companion[this.props.pickedIndex].maxHp = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].charisma = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].strength = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].constitution = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].wisdom = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].intelligence = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].dexterity = 0;
+                    character.charSpecials.companion[this.props.pickedIndex].skills = [];
+                    character.charSpecials.companion[this.props.pickedIndex].trait = '';
+                    character.charSpecials.companion[this.props.pickedIndex].flaw = '';
+                    character.charSpecials.companion[this.props.pickedIndex].modifiers = new ModifiersModel();
+                    const attributePoints: any = [character.charSpecials.companion[this.props.pickedIndex].strength,
+                    character.charSpecials.companion[this.props.pickedIndex].constitution, character.charSpecials.companion[this.props.pickedIndex].dexterity,
+                    character.charSpecials.companion[this.props.pickedIndex].intelligence,
+                    character.charSpecials.companion[this.props.pickedIndex].wisdom, character.charSpecials.companion[this.props.pickedIndex].charisma];
+                    const newModifierList = this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers;
+                    const newCharacterModifiers = character.charSpecials.companion[this.props.pickedIndex].modifiers;
+                    if (newModifierList && newCharacterModifiers) {
+                        const modifiers = Object.values(newModifierList);
+                        attributePoints.forEach((item: number, index: number) => {
+                            modifiers[index] = switchModifier(item);
+                        })
+                        newCharacterModifiers.strength = modifiers[0];
+                        newCharacterModifiers.constitution = modifiers[1];
+                        newCharacterModifiers.dexterity = modifiers[2];
+                        newCharacterModifiers.intelligence = modifiers[3];
+                        newCharacterModifiers.wisdom = modifiers[4];
+                        newCharacterModifiers.charisma = modifiers[5];
+                    }
+                }
             }
-        }
-        if (!this.state.character.charSpecials.companion[this.props.pickedIndex]) {
-            this.state.character.charSpecials.companion[this.props.pickedIndex] = new CompanionModel()
-            character.charSpecials.companion[this.props.pickedIndex].name = `new Companion ${this.props.pickedIndex + 1}`;
-            character.charSpecials.companion[this.props.pickedIndex].animalType = 'Type';
-            character.charSpecials.companion[this.props.pickedIndex].maxHp = 0;
-            character.charSpecials.companion[this.props.pickedIndex].charisma = 0;
-            character.charSpecials.companion[this.props.pickedIndex].strength = 0;
-            character.charSpecials.companion[this.props.pickedIndex].constitution = 0;
-            character.charSpecials.companion[this.props.pickedIndex].wisdom = 0;
-            character.charSpecials.companion[this.props.pickedIndex].intelligence = 0;
-            character.charSpecials.companion[this.props.pickedIndex].dexterity = 0;
-            character.charSpecials.companion[this.props.pickedIndex].skills = [];
-            character.charSpecials.companion[this.props.pickedIndex].trait = '';
-            character.charSpecials.companion[this.props.pickedIndex].flaw = '';
-            character.charSpecials.companion[this.props.pickedIndex].modifiers = new ModifiersModel();
-            const attributePoints = [character.charSpecials.companion[this.props.pickedIndex].strength,
-            character.charSpecials.companion[this.props.pickedIndex].constitution, character.charSpecials.companion[this.props.pickedIndex].dexterity,
-            character.charSpecials.companion[this.props.pickedIndex].intelligence,
-            character.charSpecials.companion[this.props.pickedIndex].wisdom, character.charSpecials.companion[this.props.pickedIndex].charisma]
-            const modifiers = Object.values(this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers);
-            attributePoints.forEach((item: number, index: number) => {
-                modifiers[index] = switchModifier(item);
+            this.setState({ loading: false, character, clickedSkills }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter();
+                    return;
+                }
+                userCharApi.updateChar(this.state.character)
             })
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.strength = modifiers[0];
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.constitution = modifiers[1];
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.dexterity = modifiers[2];
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.intelligence = modifiers[3];
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.wisdom = modifiers[4];
-            character.charSpecials.companion[this.props.pickedIndex].modifiers.charisma = modifiers[5];
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ loading: false, character, clickedSkills }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
-            }
-            userCharApi.updateChar(this.state.character)
-        })
     }
+
     addSkill = (pickedSkill: string, index: number) => {
-        const character = { ...this.state.character };
-        const clickedSkills = { ...this.state.clickedSkills };
-        if (!clickedSkills[index]) {
-            if (this.state.character.charSpecials.companion[this.props.pickedIndex].skills.length === 2) {
-                alert('Your companion can possess 2 skills at max.')
-                return;
+        try {
+            const character = { ...this.state.character };
+            const clickedSkills = { ...this.state.clickedSkills };
+            const skills = (this.state.character.charSpecials && this.state.character.charSpecials.companion) && this.state.character.charSpecials.companion[this.props.pickedIndex].skills;
+            const newSkills = (character.charSpecials && character.charSpecials.companion) && character.charSpecials.companion[this.props.pickedIndex].skills;
+            if (!clickedSkills[index] && skills && newSkills) {
+                if (skills.length === 2) {
+                    alert('Your companion can possess 2 skills at max.')
+                    return;
+                }
+                newSkills.push([pickedSkill, 0]);
+                clickedSkills[index] = true;
+                this.setState({ clickedSkills, character }, () => {
+                    this.setModifiers()
+                })
+                return
             }
-            character.charSpecials.companion[this.props.pickedIndex].skills.push([pickedSkill, 0]);
-            clickedSkills[index] = true;
-            this.setState({ clickedSkills, character }, () => {
-                this.setModifiers()
-            })
-            return
-        }
-        if (clickedSkills[index]) {
-            character.charSpecials.companion[this.props.pickedIndex].skills = character.charSpecials.companion[this.props.pickedIndex].skills.filter(item => item[0] !== pickedSkill)
-            clickedSkills[index] = false;
-            this.setState({ clickedSkills, character }, () => {
-                this.setModifiers()
-            })
-            return
+            if (clickedSkills[index] && character.charSpecials && character.charSpecials.companion && newSkills) {
+                character.charSpecials.companion[this.props.pickedIndex].skills = newSkills.filter(item => item[0] !== pickedSkill)
+                clickedSkills[index] = false;
+                this.setState({ clickedSkills, character }, () => {
+                    this.setModifiers()
+                })
+                return
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     skillCheck = (skill: string) => {
-        const modifiers = Object.entries(this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers)
-        const skillGroup = skillModifier(skill);
-        for (let item of modifiers) {
-            if (item[0] === skillGroup) {
-                return item[1]
+        try {
+            const modifierList = (this.state.character.charSpecials && this.state.character.charSpecials.companion) && this.state.character.charSpecials.companion[this.props.pickedIndex].modifiers;
+            if (modifierList) {
+                const modifiers = Object.entries(modifierList)
+                const skillGroup = skillModifier(skill);
+                for (let item of modifiers) {
+                    if (item[0] === skillGroup) {
+                        return item[1]
+                    }
+                }
             }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     handleDelete = async () => {
-        const character = { ...this.state.character };
-        for (let item of this.state.character.charSpecials.companion) {
-            character.charSpecials.companion = character.charSpecials.companion.filter(m => m.name !== this.state.character.charSpecials.companion[this.props.pickedIndex].name)
-        }
-        this.props.closeModal(false)
-        this.setState({ character }, () => {
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
+        try {
+            const character = { ...this.state.character };
+            const companion = this.state.character.charSpecials && this.state.character.charSpecials.companion;
+            if (companion && character.charSpecials && character.charSpecials.companion) {
+                for (let item of companion) {
+                    character.charSpecials.companion = character.charSpecials.companion.filter(m => m.name !== companion[this.props.pickedIndex].name)
+                }
+                this.props.closeModal(false)
+                this.setState({ character }, () => {
+                    if (this.context.user._id === "Offline") {
+                        this.updateOfflineCharacter();
+                        return;
+                    }
+                    userCharApi.updateChar(this.state.character)
+                })
             }
-            userCharApi.updateChar(this.state.character)
-        })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
 
     render() {
-        const companion = this.state.character.charSpecials.companion[this.props.pickedIndex];
+        let companion = new CompanionModel();
+        if (this.state.character.charSpecials && this.state.character.charSpecials.companion) {
+            companion = this.state.character.charSpecials.companion[this.props.pickedIndex];
+        }
         return (
             <ScrollView keyboardShouldPersistTaps="always" style={[styles.container, { backgroundColor: Colors.pageBackground }]} >
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} />
@@ -227,7 +295,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                             </View>
                         </View>
                         <View>
-                            {companion?.skills.length === 0 ?
+                            {companion.skills && companion?.skills.length === 0 ?
                                 <TouchableOpacity disabled={this.props.isDm} style={{ justifyContent: "center", alignItems: "center", padding: 15 }} onPress={() => { this.setState({ skillPickModal: true }) }}>
                                     <AppText fontSize={22} textAlign={'center'}>Your companion has no skills, you can pick up to 2 skills.</AppText>
                                     <AppText fontSize={22} textAlign={'center'}>Click here to pick</AppText>
@@ -237,7 +305,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                                     <AppText fontSize={22} textAlign={'center'}>Skills:</AppText>
                                     <View style={{ flexDirection: 'row' }}>
                                         <View style={{ flex: .5 }}>
-                                            {companion.skills.map((skill, index) =>
+                                            {companion.skills && companion.skills.map((skill, index) =>
                                                 <View key={index}>
                                                     <AppText fontSize={20} color={Colors.berries}>{skill[0]} {((this.skillCheck(skill) + this.props.proficiency) <= 0 ? "" : "+")} {(this.skillCheck(skill) + this.props.proficiency)}</AppText>
                                                 </View>)}
@@ -347,11 +415,13 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                                                     return;
                                                 }
                                                 const character = { ...this.state.character };
-                                                character.charSpecials.companion[this.props.pickedIndex][this.state.textInEdit] = this.state.textValue;
-                                                this.setState({ textValue: '', textModal: false, textInEdit: '', character }, () => {
-                                                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-                                                    this.setModifiers()
-                                                })
+                                                if (character.charSpecials && character.charSpecials.companion) {
+                                                    character.charSpecials.companion[this.props.pickedIndex][this.state.textInEdit] = this.state.textValue;
+                                                    this.setState({ textValue: '', textModal: false, textInEdit: '', character }, () => {
+                                                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                                                        this.setModifiers()
+                                                    })
+                                                }
                                             }} />
                                     </View>
                                 </View>

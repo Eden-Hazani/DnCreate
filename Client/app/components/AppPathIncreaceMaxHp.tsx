@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -15,11 +16,17 @@ export class AppPathIncreaseMaxHp extends Component<{ character: CharacterModel,
         }
     }
     componentDidMount() {
-        const character = { ...this.state.character };
-        character.maxHp = character.maxHp + this.props.increaseNum;
-        this.setState({ character }, () => {
-            this.props.loadMaxHp(this.state.character)
-        })
+        try {
+            const character = { ...this.state.character };
+            if (character.maxHp) {
+                character.maxHp = character.maxHp + this.props.increaseNum;
+                this.setState({ character }, () => {
+                    this.props.loadMaxHp(this.state.character)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

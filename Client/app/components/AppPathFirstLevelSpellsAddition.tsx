@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import spellLists from '../../jsonDump/PathSpellAdditionLists.json'
 import spellsJSON from '../../jsonDump/spells.json'
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { setTotalKnownSpells } from '../screens/charOptions/helperFunctions/setTotalKnownSpells';
@@ -24,23 +25,29 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstK
 
 
     componentDidMount() {
-        const character = { ...this.state.character }
-        const domainMagic = spellLists[this.props.character.characterClass][this.props.path][this.props.character.level].spellList;
-        for (let item of domainMagic) {
-            const spell = spellsJSON.find(spell => spell.name === item)
-            const spellLevel = spellLevelChanger(spell.level)
-            if (this.props.noCountAgainstKnown && spellLevel !== "cantrip") {
-                if (!character.spellsKnown) {
-                    const spellsKnown = setTotalKnownSpells(this.props.character);
-                    character.spellsKnown = spellsKnown;
+        try {
+            const character = { ...this.state.character }
+            const domainMagic = spellLists[this.props.character.characterClass][this.props.path][this.props.character.level].spellList;
+            for (let item of domainMagic) {
+                const spell = spellsJSON.find(spell => spell.name === item)
+                if (spell && character.spells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    if (this.props.noCountAgainstKnown && spellLevel !== "cantrip") {
+                        if (!character.spellsKnown) {
+                            const spellsKnown = setTotalKnownSpells(this.props.character);
+                            character.spellsKnown = spellsKnown;
+                        }
+                        character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
+                    }
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
                 }
-                character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
             }
-            character.spells[spellLevel].push({ spell: spell, removable: false });
+            this.setState({ character, domainMagic }, () => {
+                this.props.returnMagic(this.state.character)
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ character, domainMagic }, () => {
-            this.props.returnMagic(this.state.character)
-        })
     }
     render() {
         return (

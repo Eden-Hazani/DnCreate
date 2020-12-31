@@ -17,6 +17,7 @@ import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
+import logger from '../../../utility/logger';
 
 const ValidationSchema = Yup.object().shape({
     adventureIdentifier: Yup.string().required().label("Adventure Identifier"),
@@ -53,47 +54,55 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                 this.setState({ characters: characters.data })
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
     findAdventure = async (values: any) => {
-        this.setState({ loading: true })
-        await adventureApi.findAdventure(values.adventureIdentifier).then(confirmedAdventure => {
-            if (!confirmedAdventure.ok) {
-                this.setState({ loading: false })
-                alert(confirmedAdventure.data);
-                return;
-            }
-            if (confirmedAdventure.data !== undefined && confirmedAdventure.ok) {
-                this.setState({ confirmedAdventure: confirmedAdventure.data[0], loading: false })
-            }
-        })
+        try {
+            this.setState({ loading: true })
+            await adventureApi.findAdventure(values.adventureIdentifier).then(confirmedAdventure => {
+                if (!confirmedAdventure.ok) {
+                    this.setState({ loading: false })
+                    alert(confirmedAdventure.data);
+                    return;
+                }
+                if (confirmedAdventure.data !== undefined && confirmedAdventure.ok) {
+                    this.setState({ confirmedAdventure: confirmedAdventure.data[0], loading: false })
+                }
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     joinAdventure = () => {
-        this.setState({ loading: true })
-        if (!this.state.pickedCharacter._id) {
-            this.setState({ loading: false })
-            alert("Must Pick A Character");
-            return
-        }
-        const confirmedAdventure = { ...this.state.confirmedAdventure };
-        const pickedChar: any = this.state.pickedCharacter._id;
-        if (confirmedAdventure.participants_id !== undefined) {
-            confirmedAdventure.participants_id.push(pickedChar);
-            this.setState({ confirmedAdventure }, async () => {
-                adventureApi.addAdventureParticipant(this.state.confirmedAdventure).then(adventure => {
-                    if (!adventure.ok) {
+        try {
+            this.setState({ loading: true })
+            if (!this.state.pickedCharacter._id) {
+                this.setState({ loading: false })
+                alert("Must Pick A Character");
+                return
+            }
+            const confirmedAdventure = { ...this.state.confirmedAdventure };
+            const pickedChar: any = this.state.pickedCharacter._id;
+            if (confirmedAdventure.participants_id !== undefined) {
+                confirmedAdventure.participants_id.push(pickedChar);
+                this.setState({ confirmedAdventure }, async () => {
+                    adventureApi.addAdventureParticipant(this.state.confirmedAdventure).then(adventure => {
+                        if (!adventure.ok) {
+                            this.setState({ loading: false })
+                            alert(adventure.data);
+                            return;
+                        }
+                        store.dispatch({ type: ActionType.UpdateParticipatingAdv, payload: adventure.data })
                         this.setState({ loading: false })
-                        alert(adventure.data);
-                        return;
-                    }
-                    store.dispatch({ type: ActionType.UpdateParticipatingAdv, payload: adventure.data })
-                    this.setState({ loading: false })
-                    this.props.navigation.navigate("Adventures")
-                });
-            })
+                        this.props.navigation.navigate("Adventures")
+                    });
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

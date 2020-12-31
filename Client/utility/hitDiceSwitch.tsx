@@ -1,7 +1,7 @@
 
 
 const hitDiceSwitch = (charClass: string) => {
-    let dice: number = null;
+    let dice: number = 0;
     switch (true) {
         case charClass === "Barbarian":
             dice = 12;

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -16,19 +17,23 @@ export class AppPathAddArmorToChar extends Component<{ character: CharacterModel
         }
     }
     addArmor = async () => {
-        let armorName = this.props.armor.name;
-        let armorAc = this.props.armor.ac;
-        const armor: any = {
-            id: armorName + Math.floor((Math.random() * 1000000) + 1),
-            name: armorName,
-            ac: armorAc,
-            baseAc: armorAc,
-            disadvantageStealth: this.props.armor.disadvantageStealth,
-            armorType: this.props.armor.armorType,
-            armorBonusesCalculationType: this.props.armor.armorCalculationType,
-            removable: false
+        try {
+            let armorName = this.props.armor.name;
+            let armorAc = this.props.armor.ac;
+            const armor: any = {
+                id: armorName + Math.floor((Math.random() * 1000000) + 1),
+                name: armorName,
+                ac: armorAc,
+                baseAc: armorAc,
+                disadvantageStealth: this.props.armor.disadvantageStealth,
+                armorType: this.props.armor.armorType,
+                armorBonusesCalculationType: this.props.armor.armorCalculationType,
+                removable: false
+            }
+            this.props.armorToLoad(armor)
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.armorToLoad(armor)
     }
     componentDidMount() {
         this.addArmor()

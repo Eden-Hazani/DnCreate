@@ -5,6 +5,7 @@ import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
 import { Colors } from '../config/colors';
+import logger from '../../utility/logger';
 
 
 interface AppPickSpecificSpellWithChoicesState {
@@ -21,26 +22,32 @@ export class AppPickSpecificSpellWithChoices extends Component<{ character: Char
         }
     }
     componentDidMount() {
-        const spell = spellsJSON.find((spell: any) => spell.name === this.props.spell.name)
-        const spellLevel = spellLevelChanger(spell.level)
-        const character = { ...this.state.character };
-        for (let item of this.state.character.spells[spellLevel]) {
-            if (item.spell.name === spell.name && this.props.spell.canReplaceIfExists) {
-                this.setState({ alreadyHaveSpell: true })
-                character.magic[spellLevel] = character.magic[spellLevel] + 1;
+        try {
+            const spell = spellsJSON.find((spell: any) => spell.name === this.props.spell.name)
+            const character = { ...this.state.character };
+            if (spell && this.state.character.spells && character.magic && character.spells) {
+                const spellLevel = spellLevelChanger(spell.level)
+                for (let item of this.state.character.spells[spellLevel]) {
+                    if (item.spell.name === spell.name && this.props.spell.canReplaceIfExists) {
+                        this.setState({ alreadyHaveSpell: true })
+                        character.magic[spellLevel] = character.magic[spellLevel] + 1;
+                        this.setState({ character }, () => {
+                            this.props.updateSpells(this.state.character)
+                        })
+                        return;
+                    }
+                }
+                if (!this.props.spell.countAgainstKnown) {
+                    character.magic[spellLevel] = character.magic[spellLevel] + 1;
+                }
+                character.spells[spellLevel].push({ spell: spell, removable: false });
                 this.setState({ character }, () => {
                     this.props.updateSpells(this.state.character)
                 })
-                return;
             }
+        } catch (err) {
+            logger.log(err)
         }
-        if (!this.props.spell.countAgainstKnown) {
-            character.magic[spellLevel] = character.magic[spellLevel] + 1;
-        }
-        character.spells[spellLevel].push({ spell: spell, removable: false });
-        this.setState({ character }, () => {
-            this.props.updateSpells(this.state.character)
-        })
     }
     render() {
         return (

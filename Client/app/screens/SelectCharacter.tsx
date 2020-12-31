@@ -34,6 +34,7 @@ import { armorBonusCalculator } from './charOptions/helperFunctions/armorBonusCa
 import AuthContext from '../auth/context';
 import * as modifierNameList from '../../jsonDump/modifierNamingList.json'
 import { CharEquipmentTree } from '../components/characterEquipment/CharEquipmentTree';
+import logger from '../../utility/logger';
 /**
  * 
  * @param  image: image url-string || URI
@@ -330,19 +331,24 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
 
     setSavingThrows = () => {
-        let midRes = '';
-        const list = modifierNameList.list.map((modifierName, index) => {
-            if (this.state.cashedSavingThrows.includes(modifierName) && this.state.character.modifiers) {
-                midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : null} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
-            }
-            if ((!this.state.cashedSavingThrows.includes(modifierName)) && this.state.character.modifiers) {
-                midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : null} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
-            }
-            return <View key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
-                <AppText textAlign={'center'} fontSize={18}>{midRes} </AppText>
-            </View>
-        })
-        return list
+        try {
+            let midRes = '';
+            const list = modifierNameList.list.map((modifierName, index) => {
+                if (this.state.cashedSavingThrows.includes(modifierName) && this.state.character.modifiers) {
+                    midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
+                }
+                if ((!this.state.cashedSavingThrows.includes(modifierName)) && this.state.character.modifiers) {
+                    midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
+                }
+                return <View key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
+                    <AppText textAlign={'center'} fontSize={18}>{midRes} </AppText>
+                </View>
+            })
+            return list
+        } catch (err) {
+            logger.log
+            return []
+        }
     }
 
     render() {

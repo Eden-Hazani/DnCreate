@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { spellCharMagicRenaming } from './helperFunctions/spellCharMagicRenaming';
 import { hpColors } from '../../../utility/hpColors';
 import { AppButton } from '../../components/AppButton';
+import logger from '../../../utility/logger';
 
 interface CharMagicState {
     availableMagic: number[]
@@ -25,47 +26,59 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
     }
 
     async componentDidMount() {
-        let availableMagic = await AsyncStorage.getItem(`${this.props.character._id}availableMagic`);
-        if (this.props.character.magic) {
-            const totalMagic = Object.values(this.props.character.magic);
-            if (availableMagic) {
-                let availableMagicArray = JSON.parse(availableMagic);
-                availableMagicArray = availableMagicArray.filter((item: number) => item !== 0);
-                this.setState({ availableMagic: availableMagicArray })
-            }
-            if (!availableMagic) {
-                const newAvailableMagic: number[] = [];
-                for (let item of totalMagic) {
-                    newAvailableMagic.push(item)
+        try {
+            let availableMagic = await AsyncStorage.getItem(`${this.props.character._id}availableMagic`);
+            if (this.props.character.magic) {
+                const totalMagic = Object.values(this.props.character.magic);
+                if (availableMagic) {
+                    let availableMagicArray = JSON.parse(availableMagic);
+                    availableMagicArray = availableMagicArray.filter((item: number) => item !== 0);
+                    this.setState({ availableMagic: availableMagicArray })
                 }
-                this.setState({ availableMagic: newAvailableMagic })
-                await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+                if (!availableMagic) {
+                    const newAvailableMagic: number[] = [];
+                    for (let item of totalMagic) {
+                        newAvailableMagic.push(item)
+                    }
+                    this.setState({ availableMagic: newAvailableMagic })
+                    await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+                }
             }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     useSpellSlot = (index: number) => {
-        const availableMagic = this.state.availableMagic;
-        if (availableMagic[index] === 0) {
-            return;
-        }
-        availableMagic[index] = availableMagic[index] - 1;
-        this.setState({ availableMagic }, async () => {
-            await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
-        })
-    }
-
-    renewSpellSlot = (index: number) => {
-        if (this.props.character.magic) {
-            const totalMagic = Object.values(this.props.character.magic);
+        try {
             const availableMagic = this.state.availableMagic;
-            if (availableMagic[index] === totalMagic[index]) {
+            if (availableMagic[index] === 0) {
                 return;
             }
-            availableMagic[index] = availableMagic[index] + 1;
+            availableMagic[index] = availableMagic[index] - 1;
             this.setState({ availableMagic }, async () => {
                 await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
             })
+        } catch (err) {
+            logger.log(err)
+        }
+    }
+
+    renewSpellSlot = (index: number) => {
+        try {
+            if (this.props.character.magic) {
+                const totalMagic = Object.values(this.props.character.magic);
+                const availableMagic = this.state.availableMagic;
+                if (availableMagic[index] === totalMagic[index]) {
+                    return;
+                }
+                availableMagic[index] = availableMagic[index] + 1;
+                this.setState({ availableMagic }, async () => {
+                    await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

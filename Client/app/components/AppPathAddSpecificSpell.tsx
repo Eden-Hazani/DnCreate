@@ -6,6 +6,7 @@ import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { store } from '../redux/store';
 import { Colors } from '../config/colors';
+import logger from '../../utility/logger';
 
 
 interface AppPathAddSpecificSpellState {
@@ -24,15 +25,21 @@ export class AppPathAddSpecificSpell extends Component<{
         }
     }
     componentDidMount() {
-        const spell = spellsJSON.find((spell: any) => spell.name === this.props.spell)
-        const spellLevel = spellLevelChanger(spell.level)
-        for (let item of this.state.character.spells[spellLevel]) {
-            if (item.spell.name === spell.name) {
-                this.setState({ alreadyHaveSpell: true })
-                return;
+        try {
+            const spell = spellsJSON.find((spell: any) => spell.name === this.props.spell)
+            if (spell && this.state.character.spells) {
+                const spellLevel = spellLevelChanger(spell.level)
+                for (let item of this.state.character.spells[spellLevel]) {
+                    if (item.spell.name === spell.name) {
+                        this.setState({ alreadyHaveSpell: true })
+                        return;
+                    }
+                }
+                this.props.updateSpecificSpell({ name: this.props.spell, notCountAgainstKnownCantrips: this.props.notCountAgainstKnownCantrips })
             }
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.updateSpecificSpell({ name: this.props.spell, notCountAgainstKnownCantrips: this.props.notCountAgainstKnownCantrips })
     }
     render() {
         return (

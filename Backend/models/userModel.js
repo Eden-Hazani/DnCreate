@@ -20,6 +20,9 @@ const userSchema = mongoose.Schema({
     },
     activated: {
         type: Boolean
+    },
+    premium: {
+        type: Boolean
     }
 
 }, {

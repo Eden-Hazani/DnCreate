@@ -10,6 +10,7 @@ import adventureApi from '../../api/adventureApi';
 import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import { ScrollView } from 'react-native-gesture-handler';
+import logger from '../../../utility/logger';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -21,10 +22,14 @@ const ValidationSchema = Yup.object().shape({
 export class StartAdventure extends Component<{ navigation: any }> {
     static contextType = AuthContext;
     startAdventure = (values: any) => {
-        adventureApi.saveAdventure(values).then((adventure) => {
-            store.dispatch({ type: ActionType.UpdateLeadingAdv, payload: adventure.data })
-            this.props.navigation.navigate("SelectedLeadingAdv", { adventure: adventure.data })
-        });
+        try {
+            adventureApi.saveAdventure(values).then((adventure) => {
+                store.dispatch({ type: ActionType.UpdateLeadingAdv, payload: adventure.data })
+                this.props.navigation.navigate("SelectedLeadingAdv", { adventure: adventure.data })
+            });
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

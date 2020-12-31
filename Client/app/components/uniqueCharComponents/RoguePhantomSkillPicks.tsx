@@ -8,6 +8,7 @@ import { AppText } from '../AppText';
 import { AppButton } from '../AppButton';
 import { Colors } from '../../config/colors';
 import AsyncStorage from '@react-native-community/async-storage';
+import logger from '../../../utility/logger';
 interface RoguePhantomSkillPicksState {
     totalSkillToolList: string[]
     pickedSkill: string,
@@ -27,33 +28,49 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
     }
 
     async componentDidMount() {
-        const skill = await AsyncStorage.getItem(`${this.props.character._id}PhantomRogueSkill`);
-        if (skill) {
-            this.setState({ pickedSkill: JSON.parse(skill) })
+        try {
+            const skill = await AsyncStorage.getItem(`${this.props.character._id}PhantomRogueSkill`);
+            if (skill) {
+                this.setState({ pickedSkill: JSON.parse(skill) })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
     skillCheck = (skill: string) => {
-        if (JsonSkills.skillList.includes(skill) && this.props.character.modifiers) {
-            const modifiers = Object.entries(this.props.character.modifiers)
-            const skillGroup = skillModifier(skill);
-            for (let item of modifiers) {
-                if (item[0] === skillGroup) {
-                    return item[1]
+        try {
+            if (JsonSkills.skillList.includes(skill) && this.props.character.modifiers) {
+                const modifiers = Object.entries(this.props.character.modifiers)
+                const skillGroup = skillModifier(skill);
+                for (let item of modifiers) {
+                    if (item[0] === skillGroup) {
+                        return item[1]
+                    }
                 }
             }
+            return 0
+        } catch (err) {
+            logger.log(err)
         }
-        return 0
     }
 
     pickSkill = (skill: string, index: number) => {
-        let skillClicked = this.state.skillClicked;
-        skillClicked = [];
-        skillClicked[index] = true;
-        this.setState({ pickedSkill: skill, skillClicked }, () => this.setInStorage())
+        try {
+            let skillClicked = this.state.skillClicked;
+            skillClicked = [];
+            skillClicked[index] = true;
+            this.setState({ pickedSkill: skill, skillClicked }, () => this.setInStorage())
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     setInStorage = async () => {
-        await AsyncStorage.setItem(`${this.props.character._id}PhantomRogueSkill`, JSON.stringify(this.state.pickedSkill))
+        try {
+            await AsyncStorage.setItem(`${this.props.character._id}PhantomRogueSkill`, JSON.stringify(this.state.pickedSkill))
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
 

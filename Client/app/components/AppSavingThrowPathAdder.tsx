@@ -18,7 +18,7 @@ interface AppSavingThrowPathAdderState {
     savingThrowsConfirmation: boolean
     character: CharacterModel
     alreadyPickedSavingThrows: boolean[]
-    savingThrowsWasPickedByPath: boolean[]
+    savingThrowsWasPickedByPath: any[]
 }
 
 export class AppSavingThrowPathAdder extends Component<{
@@ -49,7 +49,7 @@ export class AppSavingThrowPathAdder extends Component<{
             }
             this.setState({ alreadyPickedSavingThrows }, () => {
                 const { extraSavingThrowsToPick, pickedSkillFromStart } = generateSavingThrowsPathConditions(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSavingThrowsTotal)
-                if (pickedSkillFromStart) {
+                if (pickedSkillFromStart !== "") {
                     let savingThrowsWasPickedByPath = this.state.savingThrowsWasPickedByPath
                     savingThrowsWasPickedByPath.push(pickedSkillFromStart)
                     this.setState({ savingThrowsWasPickedByPath }, () => {

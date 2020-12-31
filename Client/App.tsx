@@ -25,6 +25,8 @@ import { I18nManager } from "react-native";
 import { StartAnimation } from './app/animations/StartAnimation';
 import OfflineNavigator from './app/navigators/OfflineNavigator';
 import * as Updates from 'expo-updates';
+import logger from './utility/logger';
+
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
@@ -67,14 +69,11 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
         Updates.reloadAsync();
       })
     }
+    this.loadApp()
   }
 
-
-  async componentDidMount() {
+  loadApp = async () => {
     try {
-      if (!__DEV__) {
-        await this.checkForUpdates()
-      }
       this.loadColors().then(async () => {
         store.dispatch({ type: ActionType.CleanCreator })
         await TokenHandler().then(async (user) => {
@@ -109,6 +108,18 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     } catch (err) {
       console.log(err.message)
     }
+  }
+
+
+  componentDidMount() {
+    logger.start();
+    if (!__DEV__) {
+      this.setState({ isReady: false }, async () => {
+        await this.checkForUpdates()
+        return
+      })
+    }
+    this.loadApp()
   }
 
   loadColors = async () => {
@@ -164,14 +175,16 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
                 </NavigationContainer>
             }
           </AuthContext.Provider>}
-        {this.state.AppMainLoadAnimation ?
+        {this.state.AppMainLoadAnimation || !this.state.isReady ?
           null
           :
-          <AdMobBanner
-            style={{ alignItems: "center", }}
-            bannerSize="banner"
-            adUnitID={this.bannerAd}
-            servePersonalizedAds={false} />
+          null
+          // __DEV__ || this.state.user.premium || this.context.user.premium ? null :
+          //   <AdMobBanner
+          //     style={{ alignItems: "center", }}
+          //     bannerSize="banner"
+          //     adUnitID={this.bannerAd}
+          //     servePersonalizedAds={false} />
         }
       </SafeAreaView>
     );

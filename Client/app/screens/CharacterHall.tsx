@@ -42,7 +42,8 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         this.state = {
             isInternet: true,
             loadingAd: false,
-            showAds: store.getState().firstLoginAd,
+            // showAds: __DEV__ || this.context.user.premium ? false : store.getState().firstLoginAd,
+            showAds: false,
             error: false,
             loading: false,
             userInfo: this.context,

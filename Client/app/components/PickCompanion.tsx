@@ -23,20 +23,23 @@ export class PickCompanion extends Component<{ isDm: boolean, character: Charact
         super(props)
         this.state = {
             companionModal: false,
-            chosenCompanion: null,
+            chosenCompanion: 0,
             character: this.props.character
         }
     }
 
 
     render() {
+        let storeItem = store.getState().character.charSpecials?.companion;
         return (
             <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                 <View style={{ flex: .8 }}>
                     <View style={{ marginTop: 25, marginBottom: 15 }}>
                         <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} disabled={this.props.isDm}
                             borderRadius={25} title={'New Companion'} onPress={() => {
-                                this.setState({ chosenCompanion: this.state.character.charSpecials.companion.length, companionModal: true })
+                                if (this.state.character.charSpecials?.companion) {
+                                    this.setState({ chosenCompanion: this.state.character.charSpecials.companion.length, companionModal: true })
+                                }
                             }} />
                     </View>
                     <View>
@@ -46,9 +49,10 @@ export class PickCompanion extends Component<{ isDm: boolean, character: Charact
                         <AppText textAlign={'center'} fontSize={17}>You cannot add a companion without a companion related ability, either from your chosen path or from your DM</AppText>
                     </View>
                     <AppText textAlign={'center'} fontSize={22} color={Colors.berries}>Pick companion</AppText>
-                    {(this.props.isDm ? this.props.character.charSpecials.companion.length > 0 : store.getState().character.charSpecials.companion.length > 0) &&
+                    {(this.props.isDm ? this.props.character.charSpecials?.companion && this.props.character.charSpecials.companion.length > 0
+                        : storeItem && storeItem.length > 0) &&
                         <FlatList
-                            data={this.props.isDm ? this.props.character.charSpecials.companion : store.getState().character.charSpecials.companion}
+                            data={this.props.isDm ? this.props.character.charSpecials?.companion && this.props.character.charSpecials.companion : storeItem}
                             keyExtractor={(companion, index) => index.toString()}
                             renderItem={({ item, index }) => <ListItem
                                 title={item.name}
@@ -69,7 +73,8 @@ export class PickCompanion extends Component<{ isDm: boolean, character: Charact
                         borderRadius={25} title={'Close'} onPress={() => { this.props.closeModal(false) }} />
                 </View>
                 <Modal visible={this.state.companionModal}>
-                    <AppCompanion isDm={this.props.isDm} pickedIndex={this.state.chosenCompanion} proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
+                    <AppCompanion isDm={this.props.isDm} pickedIndex={this.state.chosenCompanion}
+                        proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
                 </Modal>
             </View>
         )

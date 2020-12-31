@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { ActionType } from '../redux/action-type';
@@ -30,52 +31,62 @@ export class AppToolPicker extends Component<{
         }
     }
     componentDidMount() {
-        for (let item of this.state.character.tools) {
-            if (this.props.itemList.includes(item[0])) {
-                const alreadyPickedTools = this.state.alreadyPickedTools;
-                alreadyPickedTools[this.props.itemList.indexOf(item[0])] = true;
-                this.setState({ alreadyPickedTools })
+        try {
+            if (this.state.character.tools) {
+                for (let item of this.state.character.tools) {
+                    if (this.props.itemList.includes(item[0])) {
+                        const alreadyPickedTools = this.state.alreadyPickedTools;
+                        alreadyPickedTools[this.props.itemList.indexOf(item[0])] = true;
+                        this.setState({ alreadyPickedTools })
+                    }
+                }
             }
+            this.props.setAdditionalToolPicks(true)
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.setAdditionalToolPicks(true)
     }
     componentWillUnmount() {
         this.props.setAdditionalToolPicks(false)
     }
 
     pickTool = (tool: any, index: number) => {
-        const character = this.props.character;
-        let tools = this.state.tools;
-        if (!this.state.toolsClicked[index]) {
-            for (let item of this.state.character.tools) {
-                if (item[0] === tool) {
-                    alert(`You are already proficient with this tool`)
+        try {
+            const character = this.props.character;
+            let tools = this.state.tools;
+            if (!this.state.toolsClicked[index] && this.state.character.tools && character.tools) {
+                for (let item of this.state.character.tools) {
+                    if (item[0] === tool) {
+                        alert(`You are already proficient with this tool`)
+                        return;
+                    }
+                }
+                if (this.state.tools.length >= this.state.amountToPick) {
+                    alert(`You can only pick ${this.state.amountToPick} tools.`)
                     return;
                 }
+                const toolsClicked = this.state.toolsClicked;
+                toolsClicked[index] = true;
+                tools.push(tool)
+                character.tools.push([tool, 0])
+                this.setState({ tools, toolsClicked, character }, () => {
+                    this.props.sendToolsBack(this.state.character)
+                    if (this.state.tools.length === this.state.amountToPick) {
+                        this.props.setAdditionalToolPicks(false)
+                    }
+                })
             }
-            if (this.state.tools.length >= this.state.amountToPick) {
-                alert(`You can only pick ${this.state.amountToPick} tools.`)
-                return;
+            else if (this.state.toolsClicked[index] && character.tools) {
+                tools = tools.filter(val => val !== tool);
+                character.tools = character.tools.filter(val => val[0] !== tool)
+                const toolsClicked = this.state.toolsClicked;
+                toolsClicked[index] = false;
+                this.setState({ tools, toolsClicked, character }, () => {
+                    this.props.sendToolsBack(this.state.character)
+                })
             }
-            const toolsClicked = this.state.toolsClicked;
-            toolsClicked[index] = true;
-            tools.push(tool)
-            character.tools.push([tool, 0])
-            this.setState({ tools, toolsClicked, character }, () => {
-                this.props.sendToolsBack(this.state.character)
-                if (this.state.tools.length === this.state.amountToPick) {
-                    this.props.setAdditionalToolPicks(false)
-                }
-            })
-        }
-        else if (this.state.toolsClicked[index]) {
-            tools = tools.filter(val => val !== tool);
-            character.tools = character.tools.filter(val => val[0] !== tool)
-            const toolsClicked = this.state.toolsClicked;
-            toolsClicked[index] = false;
-            this.setState({ tools, toolsClicked, character }, () => {
-                this.props.sendToolsBack(this.state.character)
-            })
+        } catch (err) {
+            logger.log(err)
         }
     }
     render() {

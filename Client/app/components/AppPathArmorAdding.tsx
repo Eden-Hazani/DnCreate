@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { AppText } from './AppText';
 
 export class AppPathArmorAdding extends Component<{ armorList: any, loadArmors: any }>{
 
     componentDidMount() {
-        this.props.loadArmors(this.props.armorList)
+        try {
+            this.props.loadArmors(this.props.armorList)
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

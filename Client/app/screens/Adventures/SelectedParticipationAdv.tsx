@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Config } from '../../../config';
+import logger from '../../../utility/logger';
 import adventureApi from '../../api/adventureApi';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
@@ -26,23 +27,27 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
         }
     }
     async componentDidMount() {
-        let userArray: string[] = []
-        if (this.state.adventure.participants_id) {
-            for (let item of this.state.adventure.participants_id) {
-                if (item.user_id) {
-                    userArray.push(item.user_id)
+        try {
+            let userArray: string[] = []
+            if (this.state.adventure.participants_id) {
+                for (let item of this.state.adventure.participants_id) {
+                    if (item.user_id) {
+                        userArray.push(item.user_id)
+                    }
                 }
             }
+            if (userArray.length === 0) {
+                this.setState({ loading: false })
+                return
+            }
+            const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+            const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
+            this.setState({ profilePicList: picList }, () => {
+                this.setState({ loading: false })
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        if (userArray.length === 0) {
-            this.setState({ loading: false })
-            return
-        }
-        const userPicList: any = await adventureApi.getUserProfileImages(userArray)
-        const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
-        this.setState({ profilePicList: picList }, () => {
-            this.setState({ loading: false })
-        })
     }
     render() {
         const adventure = this.props.route.params.adventure;

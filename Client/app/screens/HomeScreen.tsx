@@ -18,7 +18,9 @@ import { CharacterModel } from '../models/characterModel';
 import errorHandler from '../../utility/errorHander';
 import Carousel from 'react-native-snap-carousel';
 import authApi from '../api/authApi';
-
+import { HomeMessage } from '../components/HomeMessage';
+import { CacheManager } from 'react-native-expo-image-cache';
+import logger from '../../utility/logger';
 
 interface HomeState {
     loading: boolean
@@ -30,6 +32,7 @@ interface HomeState {
     test: any
     activated: boolean
     emailSentTimer: number
+    homeMessageModal: boolean
 }
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
@@ -39,6 +42,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     constructor(props: any) {
         super(props)
         this.state = {
+            homeMessageModal: false,
             emailSentTimer: 0,
             activated: false,
             test: Colors.pageBackground,
@@ -50,7 +54,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             carouselItems: [
                 {
                     title: "Welcome to DnCreate",
-                    text: "Press New Character to create a new character",
+                    message: true,
                     image: { img: require('../../assets/homeDragon1.png') }
                 },
                 {
@@ -74,6 +78,24 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
     async componentDidMount() {
         try {
+            const readHomeMessage = await AsyncStorage.getItem('readHomeMessage');
+            if (!readHomeMessage) {
+                this.setState({ homeMessageModal: true }, async () => {
+                    await AsyncStorage.setItem('readHomeMessage', "true")
+                })
+            }
+            const date = new Date().toISOString().slice(0, 10)
+            const clearCashOnceADay = await AsyncStorage.getItem('clearCashOnceADay');
+            if (!clearCashOnceADay) {
+                await CacheManager.clearCache();
+                await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
+            }
+            if (clearCashOnceADay) {
+                if (clearCashOnceADay !== date) {
+                    await CacheManager.clearCache();
+                    await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
+                }
+            }
             const isOffline = await AsyncStorage.getItem('isOffline');
             if (store.getState().nonUser) {
                 this.setState({ loading: true }, () => {
@@ -96,7 +118,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
@@ -131,6 +153,10 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 <View style={{ padding: 0 }}>
                     <AppText fontSize={22} textAlign={'center'} color={Colors.berries}>{item.title}</AppText>
                     <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>{item.text}</AppText>
+                    {item.message &&
+                        <AppButton fontSize={18} title={'Important message'} onPress={() => { this.setState({ homeMessageModal: true }) }}
+                            backgroundColor={Colors.earthYellow} width={120} height={50} borderRadius={25} />
+                    }
                 </View>
             </View>
 
@@ -166,7 +192,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     <AppText color={Colors.whiteInDarkMode} fontSize={35}>DnCreate</AppText>
                                     <Carousel
                                         data={this.state.carouselItems}
-                                        renderItem={this._renderItem}
+                                        renderItem={this._renderItem.bind(this)}
                                         sliderWidth={Dimensions.get("screen").width}
                                         itemWidth={Dimensions.get("screen").width}
                                     />
@@ -181,6 +207,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     }} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                                 </View>
+                                <Modal visible={this.state.homeMessageModal} animationType="slide">
+                                    <HomeMessage close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
+                                </Modal>
                                 <Modal visible={this.state.errorModal}>
                                     <View style={{ flex: .6, backgroundColor: Colors.pageBackground, justifyContent: "center", alignItems: "center" }}>
                                         <Image style={{ width: 200, height: 200 }} source={require("../../assets/errorDragon.png")} />

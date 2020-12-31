@@ -16,6 +16,7 @@ import userCharApi from '../../api/userCharApi';
 import { EquippedArmorModel } from '../../models/EquippedArmorModel';
 import { armorBonusCalculator } from './helperFunctions/armorBonusCalculator';
 import AuthContext from '../../auth/context';
+import logger from '../../../utility/logger';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -54,9 +55,13 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         }
     }
     async componentDidMount() {
-        const armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        if (armorList) {
-            this.setState({ armorList: JSON.parse(armorList) })
+        try {
+            const armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+            if (armorList) {
+                this.setState({ armorList: JSON.parse(armorList) })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
@@ -69,93 +74,112 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
     }
 
     addArmor = async (values: any) => {
-        if (!this.validateArmor()) {
-            alert('Must pick armor type');
-            return;
+        try {
+            if (!this.validateArmor()) {
+                alert('Must pick armor type');
+                return;
+            }
+            let armorName = values.armorName;
+            let armorAc = values.armorAc;
+            const armor: any = {
+                id: armorName + Math.floor((Math.random() * 1000000) + 1),
+                name: armorName,
+                ac: armorAc,
+                baseAc: armorAc,
+                disadvantageStealth: this.state.disadvantageStealth,
+                armorType: this.state.armorType,
+                armorBonusesCalculationType: this.state.armorType,
+                removable: true
+            }
+            let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+            if (!armorList) {
+                const armorList = [armor]
+                AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
+                this.setState({ armorList: armorList, lightArmor: false, mediumArmor: false, heavyArmor: false, addArmor: false })
+                return;
+            }
+            const newArmorList = JSON.parse(armorList)
+            newArmorList.push(armor)
+            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
+            this.setState({ addArmor: false, armorList: newArmorList, lightArmor: false, mediumArmor: false, heavyArmor: false });
+        } catch (err) {
+            logger.log(err)
         }
-        let armorName = values.armorName;
-        let armorAc = values.armorAc;
-        const armor: any = {
-            id: armorName + Math.floor((Math.random() * 1000000) + 1),
-            name: armorName,
-            ac: armorAc,
-            baseAc: armorAc,
-            disadvantageStealth: this.state.disadvantageStealth,
-            armorType: this.state.armorType,
-            armorBonusesCalculationType: this.state.armorType,
-            removable: true
-        }
-        let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        if (!armorList) {
-            const armorList = [armor]
-            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
-            this.setState({ armorList: armorList, lightArmor: false, mediumArmor: false, heavyArmor: false, addArmor: false })
-            return;
-        }
-        const newArmorList = JSON.parse(armorList)
-        newArmorList.push(armor)
-        AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
-        this.setState({ addArmor: false, armorList: newArmorList, lightArmor: false, mediumArmor: false, heavyArmor: false });
-
     }
     removeSet = async (setId: string) => {
-        let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        if (armorList) {
-            let newArmorList = JSON.parse(armorList)
-            newArmorList = newArmorList.filter((armor: any) => armor.id !== setId);
-            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
-            this.setState({ armorList: newArmorList });
+        try {
+            let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+            if (armorList) {
+                let newArmorList = JSON.parse(armorList)
+                newArmorList = newArmorList.filter((armor: any) => armor.id !== setId);
+                AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
+                this.setState({ armorList: newArmorList });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
     removeEquippedSet = () => {
-        const character = { ...this.state.character };
-        character.equippedArmor = {
-            id: '1',
-            name: 'No Armor Equipped',
-            ac: 10,
-            baseAc: 10,
-            armorBonusesCalculationType: 'none',
-            disadvantageStealth: false,
-            armorType: 'none'
-        }
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
-            }
-            userCharApi.updateChar(this.state.character);
-        });
-    }
-
-    updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
-                }
-            }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
-        }
-    }
-
-    equipSet = (set: EquippedArmorModel) => {
-        if (set.baseAc) {
-            const newSet = JSON.parse(JSON.stringify(set))
+        try {
             const character = { ...this.state.character };
-            newSet.ac = +set.baseAc;
-            character.equippedArmor = newSet;
+            character.equippedArmor = {
+                id: '1',
+                name: 'No Armor Equipped',
+                ac: 10,
+                baseAc: 10,
+                armorBonusesCalculationType: 'none',
+                disadvantageStealth: false,
+                armorType: 'none'
+            }
             this.setState({ character }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
                 if (this.context.user._id === "Offline") {
                     this.updateOfflineCharacter();
                     return;
                 }
-                userCharApi.updateChar(this.state.character)
+                userCharApi.updateChar(this.state.character);
             });
+        } catch (err) {
+            logger.log(err)
+        }
+    }
+
+    updateOfflineCharacter = async () => {
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
+                }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+            }
+        } catch (err) {
+            logger.log(err)
+        }
+    }
+
+    equipSet = (set: EquippedArmorModel) => {
+        try {
+            if (set.baseAc) {
+                const newSet = JSON.parse(JSON.stringify(set))
+                const character = { ...this.state.character };
+                newSet.ac = +set.baseAc;
+                character.equippedArmor = newSet;
+                this.setState({ character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    if (this.context.user._id === "Offline") {
+                        this.updateOfflineCharacter();
+                        return;
+                    }
+                    userCharApi.updateChar(this.state.character)
+                });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

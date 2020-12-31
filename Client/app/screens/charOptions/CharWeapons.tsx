@@ -16,6 +16,7 @@ import { ActionType } from '../../redux/action-type';
 import userCharApi from '../../api/userCharApi';
 import { ScrollView } from 'react-native-gesture-handler';
 import AuthContext from '../../auth/context';
+import logger from '../../../utility/logger';
 
 const ValidationSchema = Yup.object().shape({
     name: Yup.string().required().label("Weapon Name"),
@@ -52,110 +53,142 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
         }
     }
     async componentDidMount() {
-        const character = { ...this.state.character };
-        const weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
-        if (weaponList) {
-            this.setState({ weaponList: JSON.parse(weaponList) })
+        try {
+            const character = { ...this.state.character };
+            const weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
+            if (weaponList) {
+                this.setState({ weaponList: JSON.parse(weaponList) })
+            }
+            if (!this.state.character.currentWeapon) {
+                character.currentWeapon = new WeaponModal();
+            }
+            this.setState({ character })
+        } catch (err) {
+            logger.log(err)
         }
-        if (!this.state.character.currentWeapon) {
-            character.currentWeapon = new WeaponModal();
-        }
-        this.setState({ character })
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
                 }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     setDamageDice = (dice: string, index: number) => {
-        let diceClicked = this.state.diceClicked;
-        diceClicked = [];
-        diceClicked[index] = true
-        this.setState({ dicePicked: dice, diceClicked })
+        try {
+            let diceClicked = this.state.diceClicked;
+            diceClicked = [];
+            diceClicked[index] = true
+            this.setState({ dicePicked: dice, diceClicked })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     validateWeapon = () => {
-        if (this.state.diceClicked.length === 0) {
-            return false
+        try {
+            if (this.state.diceClicked.length === 0) {
+                return false
+            }
+            return true
+        } catch (err) {
+            logger.log(err)
         }
-        return true
     }
 
     addWeapon = async (values: any) => {
-        if (!this.validateWeapon()) {
-            alert('Must pick damage dice');
-            return;
+        try {
+            if (!this.validateWeapon()) {
+                alert('Must pick damage dice');
+                return;
+            }
+            let WeaponName = values.name;
+            let dice = this.state.dicePicked;
+            const weapon: WeaponModal = {
+                _id: WeaponName + Math.floor((Math.random() * 1000000) + 1),
+                name: WeaponName,
+                dice: dice,
+                description: values.description,
+                diceAmount: values.diceAmount,
+                removable: true
+            }
+            let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
+            if (!weaponList) {
+                const weaponList = [weapon]
+                AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(weaponList))
+                this.setState({ weaponList: weaponList, addWeapon: false })
+                return;
+            }
+            const newWeaponList = JSON.parse(weaponList)
+            newWeaponList.push(weapon)
+            AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(newWeaponList))
+            this.setState({ addWeapon: false, weaponList: newWeaponList });
+        } catch (err) {
+            logger.log(err)
         }
-        let WeaponName = values.name;
-        let dice = this.state.dicePicked;
-        const weapon: WeaponModal = {
-            _id: WeaponName + Math.floor((Math.random() * 1000000) + 1),
-            name: WeaponName,
-            dice: dice,
-            description: values.description,
-            diceAmount: values.diceAmount,
-            removable: true
-        }
-        let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
-        if (!weaponList) {
-            const weaponList = [weapon]
-            AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(weaponList))
-            this.setState({ weaponList: weaponList, addWeapon: false })
-            return;
-        }
-        const newWeaponList = JSON.parse(weaponList)
-        newWeaponList.push(weapon)
-        AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(newWeaponList))
-        this.setState({ addWeapon: false, weaponList: newWeaponList });
     }
 
     removeWeapon = async (weaponId: string) => {
-        let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
-        if (weaponList) {
-            let newWeaponList = JSON.parse(weaponList)
-            newWeaponList = newWeaponList.filter((weapon: any) => weapon._id !== weaponId);
-            AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(newWeaponList))
-            this.setState({ weaponList: newWeaponList });
+        try {
+            let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
+            if (weaponList) {
+                let newWeaponList = JSON.parse(weaponList)
+                newWeaponList = newWeaponList.filter((weapon: any) => weapon._id !== weaponId);
+                AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(newWeaponList))
+                this.setState({ weaponList: newWeaponList });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     equipWeapon = (weapon: WeaponModal) => {
-        if (weapon) {
-            const newWeapon = JSON.parse(JSON.stringify(weapon))
+        try {
+            if (weapon) {
+                const newWeapon = JSON.parse(JSON.stringify(weapon))
+                const character = { ...this.state.character };
+                character.currentWeapon = newWeapon;
+                this.setState({ character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    if (this.context.user._id === "Offline") {
+                        this.updateOfflineCharacter();
+                        return;
+                    }
+                    userCharApi.updateChar(this.state.character)
+                });
+            }
+        } catch (err) {
+            logger.log(err)
+        }
+    }
+
+    removeEquippedWeapon = () => {
+        try {
             const character = { ...this.state.character };
-            character.currentWeapon = newWeapon;
+            character.currentWeapon = new WeaponModal();
             this.setState({ character }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
                 if (this.context.user._id === "Offline") {
                     this.updateOfflineCharacter();
                     return;
                 }
-                userCharApi.updateChar(this.state.character)
+                userCharApi.updateChar(this.state.character);
             });
+        } catch (err) {
+            logger.log(err)
         }
-    }
-
-    removeEquippedWeapon = () => {
-        const character = { ...this.state.character };
-        character.currentWeapon = new WeaponModal();
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter();
-                return;
-            }
-            userCharApi.updateChar(this.state.character);
-        });
     }
 
     render() {

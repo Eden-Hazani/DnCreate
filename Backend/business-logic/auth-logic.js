@@ -29,6 +29,11 @@ function login(credentials) {
     return user
 }
 
+function findUserAsAdmin(username) {
+    const user = User.findOne({ username: { $eq: username } });
+    return user
+}
+
 async function updateUser(user) {
     const info = await User.updateOne({ _id: user._id }, user).exec();
     return info.n ? user : null;
@@ -62,5 +67,6 @@ module.exports = {
     resetLinkValidator,
     updateUserWithPassword,
     deleteAccount,
-    validateInSystem
+    validateInSystem,
+    findUserAsAdmin
 }

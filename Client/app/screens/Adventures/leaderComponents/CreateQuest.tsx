@@ -15,6 +15,7 @@ import { store } from '../../../redux/store';
 import { ActionType } from '../../../redux/action-type';
 import { AppButton } from '../../../components/AppButton';
 import errorHandler from '../../../../utility/errorHander';
+import logger from '../../../../utility/logger';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -85,7 +86,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 })
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
@@ -125,7 +126,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 })
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 

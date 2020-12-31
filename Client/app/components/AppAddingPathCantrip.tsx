@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -15,16 +16,22 @@ export class AppAddingPathCantrip extends Component<{ character: CharacterModel,
         }
     }
     componentDidMount() {
-        const character = { ...this.state.character };
-        character.magic.cantrips = character.magic.cantrips + this.props.item.additionCantrip;
-        this.setState({ character }, () => {
-            this.props.updateCantrips(this.state.character)
-        })
+        try {
+            const character = { ...this.state.character };
+            if (character.magic) {
+                character.magic.cantrips = character.magic.cantrips + this.props.item.additionCantrip;
+                this.setState({ character }, () => {
+                    this.props.updateCantrips(this.state.character)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (
             <View style={styles.container}>
-                <AppText textAlign={"center"} fontSize={18}>You now have {this.state.character.magic.cantrips} cantrips</AppText>
+                <AppText textAlign={"center"} fontSize={18}>You now have {this.state.character.magic && this.state.character.magic.cantrips} cantrips</AppText>
             </View>
         )
     }

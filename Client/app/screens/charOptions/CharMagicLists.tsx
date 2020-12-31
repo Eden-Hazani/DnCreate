@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
+import logger from '../../../utility/logger';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { AppButton } from '../../components/AppButton';
@@ -33,29 +34,37 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
     }
 
     removeSpell = () => {
-        const character = { ...this.state.character }
-        const spellLevel = spellLevelChanger(this.state.pickedSpellDetail.level)
-        if (character.spells) {
-            character.spells[spellLevel] = character.spells[spellLevel].filter((item: any) => item.spell.name !== this.state.pickedSpellDetail.name)
-            this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                this.props.reloadChar()
-                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            })
+        try {
+            const character = { ...this.state.character }
+            const spellLevel = spellLevelChanger(this.state.pickedSpellDetail.level)
+            if (character.spells) {
+                character.spells[spellLevel] = character.spells[spellLevel].filter((item: any) => item.spell.name !== this.state.pickedSpellDetail.name)
+                this.setState({ spellDetailModal: false, pickedSpellDetail: null, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    this.props.reloadChar()
+                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
                 }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+        } catch (err) {
+            logger.log(err)
         }
     }
 

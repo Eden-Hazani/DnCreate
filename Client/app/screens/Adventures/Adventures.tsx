@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
+import logger from '../../../utility/logger';
 import adventureApi from '../../api/adventureApi';
 import authApi from '../../api/authApi';
 import userCharApi from '../../api/userCharApi';
@@ -47,18 +48,22 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
     }
 
     onFocus = async () => {
-        if (this.state.characters.length === 0) {
-            const characters = store.getState().characters;
-            this.setState({ characters: characters }, () => {
-                store.dispatch({ type: ActionType.SetCharacters, payload: this.state.characters })
-                this.getLeadingAdv()
-                this.getParticipatingAdv()
-                this.setState({ loading: false })
-            });
-            return;
+        try {
+            if (this.state.characters.length === 0) {
+                const characters = store.getState().characters;
+                this.setState({ characters: characters }, () => {
+                    store.dispatch({ type: ActionType.SetCharacters, payload: this.state.characters })
+                    this.getLeadingAdv()
+                    this.getParticipatingAdv()
+                    this.setState({ loading: false })
+                });
+                return;
+            }
+            this.getLeadingAdv()
+            this.getParticipatingAdv()
+        } catch (err) {
+            logger.log(err)
         }
-        this.getLeadingAdv()
-        this.getParticipatingAdv()
     }
 
     componentDidMount() {
@@ -82,7 +87,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 }
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
@@ -116,7 +121,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 })
             }
         } catch (err) {
-            console.log(err.message)
+            logger.log(err)
         }
     }
 
@@ -129,7 +134,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 })
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
@@ -167,18 +172,22 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
             })
         } catch (err) {
-            console.log(err.message)
+            logger.log(err)
         }
     }
 
     goToParticipatingAdv = async (adventure: any) => {
-        const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
-        if (!response.ok) {
-            errorHandler(response)
-            this.getParticipatingFromServer();
-            return;
+        try {
+            const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
+            if (!response.ok) {
+                errorHandler(response)
+                this.getParticipatingFromServer();
+                return;
+            }
+            this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
     }
 
 

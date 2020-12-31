@@ -7,6 +7,7 @@ import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellL
 import { Colors } from '../config/colors';
 import { AppActivityIndicator } from './AppActivityIndicator';
 import { store } from '../redux/store';
+import logger from '../../utility/logger';
 
 
 interface AppDruidSpellPickerState {
@@ -38,41 +39,49 @@ export class AppDruidSpellPicker extends Component<{ pickDruidCircle: any, chara
     }
 
     updateChar = () => {
-        const character = { ...this.state.character };
-        character.path = this.props.path;
-        if (this.state.circlePicked) {
-            this.setState({ loading: true })
-            character.charSpecials.druidCircle = this.state.circlePicked.name;
-            this.setState({ character }, () => {
-                this.props.loadSpells(this.state.character)
-                this.setState({ loading: false })
-            })
+        try {
+            const character = { ...this.state.character };
+            character.path = this.props.path;
+            if (this.state.circlePicked && character.charSpecials) {
+                this.setState({ loading: true })
+                character.charSpecials.druidCircle = this.state.circlePicked.name;
+                this.setState({ character }, () => {
+                    this.props.loadSpells(this.state.character)
+                    this.setState({ loading: false })
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickCircle = (item: any, index: number) => {
-        let circlePicked = this.state.circlePicked;
-        if (!this.state.circleClicked[index]) {
-            if (this.state.circlePicked !== null) {
-                alert('You can only pick one Circle.')
-                return;
+        try {
+            let circlePicked = this.state.circlePicked;
+            if (!this.state.circleClicked[index]) {
+                if (this.state.circlePicked !== null) {
+                    alert('You can only pick one Circle.')
+                    return;
+                }
+                const circleClicked = this.state.circleClicked;
+                circleClicked[index] = true;
+                circlePicked = item;
+                this.setState({ circleClicked, circlePicked }, () => {
+                    this.updateChar();
+                    this.props.pickDruidCircle(false)
+                })
             }
-            const circleClicked = this.state.circleClicked;
-            circleClicked[index] = true;
-            circlePicked = item;
-            this.setState({ circleClicked, circlePicked }, () => {
-                this.updateChar();
-                this.props.pickDruidCircle(false)
-            })
-        }
-        else if (this.state.circleClicked[index]) {
-            const circleClicked = this.state.circleClicked;
-            circleClicked[index] = false;
-            circlePicked = null
-            this.setState({ character: this.state.beforeChangeChar, circleClicked, circlePicked }, () => {
-                this.updateChar();
-                this.props.pickDruidCircle(true)
-            })
+            else if (this.state.circleClicked[index]) {
+                const circleClicked = this.state.circleClicked;
+                circleClicked[index] = false;
+                circlePicked = null
+                this.setState({ character: this.state.beforeChangeChar, circleClicked, circlePicked }, () => {
+                    this.updateChar();
+                    this.props.pickDruidCircle(true)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
 
     }

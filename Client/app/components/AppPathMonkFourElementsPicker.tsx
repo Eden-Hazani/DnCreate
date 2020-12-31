@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
@@ -34,29 +35,47 @@ export class AppPathMonkFourElementsPicker extends Component<{
 
 
     getFromStorage = async () => {
-        const beforeChangeCharString = await AsyncStorage.getItem(`current${this.props.character._id}level${this.props.character.level - 1}`)
-        this.setState({ beforeChangeChar: JSON.parse(beforeChangeCharString) })
+        try {
+            if (this.props.character.level) {
+                const beforeChangeCharString = await AsyncStorage.getItem(`current${this.props.character._id}level${this.props.character.level - 1}`)
+                if (beforeChangeCharString) {
+                    this.setState({ beforeChangeChar: JSON.parse(beforeChangeCharString) })
+                }
+            }
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     componentDidMount() {
-        const fullElementList = this.props.item.filter((val: any) => val.prerequisite <= this.props.character.level);
-        this.setState({ fullElementList })
-        this.getFromStorage().then(() => {
-            this.setState({ pickedElements: store.getState().character.charSpecials.monkElementsDisciplines }, () => {
-                if (this.props.character.level === 3) {
-                    const pickedElements = this.state.pickedElements;
-                    pickedElements.push(this.props.firstElement);
-                    this.setState({ pickedElements })
-                }
-            })
-            this.state.fullElementList.forEach((item: any, index: number) => this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.forEach(val => {
-                if (item.name === val.name) {
-                    this.state.elementClicked[index] = true
-                }
-            }))
-            this.props.elementsToPick(true)
-            this.setState({ loading: false })
-        })
+        try {
+            if (this.props.character.level) {
+                const fullElementList = this.props.item.filter((val: any) => this.props.character.level && (val.prerequisite <= this.props.character.level));
+                this.setState({ fullElementList })
+                this.getFromStorage().then(() => {
+                    let storeItem = store.getState().character.charSpecials?.monkElementsDisciplines
+                    if (storeItem) {
+                        this.setState({ pickedElements: storeItem }, () => {
+                            if (this.props.character.level === 3) {
+                                const pickedElements = this.state.pickedElements;
+                                pickedElements.push(this.props.firstElement);
+                                this.setState({ pickedElements })
+                            }
+                        })
+                        this.state.fullElementList.forEach((item: any, index: number) => this.state.beforeChangeChar.charSpecials?.monkElementsDisciplines &&
+                            this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.forEach(val => {
+                                if (item.name === val.name) {
+                                    this.state.elementClicked[index] = true
+                                }
+                            }))
+                        this.props.elementsToPick(true)
+                        this.setState({ loading: false })
+                    }
+                })
+            }
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     componentWillUnmount() {
@@ -67,72 +86,81 @@ export class AppPathMonkFourElementsPicker extends Component<{
 
 
     setElements = (item: any, index: number) => {
-        for (let unit of this.state.beforeChangeChar.charSpecials.monkElementsDisciplines) {
-            if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && this.state.elementClicked[index]) {
-                if (this.state.extraElementChange) {
-                    alert('You can only change one Element you previously picked');
-                    return;
-                }
-                let pickedElements = this.state.pickedElements;
-                const elementClicked = this.state.elementClicked;
-                elementClicked[index] = false;
-                pickedElements = pickedElements.filter((val: any) => item.name !== val.name);
-                this.setState({ pickedElements, extraElementChange: true }, () => {
-                    this.props.loadElements(this.state.pickedElements)
-                })
-                this.props.elementsToPick(true)
-                return;
-            }
-            if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && !this.state.elementClicked[index]) {
-                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
-                    alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`)
-                    return;
-                }
-                let pickedElements = this.state.pickedElements;
-                const elementClicked = this.state.elementClicked;
-                elementClicked[index] = true;
-                pickedElements.push(item);
-                this.setState({ pickedElements, extraElementChange: false }, () => {
-                    this.props.loadElements(this.state.pickedElements)
-                    if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
-                        this.props.elementsToPick(false)
+        try {
+            if (this.state.beforeChangeChar.charSpecials?.monkElementsDisciplines && this.state.beforeChangeChar.level) {
+                for (let unit of this.state.beforeChangeChar.charSpecials.monkElementsDisciplines) {
+                    if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && this.state.elementClicked[index]) {
+                        if (this.state.extraElementChange) {
+                            alert('You can only change one Element you previously picked');
+                            return;
+                        }
+                        let pickedElements = this.state.pickedElements;
+                        const elementClicked = this.state.elementClicked;
+                        elementClicked[index] = false;
+                        pickedElements = pickedElements.filter((val: any) => item.name !== val.name);
+                        this.setState({ pickedElements, extraElementChange: true }, () => {
+                            this.props.loadElements(this.state.pickedElements)
+                        })
+                        this.props.elementsToPick(true)
+                        return;
                     }
-                })
-                return;
-            }
-        }
-        if (!this.state.elementClicked[index]) {
-            if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
-                alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`);
-                return;
-            }
-            const pickedElements = this.state.pickedElements;
-            const elementClicked = this.state.elementClicked;
-            elementClicked[index] = true;
-            pickedElements.push(item);
-            this.setState({ pickedElements }, () => {
-                this.props.loadElements(this.state.pickedElements)
-                if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
-                    this.props.elementsToPick(false)
+                    if (unit.name === item.name && this.state.beforeChangeChar.level > 3 && !this.state.elementClicked[index]) {
+                        if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
+                            alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`)
+                            return;
+                        }
+                        let pickedElements = this.state.pickedElements;
+                        const elementClicked = this.state.elementClicked;
+                        elementClicked[index] = true;
+                        pickedElements.push(item);
+                        this.setState({ pickedElements, extraElementChange: false }, () => {
+                            this.props.loadElements(this.state.pickedElements)
+                            if (this.state.beforeChangeChar.charSpecials?.monkElementsDisciplines &&
+                                (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick)) {
+                                this.props.elementsToPick(false)
+                            }
+                        })
+                        return;
+                    }
                 }
-            })
-        }
-        else if (this.state.elementClicked[index]) {
-            let pickedElements = this.state.pickedElements;
-            const elementClicked = this.state.elementClicked;
-            elementClicked[index] = false;
-            pickedElements = pickedElements.filter((val: any) => item.name !== val.name);
-            this.setState({ pickedElements }, () => {
-                this.props.loadElements(this.state.pickedElements)
-            })
-            this.props.elementsToPick(true)
+                if (!this.state.elementClicked[index]) {
+                    if (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick) {
+                        alert(`You have ${(this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} element disciplines to pick`);
+                        return;
+                    }
+                    const pickedElements = this.state.pickedElements;
+                    const elementClicked = this.state.elementClicked;
+                    elementClicked[index] = true;
+                    pickedElements.push(item);
+                    this.setState({ pickedElements }, () => {
+                        this.props.loadElements(this.state.pickedElements)
+                        if (this.state.beforeChangeChar.charSpecials?.monkElementsDisciplines &&
+                            (this.state.pickedElements.length === this.state.beforeChangeChar.charSpecials.monkElementsDisciplines.length + this.props.totalElementsToPick)) {
+                            this.props.elementsToPick(false)
+                        }
+                    })
+                }
+                else if (this.state.elementClicked[index]) {
+                    let pickedElements = this.state.pickedElements;
+                    const elementClicked = this.state.elementClicked;
+                    elementClicked[index] = false;
+                    pickedElements = pickedElements.filter((val: any) => item.name !== val.name);
+                    this.setState({ pickedElements }, () => {
+                        this.props.loadElements(this.state.pickedElements)
+                    })
+                    this.props.elementsToPick(true)
+                }
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
     render() {
+        let storeItem = store.getState().character.charSpecials?.monkElementsDisciplines;
         return (
             <View style={styles.container}>
-                {this.props.character.level > 3 &&
-                    <AppText>At Level {this.props.character.level} you can pick {(store.getState().character.charSpecials.monkElementsDisciplines.length - 1) + this.props.totalElementsToPick} Elements</AppText>
+                {this.props.character.level && this.props.character.level > 3 &&
+                    <AppText>At Level {this.props.character.level} you can pick {(storeItem && storeItem.length - 1) + this.props.totalElementsToPick} Elements</AppText>
                 }
                 {this.state.fullElementList.map((item: any, index: number) =>
                     <View key={`${index}${item.name}`}>

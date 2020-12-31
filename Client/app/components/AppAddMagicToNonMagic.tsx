@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { store } from '../redux/store';
@@ -8,7 +9,11 @@ import { AppText } from './AppText';
 
 export class AppAddMagicToNonMagic extends Component<{ character: CharacterModel, loadMagicalAbilities: any, pathType: string }>{
     componentDidMount() {
-        this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType))
+        try {
+            this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType))
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

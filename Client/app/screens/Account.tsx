@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, Modal, Linking, Alert, Switch, Dimensions } from 'react-native';
+import { View, StyleSheet, Image, Modal, Linking, Alert, Switch, Dimensions, ScrollView } from 'react-native';
 import { Unsubscribe } from 'redux';
 import { Config } from '../../config';
 import authApi from '../api/authApi';
@@ -17,7 +17,8 @@ import * as Yup from 'yup';
 import AsyncStorage from '@react-native-community/async-storage';
 import errorHandler from '../../utility/errorHander';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
-
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Image as CashImage } from 'react-native-expo-image-cache';
 //Account with profileImages
 
 const ValidationSchema = Yup.object().shape({
@@ -96,7 +97,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
 
     render() {
         return (
-            <View style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
+            <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     this.state.isUserOffline ?
                         <View style={{ justifyContent: "center", alignItems: "center", padding: 15, marginBottom: Dimensions.get('screen').height / 5 }}>
@@ -109,14 +110,14 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                             </View>
                         </View>
                         :
-                        <View style={{ alignItems: "center" }}>
+                        <View style={{ alignItems: "center", flex: 1 }}>
                             <View style={{ flex: .4 }}>
                                 <Image style={styles.image} source={{ uri: `${Config.serverUrl}/uploads/profile-imgs/${this.state.userInfo.profileImg}` }} />
                             </View>
                             <View style={{ flex: .1 }}>
                                 <AppText fontSize={20}>{this.state.userInfo.username}</AppText>
                             </View>
-                            <View style={{ flex: .2 }}>
+                            <View style={{ flex: .2, padding: 10 }}>
                                 <AppButton title="Change Profile Picture" onPress={() => this.setState({ changeProfileModal: true })} borderRadius={15} fontSize={18} backgroundColor={Colors.bitterSweetRed} width={150} />
                             </View>
                             <Modal visible={this.state.changeProfileModal}>
@@ -144,6 +145,13 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                             </Modal>
                             <View style={{ flex: .2 }}>
                                 <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Privacy Policy"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
+                            </View>
+                            <View style={{ flex: .3, padding: 10, justifyContent: "center", alignItems: "center" }}>
+                                <AppText textAlign={'center'}>Wish to remove ads?</AppText>
+                                <AppText textAlign={'center'}>Consider supporting DnCreate on Patreon</AppText>
+                                <TouchableOpacity style={{ padding: 10 }} onPress={() => { Linking.openURL('https://www.patreon.com/Edenhazani?fan_landing=true') }}>
+                                    <CashImage uri={`${Config.serverUrl}/assets/logos/patreon.png`} style={{ height: 100, width: 100 }} />
+                                </TouchableOpacity>
                             </View>
                             <View style={{ flex: .3 }}>
                                 <AppText textAlign={'center'}>Custom path maker beta will release in the next update!</AppText>
@@ -184,7 +192,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                             </View>
                         </View>
                 }
-            </View>
+            </ScrollView>
         )
     }
 }
@@ -193,9 +201,6 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 50,
-        justifyContent: "center",
-        alignItems: "center"
     },
     image: {
         borderRadius: 150,

@@ -8,6 +8,7 @@ import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
 import { AppText } from './AppText';
 import jsonSkills from '../../jsonDump/skillList.json'
+import logger from '../../utility/logger';
 
 interface AppSkillItemPickerState {
     skillsClicked: boolean[]
@@ -16,7 +17,7 @@ interface AppSkillItemPickerState {
     skillConfirmation: boolean
     character: CharacterModel
     alreadyPickedSkills: boolean[]
-    skillWasPickedByPath: boolean[]
+    skillWasPickedByPath: string[]
 }
 
 export class AppSkillItemPicker extends Component<{
@@ -37,49 +38,55 @@ export class AppSkillItemPicker extends Component<{
     }
 
     componentDidMount() {
-        const alreadyPickedSkills = this.state.alreadyPickedSkills;
-        if (this.props.withConditions) {
-            for (let item of this.state.character.skills) {
-                if (this.props.itemList.includes(item[0])) {
-                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                    alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+        try {
+            const alreadyPickedSkills = this.state.alreadyPickedSkills;
+            if (this.props.withConditions && this.state.character.skills && this.state.character.tools) {
+                for (let item of this.state.character.skills) {
+                    if (this.props.itemList.includes(item[0])) {
+                        const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                        alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+                    }
                 }
-            }
-            for (let item of this.state.character.tools) {
-                if (this.props.itemList.includes(item[0])) {
-                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                    alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+                for (let item of this.state.character.tools) {
+                    if (this.props.itemList.includes(item[0])) {
+                        const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                        alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+                    }
                 }
-            }
-            this.setState({ alreadyPickedSkills }, () => {
-                const { extraSkillsToPick, pickedSkillFromStart } = generateSkillPickPathCondition(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSkillsTotal)
-                if (pickedSkillFromStart) {
-                    let skillWasPickedByPath = this.state.skillWasPickedByPath
-                    skillWasPickedByPath.push(pickedSkillFromStart)
-                    this.setState({ skillWasPickedByPath }, () => {
-                        for (let item of this.state.skillWasPickedByPath) {
-                            if (this.props.itemList.includes(item)) {
-                                const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                                alreadyPickedSkills[this.props.itemList.indexOf(item)] = true;
+                this.setState({ alreadyPickedSkills }, () => {
+                    const { extraSkillsToPick, pickedSkillFromStart } = generateSkillPickPathCondition(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSkillsTotal)
+                    if (pickedSkillFromStart) {
+                        let skillWasPickedByPath = this.state.skillWasPickedByPath
+                        skillWasPickedByPath.push(pickedSkillFromStart)
+                        this.setState({ skillWasPickedByPath }, () => {
+                            for (let item of this.state.skillWasPickedByPath) {
+                                if (this.props.itemList.includes(item)) {
+                                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                                    alreadyPickedSkills[this.props.itemList.indexOf(item)] = true;
+                                }
                             }
-                        }
-                        this.pickSkill(pickedSkillFromStart, 0)
+                            this.pickSkill(pickedSkillFromStart, 0)
+                            this.setState({ amountToPick: extraSkillsToPick })
+                        })
+                    } else {
                         this.setState({ amountToPick: extraSkillsToPick })
-                    })
-                } else {
-                    this.setState({ amountToPick: extraSkillsToPick })
-                }
-            })
-            this.props.setAdditionalSkillPicks(this.state.amountToPick)
-            return
-        }
-        for (let item of this.state.character.skills) {
-            if (this.props.itemList.includes(item[0])) {
-                const alreadyPickedSkills = this.state.alreadyPickedSkills;
-                alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+                    }
+                })
+                this.props.setAdditionalSkillPicks(this.state.amountToPick)
+                return
             }
+            if (this.state.character.skills) {
+                for (let item of this.state.character.skills) {
+                    if (this.props.itemList.includes(item[0])) {
+                        const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                        alreadyPickedSkills[this.props.itemList.indexOf(item[0])] = true;
+                    }
+                }
+            }
+            this.props.setAdditionalSkillPicks(this.state.amountToPick)
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.setAdditionalSkillPicks(this.state.amountToPick)
     }
     componentWillUnmount() {
         this.props.setAdditionalSkillPicks(0)
@@ -93,78 +100,90 @@ export class AppSkillItemPicker extends Component<{
     }
 
     pickSkill = (skill: any, index: number) => {
-        if (this.props.withConditions) {
-            if (jsonSkills.skillList.includes(skill)) {
-                this.pickSkillFuc(skill, index)
-                return;
-            } else {
-                this.pickToolFuc(skill, index)
-                return;
+        try {
+            if (this.props.withConditions) {
+                if (jsonSkills.skillList.includes(skill)) {
+                    this.pickSkillFuc(skill, index)
+                    return;
+                } else {
+                    this.pickToolFuc(skill, index)
+                    return;
+                }
             }
+            this.pickSkillFuc(skill, index)
+        } catch (err) {
+            logger.log(err)
         }
-        this.pickSkillFuc(skill, index)
     }
 
     pickToolFuc = (skill: any, index: number) => {
-        const character = store.getState().character;
-        let skills = this.state.skills;
-        if (!this.state.skillsClicked[index]) {
-            if (this.state.skills.length >= this.state.amountToPick) {
-                alert(`You can only pick ${this.state.amountToPick} skills.`)
-                return;
+        try {
+            const character = store.getState().character;
+            let skills = this.state.skills;
+            if (!this.state.skillsClicked[index] && character.tools) {
+                if (this.state.skills.length >= this.state.amountToPick) {
+                    alert(`You can only pick ${this.state.amountToPick} skills.`)
+                    return;
+                }
+                const skillsClicked = this.state.skillsClicked;
+                skillsClicked[index] = true;
+                skills.push(skill)
+                this.props.skillsStartAsExpertise ? character.tools.push([skill, 2]) : character.tools.push([skill, 0])
+                this.setState({ skills, skillsClicked, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                })
             }
-            const skillsClicked = this.state.skillsClicked;
-            skillsClicked[index] = true;
-            skills.push(skill)
-            this.props.skillsStartAsExpertise ? character.tools.push([skill, 2]) : character.tools.push([skill, 0])
-            this.setState({ skills, skillsClicked, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            })
-        }
-        else if (this.state.skillsClicked[index]) {
-            this.props.resetExpertiseSkills(skill)
-            skills = skills.filter(val => val !== skill);
-            character.tools = character.tools.filter(val => val[0] !== skill)
-            const skillsClicked = this.state.skillsClicked;
-            skillsClicked[index] = false;
-            this.setState({ skills, skillsClicked, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            })
+            else if (this.state.skillsClicked[index] && character.tools) {
+                this.props.resetExpertiseSkills(skill)
+                skills = skills.filter(val => val !== skill);
+                character.tools = character.tools.filter(val => val[0] !== skill)
+                const skillsClicked = this.state.skillsClicked;
+                skillsClicked[index] = false;
+                this.setState({ skills, skillsClicked, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickSkillFuc = (skill: any, index: number) => {
-        const character = store.getState().character;
-        let skills = this.state.skills;
-        if (!this.state.skillsClicked[index]) {
-            for (let item of this.state.character.skills) {
-                if (item[0] === skill) {
-                    alert(`You are already proficient with this skill`)
+        try {
+            const character = store.getState().character;
+            let skills = this.state.skills;
+            if (!this.state.skillsClicked[index] && this.state.character.skills && character.skills) {
+                for (let item of this.state.character.skills) {
+                    if (item[0] === skill) {
+                        alert(`You are already proficient with this skill`)
+                        return;
+                    }
+                }
+                if (this.state.skills.length >= this.state.amountToPick) {
+                    this.state.amountToPick === 0 && alert(`You have zero skills to pick from (a skill might have been auto picked by your path).`)
+                    this.state.amountToPick > 0 && alert(`You can only pick ${this.state.amountToPick} skills.`)
                     return;
                 }
+                const skillsClicked = this.state.skillsClicked;
+                skillsClicked[index] = true;
+                skills.push(skill)
+                this.props.skillsStartAsExpertise ? character.skills.push([skill, 2]) : character.skills.push([skill, 0])
+                this.setState({ skills, skillsClicked, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                })
             }
-            if (this.state.skills.length >= this.state.amountToPick) {
-                this.state.amountToPick === 0 && alert(`You have zero skills to pick from (a skill might have been auto picked by your path).`)
-                this.state.amountToPick > 0 && alert(`You can only pick ${this.state.amountToPick} skills.`)
-                return;
+            else if (this.state.skillsClicked[index] && character.skills) {
+                this.props.resetExpertiseSkills(skill)
+                skills = skills.filter(val => val !== skill);
+                character.skills = character.skills.filter(val => val[0] !== skill)
+                const skillsClicked = this.state.skillsClicked;
+                skillsClicked[index] = false;
+                this.setState({ skills, skillsClicked, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                })
             }
-            const skillsClicked = this.state.skillsClicked;
-            skillsClicked[index] = true;
-            skills.push(skill)
-            this.props.skillsStartAsExpertise ? character.skills.push([skill, 2]) : character.skills.push([skill, 0])
-            this.setState({ skills, skillsClicked, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            })
-        }
-        else if (this.state.skillsClicked[index]) {
-            this.props.resetExpertiseSkills(skill)
-            skills = skills.filter(val => val !== skill);
-            character.skills = character.skills.filter(val => val[0] !== skill)
-            const skillsClicked = this.state.skillsClicked;
-            skillsClicked[index] = false;
-            this.setState({ skills, skillsClicked, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            })
+        } catch (err) {
+            logger.log(err)
         }
     }
 

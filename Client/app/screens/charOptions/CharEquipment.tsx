@@ -20,6 +20,7 @@ import { AppEquipmentImagePicker } from '../../components/AppEquipmentImagePicke
 import { Image, CacheManager } from 'react-native-expo-image-cache'
 import { Config } from '../../../config';
 import AuthContext from '../../auth/context';
+import logger from '../../../utility/logger';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -51,69 +52,85 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
 
 
     addEquipment = async (values: any) => {
-        const equipment: EquipmentModal = {
-            _id: values.name + Math.floor((Math.random() * 1000000) + 1),
-            name: values.name,
-            description: values.description,
-            equipmentType: values.equipmentType,
-            image: this.state.pickedImg ? this.state.pickedImg : undefined,
-            isEquipped: false
-        }
+        try {
+            const equipment: EquipmentModal = {
+                _id: values.name + Math.floor((Math.random() * 1000000) + 1),
+                name: values.name,
+                description: values.description,
+                equipmentType: values.equipmentType,
+                image: this.state.pickedImg ? this.state.pickedImg : undefined,
+                isEquipped: false
+            }
 
-        const character = store.getState().character;
-        if (!character.equipment) {
-            character.equipment = [];
+            const character = store.getState().character;
+            if (!character.equipment) {
+                character.equipment = [];
+            }
+            character.equipment.push(equipment)
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                this.setState({ addNewEquipmentModal: false })
+            })
+            this.setState({ pickedImg: "" })
+        } catch (err) {
+            logger.log(err)
         }
-        character.equipment.push(equipment)
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            this.setState({ addNewEquipmentModal: false })
-        })
-        this.setState({ pickedImg: "" })
     }
 
     removeEquipment = async (_id: string) => {
-        const character = { ...this.state.character };
-        const newList = character.equipment?.filter((item) => item._id !== _id);
-        character.equipment = newList;
-        this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            this.setState({ addNewEquipmentModal: false })
-        })
+        try {
+            const character = { ...this.state.character };
+            const newList = character.equipment?.filter((item) => item._id !== _id);
+            character.equipment = newList;
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                this.setState({ addNewEquipmentModal: false })
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
                 }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     equipItem = (_id: string) => {
-        const character = { ...this.state.character };
-        if (character.equipment) {
-            const newList = character.equipment.find((item, index) => {
-                if (item._id === _id) {
-                    item.isEquipped === true ? item.isEquipped = false : item.isEquipped = true
-                }
-            })
-            this.setState({ character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            })
-            return newList
-        }
-        if (!character.equipment) {
-            return []
+        try {
+            const character = { ...this.state.character };
+            if (character.equipment) {
+                const newList = character.equipment.find((item, index) => {
+                    if (item._id === _id) {
+                        item.isEquipped === true ? item.isEquipped = false : item.isEquipped = true
+                    }
+                })
+                this.setState({ character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                })
+                return newList
+            }
+            if (!character.equipment) {
+                return []
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

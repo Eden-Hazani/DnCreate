@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
@@ -7,7 +8,11 @@ import { AppText } from './AppText';
 
 export class AppPathAddSpellPickAvailability extends Component<{ spellList: string[], loadSpells: any, character: CharacterModel, path: string }>{
     componentDidMount() {
-        this.props.loadSpells(this.props.spellList)
+        try {
+            this.props.loadSpells(this.props.spellList)
+        } catch (err) {
+            logger.log(err)
+        }
     }
     componentWillUnmount() {
         this.props.loadSpells([])

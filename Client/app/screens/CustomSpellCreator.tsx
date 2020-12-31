@@ -9,6 +9,7 @@ import { CustomSpellModal } from '../models/CustomSpellModal';
 import { Colors } from '../config/colors';
 import { SubmitButton } from '../components/forms/SubmitButton';
 import AsyncStorage from '@react-native-community/async-storage';
+import logger from '../../utility/logger';
 
 const ValidationSchema = Yup.object().shape({
     casting_time: Yup.string().required().label("Casting time"),
@@ -53,138 +54,162 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
     }
 
     componentDidMount() {
-        if (this.state.isEdit?.true) {
-            let oldSpellValues = { ...this.state.oldSpellValues }
-            let classPicked = this.state.classPicked;
-            let classClicked = this.state.classClicked;
-            oldSpellValues = this.state.isEdit.spell;
-            classPicked = this.state.isEdit.spell.classes;
-            classes.forEach((charClass: string, index: number) => {
-                if (classPicked.includes(charClass)) {
-                    classClicked[index] = true
-                }
-            })
+        try {
+            if (this.state.isEdit?.true) {
+                let oldSpellValues = { ...this.state.oldSpellValues }
+                let classPicked = this.state.classPicked;
+                let classClicked = this.state.classClicked;
+                oldSpellValues = this.state.isEdit.spell;
+                classPicked = this.state.isEdit.spell.classes;
+                classes.forEach((charClass: string, index: number) => {
+                    if (classPicked.includes(charClass)) {
+                        classClicked[index] = true
+                    }
+                })
 
-            let pickedSchool = '';
-            let schoolClicked = this.state.schoolClicked;
-            pickedSchool = this.state.isEdit.spell.school;
-            magicSchools.forEach((spellSchool: string, index: number) => {
-                if (pickedSchool === spellSchool) {
-                    schoolClicked[index] = true
-                }
-            })
+                let pickedSchool = '';
+                let schoolClicked = this.state.schoolClicked;
+                pickedSchool = this.state.isEdit.spell.school;
+                magicSchools.forEach((spellSchool: string, index: number) => {
+                    if (pickedSchool === spellSchool) {
+                        schoolClicked[index] = true
+                    }
+                })
 
-            let pickedLevel = '';
-            let levelClicked = this.state.levelClicked;
-            levels.forEach((level: string, index: number) => {
-                if (this.state.isEdit.spell.level === level.charAt(0)) {
-                    pickedLevel = level
-                    levelClicked[index] = true
-                }
-            })
+                let pickedLevel = '';
+                let levelClicked = this.state.levelClicked;
+                levels.forEach((level: string, index: number) => {
+                    if (this.state.isEdit.spell.level === level.charAt(0)) {
+                        pickedLevel = level
+                        levelClicked[index] = true
+                    }
+                })
 
-            this.setState({ oldSpellValues, classClicked, classPicked, schoolClicked, pickedSchool, levelClicked, pickedLevel })
+                this.setState({ oldSpellValues, classClicked, classPicked, schoolClicked, pickedSchool, levelClicked, pickedLevel })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickLevel = (level: string, index: number) => {
-        let levelClicked = this.state.levelClicked;
-        levelClicked = [];
-        levelClicked[index] = true;
-        this.setState({ pickedLevel: level, levelClicked })
+        try {
+            let levelClicked = this.state.levelClicked;
+            levelClicked = [];
+            levelClicked[index] = true;
+            this.setState({ pickedLevel: level, levelClicked })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
 
     pickMagicSchool = (school: string, index: number) => {
-        let schoolClicked = this.state.schoolClicked;
-        schoolClicked = [];
-        schoolClicked[index] = true;
-        this.setState({ pickedSchool: school, schoolClicked })
+        try {
+            let schoolClicked = this.state.schoolClicked;
+            schoolClicked = [];
+            schoolClicked[index] = true;
+            this.setState({ pickedSchool: school, schoolClicked })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     pickClass = (newClass: string, index: number) => {
-        if (!this.state.classClicked[index]) {
-            const classPicked = this.state.classPicked;
-            const classClicked = this.state.classClicked;
-            classClicked[index] = true;
-            classPicked.push(newClass)
-            this.setState({ classClicked, classPicked });
-        }
-        else if (this.state.classClicked[index]) {
-            const oldClassPicked = this.state.classPicked;
-            const classClicked = this.state.classClicked;
-            classClicked[index] = false;
-            const classPicked = oldClassPicked.filter(item => item[0] !== newClass);
-            this.setState({ classClicked, classPicked });
+        try {
+            if (!this.state.classClicked[index]) {
+                const classPicked = this.state.classPicked;
+                const classClicked = this.state.classClicked;
+                classClicked[index] = true;
+                classPicked.push(newClass)
+                this.setState({ classClicked, classPicked });
+            }
+            else if (this.state.classClicked[index]) {
+                const oldClassPicked = this.state.classPicked;
+                const classClicked = this.state.classClicked;
+                classClicked[index] = false;
+                const classPicked = oldClassPicked.filter(item => item[0] !== newClass);
+                this.setState({ classClicked, classPicked });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     createSpell = async (values: any) => {
-        if (this.state.classPicked.length === 0) {
-            alert('Must pick at least one class to use the spell');
-            return
+        try {
+            if (this.state.classPicked.length === 0) {
+                alert('Must pick at least one class to use the spell');
+                return
+            }
+            if (this.state.schoolClicked.length === 0) {
+                alert('Must pick a magic school');
+                return
+            }
+            const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
+            const spellLevel = this.state.pickedLevel.charAt(0);
+            const customSpell: CustomSpellModal = {
+                _id: `${Math.floor((Math.random() * 1000000) + 1)}`,
+                type: spellType,
+                school: this.state.pickedSchool,
+                casting_time: values.casting_time,
+                materials_needed: values.materials_needed,
+                duration: values.duration,
+                range: values.range,
+                higher_levels: values.higher_levels,
+                description: values.description,
+                name: values.name,
+                classes: this.state.classPicked,
+                level: spellLevel
+            }
+            const stringedCustomSpells = await AsyncStorage.getItem('customSpellList');
+            if (!stringedCustomSpells) {
+                await AsyncStorage.setItem('customSpellList', JSON.stringify([customSpell]))
+                return;
+            }
+            const customSpellsList = JSON.parse(stringedCustomSpells);
+            customSpellsList.push(customSpell);
+            await AsyncStorage.setItem('customSpellList', JSON.stringify(customSpellsList)).then(async () => {
+                this.props.navigation.navigate('CustomSpellList');
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        if (this.state.schoolClicked.length === 0) {
-            alert('Must pick a magic school');
-            return
-        }
-        const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
-        const spellLevel = this.state.pickedLevel.charAt(0);
-        const customSpell: CustomSpellModal = {
-            _id: `${Math.floor((Math.random() * 1000000) + 1)}`,
-            type: spellType,
-            school: this.state.pickedSchool,
-            casting_time: values.casting_time,
-            materials_needed: values.materials_needed,
-            duration: values.duration,
-            range: values.range,
-            higher_levels: values.higher_levels,
-            description: values.description,
-            name: values.name,
-            classes: this.state.classPicked,
-            level: spellLevel
-        }
-        const stringedCustomSpells = await AsyncStorage.getItem('customSpellList');
-        if (!stringedCustomSpells) {
-            await AsyncStorage.setItem('customSpellList', JSON.stringify([customSpell]))
-            return;
-        }
-        const customSpellsList = JSON.parse(stringedCustomSpells);
-        customSpellsList.push(customSpell);
-        await AsyncStorage.setItem('customSpellList', JSON.stringify(customSpellsList)).then(async () => {
-            this.props.navigation.navigate('CustomSpellList');
-        })
     }
 
 
     editSpell = async (values: any, _id: string) => {
-        const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
-        const spellLevel = this.state.pickedLevel.charAt(0);
-        const newSpell: CustomSpellModal = {
-            type: spellType,
-            school: this.state.pickedSchool,
-            casting_time: values.casting_time,
-            materials_needed: values.materials_needed,
-            duration: values.duration,
-            range: values.range,
-            description: values.description,
-            higher_levels: values.higher_levels,
-            name: values.name,
-            classes: this.state.classPicked,
-            level: spellLevel
-        }
-        const customSpellString = await AsyncStorage.getItem('customSpellList');
-        if (customSpellString) {
-            const customSpellList = JSON.parse(customSpellString);
-            const newCustomSpellList = customSpellList.map((spell: CustomSpellModal) => {
-                if (spell._id === _id) {
-                    spell = newSpell
-                }
-                return spell
-            });
-            await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
-                this.props.navigation.navigate('CustomSpellList');
-            })
+        try {
+            const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
+            const spellLevel = this.state.pickedLevel.charAt(0);
+            const newSpell: CustomSpellModal = {
+                type: spellType,
+                school: this.state.pickedSchool,
+                casting_time: values.casting_time,
+                materials_needed: values.materials_needed,
+                duration: values.duration,
+                range: values.range,
+                description: values.description,
+                higher_levels: values.higher_levels,
+                name: values.name,
+                classes: this.state.classPicked,
+                level: spellLevel
+            }
+            const customSpellString = await AsyncStorage.getItem('customSpellList');
+            if (customSpellString) {
+                const customSpellList = JSON.parse(customSpellString);
+                const newCustomSpellList = customSpellList.map((spell: CustomSpellModal) => {
+                    if (spell._id === _id) {
+                        spell = newSpell
+                    }
+                    return spell
+                });
+                await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
+                    this.props.navigation.navigate('CustomSpellList');
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

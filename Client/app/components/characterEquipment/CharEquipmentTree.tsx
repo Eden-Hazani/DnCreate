@@ -10,6 +10,7 @@ import { Config } from '../../../config';
 import { AppButton } from '../AppButton';
 import { WeaponModal } from '../../models/WeaponModal';
 import { EquipmentModal } from '../../models/EquipmentModal';
+import logger from '../../../utility/logger';
 
 
 interface CharEquipmentTreeState {
@@ -35,15 +36,19 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
     }
 
     checkForEmptySideEquipment = () => {
-        if (this.props.character.equipment) {
-            let list: any = this.props.character.equipment.find((equipment) => {
-                if (equipment.isEquipped) {
-                    return true
+        try {
+            if (this.props.character.equipment) {
+                let list: any = this.props.character.equipment.find((equipment) => {
+                    if (equipment.isEquipped) {
+                        return true
+                    }
+                });
+                if (list === undefined) {
+                    return <AppText>No Equipment Selected</AppText>
                 }
-            });
-            if (list === undefined) {
-                return <AppText>No Equipment Selected</AppText>
             }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

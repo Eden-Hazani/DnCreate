@@ -24,6 +24,7 @@ import { spellLevelReadingChanger } from './charOptions/helperFunctions/spellLev
 import AuthContext from '../auth/context';
 import AsyncStorage from '@react-native-community/async-storage';
 import { charCanSpellCast } from './charOptions/helperFunctions/charCanSpellCast';
+import logger from '../../utility/logger';
 
 
 interface SpellsState {
@@ -70,227 +71,255 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         }
     }
     async componentDidMount() {
-        const stringedCustomSpellsJson = await AsyncStorage.getItem('customSpellList');
-        if (!stringedCustomSpellsJson) {
-            this.setState({ spellsJSON: spellsJsonImport, contentLoading: false }, () => {
+        try {
+            const stringedCustomSpellsJson = await AsyncStorage.getItem('customSpellList');
+            if (!stringedCustomSpellsJson) {
+                this.setState({ spellsJSON: spellsJsonImport, contentLoading: false }, () => {
+                    this.loadSpells(this.state.shownSpells)
+                })
+                return
+            }
+            const CustomSpellsJson = JSON.parse(stringedCustomSpellsJson);
+            const spellsJSON = spellsJsonImport.concat(CustomSpellsJson)
+            this.setState({ spellsJSON, contentLoading: false }, () => {
                 this.loadSpells(this.state.shownSpells)
             })
-            return
+        } catch (err) {
+            logger.log(err)
         }
-        const CustomSpellsJson = JSON.parse(stringedCustomSpellsJson);
-        const spellsJSON = spellsJsonImport.concat(CustomSpellsJson)
-        this.setState({ spellsJSON, contentLoading: false }, () => {
-            this.loadSpells(this.state.shownSpells)
-        })
     }
 
     filterByClass = (shownSpells: any, newSpells: any) => {
-        const searchedSpells = shownSpells;
-        if (this.state.search !== '') {
-            const fullList = searchedSpells.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
-            newSpells = fullList;
-        } else {
-            newSpells = [];
-            const fullList = this.state.spellsJSON.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
-            for (let item = 0; item < this.state.loadNumber; item++) {
-                newSpells.push(fullList[item])
+        try {
+            const searchedSpells = shownSpells;
+            if (this.state.search !== '') {
+                const fullList = searchedSpells.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
+                newSpells = fullList;
+            } else {
+                newSpells = [];
+                const fullList = this.state.spellsJSON.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
+                for (let item = 0; item < this.state.loadNumber; item++) {
+                    newSpells.push(fullList[item])
+                }
             }
+            return newSpells
+        } catch (err) {
+            logger.log(err)
         }
-        return newSpells
     }
     loadSpells = (shownSpells: any[]) => {
-        this.setState({ loading: true })
-        let newSpells: any[] = this.state.shownSpells;
-        if (this.state.search === '') {
-            if (this.state.shownSpells.length > 0) {
-                for (let item = this.state.shownSpells.length; item < this.state.loadNumber; item++) {
-                    newSpells.push(this.state.spellsJSON[item])
-                }
-            } else {
-                for (let item = 0; item < this.state.loadNumber; item++) {
-                    newSpells.push(this.state.spellsJSON[item])
-                }
-            }
-        }
-        if (this.state.filterByClass) {
-            newSpells = this.filterByClass(shownSpells, newSpells)
-        }
-        if (this.state.filterByLevel) {
-            const result: any = filterMagicLevel(this.state.character, newSpells);
-            newSpells = result;
-        }
-        if (this.state.sliderLevelFilter && this.state.sliderLevelVal !== 0) {
-            let fullList = this.state.spellsJSON.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString())
-            if (this.state.filterByClass) {
-                const searchedSpells = shownSpells;
-                if (this.state.search !== '') {
-                    fullList = searchedSpells.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString() && spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
-                    newSpells = fullList;
+        try {
+            this.setState({ loading: true })
+            let newSpells: any[] = this.state.shownSpells;
+            if (this.state.search === '') {
+                if (this.state.shownSpells.length > 0) {
+                    for (let item = this.state.shownSpells.length; item < this.state.loadNumber; item++) {
+                        newSpells.push(this.state.spellsJSON[item])
+                    }
                 } else {
-                    fullList = fullList.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
+                    for (let item = 0; item < this.state.loadNumber; item++) {
+                        newSpells.push(this.state.spellsJSON[item])
+                    }
                 }
             }
-            newSpells = fullList
+            if (this.state.filterByClass) {
+                newSpells = this.filterByClass(shownSpells, newSpells)
+            }
+            if (this.state.filterByLevel) {
+                const result: any = filterMagicLevel(this.state.character, newSpells);
+                newSpells = result;
+            }
+            if (this.state.sliderLevelFilter && this.state.sliderLevelVal !== 0) {
+                let fullList = this.state.spellsJSON.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString())
+                if (this.state.filterByClass) {
+                    const searchedSpells = shownSpells;
+                    if (this.state.search !== '') {
+                        fullList = searchedSpells.filter((spell: any) => spell.level === this.state.sliderLevelVal.toString() && spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
+                        newSpells = fullList;
+                    } else {
+                        fullList = fullList.filter((spell: any) => spell.classes.includes(this.state.character.spellCastingClass ? this.state.character.spellCastingClass.toLowerCase() : ""))
+                    }
+                }
+                newSpells = fullList
+            }
+            this.setState({ shownSpells: newSpells }, () => {
+                setTimeout(() => {
+                    this.setState({ loading: false })
+                }, 1000);
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ shownSpells: newSpells }, () => {
-            setTimeout(() => {
-                this.setState({ loading: false })
-            }, 1000);
-        })
     }
 
     resetList = () => {
-        this.setState({ search: '', shownSpells: [], flatListLoadPauseTimer: true }, () => {
-            this.loadSpells(this.state.shownSpells)
-            setTimeout(() => {
-                this.setState({ flatListLoadPauseTimer: false })
-            }, 500);
-        })
+        try {
+            this.setState({ search: '', shownSpells: [], flatListLoadPauseTimer: true }, () => {
+                this.loadSpells(this.state.shownSpells)
+                setTimeout(() => {
+                    this.setState({ flatListLoadPauseTimer: false })
+                }, 500);
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
 
     updateSearch = (search: string) => {
-        this.setState({ search })
-        if (search.trim() === "") {
-            this.resetList()
-            return;
-        }
-        const shownSpells: any[] = [];
-        for (let item of this.state.spellsJSON) {
-            if (item.name.includes(search)) {
-                shownSpells.push(item);
+        try {
+            this.setState({ search })
+            if (search.trim() === "") {
+                this.resetList()
+                return;
             }
+            const shownSpells: any[] = [];
+            for (let item of this.state.spellsJSON) {
+                if (item.name.includes(search)) {
+                    shownSpells.push(item);
+                }
+            }
+            this.setState({ shownSpells }, () => {
+                this.loadSpells(this.state.shownSpells)
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ shownSpells }, () => {
-            this.loadSpells(this.state.shownSpells)
-        })
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
                 }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     addSpellToChar = () => {
-        const character = { ...this.state.character };
-        if (character.unrestrictedKnownSpells && character.unrestrictedKnownSpells > 0 && !this.state.pickedSpell.classes.includes(character.spellCastingClass ? character.spellCastingClass.toLowerCase() : "")) {
+        try {
+            const character = { ...this.state.character };
+            if (character.unrestrictedKnownSpells && character.unrestrictedKnownSpells > 0 && !this.state.pickedSpell.classes.includes(character.spellCastingClass ? character.spellCastingClass.toLowerCase() : "")) {
+                const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                    alert('You already possess this spell');
+                    return;
+                }
+                if (character.spells) {
+                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                    character.unrestrictedKnownSpells = character.unrestrictedKnownSpells - 1;
+                    character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString();
+                    this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                        alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)
+                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                    })
+                    return;
+                }
+            }
+            if (character.differentClassSpellsToPick && character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
+                let index = 0;
+                for (let item of character.differentClassSpellsToPick) {
+                    if (this.state.pickedSpell.classes.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
+                        const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                        if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                            alert('You already possess this spell');
+                            return;
+                        }
+                        if (character.spells) {
+                            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                            item.numberOfSpells = item.numberOfSpells - 1;
+                            if (item.numberOfSpells === 0) {
+
+                                character.differentClassSpellsToPick.splice(index, 1);
+                            }
+                            this.setState({ character, confirmed: true }, () => {
+                                setTimeout(() => {
+                                    this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                                }, 1200);
+                                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                            })
+                            return;
+                        }
+                    }
+                    if (this.state.pickedSpell.school.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
+                        const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                        if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                            alert('You already possess this spell');
+                            return;
+                        }
+                        if (character.spells) {
+                            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                            item.numberOfSpells = item.numberOfSpells - 1;
+                            if (item.numberOfSpells === 0) {
+
+                                character.differentClassSpellsToPick.splice(index, 1);
+                            }
+                            this.setState({ character, confirmed: true }, () => {
+                                setTimeout(() => {
+                                    this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                                }, 1200);
+                                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                            })
+                            return;
+                        }
+                    }
+                    index++
+                }
+            }
             const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
             if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
                 alert('You already possess this spell');
                 return;
             }
-            if (character.spells) {
-                character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-                character.unrestrictedKnownSpells = character.unrestrictedKnownSpells - 1;
-                character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString();
-                this.setState({ character, pickSpellModal: false, pickedSpell: null }, () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                    alert(`You now have ${this.state.character.unrestrictedKnownSpells} more picks of any spells you want of your level`)
-                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-                })
+            const checkIfTrue = checkSpellSlots(this.state.character, this.state.pickedSpell)
+            if (!checkHigherWarlockSpells(this.state.character, this.state.pickedSpell)) {
+                alert(`As a Warlock your Mystic Arcanum ability only allows one ${this.state.pickedSpell.level}th level spell`);
                 return;
             }
-        }
-        if (character.differentClassSpellsToPick && character.differentClassSpellsToPick.length > 0 && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
-            let index = 0;
-            for (let item of character.differentClassSpellsToPick) {
-                if (this.state.pickedSpell.classes.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
-                    const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
-                    if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
-                        alert('You already possess this spell');
-                        return;
-                    }
-                    if (character.spells) {
-                        character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-                        item.numberOfSpells = item.numberOfSpells - 1;
-                        if (item.numberOfSpells === 0) {
-
-                            character.differentClassSpellsToPick.splice(index, 1);
-                        }
-                        this.setState({ character, confirmed: true }, () => {
-                            setTimeout(() => {
-                                this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                            }, 1200);
-                            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-                        })
-                        return;
-                    }
-                }
-                if (this.state.pickedSpell.school.includes(item.className.toLowerCase()) && this.state.pickedSpell.level === item.spellLevel) {
-                    const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
-                    if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
-                        alert('You already possess this spell');
-                        return;
-                    }
-                    if (character.spells) {
-                        character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-                        item.numberOfSpells = item.numberOfSpells - 1;
-                        if (item.numberOfSpells === 0) {
-
-                            character.differentClassSpellsToPick.splice(index, 1);
-                        }
-                        this.setState({ character, confirmed: true }, () => {
-                            setTimeout(() => {
-                                this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                            }, 1200);
-                            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                            this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-                        })
-                        return;
-                    }
-                }
-                index++
+            if (checkIfTrue === 'maxKnownSpells') {
+                alert('You have reached the maximum amount of spells for your level');
+                return;
             }
-        }
-        const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
-        if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
-            alert('You already possess this spell');
-            return;
-        }
-        const checkIfTrue = checkSpellSlots(this.state.character, this.state.pickedSpell)
-        if (!checkHigherWarlockSpells(this.state.character, this.state.pickedSpell)) {
-            alert(`As a Warlock your Mystic Arcanum ability only allows one ${this.state.pickedSpell.level}th level spell`);
-            return;
-        }
-        if (checkIfTrue === 'maxKnownSpells') {
-            alert('You have reached the maximum amount of spells for your level');
-            return;
-        }
-        if (checkIfTrue === 'spellAlreadyPicked') {
-            alert('You already possess this spell');
-            return;
-        }
-        if (checkIfTrue === 'wrongClass') {
-            alert('Your class cannot use this spell');
-            return;
-        }
-        if (checkIfTrue === 'maxPreparedSpells' && spellLevel !== 'cantrips') {
-            alert(`You already prepared the maximum amount of spells for your level. \nAs a ${character.characterClass} you are able to replace your prepared spells with new spells from the spell book every long rest`);
-            return;
-        }
-        if (checkIfTrue === 'maxCantrips' && spellLevel === 'cantrips') {
-            alert(`You Have reached the maximum number of available cantrips, Level up to unlock more`);
-            return;
-        }
-        if (character.spells) {
-            character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
-            this.setState({ character, confirmed: true }, () => {
-                setTimeout(() => {
-                    this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
-                }, 1200);
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            })
+            if (checkIfTrue === 'spellAlreadyPicked') {
+                alert('You already possess this spell');
+                return;
+            }
+            if (checkIfTrue === 'wrongClass') {
+                alert('Your class cannot use this spell');
+                return;
+            }
+            if (checkIfTrue === 'maxPreparedSpells' && spellLevel !== 'cantrips') {
+                alert(`You already prepared the maximum amount of spells for your level. \nAs a ${character.characterClass} you are able to replace your prepared spells with new spells from the spell book every long rest`);
+                return;
+            }
+            if (checkIfTrue === 'maxCantrips' && spellLevel === 'cantrips') {
+                alert(`You Have reached the maximum number of available cantrips, Level up to unlock more`);
+                return;
+            }
+            if (character.spells) {
+                character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                this.setState({ character, confirmed: true }, () => {
+                    setTimeout(() => {
+                        this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                    }, 1200);
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
 
     }

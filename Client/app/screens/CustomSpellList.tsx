@@ -10,6 +10,7 @@ import { Colors } from '../config/colors';
 import { CustomSpellModal } from '../models/CustomSpellModal';
 import { Image, CacheManager } from 'react-native-expo-image-cache';
 import { Config } from '../../config';
+import logger from '../../utility/logger';
 
 
 interface CustomSpellListState {
@@ -53,13 +54,17 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
     }
 
     handleDelete = async (item: CustomSpellModal) => {
-        const stringCustomSpellList = await AsyncStorage.getItem('customSpellList');
-        if (stringCustomSpellList) {
-            const customSpellList = JSON.parse(stringCustomSpellList);
-            const newCustomSpellList = customSpellList.filter((spell: CustomSpellModal) => spell._id !== item._id);
-            await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
-                this.setState({ customSpellList: newCustomSpellList })
-            });
+        try {
+            const stringCustomSpellList = await AsyncStorage.getItem('customSpellList');
+            if (stringCustomSpellList) {
+                const customSpellList = JSON.parse(stringCustomSpellList);
+                const newCustomSpellList = customSpellList.filter((spell: CustomSpellModal) => spell._id !== item._id);
+                await AsyncStorage.setItem('customSpellList', JSON.stringify(newCustomSpellList)).then(() => {
+                    this.setState({ customSpellList: newCustomSpellList })
+                });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

@@ -6,6 +6,7 @@ import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { store } from '../redux/store';
 import { Colors } from '../config/colors';
+import logger from '../../utility/logger';
 
 
 interface AppAddSpellChoiceState {
@@ -28,35 +29,47 @@ export class AppAddSpellChoice extends Component<{
         }
     }
     componentDidMount() {
-        this.props.updateSpellList({ spells: 0, limit: this.props.spellListWithLimiter.limit })
+        try {
+            this.props.updateSpellList({ spells: 0, limit: this.props.spellListWithLimiter.limit })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     pickSpells = (spell: any, index: number) => {
-        let pickedSpellList = this.state.pickedSpellList;
-        if (!this.state.spellClicked[index]) {
-            if (this.state.pickedSpellList.length >= this.props.spellListWithLimiter.limit) {
-                alert(`You can only pick ${this.props.spellListWithLimiter.limit} spells.`)
-                return;
+        try {
+            let pickedSpellList = this.state.pickedSpellList;
+            if (!this.state.spellClicked[index]) {
+                if (this.state.pickedSpellList.length >= this.props.spellListWithLimiter.limit) {
+                    alert(`You can only pick ${this.props.spellListWithLimiter.limit} spells.`)
+                    return;
+                }
+                const spellClicked = this.state.spellClicked;
+                spellClicked[index] = true;
+                pickedSpellList.push(spell)
+                this.setState({ pickedSpellList, spellClicked }, () => {
+                    this.sendSpells()
+                })
             }
-            const spellClicked = this.state.spellClicked;
-            spellClicked[index] = true;
-            pickedSpellList.push(spell)
-            this.setState({ pickedSpellList, spellClicked }, () => {
-                this.sendSpells()
-            })
-        }
-        else if (this.state.spellClicked[index]) {
-            pickedSpellList = pickedSpellList.filter(val => val !== spell);
-            const spellClicked = this.state.spellClicked;
-            spellClicked[index] = false;
-            this.setState({ pickedSpellList, spellClicked }, () => {
-                this.sendSpells()
-            })
+            else if (this.state.spellClicked[index]) {
+                pickedSpellList = pickedSpellList.filter(val => val !== spell);
+                const spellClicked = this.state.spellClicked;
+                spellClicked[index] = false;
+                this.setState({ pickedSpellList, spellClicked }, () => {
+                    this.sendSpells()
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     sendSpells = () => {
-        this.props.updateSpellList({ spells: this.state.pickedSpellList, limit: this.props.spellListWithLimiter.limit })
+        try {
+            this.props.updateSpellList({ spells: this.state.pickedSpellList, limit: this.props.spellListWithLimiter.limit })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

@@ -10,6 +10,8 @@ const verifyInSystem = require('../middleware/validateUserInSystem')
 const verifyLoggedIn = require('../middleware/verify-logged-in')
 const validateExistingImage = require('../middleware/validateExistingImage')
 const fs = require('fs');
+const cors = require('cors')
+
 
 
 const mailgun = require("mailgun-js");
@@ -282,6 +284,45 @@ router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
         response.status(500).send(err.message);
     }
 });
+
+
+router.post("/databaseLoginAdmin", cors(), async (request, response) => {
+    try {
+        const user = await authLogic.login(request.body);
+        if (user.username === "mr.edenhazani@gmail.com") {
+            response.json(true);
+        } else {
+            response.json(false);
+        }
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.post("/databaseFindPersonAdmin", cors(), async (request, response) => {
+    try {
+        console.log(request.body)
+        const user = await authLogic.findUserAsAdmin(request.body.username);
+        response.json({ user });
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.post("/changePremiumStatusAdmin", cors(), async (request, response) => {
+    try {
+        console.log(request.body)
+        const userToUpdate = new User(request.body);
+        const user = await authLogic.updateUser(userToUpdate)
+        console.log(user)
+        response.json({ user });
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+
+
 
 
 module.exports = router;

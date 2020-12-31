@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Vibration } from 'react-native';
+import logger from '../../../utility/logger';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { decreaseInspiration, increaseInspiration, inspirationInitiator } from '../../screens/charOptions/UniqueCharFunctions/bardFunctions';
@@ -19,23 +20,35 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
         }
     }
     async componentDidMount() {
-        if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
-            inspirationInitiator(this.props.character._id, this.props.character.modifiers.charisma).then(result => {
-                this.setState({ inspectionRemaining: parseInt(result) })
-            })
+        try {
+            if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
+                inspirationInitiator(this.props.character._id, this.props.character.modifiers.charisma).then(result => {
+                    this.setState({ inspectionRemaining: parseInt(result) })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     increase = () => {
-        if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
-            increaseInspiration(this.props.character._id, this.props.character.modifiers.charisma).then((result: any) => {
-                this.setState({ inspectionRemaining: result })
-            })
+        try {
+            if (this.props.character._id && this.props.character.modifiers && this.props.character.modifiers.charisma)
+                increaseInspiration(this.props.character._id, this.props.character.modifiers.charisma).then((result: any) => {
+                    this.setState({ inspectionRemaining: result })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     decrease = () => {
-        if (this.props.character._id)
-            decreaseInspiration(this.props.character._id).then((result: any) => {
-                this.setState({ inspectionRemaining: result })
-            })
+        try {
+            if (this.props.character._id)
+                decreaseInspiration(this.props.character._id).then((result: any) => {
+                    this.setState({ inspectionRemaining: result })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

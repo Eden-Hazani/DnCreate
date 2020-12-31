@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { AppText } from './AppText';
 import { AppTextInput } from './forms/AppTextInput';
 
@@ -15,30 +16,38 @@ export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, 
         }
     }
     componentDidMount() {
-        if (this.props.learnSpecificLanguage) {
-            this.props.loadLanguage(this.props.amountOfLanguages)
-            this.props.languagesToPick(false)
-            return;
+        try {
+            if (this.props.learnSpecificLanguage) {
+                this.props.loadLanguage(this.props.amountOfLanguages)
+                this.props.languagesToPick(false)
+                return;
+            }
+            this.props.languagesToPick(true)
+        } catch (err) {
+            logger.log(err)
         }
-        this.props.languagesToPick(true)
     }
     componentWillUnmount() {
         this.props.languagesToPick(false)
     }
 
     setLang = (text: string, index: number) => {
-        const languageToAdd = this.state.languageToAdd;
-        languageToAdd[index] = text;
-        this.setState({ languageToAdd }, () => {
-            this.props.loadLanguage(this.state.languageToAdd)
-            for (let item of languageToAdd) {
-                if (item === '') {
-                    this.props.languagesToPick(true)
-                    return;
+        try {
+            const languageToAdd = this.state.languageToAdd;
+            languageToAdd[index] = text;
+            this.setState({ languageToAdd }, () => {
+                this.props.loadLanguage(this.state.languageToAdd)
+                for (let item of languageToAdd) {
+                    if (item === '') {
+                        this.props.languagesToPick(true)
+                        return;
+                    }
                 }
-            }
-            this.props.languagesToPick(false)
-        })
+                this.props.languagesToPick(false)
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

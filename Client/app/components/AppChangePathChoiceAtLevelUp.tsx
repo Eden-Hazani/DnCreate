@@ -7,6 +7,7 @@ import { store } from '../redux/store';
 import { AppText } from './AppText';
 import levelUpPathChoice from '../../jsonDump/levelUpPathChoices.json'
 import { pathChoiceChangePicker } from '../classFeatures/pathChoiceChnagePicker';
+import logger from '../../utility/logger';
 
 interface AppChangePathChoiceAtLevelUpState {
     loading: boolean
@@ -31,30 +32,40 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
 
 
     componentDidMount() {
-        for (let item of this.props.character.pathFeatures) {
-            if (item.name === pathChoiceChangePicker(this.props.character)) {
-                this.setState({ pickedPathChoice: item.choice[0] }, () => {
-                    this.setState({ optionsToPickFrom: levelUpPathChoice[this.props.character.path.name] }, () => {
-                        this.state.optionsToPickFrom.forEach((item: any, index: number) => {
-                            if (this.state.pickedPathChoice.name === item.name) {
-                                let choiceClicked = this.state.choiceClicked;
-                                choiceClicked[index] = true;
-                                this.setState({ choiceClicked })
-                            }
+        try {
+            if (this.props.character.pathFeatures) {
+                for (let item of this.props.character.pathFeatures) {
+                    if (item.name === pathChoiceChangePicker(this.props.character)) {
+                        this.setState({ pickedPathChoice: item.choice[0] }, () => {
+                            this.setState({ optionsToPickFrom: levelUpPathChoice[this.props.character.path.name] }, () => {
+                                this.state.optionsToPickFrom.forEach((item: any, index: number) => {
+                                    if (this.state.pickedPathChoice.name === item.name) {
+                                        let choiceClicked = this.state.choiceClicked;
+                                        choiceClicked[index] = true;
+                                        this.setState({ choiceClicked })
+                                    }
+                                })
+                            });
                         })
-                    });
-                })
+                    }
+                }
             }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
 
     setChoice = (item: any, index: number) => {
-        let choiceClicked = this.state.choiceClicked;
-        choiceClicked = [];
-        choiceClicked[index] = true;
-        this.setState({ choiceClicked })
-        this.props.newPathChoice(item)
+        try {
+            let choiceClicked = this.state.choiceClicked;
+            choiceClicked = [];
+            choiceClicked[index] = true;
+            this.setState({ choiceClicked })
+            this.props.newPathChoice(item)
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

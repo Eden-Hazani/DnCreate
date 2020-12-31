@@ -5,6 +5,7 @@ import spellsJSON from '../../jsonDump/spells.json'
 import { spellLevelChanger } from '../screens/charOptions/helperFunctions/SpellLevelChanger';
 import { AppText } from './AppText';
 import { Colors } from '../config/colors';
+import logger from '../../utility/logger';
 
 
 interface AppPathAddSpellsListState {
@@ -18,13 +19,19 @@ export class AppPathAddSpellsList extends Component<{ loadSpells: any, path: str
         }
     }
     componentDidMount() {
-        const character = { ...this.state.character };
-        for (let item of this.props.spellList) {
-            const spell = spellsJSON.find((spell: any) => spell.name === item)
-            const spellLevel = spellLevelChanger(spell.level)
-            character.spells[spellLevel].push({ spell: spell, removable: false });
+        try {
+            const character = { ...this.state.character };
+            for (let item of this.props.spellList) {
+                const spell = spellsJSON.find((spell: any) => spell.name === item)
+                if (spell && character.spells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
+            }
+            this.setState({ character })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ character })
     }
     render() {
         return (

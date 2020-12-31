@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, View, Animated, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, FlatList, View, Animated, Image, TouchableOpacity, Modal } from 'react-native';
 import { ListItem } from '../../components/ListItem';
 import { SearchBar } from 'react-native-elements';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
@@ -22,6 +22,8 @@ import { AppText } from '../../components/AppText';
 import { AnimatedHorizontalList } from '../../components/AnimatedHorizontalList';
 import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../../components/AppNoInternet';
+import { AppButton } from '../../components/AppButton';
+
 
 const { width, height } = Dimensions.get('screen');
 
@@ -39,6 +41,7 @@ interface RaceListState {
     searchColor: string
     isInternet: boolean
     isUserOffline: boolean
+    disclaimerModal: boolean
 }
 
 
@@ -48,6 +51,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     constructor(props: any) {
         super(props)
         this.state = {
+            disclaimerModal: false,
             isUserOffline: false,
             isInternet: true,
             searchColor: Colors.pageBackground,
@@ -72,6 +76,10 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         })
     }
     async componentDidMount() {
+        const disclaimer = await AsyncStorage.getItem('shownDisclaimer');
+        if (!disclaimer) {
+            this.setState({ disclaimerModal: true })
+        }
         const isOffline = await AsyncStorage.getItem('isOffline');
         if (isOffline) {
             this.setState({ isUserOffline: JSON.parse(isOffline) })
@@ -197,6 +205,21 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                                 onPress={(val: any) => { this.pickRace(val) }} />
                                         </View>
                                     </View>}
+                                <Modal visible={this.state.disclaimerModal} animationType="slide">
+                                    <View>
+                                        <AppText textAlign={'center'} fontSize={22}>Important notice</AppText>
+                                        <AppText textAlign={'center'} fontSize={17}>Purchasing the 5e players handbook is a must if you wish to have the full game experience.</AppText>
+                                        <AppText textAlign={'center'} fontSize={17}>DnCreate is only a tool to ease character creation and the leveling process.</AppText>
+                                        <AppText textAlign={'center'} fontSize={17}>Before using DnCreate or considering donating to us we extremely
+                                                recommend purchasing the players handbook from Wizards Of The Coast.</AppText>
+                                        <AppButton padding={20} backgroundColor={Colors.metallicBlue} onPress={() => {
+                                            this.setState({ disclaimerModal: false }, async () => {
+                                                await AsyncStorage.setItem('shownDisclaimer', "true")
+                                            })
+                                        }}
+                                            fontSize={18} borderRadius={25} width={120} height={65} title={"I Understand"} />
+                                    </View>
+                                </Modal>
                             </View>}
             </View>
         )

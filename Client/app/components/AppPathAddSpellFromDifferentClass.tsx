@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
 
@@ -19,11 +20,18 @@ export class AppPathAddSpellFromDifferentClass extends Component<{
         }
     }
     componentDidMount() {
-        const character = { ...this.state.character };
-        character.differentClassSpellsToPick.push({ className: this.props.className, spellLevel: this.props.spellLevel, numberOfSpells: this.props.numberOfSpells });
-        this.setState({ character }, () => {
-            this.props.loadSpellsFromOtherClasses(this.state.character)
-        })
+        try {
+            const character = { ...this.state.character };
+            if (!character.differentClassSpellsToPick) {
+                character.differentClassSpellsToPick = [];
+            }
+            character.differentClassSpellsToPick.push({ className: this.props.className, spellLevel: this.props.spellLevel, numberOfSpells: this.props.numberOfSpells });
+            this.setState({ character }, () => {
+                this.props.loadSpellsFromOtherClasses(this.state.character)
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     render() {
         return (

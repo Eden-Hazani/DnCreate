@@ -16,6 +16,7 @@ import { PathSummonedCompanion } from '../../components/uniqueCharComponents/Pat
 import pathCreatedCompanion from '../../../jsonDump/pathCreatedCompanion.json'
 import { MonkKiPointCounter } from '../../components/uniqueCharComponents/MonkKiPointCounter';
 import { RoguePhantomSkillPicks } from '../../components/uniqueCharComponents/RoguePhantomSkillPicks';
+import logger from '../../../utility/logger';
 
 interface UniqueCharStatsState {
     talesFromTheBeyondModal: boolean
@@ -46,15 +47,20 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
         }
     }
     userFeatureChoices = () => {
-        let choices: any[] = []
-        if (this.props.character.pathFeatures) {
-            for (let charChoice of this.props.character.pathFeatures) {
-                if (charChoice.choice) {
-                    charChoice.choice.forEach((item: any) => choices.push(item))
+        try {
+            let choices: any[] = []
+            if (this.props.character.pathFeatures) {
+                for (let charChoice of this.props.character.pathFeatures) {
+                    if (charChoice.choice) {
+                        charChoice.choice.forEach((item: any) => choices.push(item))
+                    }
                 }
             }
+            return choices;
+        } catch (err) {
+            logger.log(err)
+            return []
         }
-        return choices;
     }
     render() {
         return (

@@ -28,6 +28,7 @@ import { AppChangePathChoiceAtLevelUp } from '../../components/AppChangePathChoi
 import { allowedChangingPaths, pathChoiceChangePicker } from '../../classFeatures/pathChoiceChnagePicker';
 import { addRacialSpells } from './helperFunctions/addRacialSpells';
 import AuthContext from '../../auth/context';
+import logger from '../../../utility/logger';
 
 
 interface LevelUpOptionsState {
@@ -157,840 +158,962 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
 
     async componentDidMount() {
-        const character = { ...this.props.character }
-        setTimeout(() => {
-            this.setState({ load: false })
-        }, 1000);
-        let beforeLevelUpString: string = JSON.stringify(character);
-        const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
-        if (this.state.character.level) {
-            const result = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
-            if (result) {
-                beforeLevelUpString = result;
-            }
-        }
-        this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
-        character.magic = new MagicModel()
-        this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
-        if (this.props.options.spells || this.props.options.spellsKnown) {
-            const character = { ...this.props.character };
-            if (this.props.options.spellSlotLevel && character.charSpecials !== undefined) {
-                character.charSpecials.warlockSpellSlotLevel = this.props.options.spellSlotLevel;
-            }
-            if (this.props.options.spellSlots && character.charSpecials !== undefined) {
-                character.charSpecials.warlockSpellSlots = this.props.options.spellSlots;
-            }
-            if (this.props.options.sorceryPoints && character.charSpecials !== undefined) {
-                character.charSpecials.sorceryPoints = this.props.options.sorceryPoints;
-            }
-            if (this.props.options.spellsKnown) {
-                character.spellsKnown = this.props.options.spellsKnown
-            }
-            if (!this.props.options.spellsKnown) {
-                const spellsKnown = setTotalKnownSpells(this.props.character);
-                character.spellsKnown = spellsKnown;
-            }
-            character.magic = new MagicModel()
-            character.magic.cantrips = this.props.options.cantrips;
-            if (this.props.character.characterClass !== 'Warlock') {
-                character.magic.firstLevelSpells = this.props.options.spells[0];
-                character.magic.secondLevelSpells = this.props.options.spells[1];
-                character.magic.thirdLevelSpells = this.props.options.spells[2];
-                character.magic.forthLevelSpells = this.props.options.spells[3];
-                character.magic.fifthLevelSpells = this.props.options.spells[4];
-                character.magic.sixthLevelSpells = this.props.options.spells[5];
-                character.magic.seventhLevelSpells = this.props.options.spells[6];
-                character.magic.eighthLevelSpells = this.props.options.spells[7];
-                character.magic.ninthLevelSpells = this.props.options.spells[8];
-            }
-            const beforeAnyChanges = JSON.parse(JSON.stringify(character))
-            this.setState({ character, beforeAnyChanges }, async () => {
-                if (this.props.character.level === 1 && this.props.character.race !== undefined) {
-                    addRacialSpells(this.props.character.race).forEach(item => {
-                        const spell = spellsJSON.find(spell => spell.name === item)
-                        if (spell && character.spells !== undefined && character.magic !== undefined && this.state.character.magic !== undefined) {
-                            const spellLevel = spellLevelChanger(spell.level)
-                            character.spells[spellLevel].push({ spell: spell, removable: false });
-                            character.magic[spellLevel] = this.state.character.magic[spellLevel] + 1;
-                        }
-                    })
-                    this.setState({ character })
+        try {
+            const character = { ...this.props.character }
+            setTimeout(() => {
+                this.setState({ load: false })
+            }, 1000);
+            let beforeLevelUpString: string = JSON.stringify(character);
+            const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
+            if (this.state.character.level) {
+                const result = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
+                if (result) {
+                    beforeLevelUpString = result;
                 }
-                this.setAvailableMagicSlots()
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            })
-        }
-        if (this.props.character.level === 1 && !(this.props.options.spells || this.props.options.spellsKnown)) {
-            if (this.props.character.race) {
-                addRacialSpells(this.props.character.race).forEach(item => {
-                    const spell = spellsJSON.find(spell => spell.name === item)
-                    if (spell && character.spells !== undefined) {
-                        const spellLevel = spellLevelChanger(spell.level)
-                        character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
+            this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
+            character.magic = new MagicModel()
+            this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
+            if (this.props.options.spells || this.props.options.spellsKnown) {
+                const character = { ...this.props.character };
+                if (this.props.options.spellSlotLevel && character.charSpecials !== undefined) {
+                    character.charSpecials.warlockSpellSlotLevel = this.props.options.spellSlotLevel;
+                }
+                if (this.props.options.spellSlots && character.charSpecials !== undefined) {
+                    character.charSpecials.warlockSpellSlots = this.props.options.spellSlots;
+                }
+                if (this.props.options.sorceryPoints && character.charSpecials !== undefined) {
+                    character.charSpecials.sorceryPoints = this.props.options.sorceryPoints;
+                }
+                if (this.props.options.spellsKnown) {
+                    character.spellsKnown = this.props.options.spellsKnown
+                }
+                if (!this.props.options.spellsKnown) {
+                    const spellsKnown = setTotalKnownSpells(this.props.character);
+                    character.spellsKnown = spellsKnown;
+                }
+                character.magic = new MagicModel()
+                character.magic.cantrips = this.props.options.cantrips;
+                if (this.props.character.characterClass !== 'Warlock') {
+                    character.magic.firstLevelSpells = this.props.options.spells[0];
+                    character.magic.secondLevelSpells = this.props.options.spells[1];
+                    character.magic.thirdLevelSpells = this.props.options.spells[2];
+                    character.magic.forthLevelSpells = this.props.options.spells[3];
+                    character.magic.fifthLevelSpells = this.props.options.spells[4];
+                    character.magic.sixthLevelSpells = this.props.options.spells[5];
+                    character.magic.seventhLevelSpells = this.props.options.spells[6];
+                    character.magic.eighthLevelSpells = this.props.options.spells[7];
+                    character.magic.ninthLevelSpells = this.props.options.spells[8];
+                }
+                const beforeAnyChanges = JSON.parse(JSON.stringify(character))
+                this.setState({ character, beforeAnyChanges }, async () => {
+                    if (this.props.character.level === 1 && this.props.character.race !== undefined) {
+                        addRacialSpells(this.props.character.race).forEach(item => {
+                            const spell = spellsJSON.find(spell => spell.name === item)
+                            if (spell && character.spells !== undefined && character.magic !== undefined && this.state.character.magic !== undefined) {
+                                const spellLevel = spellLevelChanger(spell.level)
+                                character.spells[spellLevel].push({ spell: spell, removable: false });
+                                character.magic[spellLevel] = this.state.character.magic[spellLevel] + 1;
+                            }
+                        })
+                        this.setState({ character })
                     }
+                    this.setAvailableMagicSlots()
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
                 })
             }
-            this.setState({ character })
-        }
-        if (this.props.options.abilityPointIncrease) {
-            this.setState({ totalAbilityPoints: 2 });
-        }
-        if (this.props.options.metamagic) {
-            this.setState({ totalMetaMagicPoints: this.props.options.metamagic.amount });
-        }
-        if (this.props.options.eldritchInvocations) {
-            this.setState({ totalInvocationPoints: this.props.options.eldritchInvocations })
-        }
-        if (this.state.invocations.length > 0) {
-            if (this.props.character.level) {
-                this.setState({ invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            if (this.props.character.level === 1 && !(this.props.options.spells || this.props.options.spellsKnown)) {
+                if (this.props.character.race) {
+                    addRacialSpells(this.props.character.race).forEach(item => {
+                        const spell = spellsJSON.find(spell => spell.name === item)
+                        if (spell && character.spells !== undefined) {
+                            const spellLevel = spellLevelChanger(spell.level)
+                            character.spells[spellLevel].push({ spell: spell, removable: false });
+                        }
+                    })
+                }
+                this.setState({ character })
             }
-        }
-        if (Array.isArray(this.props.options)) {
-            const pathClicked = [];
-            for (let item of this.props.options) {
-                pathClicked.push(false)
+            if (this.props.options.abilityPointIncrease) {
+                this.setState({ totalAbilityPoints: 2 });
             }
+            if (this.props.options.metamagic) {
+                this.setState({ totalMetaMagicPoints: this.props.options.metamagic.amount });
+            }
+            if (this.props.options.eldritchInvocations) {
+                this.setState({ totalInvocationPoints: this.props.options.eldritchInvocations })
+            }
+            if (this.state.invocations.length > 0) {
+                if (this.props.character.level) {
+                    this.setState({ invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+                }
+            }
+            if (Array.isArray(this.props.options)) {
+                const pathClicked = [];
+                for (let item of this.props.options) {
+                    pathClicked.push(false)
+                }
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     setAvailableMagicSlots = async () => {
-        if (this.state.character.magic) {
-            const totalMagic = Object.values(this.state.character.magic);
-            const newAvailableMagic = []
-            for (let item of totalMagic) {
-                newAvailableMagic.push(item)
+        try {
+            if (this.state.character.magic) {
+                const totalMagic = Object.values(this.state.character.magic);
+                const newAvailableMagic = []
+                for (let item of totalMagic) {
+                    newAvailableMagic.push(item)
+                }
+                await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
             }
-            await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickPath = (path: any, index: number) => {
-        this.setState({ pathInfoLoading: true })
-        setTimeout(() => {
-            this.setState({ pathInfoLoading: false })
-        }, 800);
-        let character = { ...this.state.character };
-        if (!this.state.pathClicked[index]) {
-            if (this.state.pathChosen !== null) {
-                alert(`Can't pick more then one path`)
-                return
+        try {
+            this.setState({ pathInfoLoading: true })
+            setTimeout(() => {
+                this.setState({ pathInfoLoading: false })
+            }, 800);
+            let character = { ...this.state.character };
+            if (!this.state.pathClicked[index]) {
+                if (this.state.pathChosen !== null) {
+                    alert(`Can't pick more then one path`)
+                    return
+                }
+                const pathClicked = this.state.pathClicked;
+                pathClicked[index] = true
+                this.setState({ pathClicked, pathChosen: path }, () => {
+                    this.extractCustomPathJson(this.state.pathChosen.name)
+                });
             }
-            const pathClicked = this.state.pathClicked;
-            pathClicked[index] = true
-            this.setState({ pathClicked, pathChosen: path }, () => {
-                this.extractCustomPathJson(this.state.pathChosen.name)
-            });
-        }
-        else if (this.state.pathClicked[index]) {
-            character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
-            const pathClicked = this.state.pathClicked;
-            pathClicked[index] = false;
-            this.setState({ pathClicked, pathChosen: null, character }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-            });
+            else if (this.state.pathClicked[index]) {
+                character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
+                const pathClicked = this.state.pathClicked;
+                pathClicked[index] = false;
+                this.setState({ pathClicked, pathChosen: null, character }, () => {
+                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+                });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     resetExpertiseSkills = async (skill: any) => {
-        store.dispatch({ type: ActionType.ResetCharSkillsToLowerLevel })
-        this.setState({ reloadingSkills: true, skillsClicked: [] })
-        setTimeout(() => {
-            this.setState({ reloadingSkills: false })
-        }, 500);
+        try {
+            store.dispatch({ type: ActionType.ResetCharSkillsToLowerLevel })
+            this.setState({ reloadingSkills: true, skillsClicked: [] })
+            setTimeout(() => {
+                this.setState({ reloadingSkills: false })
+            }, 500);
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     pickSkill = (skill: any, index: number) => {
-        let count = 0;
-        this.state.skillsClicked.forEach(appear => appear === true && count++)
-        if (!this.state.skillsClicked[index]) {
-            if (count === this.props.options.expertise) {
-                alert(`You can only Improve ${this.props.options.expertise} skills`);
-                return;
-            }
-            const newTools = this.state.newTools;
-            let newSkills: any = [];
-            const storeCharSkills = store.getState().character.skills;
-            if (storeCharSkills) {
-                newSkills = storeCharSkills
-            }
-            const skillsClicked = this.state.skillsClicked;
-            newTools.filter((item: any, index: number) => {
-                if (item.includes(skill[0]) && this.state.character.skills) {
-                    if (item[1] === 2) {
-                        alert('You already have expertise in this skill, you cannot double stack that same skill.');
+        try {
+            let count = 0;
+            this.state.skillsClicked.forEach(appear => appear === true && count++)
+            if (!this.state.skillsClicked[index]) {
+                if (count === this.props.options.expertise) {
+                    alert(`You can only Improve ${this.props.options.expertise} skills`);
+                    return;
+                }
+                const newTools = this.state.newTools;
+                let newSkills: any = [];
+                const storeCharSkills = store.getState().character.skills;
+                if (storeCharSkills) {
+                    newSkills = storeCharSkills
+                }
+                const skillsClicked = this.state.skillsClicked;
+                newTools.filter((item: any, index: number) => {
+                    if (item.includes(skill[0]) && this.state.character.skills) {
+                        if (item[1] === 2) {
+                            alert('You already have expertise in this skill, you cannot double stack that same skill.');
+                            return;
+                        }
+                        skillsClicked[index + this.state.character.skills.length] = true
+                        item[1] = item[1] + 2
+                        this.setState({ skillsClicked });
                         return;
                     }
-                    skillsClicked[index + this.state.character.skills.length] = true
-                    item[1] = item[1] + 2
-                    this.setState({ skillsClicked });
-                    return;
-                }
-            })
-            newSkills.filter((item: any, index: number) => {
-                if (item.includes(skill[0])) {
-                    if (item[1] === 2) {
-                        alert('You already have expertise in this skill, you cannot double stack that same skill.');
+                })
+                newSkills.filter((item: any, index: number) => {
+                    if (item.includes(skill[0])) {
+                        if (item[1] === 2) {
+                            alert('You already have expertise in this skill, you cannot double stack that same skill.');
+                            return;
+                        }
+                        skillsClicked[index] = true
+                        item[1] = item[1] + 2
+                        this.setState({ skillsClicked });
                         return;
                     }
-                    skillsClicked[index] = true
-                    item[1] = item[1] + 2
-                    this.setState({ skillsClicked });
-                    return;
-                }
-            })
-        }
-        else if (this.state.skillsClicked[index]) {
-            const skillsClicked = this.state.skillsClicked;
-            let newSkills: any = [];
-            const storeCharSkills = store.getState().character.skills;
-            if (storeCharSkills) {
-                newSkills = storeCharSkills
+                })
             }
-            const newTools = this.state.newTools;
-            newTools.filter((item: any, index: number) => {
-                if (item.includes(skill[0]) && this.state.character.skills) {
-                    skillsClicked[index + this.state.character.skills.length] = false
-                    item[1] = item[1] - 2
-                    this.setState({ skillsClicked });
-                    return;
+            else if (this.state.skillsClicked[index]) {
+                const skillsClicked = this.state.skillsClicked;
+                let newSkills: any = [];
+                const storeCharSkills = store.getState().character.skills;
+                if (storeCharSkills) {
+                    newSkills = storeCharSkills
                 }
-            })
-            newSkills.filter((item: any, index: number) => {
-                if (item.includes(skill[0])) {
-                    skillsClicked[index] = false
-                    item[1] = item[1] - 2;
-                    this.setState({ skillsClicked });
-                    return;
-                }
-            })
+                const newTools = this.state.newTools;
+                newTools.filter((item: any, index: number) => {
+                    if (item.includes(skill[0]) && this.state.character.skills) {
+                        skillsClicked[index + this.state.character.skills.length] = false
+                        item[1] = item[1] - 2
+                        this.setState({ skillsClicked });
+                        return;
+                    }
+                })
+                newSkills.filter((item: any, index: number) => {
+                    if (item.includes(skill[0])) {
+                        skillsClicked[index] = false
+                        item[1] = item[1] - 2;
+                        this.setState({ skillsClicked });
+                        return;
+                    }
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
 
     }
 
     addSkills = () => {
-        let count = 0;
-        this.state.skillsClicked.forEach(appear => appear === true && count++);
-        if (count < 2) {
-            alert('You still have points to spend on skill proficiencies.')
-            return false;
+        try {
+            let count = 0;
+            this.state.skillsClicked.forEach(appear => appear === true && count++);
+            if (count < 2) {
+                alert('You still have points to spend on skill proficiencies.')
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
     addPath = () => {
-        if (this.state.pathChosen === null) {
-            alert(`Must Pick A path!`)
-            return false
+        try {
+            if (this.state.pathChosen === null) {
+                alert(`Must Pick A path!`)
+                return false
+            }
+            return true
+        } catch (err) {
+            logger.log(err)
         }
-        return true
     }
 
     addAbilityPoints = () => {
-        if (this.state.totalAbilityPoints > 0) {
-            alert(`You still have ${this.state.totalAbilityPoints} points to spend.`);
-            return false;
+        try {
+            if (this.state.totalAbilityPoints > 0) {
+                alert(`You still have ${this.state.totalAbilityPoints} points to spend.`);
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
     listStats = () => {
-        const stats: any[] = [];
-        stats.push(['strength', this.state.strength])
-        stats.push(['constitution', this.state.constitution])
-        stats.push(['dexterity', this.state.dexterity])
-        stats.push(['intelligence', this.state.intelligence])
-        stats.push(['wisdom', this.state.wisdom])
-        stats.push(['charisma', this.state.charisma]);
-        return stats
+        try {
+            const stats: any[] = [];
+            stats.push(['strength', this.state.strength])
+            stats.push(['constitution', this.state.constitution])
+            stats.push(['dexterity', this.state.dexterity])
+            stats.push(['intelligence', this.state.intelligence])
+            stats.push(['wisdom', this.state.wisdom])
+            stats.push(['charisma', this.state.charisma]);
+            return stats
+        } catch (err) {
+            logger.log(err)
+            return []
+        }
     }
 
     pickAbilityPoints = (ability: any, index: number) => {
-        if (this.state[ability] === 20) {
-            alert(`Max 20 ability points`)
-            return;
-        }
-        if (this.state.abilityClicked[index] <= 2) {
-            if (this.state.totalAbilityPoints === 0) {
-                alert(`You only have 2 ability points to spend`)
+        try {
+            if (this.state[ability] === 20) {
+                alert(`Max 20 ability points`)
                 return;
             }
-            const abilityClicked = this.state.abilityClicked;
-            abilityClicked[index] = abilityClicked[index] + 1
-            this.setState({ [ability]: this.state[ability] + 1 } as any)
-            this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints - 1 });
+            if (this.state.abilityClicked[index] <= 2) {
+                if (this.state.totalAbilityPoints === 0) {
+                    alert(`You only have 2 ability points to spend`)
+                    return;
+                }
+                const abilityClicked = this.state.abilityClicked;
+                abilityClicked[index] = abilityClicked[index] + 1
+                this.setState({ [ability]: this.state[ability] + 1 } as any)
+                this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints - 1 });
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     removeAbilityPoints = (ability: any, index: number) => {
-        if (this.state.abilityClicked[index] >= 0 && this.state.abilityClicked[index] <= 2 && this.state.totalAbilityPoints < 2) {
-            if (this.state[ability] === this.state.character[ability]) {
-                return;
+        try {
+            if (this.state.abilityClicked[index] >= 0 && this.state.abilityClicked[index] <= 2 && this.state.totalAbilityPoints < 2) {
+                if (this.state[ability] === this.state.character[ability]) {
+                    return;
+                }
+                const abilityClicked = this.state.abilityClicked;
+                abilityClicked[index] = abilityClicked[index] - 1
+                this.setState({ [ability]: this.state[ability] - 1 } as any)
+                this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints + 1 });
             }
-            const abilityClicked = this.state.abilityClicked;
-            abilityClicked[index] = abilityClicked[index] - 1
-            this.setState({ [ability]: this.state[ability] - 1 } as any)
-            this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints + 1 });
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickFightingStyle = (style: any, index: number) => {
-        if (!this.state.fightingStyleClicked[index]) {
-            if (this.state.fightingStyle.length >= 1) {
-                alert('You can only pick one fighting style.')
-                return;
+        try {
+            if (!this.state.fightingStyleClicked[index]) {
+                if (this.state.fightingStyle.length >= 1) {
+                    alert('You can only pick one fighting style.')
+                    return;
+                }
+                const fightingStyleClicked = this.state.fightingStyleClicked;
+                fightingStyleClicked[index] = true;
+                const fightingStyle = this.state.fightingStyle;
+                fightingStyle.push(style);
+                this.setState({ fightingStyle, fightingStyleClicked })
             }
-            const fightingStyleClicked = this.state.fightingStyleClicked;
-            fightingStyleClicked[index] = true;
-            const fightingStyle = this.state.fightingStyle;
-            fightingStyle.push(style);
-            this.setState({ fightingStyle, fightingStyleClicked })
-        }
-        else if (this.state.fightingStyleClicked[index]) {
-            const fightingStyleClicked = this.state.fightingStyleClicked;
-            fightingStyleClicked[index] = false;
-            let fightingStyle = this.state.fightingStyle;
-            fightingStyle = fightingStyle.filter((n: any) => n.name !== style.name)
-            this.setState({ fightingStyle, fightingStyleClicked })
+            else if (this.state.fightingStyleClicked[index]) {
+                const fightingStyleClicked = this.state.fightingStyleClicked;
+                fightingStyleClicked[index] = false;
+                let fightingStyle = this.state.fightingStyle;
+                fightingStyle = fightingStyle.filter((n: any) => n.name !== style.name)
+                this.setState({ fightingStyle, fightingStyleClicked })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     pickMetaMagic = (magic: any, index: number) => {
-        let metaMagic = this.state.metaMagic;
-        if (!this.state.metamagicClicked[index]) {
-            if (this.state.metaMagic.length >= this.state.totalMetaMagicPoints) {
-                alert(`You can only pick ${this.state.totalMetaMagicPoints} Metamagic abilities.`)
-                return;
+        try {
+            let metaMagic = this.state.metaMagic;
+            if (!this.state.metamagicClicked[index]) {
+                if (this.state.metaMagic.length >= this.state.totalMetaMagicPoints) {
+                    alert(`You can only pick ${this.state.totalMetaMagicPoints} Metamagic abilities.`)
+                    return;
+                }
+                const metamagicClicked = this.state.metamagicClicked;
+                metamagicClicked[index] = true;
+                metaMagic.push(magic)
+                this.setState({ metaMagic, metamagicClicked })
             }
-            const metamagicClicked = this.state.metamagicClicked;
-            metamagicClicked[index] = true;
-            metaMagic.push(magic)
-            this.setState({ metaMagic, metamagicClicked })
-        }
-        else if (this.state.metamagicClicked[index]) {
-            metaMagic = metaMagic.filter(val => val.name !== magic.name);
-            const metamagicClicked = this.state.metamagicClicked;
-            metamagicClicked[index] = false;
-            this.setState({ metaMagic, metamagicClicked })
+            else if (this.state.metamagicClicked[index]) {
+                metaMagic = metaMagic.filter(val => val.name !== magic.name);
+                const metamagicClicked = this.state.metamagicClicked;
+                metamagicClicked[index] = false;
+                this.setState({ metaMagic, metamagicClicked })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
     addMetaMagic = () => {
-        if (this.state.metaMagic.length !== this.state.totalMetaMagicPoints) {
-            alert(`You still have ${this.state.totalMetaMagicPoints - this.state.metaMagic.length} Metamagic points`);
-            return false;
+        try {
+            if (this.state.metaMagic.length !== this.state.totalMetaMagicPoints) {
+                alert(`You still have ${this.state.totalMetaMagicPoints - this.state.metaMagic.length} Metamagic points`);
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
 
     addFightingStyle = () => {
-        if (this.state.fightingStyle.length === 0) {
-            alert(`You must pick a fighting style`);
-            return false;
+        try {
+            if (this.state.fightingStyle.length === 0) {
+                alert(`You must pick a fighting style`);
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
     checkSpellSlotImprove = (spellSlot: string) => {
-        if (!this.state.beforeLevelUp) {
-            return;
-        }
-        if (this.state.character.magic && this.state.beforeLevelUp.magic) {
-            const difference = this.state.character.magic[spellSlot] - this.state.beforeLevelUp.magic[spellSlot];
-            return difference === 0 ? '' : ` + ${difference} new!`;
+        try {
+            if (!this.state.beforeLevelUp) {
+                return;
+            }
+            if (this.state.character.magic && this.state.beforeLevelUp.magic) {
+                const difference = this.state.character.magic[spellSlot] - this.state.beforeLevelUp.magic[spellSlot];
+                return difference === 0 ? '' : ` + ${difference} new!`;
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
 
     pickEldritchInvocations = (invocation: any, index: number) => {
-        let invocations = this.state.invocations;
-        if (!this.state.invocationsClicked[index]) {
-            if (this.state.invocations.length >= this.state.totalInvocationPoints) {
-                alert(`You can only pick ${this.state.totalInvocationPoints} Eldritch Invocations.`)
-                return;
+        try {
+            let invocations = this.state.invocations;
+            if (!this.state.invocationsClicked[index]) {
+                if (this.state.invocations.length >= this.state.totalInvocationPoints) {
+                    alert(`You can only pick ${this.state.totalInvocationPoints} Eldritch Invocations.`)
+                    return;
+                }
+                const invocationsClicked = this.state.invocationsClicked;
+                invocationsClicked[index] = true;
+                invocations.push(invocation)
+                this.setState({ invocations, invocationsClicked })
             }
-            const invocationsClicked = this.state.invocationsClicked;
-            invocationsClicked[index] = true;
-            invocations.push(invocation)
-            this.setState({ invocations, invocationsClicked })
-        }
-        else if (this.state.invocationsClicked[index]) {
-            invocations = invocations.filter((val: any) => val.name !== invocation.name);
-            const invocationsClicked = this.state.invocationsClicked;
-            invocationsClicked[index] = false;
-            this.setState({ invocations, invocationsClicked })
+            else if (this.state.invocationsClicked[index]) {
+                invocations = invocations.filter((val: any) => val.name !== invocation.name);
+                const invocationsClicked = this.state.invocationsClicked;
+                invocationsClicked[index] = false;
+                this.setState({ invocations, invocationsClicked })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     addEldritchInvocations = () => {
-        if (this.state.invocations.length !== this.state.totalInvocationPoints) {
-            alert(`You still have ${this.state.totalInvocationPoints - this.state.invocations.length} Eldritch Invocations to pick`);
-            return false;
+        try {
+            if (this.state.invocations.length !== this.state.totalInvocationPoints) {
+                alert(`You still have ${this.state.totalInvocationPoints - this.state.invocations.length} Eldritch Invocations to pick`);
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
     pickWarlockPact = (pact: any, index: number) => {
-        const character = { ...this.state.character };
-        if (!this.state.pactClicked[index]) {
-            if (this.state.pact !== null) {
-                alert('You can only pick one pact.')
-                return;
+        try {
+            const character = { ...this.state.character };
+            if (!this.state.pactClicked[index]) {
+                if (this.state.pact !== null) {
+                    alert('You can only pick one pact.')
+                    return;
+                }
+                const pactClicked = this.state.pactClicked;
+                pactClicked[index] = true;
+                if (character.charSpecials && this.props.character.level) {
+                    character.charSpecials.warlockPactBoon = pact
+                    this.setState({ pact: pact, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+                }
             }
-            const pactClicked = this.state.pactClicked;
-            pactClicked[index] = true;
-            if (character.charSpecials && this.props.character.level) {
-                character.charSpecials.warlockPactBoon = pact
-                this.setState({ pact: pact, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+            else if (this.state.pactClicked[index]) {
+                const pactClicked = this.state.pactClicked;
+                pactClicked[index] = false;
+                if (character.charSpecials && this.props.character.level) {
+                    character.charSpecials.warlockPactBoon = { name: '', description: "" };
+                    this.setState({ pact: null, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
+                }
             }
-        }
-        else if (this.state.pactClicked[index]) {
-            const pactClicked = this.state.pactClicked;
-            pactClicked[index] = false;
-            if (character.charSpecials && this.props.character.level) {
-                character.charSpecials.warlockPactBoon = { name: '', description: "" };
-                this.setState({ pact: null, pactClicked, character, invocationsClicked: highLightPicked(this.state.invocations, eldritchInvocations(this.props.character.level, this.props.character)) })
-            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     addWarlockPact = () => {
-        if (this.state.pact === null) {
-            alert(`You must pick a pact`);
-            return false;
+        try {
+            if (this.state.pact === null) {
+                alert(`You must pick a pact`);
+                return false;
+            }
+            return true;
+        } catch (err) {
+            logger.log(err)
         }
-        return true;
     }
 
     resetAbilityScoresToCurrentLevel = () => {
-        this.setState({
-            strength: this.props.character.strength ? this.props.character.strength : 0,
-            dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
-            constitution: this.props.character.constitution ? this.props.character.constitution : 0,
-            intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
-            wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
-            charisma: this.props.character.charisma ? this.props.character.charisma : 0
-        })
+        try {
+            this.setState({
+                strength: this.props.character.strength ? this.props.character.strength : 0,
+                dexterity: this.props.character.dexterity ? this.props.character.dexterity : 0,
+                constitution: this.props.character.constitution ? this.props.character.constitution : 0,
+                intelligence: this.props.character.intelligence ? this.props.character.intelligence : 0,
+                wisdom: this.props.character.wisdom ? this.props.character.wisdom : 0,
+                charisma: this.props.character.charisma ? this.props.character.charisma : 0
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     disableExtraPathChoice = () => {
-        if (!this.state.extraPathChoice) {
-            return;
+        try {
+            if (!this.state.extraPathChoice) {
+                return;
+            }
+            this.setState({ extraPathChoice: false })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ extraPathChoice: false })
     }
 
     enableExtraPathChoice = () => {
-        if (this.state.extraPathChoice) {
-            return;
+        try {
+            if (this.state.extraPathChoice) {
+                return;
+            }
+            this.setState({ extraPathChoice: true })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ extraPathChoice: true })
     }
 
     applyExtraPathChoice = (choice: any, index: number) => {
-        if (!this.state.extraPathChoiceClicked[index]) {
-            const extraPathChoiceAmount = this.state.numberOfChoices;
-            if (this.state.extraPathChoiceValue.length === extraPathChoiceAmount) {
-                alert(`You can only pick ${extraPathChoiceAmount} choices.`)
-                return;
-            }
-            const extraPathChoiceValue = this.state.extraPathChoiceValue;
-            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
-            extraPathChoiceClicked[index] = true;
-            extraPathChoiceValue.push(choice);
-            this.setState({ extraPathChoiceValue })
+        try {
+            if (!this.state.extraPathChoiceClicked[index]) {
+                const extraPathChoiceAmount = this.state.numberOfChoices;
+                if (this.state.extraPathChoiceValue.length === extraPathChoiceAmount) {
+                    alert(`You can only pick ${extraPathChoiceAmount} choices.`)
+                    return;
+                }
+                const extraPathChoiceValue = this.state.extraPathChoiceValue;
+                const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+                extraPathChoiceClicked[index] = true;
+                extraPathChoiceValue.push(choice);
+                this.setState({ extraPathChoiceValue })
 
-        }
-        else if (this.state.extraPathChoiceClicked[index]) {
-            let extraPathChoiceValue = this.state.extraPathChoiceValue;
-            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
-            extraPathChoiceClicked[index] = false;
-            extraPathChoiceValue = extraPathChoiceValue.filter((val: any) => choice.name !== val.name);
-            this.setState({ extraPathChoiceValue })
+            }
+            else if (this.state.extraPathChoiceClicked[index]) {
+                let extraPathChoiceValue = this.state.extraPathChoiceValue;
+                const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+                extraPathChoiceClicked[index] = false;
+                extraPathChoiceValue = extraPathChoiceValue.filter((val: any) => choice.name !== val.name);
+                this.setState({ extraPathChoiceValue })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     addArmor = async () => {
-        let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
-        if (!armorList) {
-            const armorList = [this.state.armorToLoad]
-            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
-            return;
+        try {
+            let armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+            if (!armorList) {
+                const armorList = [this.state.armorToLoad]
+                AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(armorList))
+                return;
+            }
+            const newArmorList = JSON.parse(armorList)
+            newArmorList.push(this.state.armorToLoad)
+            AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
+        } catch (err) {
+            logger.log(err)
         }
-        const newArmorList = JSON.parse(armorList)
-        newArmorList.push(this.state.armorToLoad)
-        AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
     }
 
     armorBonuses = (armorAc: number, armorBonusesCalculationType: any) => {
-        let newArmorAc: number = 0;
-        let dex: number = 0
-        let wiz: number = 0
-        let con: number = 0
-        if (this.state.character.modifiers) {
-            if (this.state.character.modifiers.dexterity) {
-                dex = this.state.character.modifiers.dexterity
-            }
-            if (this.state.character.modifiers.wisdom) {
-                wiz = this.state.character.modifiers.wisdom
-            }
-            if (this.state.character.modifiers.constitution) {
-                con = this.state.character.modifiers.constitution
-            }
-        }
-        if (armorBonusesCalculationType === "Medium Armor") {
-            newArmorAc = +armorAc + (dex >= 2 ? 2 : dex)
-        }
-        if (armorBonusesCalculationType === "Light Armor") {
-            newArmorAc = +armorAc + (dex)
-        }
-        if (armorBonusesCalculationType === "Heavy Armor") {
-            newArmorAc = +armorAc
-        }
-        if (armorBonusesCalculationType === "none") {
-            newArmorAc = 10 + +dex
-        }
-        if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +dex + +con)
-        }
-        if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
-            newArmorAc = (10 + +dex + +wiz)
-        }
-        if (this.state.character.pathFeatures && this.state.character.pathFeatures?.length > 0) {
-            this.state.character.pathFeatures.forEach(item => {
-                if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
-                    newArmorAc = (13 + +dex)
+        try {
+            let newArmorAc: number = 0;
+            let dex: number = 0
+            let wiz: number = 0
+            let con: number = 0
+            if (this.state.character.modifiers) {
+                if (this.state.character.modifiers.dexterity) {
+                    dex = this.state.character.modifiers.dexterity
                 }
-            })
+                if (this.state.character.modifiers.wisdom) {
+                    wiz = this.state.character.modifiers.wisdom
+                }
+                if (this.state.character.modifiers.constitution) {
+                    con = this.state.character.modifiers.constitution
+                }
+            }
+            if (armorBonusesCalculationType === "Medium Armor") {
+                newArmorAc = +armorAc + (dex >= 2 ? 2 : dex)
+            }
+            if (armorBonusesCalculationType === "Light Armor") {
+                newArmorAc = +armorAc + (dex)
+            }
+            if (armorBonusesCalculationType === "Heavy Armor") {
+                newArmorAc = +armorAc
+            }
+            if (armorBonusesCalculationType === "none") {
+                newArmorAc = 10 + +dex
+            }
+            if (this.state.character.characterClass === "Barbarian" && armorBonusesCalculationType === "none") {
+                newArmorAc = (10 + +dex + +con)
+            }
+            if (this.state.character.characterClass === "Monk" && armorBonusesCalculationType === "none") {
+                newArmorAc = (10 + +dex + +wiz)
+            }
+            if (this.state.character.pathFeatures && this.state.character.pathFeatures?.length > 0) {
+                this.state.character.pathFeatures.forEach(item => {
+                    if (item.name === "Draconic Resilience" && armorBonusesCalculationType === "none") {
+                        newArmorAc = (13 + +dex)
+                    }
+                })
+            }
+            return newArmorAc
+        } catch (err) {
+            logger.log(err)
         }
-        return newArmorAc
     }
 
     close = async () => {
-        if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`)) {
-            await AsyncStorage.removeItem(`${this.state.character._id}FirstTimeOpened`)
-        }
-        const character = { ...this.state.character };
-        if (this.props.options.pathSelector) {
-            if (!this.addPath()) {
-                return;
+        try {
+            if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`)) {
+                await AsyncStorage.removeItem(`${this.state.character._id}FirstTimeOpened`)
             }
-            if (this.state.additionalSkillPicks > 0) {
-                alert('You have additional choices to pick from')
-                return;
-            }
-            if (this.state.pathFightingStyle) {
-                alert('You still have to pick a fighting style')
-                return;
-            }
-            if (this.state.additionalToolPicks) {
-                alert('You have additional tools to pick from')
-                return;
-            }
-            if (this.state.pathPickDruidCircle) {
-                alert('You Must pick a druid circle')
-                return;
-            }
-            if (this.state.languageToPick) {
-                alert('You must add languages.')
-                return;
-            }
-            if (this.state.extraPathChoice) {
-                if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
+            const character = { ...this.state.character };
+            if (this.props.options.pathSelector) {
+                if (!this.addPath()) {
+                    return;
+                }
+                if (this.state.additionalSkillPicks > 0) {
                     alert('You have additional choices to pick from')
                     return;
                 }
-            }
-            if (this.state.maneuversToPick) {
-                alert('You have additional Maneuvers to pick from')
-                return;
-            }
-            if (this.state.ElementsToPick) {
-                alert('You have additional Elements to pick from')
-                return;
-            }
-            if (character.charSpecials && character.pathFeatures) {
-                character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
-                character.charSpecials.monkElementsDisciplines = this.state.elements;
-                character.path = this.state.pathChosen;
-                const officialOrCustom = Path[this.state.character.characterClass][this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
-                const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
-                for (let item of pathResult) {
-                    character.pathFeatures.push(item)
+                if (this.state.pathFightingStyle) {
+                    alert('You still have to pick a fighting style')
+                    return;
                 }
-            }
+                if (this.state.additionalToolPicks) {
+                    alert('You have additional tools to pick from')
+                    return;
+                }
+                if (this.state.pathPickDruidCircle) {
+                    alert('You Must pick a druid circle')
+                    return;
+                }
+                if (this.state.languageToPick) {
+                    alert('You must add languages.')
+                    return;
+                }
+                if (this.state.extraPathChoice) {
+                    if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
+                        alert('You have additional choices to pick from')
+                        return;
+                    }
+                }
+                if (this.state.maneuversToPick) {
+                    alert('You have additional Maneuvers to pick from')
+                    return;
+                }
+                if (this.state.ElementsToPick) {
+                    alert('You have additional Elements to pick from')
+                    return;
+                }
+                if (character.charSpecials && character.pathFeatures) {
+                    character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+                    character.charSpecials.monkElementsDisciplines = this.state.elements;
+                    character.path = this.state.pathChosen;
+                    const officialOrCustom = Path[this.state.character.characterClass][this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
+                    const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
+                    for (let item of pathResult) {
+                        character.pathFeatures.push(item)
+                    }
+                }
 
-        }
-        if (this.props.options.pathFeature && !this.props.options.pathSelector) {
-            if (this.state.additionalSkillPicks > 0) {
-                alert('You have additional choices to pick from')
-                return;
             }
-            if (this.state.additionalToolPicks) {
-                alert('You have additional tools to pick from')
-                return;
-            }
-            if (this.state.pathFightingStyle) {
-                alert('You still have to pick a fighting style')
-                return;
-            }
-            if (this.state.languageToPick) {
-                alert('You must add languages.')
-                return;
-            }
-            if (this.state.extraPathChoice) {
-                if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
+            if (this.props.options.pathFeature && !this.props.options.pathSelector) {
+                if (this.state.additionalSkillPicks > 0) {
                     alert('You have additional choices to pick from')
                     return;
                 }
-            }
-            if (this.state.maneuversToPick) {
-                alert('You have additional Maneuvers to pick from')
-                return;
-            }
-            if (this.state.ElementsToPick) {
-                alert('You have additional Elements to pick from')
-                return;
-            }
-            if (character.charSpecials && character.pathFeatures) {
-                character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
-                character.charSpecials.monkElementsDisciplines = this.state.elements;
-                const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
-                const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
-                for (let item of pathResult) {
-                    character.pathFeatures.push(item)
+                if (this.state.additionalToolPicks) {
+                    alert('You have additional tools to pick from')
+                    return;
                 }
-            }
+                if (this.state.pathFightingStyle) {
+                    alert('You still have to pick a fighting style')
+                    return;
+                }
+                if (this.state.languageToPick) {
+                    alert('You must add languages.')
+                    return;
+                }
+                if (this.state.extraPathChoice) {
+                    if (this.state.extraPathChoiceValue.length !== this.state.numberOfChoices) {
+                        alert('You have additional choices to pick from')
+                        return;
+                    }
+                }
+                if (this.state.maneuversToPick) {
+                    alert('You have additional Maneuvers to pick from')
+                    return;
+                }
+                if (this.state.ElementsToPick) {
+                    alert('You have additional Elements to pick from')
+                    return;
+                }
+                if (character.charSpecials && character.pathFeatures) {
+                    character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
+                    character.charSpecials.monkElementsDisciplines = this.state.elements;
+                    const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
+                    const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
+                    for (let item of pathResult) {
+                        character.pathFeatures.push(item)
+                    }
+                }
 
-        }
-        if (this.props.options.extraSpells) {
-            for (let item of this.props.options.extraSpells) {
-                const spell = spellsJSON.find(spell => spell.name === item)
-                if (spell && character.spells) {
-                    const spellLevel = spellLevelChanger(spell.level)
-                    character.spells[spellLevel].push({ spell: spell, removable: false });
+            }
+            if (this.props.options.extraSpells) {
+                for (let item of this.props.options.extraSpells) {
+                    const spell = spellsJSON.find(spell => spell.name === item)
+                    if (spell && character.spells) {
+                        const spellLevel = spellLevelChanger(spell.level)
+                        character.spells[spellLevel].push({ spell: spell, removable: false });
+                    }
+                }
+                if (this.props.options.notCountAgainstKnown) {
+                    character.spellsKnown = parseInt(character.spellsKnown + this.props.options.extraSpells.length).toString()
                 }
             }
-            if (this.props.options.notCountAgainstKnown) {
-                character.spellsKnown = parseInt(character.spellsKnown + this.props.options.extraSpells.length).toString()
-            }
-        }
-        if (this.props.options.abilityPointIncrease && !this.state.featsWindow && !this.state.abilityWindow) {
-            alert('Must pick Ability score increase or new feat.');
-            return;
-        }
-        if (this.props.options.abilityPointIncrease && this.state.abilityWindow) {
-            if (!this.addAbilityPoints()) {
+            if (this.props.options.abilityPointIncrease && !this.state.featsWindow && !this.state.abilityWindow) {
+                alert('Must pick Ability score increase or new feat.');
                 return;
             }
-            character.strength = this.state.strength;
-            character.constitution = this.state.constitution;
-            character.dexterity = this.state.dexterity;
-            character.intelligence = this.state.intelligence;
-            character.charisma = this.state.charisma;
-            character.wisdom = this.state.wisdom;
-        }
-        if (this.props.options.abilityPointIncrease && this.state.featsWindow) {
-            if (this.state.featName === '' || this.state.featDescription === '') {
-                alert('You must provide a name and description for your feat.');
-                return;
-            }
-            this.state.weaponProfArray.forEach(item => {
-                if (character.addedWeaponProf !== undefined) {
-                    character.addedWeaponProf.push(item)
+            if (this.props.options.abilityPointIncrease && this.state.abilityWindow) {
+                if (!this.addAbilityPoints()) {
+                    return;
                 }
-            });
-            this.state.armorProfArray.forEach(item => {
-                if (character.addedArmorProf) {
-                    character.addedArmorProf.push(item)
-                }
-            });
-            if (character.feats) {
-                character.feats.push({ name: this.state.featName, description: this.state.featDescription })
+                character.strength = this.state.strength;
+                character.constitution = this.state.constitution;
+                character.dexterity = this.state.dexterity;
+                character.intelligence = this.state.intelligence;
+                character.charisma = this.state.charisma;
+                character.wisdom = this.state.wisdom;
             }
+            if (this.props.options.abilityPointIncrease && this.state.featsWindow) {
+                if (this.state.featName === '' || this.state.featDescription === '') {
+                    alert('You must provide a name and description for your feat.');
+                    return;
+                }
+                this.state.weaponProfArray.forEach(item => {
+                    if (character.addedWeaponProf !== undefined) {
+                        character.addedWeaponProf.push(item)
+                    }
+                });
+                this.state.armorProfArray.forEach(item => {
+                    if (character.addedArmorProf) {
+                        character.addedArmorProf.push(item)
+                    }
+                });
+                if (character.feats) {
+                    character.feats.push({ name: this.state.featName, description: this.state.featDescription })
+                }
 
-            character.strength = this.state.strength;
-            character.constitution = this.state.constitution;
-            character.dexterity = this.state.dexterity;
-            character.intelligence = this.state.intelligence;
-            character.charisma = this.state.charisma;
-            character.wisdom = this.state.wisdom;
-        }
-        if (this.state.spellListToLoad) {
-            if (this.state.spellListToLoad.spells.length < this.state.spellListToLoad.limit) {
-                alert("You have additional spells to pick");
-                return;
+                character.strength = this.state.strength;
+                character.constitution = this.state.constitution;
+                character.dexterity = this.state.dexterity;
+                character.intelligence = this.state.intelligence;
+                character.charisma = this.state.charisma;
+                character.wisdom = this.state.wisdom;
             }
-            for (let item of this.state.spellListToLoad.spells) {
-                const spell = spellsJSON.find(spell => spell.name === item)
-                if (spell && character.spells) {
-                    const spellLevel = spellLevelChanger(spell.level)
-                    character.spells[spellLevel].push({ spell: spell, removable: false });
+            if (this.state.spellListToLoad) {
+                if (this.state.spellListToLoad.spells.length < this.state.spellListToLoad.limit) {
+                    alert("You have additional spells to pick");
+                    return;
                 }
-            }
-        }
-        if (this.state.specificSpellToLoad) {
-            if (this.state.specificSpell.notCountAgainstKnownCantrips) {
-                if (character.magic && character.magic.cantrips) {
-                    character.magic.cantrips = character.magic.cantrips + 1;
-                }
-            }
-            const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell.name)
-            if (spell && character.spells) {
-                const spellLevel = spellLevelChanger(spell.level)
-                character.spells[spellLevel].push({ spell: spell, removable: false });
-            }
-        }
-        if (this.props.options.expertise) {
-            if (!this.addSkills()) {
-                return;
-            }
-            character.skills = store.getState().character.skills;
-            character.tools = this.state.newTools
-        }
-        if (this.props.options.pickFightingStyle) {
-            if (!this.addFightingStyle()) {
-                return;
-            }
-            for (let item of this.state.fightingStyle) {
-                if (character.charSpecials && character.charSpecials.fightingStyle) {
-                    character.charSpecials.fightingStyle.push(item)
-                }
-            }
-        }
-        if (this.state.langHolder.length > 0) {
-            for (let item of this.state.langHolder) {
-                if (character.languages) {
-                    character.languages.push(item)
-                }
-            }
-        }
-        if (this.props.options.metamagic) {
-            if (!this.addMetaMagic()) {
-                return;
-            }
-            for (let item of this.state.metaMagic) {
-                if (character.charSpecials && character.charSpecials.sorcererMetamagic) {
-                    character.charSpecials.sorcererMetamagic.push(item)
-                }
-            }
-        }
-        if (this.props.options.rageAmount && character.charSpecials) {
-            character.charSpecials.rageAmount = this.props.options.rageAmount;
-            character.charSpecials.rageDamage = this.props.options.rageDamage;
-        }
-        if (this.props.options.eldritchInvocations) {
-            if (!this.addEldritchInvocations()) {
-                return;
-            }
-            if (character.charSpecials) {
-                character.charSpecials.eldritchInvocations = this.state.invocations
-            }
-        }
-        if (this.state.newSpellAvailabilityList.length > 0) {
-            for (let item of this.state.newSpellAvailabilityList) {
-                if (character.differentClassSpellsToPick) {
-                    character.differentClassSpellsToPick.push(item)
-                }
-            }
-        }
-        if (this.props.options.monkMartialArts && character.charSpecials) {
-            character.charSpecials.kiPoints = this.props.options.kiPoints
-            character.charSpecials.martialPoints = this.props.options.monkMartialArts
-        }
-        if (this.props.options.sneakAttackDie && character.charSpecials) {
-            character.charSpecials.sneakAttackDie = this.props.options.sneakAttackDie
-        }
-        if (this.state.armorToLoad !== null) {
-            this.addArmor()
-        }
-        if (this.state.newPathChoice !== null) {
-            if (character.pathFeatures) {
-                for (let item of character.pathFeatures) {
-                    if (pathChoiceChangePicker(character) === item.name) {
-                        item.choice[0] = this.state.newPathChoice;
+                for (let item of this.state.spellListToLoad.spells) {
+                    const spell = spellsJSON.find(spell => spell.name === item)
+                    if (spell && character.spells) {
+                        const spellLevel = spellLevelChanger(spell.level)
+                        character.spells[spellLevel].push({ spell: spell, removable: false });
                     }
                 }
             }
-        }
-        if (this.props.options.pactSelector) {
-            if (!this.addWarlockPact()) {
-                return;
+            if (this.state.specificSpellToLoad) {
+                if (this.state.specificSpell.notCountAgainstKnownCantrips) {
+                    if (character.magic && character.magic.cantrips) {
+                        character.magic.cantrips = character.magic.cantrips + 1;
+                    }
+                }
+                const spell = spellsJSON.find(spell => spell.name === this.state.specificSpell.name)
+                if (spell && character.spells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
             }
-            if (character.charSpecials) {
-                character.charSpecials.warlockPactBoon = this.state.pact;
+            if (this.props.options.expertise) {
+                if (!this.addSkills()) {
+                    return;
+                }
+                character.skills = store.getState().character.skills;
+                character.tools = this.state.newTools
             }
-        }
-        this.setState({ character }, async () => {
-            const character = { ...this.state.character };
-            const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
-            if (this.state.character.modifiers && character.modifiers) {
-                const modifiers = Object.values(this.state.character.modifiers);
-                attributePoints.forEach((item: any, index: number) => {
-                    modifiers[index] = switchModifier(item);
-                })
-                character.modifiers.strength = modifiers[0];
-                character.modifiers.constitution = modifiers[1];
-                character.modifiers.dexterity = modifiers[2];
-                character.modifiers.intelligence = modifiers[3];
-                character.modifiers.wisdom = modifiers[4];
-                character.modifiers.charisma = modifiers[5];
+            if (this.props.options.pickFightingStyle) {
+                if (!this.addFightingStyle()) {
+                    return;
+                }
+                for (let item of this.state.fightingStyle) {
+                    if (character.charSpecials && character.charSpecials.fightingStyle) {
+                        character.charSpecials.fightingStyle.push(item)
+                    }
+                }
             }
-            if (character.equippedArmor && character.equippedArmor.baseAc) {
-                character.equippedArmor.ac = this.armorBonuses(character.equippedArmor.baseAc, character.equippedArmor.armorBonusesCalculationType)
-                this.setState({ character })
+            if (this.state.langHolder.length > 0) {
+                for (let item of this.state.langHolder) {
+                    if (character.languages) {
+                        character.languages.push(item)
+                    }
+                }
             }
-            if (this.context.user._id === "Offline") {
-                this.updateOfflineCharacter().then(() => {
+            if (this.props.options.metamagic) {
+                if (!this.addMetaMagic()) {
+                    return;
+                }
+                for (let item of this.state.metaMagic) {
+                    if (character.charSpecials && character.charSpecials.sorcererMetamagic) {
+                        character.charSpecials.sorcererMetamagic.push(item)
+                    }
+                }
+            }
+            if (this.props.options.rageAmount && character.charSpecials) {
+                character.charSpecials.rageAmount = this.props.options.rageAmount;
+                character.charSpecials.rageDamage = this.props.options.rageDamage;
+            }
+            if (this.props.options.eldritchInvocations) {
+                if (!this.addEldritchInvocations()) {
+                    return;
+                }
+                if (character.charSpecials) {
+                    character.charSpecials.eldritchInvocations = this.state.invocations
+                }
+            }
+            if (this.state.newSpellAvailabilityList.length > 0) {
+                for (let item of this.state.newSpellAvailabilityList) {
+                    if (character.differentClassSpellsToPick) {
+                        character.differentClassSpellsToPick.push(item)
+                    }
+                }
+            }
+            if (this.props.options.monkMartialArts && character.charSpecials) {
+                character.charSpecials.kiPoints = this.props.options.kiPoints
+                character.charSpecials.martialPoints = this.props.options.monkMartialArts
+            }
+            if (this.props.options.sneakAttackDie && character.charSpecials) {
+                character.charSpecials.sneakAttackDie = this.props.options.sneakAttackDie
+            }
+            if (this.state.armorToLoad !== null) {
+                this.addArmor()
+            }
+            if (this.state.newPathChoice !== null) {
+                if (character.pathFeatures) {
+                    for (let item of character.pathFeatures) {
+                        if (pathChoiceChangePicker(character) === item.name) {
+                            item.choice[0] = this.state.newPathChoice;
+                        }
+                    }
+                }
+            }
+            if (this.props.options.pactSelector) {
+                if (!this.addWarlockPact()) {
+                    return;
+                }
+                if (character.charSpecials) {
+                    character.charSpecials.warlockPactBoon = this.state.pact;
+                }
+            }
+            this.setState({ character }, async () => {
+                const character = { ...this.state.character };
+                const attributePoints = [character.strength, character.constitution, character.dexterity, character.intelligence, character.wisdom, character.charisma]
+                if (this.state.character.modifiers && character.modifiers) {
+                    const modifiers = Object.values(this.state.character.modifiers);
+                    attributePoints.forEach((item: any, index: number) => {
+                        modifiers[index] = switchModifier(item);
+                    })
+                    character.modifiers.strength = modifiers[0];
+                    character.modifiers.constitution = modifiers[1];
+                    character.modifiers.dexterity = modifiers[2];
+                    character.modifiers.intelligence = modifiers[3];
+                    character.modifiers.wisdom = modifiers[4];
+                    character.modifiers.charisma = modifiers[5];
+                }
+                if (character.equippedArmor && character.equippedArmor.baseAc) {
+                    character.equippedArmor.ac = this.armorBonuses(character.equippedArmor.baseAc, character.equippedArmor.armorBonusesCalculationType)
+                    this.setState({ character })
+                }
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter().then(() => {
+                        this.props.refresh()
+                        this.props.close(false);
+                    })
+                    return
+                }
+                userCharApi.updateChar(this.state.character).then(() => {
                     this.props.refresh()
                     this.props.close(false);
                 })
-                return
-            }
-            userCharApi.updateChar(this.state.character).then(() => {
-                this.props.refresh()
-                this.props.close(false);
             })
-        })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     updateOfflineCharacter = async () => {
-        const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
-        if (stringifiedChars) {
-            const characters = JSON.parse(stringifiedChars);
-            for (let index in characters) {
-                if (characters[index]._id === this.state.character._id) {
-                    characters[index] = this.state.character;
-                    break;
+        try {
+            const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
+            if (stringifiedChars) {
+                const characters = JSON.parse(stringifiedChars);
+                for (let index in characters) {
+                    if (characters[index]._id === this.state.character._id) {
+                        characters[index] = this.state.character;
+                        break;
+                    }
                 }
+                await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
-            await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     extractCustomPathJson = async (pathName: any) => {
-        const json = await AsyncStorage.getItem(`${this.props.character.characterClass}-CustomPathFeatures`);
-        if (this.props.options.pathFeature && json) {
-            const strArray = JSON.parse(json);
-            let levelFeatures: any = [];
-            for (let item of strArray) {
-                if (pathName === Object.keys(JSON.parse(item))[0] && this.state.character.level) {
-                    const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level ? this.state.character.level : 0])
-                    currentLevel[this.state.character.level].forEach((feature: any, index: number) => levelFeatures.push(feature))
+        try {
+            const json = await AsyncStorage.getItem(`${this.props.character.characterClass}-CustomPathFeatures`);
+            if (this.props.options.pathFeature && json) {
+                const strArray = JSON.parse(json);
+                let levelFeatures: any = [];
+                for (let item of strArray) {
+                    if (pathName === Object.keys(JSON.parse(item))[0] && this.state.character.level) {
+                        const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level ? this.state.character.level : 0])
+                        currentLevel[this.state.character.level].forEach((feature: any, index: number) => levelFeatures.push(feature))
+                    }
+                    // Pathname
+                    // Level
                 }
-                // Pathname
-                // Level
+                this.setState({ customPathFeatureList: levelFeatures })
+                // return levelFeatures
             }
-            this.setState({ customPathFeatureList: levelFeatures })
-            // return levelFeatures
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     customOrOfficialPath = () => {
-        if (Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name]) {
-            return Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level])
-        } else {
-            return this.state.customPathFeatureList
+        try {
+            if (Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name]) {
+                return Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level])
+            } else {
+                return this.state.customPathFeatureList
+            }
+        } catch (err) {
+            logger.log(err)
+            return []
         }
     }
 

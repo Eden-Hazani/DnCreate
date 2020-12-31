@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
@@ -16,13 +17,19 @@ export class AppAddSpecificTools extends Component<{ tools: [], character: Chara
         }
     }
     componentDidMount() {
-        const character = { ...this.state.character };
-        for (let item of this.props.tools) {
-            character.tools.push([item, 0]);
+        try {
+            const character = { ...this.state.character };
+            if (character.tools) {
+                for (let item of this.props.tools) {
+                    character.tools.push([item, 0]);
+                }
+                this.setState({ character }, () => {
+                    this.props.loadTools(this.state.character)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ character }, () => {
-            this.props.loadTools(this.state.character)
-        })
     }
 
     render() {

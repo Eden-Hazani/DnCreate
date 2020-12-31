@@ -17,12 +17,17 @@ const adventureController = require("./controllers/adventure-controller")
 const compression = require("compression");
 const config = require("config");
 const app = express();
+const cors = require('cors')
 
 //..
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(helmet());
 app.use(compression());
+
+app.options('/api/auth/databaseLoginAdmin', cors())
+app.options('/api/auth/databaseFindPersonAdmin', cors())
+app.options('/api/auth/changePremiumStatusAdmin', cors())
 
 app.use("/api/auth", authController);
 app.use("/api/races", raceController);

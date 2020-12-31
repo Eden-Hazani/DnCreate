@@ -1,6 +1,7 @@
 import { ApiResponse } from 'apisauce';
 import { ActionType } from '../app/redux/action-type';
 import { store } from '../app/redux/store';
+import logger from './logger';
 
 
 
@@ -19,6 +20,7 @@ const errorHandler = (answer: ApiResponse<unknown, unknown> | any) => {
         return true
     }
     if (answer.status === 400) {
+        logger.log(new Error(answer.data))
         alert(answer.data)
         return true
     }

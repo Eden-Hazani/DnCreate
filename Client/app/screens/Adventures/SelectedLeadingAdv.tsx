@@ -16,6 +16,7 @@ import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { CreateQuest } from './leaderComponents/CreateQuest';
+import logger from '../../../utility/logger';
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
@@ -41,18 +42,26 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     }
 
     onFocus = async () => {
-        const leadingAdv = store.getState().leadingAdv;
-        const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
-        if (adventure !== undefined) {
-            this.setState({ adventure })
+        try {
+            const leadingAdv = store.getState().leadingAdv;
+            const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
+            if (adventure !== undefined) {
+                this.setState({ adventure })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     reloadAdventureAfterQuest = () => {
-        const leadingAdv = store.getState().leadingAdv;
-        const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
-        if (adventure !== undefined) {
-            this.setState({ adventure })
+        try {
+            const leadingAdv = store.getState().leadingAdv;
+            const adventure = leadingAdv.find(adv => adv._id === this.props.route.params.adventure._id);
+            if (adventure !== undefined) {
+                this.setState({ adventure })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
@@ -75,7 +84,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 e.preventDefault();
             })
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
     back = () => {
@@ -86,28 +95,36 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     }
 
     removeFromAdventure = (item: any) => {
-        const adventure = { ...this.state.adventure };
-        if (adventure.participants_id !== undefined) {
-            const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
-            adventure.participants_id = participants_id;
-            this.setState({ adventure }, () => {
-                store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure })
-                adventureApi.leaveAdventure(this.state.adventure)
-            })
+        try {
+            const adventure = { ...this.state.adventure };
+            if (adventure.participants_id !== undefined) {
+                const participants_id = adventure.participants_id.filter((participant: any) => participant._id !== item._id)
+                adventure.participants_id = participants_id;
+                this.setState({ adventure }, () => {
+                    store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure })
+                    adventureApi.leaveAdventure(this.state.adventure)
+                })
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 
     characterWindow = async (character: any) => {
-        this.setState({ loading: true })
-        const char = await userCharApi.getChar(character._id);
-        if (!char.ok) {
-            errorHandler(char)
-            this.setState({ loading: false })
-            return;
+        try {
+            this.setState({ loading: true })
+            const char = await userCharApi.getChar(character._id);
+            if (!char.ok) {
+                errorHandler(char)
+                this.setState({ loading: false })
+                return;
+            }
+            this.setState({ loading: false }, () => {
+                this.props.navigation.navigate("SelectCharacter", { character: char.data, isDm: true })
+            })
+        } catch (err) {
+            logger.log(err)
         }
-        this.setState({ loading: false }, () => {
-            this.props.navigation.navigate("SelectCharacter", { character: char.data, isDm: true })
-        })
     }
 
     deleteAdventure = async () => {
@@ -122,7 +139,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 this.back();
             }
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 
@@ -151,7 +168,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 }
             })
         } catch (err) {
-            errorHandler(err)
+            logger.log(err)
         }
     }
 

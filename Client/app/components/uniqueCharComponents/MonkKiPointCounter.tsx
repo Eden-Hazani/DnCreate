@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Vibration } from 'react-native';
+import logger from '../../../utility/logger';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { decreaseKiPoint, increaseKiPoints, kiPointInitiator } from '../../screens/charOptions/UniqueCharFunctions/monkFunctions';
@@ -19,21 +20,32 @@ export class MonkKiPointCounter extends Component<{ character: CharacterModel },
         }
     }
     async componentDidMount() {
-
-        kiPointInitiator(this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0, this.props.character._id ? this.props.character._id : '').then(result => {
-            this.setState({ kiRemaining: parseInt(result) })
-        })
+        try {
+            kiPointInitiator(this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0, this.props.character._id ? this.props.character._id : '').then(result => {
+                this.setState({ kiRemaining: parseInt(result) })
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     increase = () => {
-        increaseKiPoints(this.props.character._id ? this.props.character._id : '', this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0).then((result: any) => {
-            this.setState({ kiRemaining: result })
-        })
+        try {
+            increaseKiPoints(this.props.character._id ? this.props.character._id : '', this.props.character.charSpecials && this.props.character.charSpecials.kiPoints ? this.props.character.charSpecials.kiPoints : 0).then((result: any) => {
+                this.setState({ kiRemaining: result })
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     decrease = () => {
-        decreaseKiPoint(this.props.character._id ? this.props.character._id : '').then((result: any) => {
-            this.setState({ kiRemaining: result })
-        })
+        try {
+            decreaseKiPoint(this.props.character._id ? this.props.character._id : '').then((result: any) => {
+                this.setState({ kiRemaining: result })
+            })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

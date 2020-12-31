@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import logger from '../../utility/logger';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
 import { AppText } from './AppText';
@@ -27,38 +28,42 @@ export class AppPickFightingStyle extends Component<{ itemList: [], character: C
     }
 
     pickFightingStyle = (style: any, index: number) => {
-        const character = { ...this.state.character }
-        let fightingStyle = this.state.fightingStyle;
-        if (!this.state.fightingStyleClicked[index]) {
-            for (let item of this.state.character.charSpecials.fightingStyle) {
-                if (item.name === style.name) {
-                    alert('You already have this fighting style.')
+        try {
+            const character = { ...this.state.character }
+            let fightingStyle = this.state.fightingStyle;
+            if (this.state.character.charSpecials?.fightingStyle && !this.state.fightingStyleClicked[index] && character.charSpecials?.fightingStyle) {
+                for (let item of this.state.character.charSpecials.fightingStyle) {
+                    if (item.name === style.name) {
+                        alert('You already have this fighting style.')
+                        return;
+                    }
+                }
+                if (this.state.fightingStyle.length >= 1) {
+                    alert('You can only pick one fighting style.')
                     return;
                 }
+                const fightingStyleClicked = this.state.fightingStyleClicked;
+                fightingStyleClicked[index] = true;
+                character.charSpecials.fightingStyle.push(style);
+                fightingStyle.push(style)
+                this.setState({ fightingStyle, character, fightingStyleClicked }, () => {
+                    this.props.loadFightingStyles(this.state.character)
+                })
             }
-            if (this.state.fightingStyle.length >= 1) {
-                alert('You can only pick one fighting style.')
-                return;
+            else if (this.state.fightingStyleClicked[index] && character.charSpecials?.fightingStyle) {
+                const fightingStyleClicked = this.state.fightingStyleClicked;
+                fightingStyleClicked[index] = false;
+                character.charSpecials.fightingStyle = character.charSpecials.fightingStyle.filter((n: any) => n.name !== style.name)
+                fightingStyle = fightingStyle.filter((n: any) => n.name !== style.name)
+                this.setState({ fightingStyle, character, fightingStyleClicked }, () => {
+                    this.props.loadFightingStyles(this.state.character)
+                })
             }
-            const fightingStyleClicked = this.state.fightingStyleClicked;
-            fightingStyleClicked[index] = true;
-            character.charSpecials.fightingStyle.push(style);
-            fightingStyle.push(style)
-            this.setState({ fightingStyle, character, fightingStyleClicked }, () => {
-                this.props.loadFightingStyles(this.state.character)
-            })
-        }
-        else if (this.state.fightingStyleClicked[index]) {
-            const fightingStyleClicked = this.state.fightingStyleClicked;
-            fightingStyleClicked[index] = false;
-            character.charSpecials.fightingStyle = character.charSpecials.fightingStyle.filter((n: any) => n.name !== style.name)
-            fightingStyle = fightingStyle.filter((n: any) => n.name !== style.name)
-            this.setState({ fightingStyle, character, fightingStyleClicked }, () => {
-                this.props.loadFightingStyles(this.state.character)
-            })
-        }
-        if (this.state.fightingStyle.length === 1) {
-            this.props.fightingStylesToPick(false)
+            if (this.state.fightingStyle.length === 1) {
+                this.props.fightingStylesToPick(false)
+            }
+        } catch (err) {
+            logger.log(err)
         }
     }
 

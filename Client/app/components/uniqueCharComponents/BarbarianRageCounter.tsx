@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Vibration } from 'react-native';
+import logger from '../../../utility/logger';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { decreaseRage, increaseRage, rageInitiator } from '../../screens/charOptions/UniqueCharFunctions/barbarianFunctions';
@@ -20,23 +21,35 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
         }
     }
     async componentDidMount() {
-        if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
-            rageInitiator(this.props.character._id, this.props.character.charSpecials.rageAmount).then(result => {
-                this.setState({ rageRemaining: parseInt(result) })
-            })
+        try {
+            if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
+                rageInitiator(this.props.character._id, this.props.character.charSpecials.rageAmount).then(result => {
+                    this.setState({ rageRemaining: parseInt(result) })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     increase = () => {
-        if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
-            increaseRage(this.props.character._id, this.props.character.charSpecials.rageAmount).then((result: any) => {
-                this.setState({ rageRemaining: result })
-            })
+        try {
+            if (this.props.character._id && this.props.character.charSpecials && this.props.character.charSpecials.rageAmount)
+                increaseRage(this.props.character._id, this.props.character.charSpecials.rageAmount).then((result: any) => {
+                    this.setState({ rageRemaining: result })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
     decrease = () => {
-        if (this.props.character._id)
-            decreaseRage(this.props.character._id).then((result: any) => {
-                this.setState({ rageRemaining: result })
-            })
+        try {
+            if (this.props.character._id)
+                decreaseRage(this.props.character._id).then((result: any) => {
+                    this.setState({ rageRemaining: result })
+                })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

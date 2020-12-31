@@ -5,6 +5,7 @@ import { CharacterModel } from '../models/characterModel';
 import skillsJson from '../../jsonDump/skillList.json';
 import { AppText } from './AppText';
 import { Colors } from '../config/colors';
+import logger from '../../utility/logger';
 
 interface CompleteSkillListState {
     skillList: any[]
@@ -18,24 +19,30 @@ export class CompleteSkillList extends Component<{ character: CharacterModel }, 
         }
     }
     componentDidMount() {
-        const baseSkillList = skillsJson.skillList;
-        for (let item of this.props.character.skills) {
-            if (baseSkillList.includes(item[0])) {
-                baseSkillList.splice(baseSkillList.indexOf(item[0]), 1);
-            }
-        }
-        const skillList = baseSkillList.map((skill) => { return [skill, 0] })
-        const modifiers = Object.entries(this.props.character.modifiers)
-        let modifiedSkills: any[] = [];
-        skillList.forEach((skill: any) => {
-            const skillGroup = skillModifier(skill);
-            for (let item of modifiers) {
-                if (item[0] === skillGroup) {
-                    modifiedSkills.push([skill[0], item[1]])
+        try {
+            const baseSkillList = skillsJson.skillList;
+            if (this.props.character.skills && this.props.character.modifiers) {
+                for (let item of this.props.character.skills) {
+                    if (baseSkillList.includes(item[0])) {
+                        baseSkillList.splice(baseSkillList.indexOf(item[0]), 1);
+                    }
                 }
+                const skillList = baseSkillList.map((skill) => { return [skill, 0] })
+                const modifiers = Object.entries(this.props.character.modifiers)
+                let modifiedSkills: any[] = [];
+                skillList.forEach((skill: any) => {
+                    const skillGroup = skillModifier(skill);
+                    for (let item of modifiers) {
+                        if (item[0] === skillGroup) {
+                            modifiedSkills.push([skill[0], item[1]])
+                        }
+                    }
+                })
+                this.setState({ skillList: modifiedSkills })
             }
-        })
-        this.setState({ skillList: modifiedSkills })
+        } catch (err) {
+            logger.log(err)
+        }
     }
 
     render() {

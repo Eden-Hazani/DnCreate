@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import errorHandler from '../../utility/errorHander';
+import logger from '../../utility/logger';
 import userCharApi from '../api/userCharApi';
 import { Colors } from '../config/colors';
 import { CharacterModel } from '../models/characterModel';
@@ -27,23 +28,28 @@ export class AppExtraPathChoicePicker extends Component<{
     }
 
     componentDidMount() {
-        const multipleChoices: any = []
-        this.props.isExtraChoice(true)
-        this.props.numberOfChoices(this.props.item.numberOfChoices)
-        const disabledChoice = this.state.disabledChoice;
-        multipleChoices.push(this.props.item);
-        if (this.props.item.excludePreviousLevelChoices) {
-            for (let charChoice of this.props.character.pathFeatures) {
-                if (charChoice.choice) {
-                    const takenChoiceArray = charChoice.choice.map((takenChoice: any) => { return takenChoice.name });
-                    this.props.item.choice.forEach((newChoice: any, index: number) => {
-                        if (takenChoiceArray.includes(newChoice.name)) {
-                            disabledChoice[index] = true;
-                        }
-                    })
+        try {
+            const multipleChoices: any = []
+            this.props.isExtraChoice(true)
+            this.props.numberOfChoices(this.props.item.numberOfChoices)
+            const disabledChoice = this.state.disabledChoice;
+            multipleChoices.push(this.props.item);
+            if (this.props.item.excludePreviousLevelChoices && this.props.character.pathFeatures) {
+                for (let charChoice of this.props.character.pathFeatures) {
+                    if (charChoice.choice) {
+                        const takenChoiceArray = charChoice.choice.map((takenChoice: any) => { return takenChoice.name });
+                        this.props.item.choice.forEach((newChoice: any, index: number) => {
+                            if (takenChoiceArray.includes(newChoice.name)) {
+                                disabledChoice[index] = true;
+                            }
+                        })
+                    }
                 }
+                this.setState({ disabledChoice })
             }
-            this.setState({ disabledChoice })
+
+        } catch (err) {
+            logger.log(err)
         }
     }
     componentWillUnmount() {
