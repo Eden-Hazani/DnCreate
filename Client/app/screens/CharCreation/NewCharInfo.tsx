@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, Modal, TouchableOpacity } from 'react-native';
 import { Unsubscribe } from 'redux';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
@@ -15,11 +15,21 @@ import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
+import NumberScroll from '../../components/NumberScroll';
 
 interface NewCharInfoState {
     characterInfo: CharacterModel
     confirmed: boolean
+    pickedGender: string
+    colorPickWindow: boolean
+    pickedEyeColor: string
+    pickedHairColor: string
+    pickedSkinColor: string
+    pickedAge: number
+    pickedHeight: number
+    pickedWeight: number
+    colorPickOrder: string
 }
 
 const ValidationSchema = Yup.object().shape({
@@ -51,13 +61,6 @@ const ValidationSchema = Yup.object().shape({
         return true
 
     }).label("Full Name"),
-    eyes: Yup.string().required().label("Eye Color"),
-    skin: Yup.string().required().label("Skin Color"),
-    hair: Yup.string().required().label("Hair Color"),
-    height: Yup.number().typeError("Number").required().label("Height"),
-    weight: Yup.number().typeError("Number").required().label("Weight"),
-    age: Yup.number().typeError("Number").required().label("Age"),
-
 })
 
 
@@ -68,6 +71,15 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
     constructor(props: any) {
         super(props)
         this.state = {
+            pickedAge: 0,
+            pickedHeight: 0,
+            pickedWeight: 0,
+            colorPickOrder: '',
+            pickedEyeColor: '',
+            pickedHairColor: '',
+            pickedSkinColor: '',
+            colorPickWindow: false,
+            pickedGender: '',
             confirmed: false,
             characterInfo: store.getState().character
         }
@@ -78,13 +90,42 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
 
     setInfoAndContinue = (values: any) => {
         const characterInfo = { ...this.state.characterInfo };
+        if (this.state.pickedGender === '') {
+            alert('Please pick a gender');
+            return
+        }
+        if (this.state.pickedHairColor === '') {
+            alert('Please pick hair color.');
+            return
+        }
+        if (this.state.pickedEyeColor === '') {
+            alert('Please pick eye color.');
+            return
+        }
+        if (this.state.pickedSkinColor === '') {
+            alert('Please pick skin color.');
+            return
+        }
+        if (this.state.pickedAge === 0) {
+            alert('Please pick age.');
+            return
+        }
+        if (this.state.pickedHeight === 0) {
+            alert('Please pick height.');
+            return
+        }
+        if (this.state.pickedWeight === 0) {
+            alert('Please pick weight.');
+            return
+        }
         characterInfo.name = values.fullName;
-        characterInfo.age = values.age;
-        characterInfo.height = values.height;
-        characterInfo.weight = values.weight;
-        characterInfo.eyes = values.eyes;
-        characterInfo.skin = values.skin;
-        characterInfo.hair = values.hair;
+        characterInfo.age = this.state.pickedAge;
+        characterInfo.height = this.state.pickedHeight;
+        characterInfo.weight = this.state.pickedWeight;
+        characterInfo.eyes = this.state.pickedEyeColor
+        characterInfo.skin = this.state.pickedSkinColor;
+        characterInfo.hair = this.state.pickedHairColor;
+        characterInfo.gender = this.state.pickedGender;
         this.setState({ confirmed: true })
         this.setState({ characterInfo }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
@@ -110,62 +151,85 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                         <View>
                             <AppText textAlign={'center'} fontSize={20}>{this.state.characterInfo.race}</AppText>
                             <AppForm
-                                initialValues={{ fullName: store.getState().character.name, age: null, height: null, weight: null, eyes: '', skin: '', hair: '', user_id: store.getState().nonUser ? null : this.context.user._id }}
+                                initialValues={{ fullName: store.getState().character.name, user_id: store.getState().nonUser ? null : this.context.user._id }}
                                 onSubmit={(values: any) => this.setInfoAndContinue(values)}
                                 validationSchema={ValidationSchema}>
-                                <View >
+                                <View style={{ paddingBottom: 15 }}>
                                     <AppFormField
                                         style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"fullName"}
                                         name="fullName"
                                         iconName={"text-short"}
                                         placeholder={"Character Full Name..."} />
-                                    <View style={{ flexDirection: 'row', justifyContent: "space-around", paddingLeft: 50, paddingRight: 30 }}>
-                                        <AppFormField
-                                            internalWidth={200}
-                                            externalWidth={230}
-                                            keyboardType={"numeric"}
-                                            fieldName={"age"}
-                                            name="age"
-                                            iconName={"text-short"}
-                                            placeholder={"Age..."} />
-                                        <AppFormField
-                                            internalWidth={200}
-                                            externalWidth={230}
-                                            keyboardType={"numeric"}
-                                            fieldName={"height"}
-                                            name="height"
-                                            iconName={"text-short"}
-                                            placeholder={"Height..."} />
+                                    <View style={{ paddingLeft: 35, paddingRight: 35, paddingBottom: 10 }}>
+                                        <AppText fontSize={19} textAlign={'center'}>Slide the numbers to pick your character's information.</AppText>
+                                        <AppText fontSize={16} textAlign={'center'}>You can also click the number to manually input.</AppText>
                                     </View>
-                                    <AppFormField
-                                        style={{ width: Dimensions.get('screen').width }}
-                                        keyboardType={"numeric"}
-                                        fieldName={"weight"}
-                                        name="weight"
-                                        iconName={"text-short"}
-                                        placeholder={"Weight..."} />
-                                    <AppFormField
-                                        style={{ width: Dimensions.get('screen').width }}
-                                        fieldName={"eyes"}
-                                        name="eyes"
-                                        iconName={"text-short"}
-                                        placeholder={"Eye Color..."} />
-                                    <AppFormField
-                                        style={{ width: Dimensions.get('screen').width }}
-                                        fieldName={"skin"}
-                                        name="skin"
-                                        iconName={"text-short"}
-                                        placeholder={"Skin Color..."} />
-                                    <AppFormField
-                                        style={{ width: Dimensions.get('screen').width }}
-                                        fieldName={"hair"}
-                                        name="hair"
-                                        iconName={"text-short"}
-                                        placeholder={"Hair Color..."} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-evenly", paddingLeft: 20, paddingRight: 20 }}>
+                                        <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
+                                            <AppText textAlign={'center'} fontSize={18}>Age</AppText>
+                                            <NumberScroll max={5000} getValue={(val: any) => {
+                                                this.setState({ pickedAge: val.viewableItems[0].item })
+                                            }} />
+                                        </View>
+
+                                        <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
+                                            <AppText textAlign={'center'} fontSize={18}>Height</AppText>
+                                            <NumberScroll max={450} getValue={(val: any) => {
+                                                this.setState({ pickedHeight: val.viewableItems[0].item })
+                                            }} />
+                                        </View>
+                                    </View>
+                                    <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 15, paddingBottom: 10 }}>
+                                        <View style={{ width: Dimensions.get('window').width / 2, borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
+                                            <AppText textAlign={'center'} fontSize={18}>Weight</AppText>
+                                            <NumberScroll max={1000} getValue={(val: any) => {
+                                                this.setState({ pickedWeight: val.viewableItems[0].item })
+                                            }} />
+                                        </View>
+                                    </View>
+
+
+
+                                    <AppButton highlightText={true} backgroundColor={this.state.pickedEyeColor ? this.state.pickedEyeColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                        title={'Pick Eye Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedEyeColor" }) }} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
+
+                                        <AppButton highlightText={true} backgroundColor={this.state.pickedHairColor ? this.state.pickedHairColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                            title={'Pick Hair Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedHairColor" }) }} />
+
+                                        <AppButton highlightText={true} backgroundColor={this.state.pickedSkinColor ? this.state.pickedSkinColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                            title={'Pick Skin Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedSkinColor" }) }} />
+                                    </View>
+
+                                    <AppText fontSize={20} textAlign={'center'}>Gender</AppText>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                                        <AppButton backgroundColor={this.state.pickedGender === "Male" ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
+                                            title={'Male'} onPress={() => { this.setState({ pickedGender: "Male" }) }} />
+                                        <AppButton backgroundColor={this.state.pickedGender === "Female" ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
+                                            title={'Female'} onPress={() => { this.setState({ pickedGender: "Female" }) }} />
+                                        <AppButton backgroundColor={this.state.pickedGender === "Other" ? Colors.bitterSweetRed : Colors.lightGray} width={100} height={50} borderRadius={25}
+                                            title={'Other'} onPress={() => { this.setState({ pickedGender: "Other" }) }} />
+                                    </View>
                                 </View>
                                 <SubmitButton title={"Continue"} />
                             </AppForm>
+                            <Modal visible={this.state.colorPickWindow} animationType="slide">
+                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
+                                    <TriangleColorPicker
+                                        defaultColor={this.state[this.state.colorPickOrder]}
+                                        hideControls={true}
+                                        onColorChange={(color) => {
+                                            const pickedColor = fromHsv(color)
+                                            this.setState({ [this.state.colorPickOrder]: pickedColor } as any)
+                                        }}
+                                        style={{ flex: .5 }}
+                                    />
+                                    <AppText textAlign={'center'}>Pick Color</AppText>
+                                    <AppButton backgroundColor={this.state[this.state.colorPickOrder] ? this.state[this.state.colorPickOrder] : Colors.lightGray} width={150} height={80} borderRadius={25}
+                                        title={'Pick Color'} onPress={() => { this.setState({ colorPickWindow: false }) }} />
+                                </View>
+                            </Modal>
                         </View>}
                 </View>
             </ScrollView>
@@ -178,5 +242,8 @@ const styles = StyleSheet.create({
     container: {
         paddingTop: 15,
         alignItems: "center"
+    },
+    item: {
+
     }
 });

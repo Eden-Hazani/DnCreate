@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert, Vibration } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert, Vibration, Animated } from 'react-native';
 import { IconGen } from '../components/IconGen';
 import { Colors } from '../config/colors';
 import { AppText } from '../components/AppText';
@@ -35,6 +35,8 @@ import AuthContext from '../auth/context';
 import * as modifierNameList from '../../jsonDump/modifierNamingList.json'
 import { CharEquipmentTree } from '../components/characterEquipment/CharEquipmentTree';
 import logger from '../../utility/logger';
+import { Easing } from 'react-native-reanimated';
+import { PersonalInfo } from '../components/PersonalInfo';
 /**
  * 
  * @param  image: image url-string || URI
@@ -56,6 +58,8 @@ interface SelectCharacterState {
     setCurrentHpModal: boolean
     completeSkillModel: boolean
     cashedSavingThrows: any[]
+    startingAnimations: Animated.ValueXY[]
+    personalInfoModal: boolean
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -65,6 +69,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            personalInfoModal: false,
+            startingAnimations: [],
             cashedSavingThrows: [],
             completeSkillModel: false,
             attackRollTutorialModal: false,
@@ -132,6 +138,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
 
     componentDidMount() {
+        let startingAnimations: Animated.ValueXY[] = []
+        for (let i = 0; i < 7; i++) {
+            startingAnimations.push(new Animated.ValueXY({ x: 0, y: -900 }));
+        }
+        this.setState({ startingAnimations })
         let startCharInfo: CharacterModel = new CharacterModel();
         if (this.state.isDm) {
             startCharInfo = this.props.route.params.character;
@@ -139,9 +150,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         if (!this.state.isDm) {
             startCharInfo = store.getState().character;
         }
-        setTimeout(() => {
-            this.setState({ loading: false })
-        }, 800);
+
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows()
             if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
@@ -154,7 +163,24 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
             }
 
+            this.setState({ loading: false }, () => {
+                setTimeout(() => {
+                    this.startAnimations()
+                }, 150);
+            })
         })
+    }
+
+    startAnimations = () => {
+        let index: number = 200;
+        for (let item in this.state.startingAnimations) {
+            Animated.timing(this.state.startingAnimations[item], {
+                toValue: { x: 0, y: 0 },
+                duration: index,
+                useNativeDriver: false,
+            }).start()
+            index = index + 100
+        }
     }
 
     loadCashedSavingThrows = async () => {
@@ -357,22 +383,27 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
-                        <Modal visible={this.state.levelUpFunctionActive} >
+                        <Modal visible={this.state.levelUpFunctionActive} animationType="slide">
                             <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
                             </ScrollView>
                         </Modal>
+                        <Modal visible={this.state.personalInfoModal} animationType="slide">
+                            <PersonalInfo character={this.state.character} close={(val: boolean) => { this.setState({ personalInfoModal: val }) }} />
+                        </Modal>
                         <View>
                             <View style={styles.imageContainer}>
                                 <View style={styles.upperContainer}>
-                                    <View style={{ flexDirection: "column", paddingLeft: 2 }}>
-                                        <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
+                                    <Animated.View style={[this.state.startingAnimations[6].getLayout(), { flexDirection: "column", paddingLeft: 2 }]}>
+                                        <TouchableOpacity onPress={() => { this.setState({ personalInfoModal: true }) }}>
+                                            <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
+                                        </TouchableOpacity>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}</AppText>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.race}</AppText>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.characterClass}</AppText>
-                                    </View>
+                                    </Animated.View>
                                     <View style={{ flex: 1, marginLeft: 10 }}>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                        <Animated.View style={[this.state.startingAnimations[6].getLayout(), { flexDirection: "row", alignItems: "center" }]}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Initiative</AppText>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
@@ -403,8 +434,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{`${this.state.character.maxHp}`}</AppText>
                                                 </View>
                                             </View>
-                                        </View>
-                                        <View style={{ flexDirection: "row" }}>
+                                        </Animated.View>
+                                        <Animated.View style={[this.state.startingAnimations[5].getLayout(), { flexDirection: "row" }]}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{`+${this.state.currentProficiency}`}</AppText>
@@ -432,12 +463,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                     <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Ok'} onPress={() => { this.setCurrentHp() }} />
                                                 </View>
                                             </Modal>
-                                        </View>
+                                        </Animated.View>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                        <View style={styles.iconContainer}>
+                        <Animated.View style={[this.state.startingAnimations[4].getLayout(), styles.secRowIconContainer]}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
                                 <IconGen size={80} backgroundColor={Colors.primary} name={"book-open-page-variant"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -476,7 +507,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     </View>
                                 </ScrollView>
                             </Modal>
-
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ statsVisible: true })}>
                                 <IconGen size={80} backgroundColor={Colors.bitterSweetRed} name={"sword"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -516,8 +546,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Items And Currency</AppText>
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.secRowIconContainer}>
+                        </Animated.View>
+                        <Animated.View style={[this.state.startingAnimations[3].getLayout(), styles.secRowIconContainer]}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeatures", { char: this.state.character }) }}>
                                 <IconGen size={80} backgroundColor={Colors.shadowBlue} name={"pentagon"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -536,8 +566,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Spell Book</AppText>
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.secRowIconContainer}>
+                        </Animated.View>
+                        <Animated.View style={[this.state.startingAnimations[2].getLayout(), styles.secRowIconContainer]}>
                             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character, isDm: this.state.isDm }) }}>
                                 <IconGen size={80} backgroundColor={Colors.paleGreen} name={"tshirt-crew"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -556,8 +586,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Race Features</AppText>
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.secRowIconContainer}>
+                        </Animated.View>
+                        <Animated.View style={[this.state.startingAnimations[1].getLayout(), styles.secRowIconContainer]}>
                             <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CreatePDF", { char: this.state.character, proficiency: this.state.currentProficiency }) }}>
                                 <IconGen size={80} backgroundColor={Colors.burgundy} name={"file-pdf-box"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
@@ -576,15 +606,15 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Wearable Equipment</AppText>
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.secRowIconContainer}>
+                        </Animated.View>
+                        <Animated.View style={[this.state.startingAnimations[0].getLayout(), styles.secRowIconContainer]}>
                             <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
                                 <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
                                 <View style={{ width: 90, marginTop: 10 }}>
                                     <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
                                 </View>
                             </TouchableOpacity>
-                        </View>
+                        </Animated.View>
                         <View>
                             <CharEquipmentTree character={this.state.character} />
                         </View>

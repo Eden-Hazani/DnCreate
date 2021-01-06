@@ -26,10 +26,10 @@ import { StartAnimation } from './app/animations/StartAnimation';
 import OfflineNavigator from './app/navigators/OfflineNavigator';
 import * as Updates from 'expo-updates';
 import logger from './utility/logger';
+import * as FacebookAds from 'expo-ads-facebook';
 
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
-
 
 interface AppState {
   fontsLoaded: boolean
@@ -43,6 +43,7 @@ interface AppState {
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
   public interstitialAd: string;
   public bannerAd: string;
+  public facebookBannerAd: string
   navigationSubscription: any;
   static contextType = AuthContext;
   private UnsubscribeStore: Unsubscribe;
@@ -61,6 +62,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     })
     this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     this.bannerAd = Platform.OS === 'ios' ? Config.iosBanner : Config.androidBanner
+    this.facebookBannerAd = Config.facebookBannerAd
   }
 
   checkForUpdates = async () => {
@@ -88,7 +90,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           }
           if (user === null) {
             const isOffline = await AsyncStorage.getItem("isOffline");
-            const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
+            const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined, premium: false }
             if (isOffline) {
               if (JSON.parse(isOffline)) {
                 store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
@@ -157,9 +159,28 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     }
   }
 
+  pickBannerAd = () => {
+    const random = Math.random();
+    if (random) {
+      return <FacebookAds.BannerAd
+        placementId={this.facebookBannerAd}
+        type="standard"
+        onPress={() => console.log('click')}
+        onError={error => console.log('error', error)}
+      />
+    } else {
+      return <AdMobBanner
+        style={{ alignItems: "center", }}
+        bannerSize="banner"
+        adUnitID={this.bannerAd}
+        servePersonalizedAds={false} />
+    }
+  }
+
 
 
   render() {
+
     const user = this.state.user
     const { setUser } = this
     return (
@@ -178,13 +199,15 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
         {this.state.AppMainLoadAnimation || !this.state.isReady ?
           null
           :
-          null
-          // __DEV__ || this.state.user.premium || this.context.user.premium ? null :
-          //   <AdMobBanner
-          //     style={{ alignItems: "center", }}
-          //     bannerSize="banner"
-          //     adUnitID={this.bannerAd}
-          //     servePersonalizedAds={false} />
+          (this.state.user && this.state.user._id && this.state.user._id !== 'Offline') && (this.state.user.premium) ? null :
+            <View>
+              <FacebookAds.BannerAd
+                placementId={this.facebookBannerAd}
+                type="standard"
+                onPress={() => console.log('click')}
+                onError={error => console.log('error', error)}
+              />
+            </View>
         }
       </SafeAreaView>
     );

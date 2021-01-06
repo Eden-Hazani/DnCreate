@@ -65,11 +65,13 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             refreshing: false,
             error: false
         }
-        this.NetUnSub = NetInfo.addEventListener(netInfo => {
-            if (netInfo.isInternetReachable) {
-                this.setState({ isInternet: netInfo.isInternetReachable })
-            }
-        })
+        setTimeout(() => {
+            this.NetUnSub = NetInfo.addEventListener(netInfo => {
+                if (netInfo.isInternetReachable) {
+                    this.setState({ isInternet: netInfo.isInternetReachable })
+                }
+            })
+        }, 500);
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
             this.setState({ searchColor: Colors.pageBackground })
@@ -84,7 +86,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         if (isOffline) {
             this.setState({ isUserOffline: JSON.parse(isOffline) })
         }
-        this.getRacesFromServer();
+        this.getRacesFromServer().then(() => {
+            this.setState({ loading: false })
+        });
     }
     componentWillUnmount() {
         this.NetUnSub();
@@ -120,9 +124,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         for (let item of races) {
             raceColors.push(item.raceColors)
         }
-        this.setState({ races, error: errorHandler(result), raceColors }, () => {
-            this.setState({ loading: false })
-        })
+        this.setState({ races, error: errorHandler(result), raceColors })
     }
 
     updateSearch = async (search: string) => {

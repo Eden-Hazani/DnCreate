@@ -54,7 +54,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             carouselItems: [
                 {
                     title: "Welcome to DnCreate",
-                    message: true,
+                    text: "Have Fun Creating!",
                     image: { img: require('../../assets/homeDragon1.png') }
                 },
                 {
@@ -78,12 +78,12 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
     async componentDidMount() {
         try {
-            const readHomeMessage = await AsyncStorage.getItem('readHomeMessage');
-            if (!readHomeMessage) {
-                this.setState({ homeMessageModal: true }, async () => {
-                    await AsyncStorage.setItem('readHomeMessage', "true")
-                })
-            }
+            // const readHomeMessage = await AsyncStorage.getItem('readHomeMessage');
+            // if (!readHomeMessage) {
+            //     this.setState({ homeMessageModal: true }, async () => {
+            //         await AsyncStorage.setItem('readHomeMessage', "true")
+            //     })
+            // }
             const date = new Date().toISOString().slice(0, 10)
             const clearCashOnceADay = await AsyncStorage.getItem('clearCashOnceADay');
             if (!clearCashOnceADay) {

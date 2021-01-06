@@ -19,6 +19,7 @@ export class CharacterModel {
         public height?: number,
         public weight?: number,
         public eyes?: string,
+        public gender?: string,
         public skin?: string,
         public hair?: string,
         public strength?: number,

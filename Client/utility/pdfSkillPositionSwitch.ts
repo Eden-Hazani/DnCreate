@@ -5,76 +5,76 @@ const pdfSkillPositionSwitch = (skill: string) => {
     let numberHeight: string = '';
     switch (true) {
         case skill === "Acrobatics":
-            dotHeight = "562px";
-            numberHeight = "568px";
-            break;
-        case skill === "Deception":
-            dotHeight = "661px";
-            numberHeight = "668px";
-            break;
-        case skill === "Athletics":
-            dotHeight = "636px";
-            numberHeight = "642px";
-            break;
-        case skill === "Arcana":
-            dotHeight = "611px";
-            numberHeight = "617px";
+            dotHeight = "567px";
+            numberHeight = "570px";
             break;
         case skill === "Animal Handling":
-            dotHeight = "587px";
-            numberHeight = "592px";
+            dotHeight = "592px";
+            numberHeight = "595px";
+            break;
+        case skill === "Arcana":
+            dotHeight = "617px";
+            numberHeight = "620px";
+            break;
+        case skill === "Athletics":
+            dotHeight = "642px";
+            numberHeight = "645px";
+            break;
+        case skill === "Deception":
+            dotHeight = "667px";
+            numberHeight = "671px";
             break;
         case skill === "History":
-            dotHeight = "686px";
-            numberHeight = "692px";
+            dotHeight = "692px";
+            numberHeight = "694px";
             break;
         case skill === "Insight":
-            dotHeight = "711px";
-            numberHeight = "718px";
+            dotHeight = "716px";
+            numberHeight = "720px";
             break;
         case skill === "Intimidation":
-            dotHeight = "736.5px";
-            numberHeight = "743px";
+            dotHeight = "742px";
+            numberHeight = "744px";
             break;
         case skill === "Investigation":
-            dotHeight = "761.5px";
-            numberHeight = "768px";
+            dotHeight = "767px";
+            numberHeight = "770px";
             break;
         case skill === "Medicine":
-            dotHeight = "786px";
-            numberHeight = "793px";
+            dotHeight = "792px";
+            numberHeight = "795px";
             break;
         case skill === "Nature":
-            dotHeight = "811px";
-            numberHeight = "817px";
+            dotHeight = "817px";
+            numberHeight = "820px";
             break;
         case skill === "Perception":
-            dotHeight = "836px";
-            numberHeight = "842.5px";
+            dotHeight = "841px";
+            numberHeight = "845px";
             break;
         case skill === "Performance":
-            dotHeight = "860.5px";
-            numberHeight = "866.5px";
+            dotHeight = "867px";
+            numberHeight = "871px";
             break;
         case skill === "Persuasion":
-            dotHeight = "885.5px";
-            numberHeight = "892px";
+            dotHeight = "892px";
+            numberHeight = "895px";
             break;
         case skill === "Religion":
-            dotHeight = "910.5px";
-            numberHeight = "916.5px";
+            dotHeight = "916px";
+            numberHeight = "920px";
             break;
         case skill === "Sleight of Hand":
-            dotHeight = "935.5";
-            numberHeight = "942px";
+            dotHeight = "942px";
+            numberHeight = "945px";
             break;
         case skill === "Stealth":
-            dotHeight = "960.5px";
-            numberHeight = "966px";
+            dotHeight = "967px";
+            numberHeight = "970px";
             break;
         case skill === "Survival":
-            dotHeight = "985.5px";
-            numberHeight = "992px";
+            dotHeight = "992px";
+            numberHeight = "995px";
             break;
 
     }

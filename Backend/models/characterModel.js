@@ -24,6 +24,9 @@ const CharacterSchema = mongoose.Schema({
     eyes: {
         type: String
     },
+    gender: {
+        type: String
+    },
     skin: {
         type: String
     },

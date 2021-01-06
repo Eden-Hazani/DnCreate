@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, TouchableHighlight } from 'react-native';
 import { AppText } from './AppText';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Colors } from '../config/colors';
+import { Image } from 'react-native-expo-image-cache';
 
 
 /**
@@ -35,7 +36,12 @@ export class ListItem extends Component<any>{
                     }}>
                         <View>
                             {this.props.imageUrl ?
-                                <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} source={{ uri: this.props.imageUrl }} />
+                                this.props.addBackground ?
+                                    <View style={{ backgroundColor: Colors.bitterSweetRed, padding: 5, borderRadius: 50, borderColor: Colors.whiteInDarkMode, borderWidth: 1 }}>
+                                        <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} uri={this.props.imageUrl} />
+                                    </View>
+                                    : <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} uri={this.props.imageUrl} />
+
                                 : null}
                         </View>
                         <View style={{ paddingLeft: this.props.textDistanceFromImg }}>

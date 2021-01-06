@@ -48,12 +48,12 @@ export function reduce(currentState: AppState | undefined = initialState, action
             newState.characters = action.payload
             break;
         case ActionType.SetUserInfo:
-            const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated)
+            const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated, action.payload.premium)
             newState.user = user;
             break;
 
         case ActionType.SetUserInfoLoginRegister:
-            const loggedUser = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated)
+            const loggedUser = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated, action.payload.premium)
             newState.user = loggedUser
             break;
 

@@ -7,27 +7,27 @@ const pfdPersonalityTraitPositionSwitch = (traitGroup: string) => {
     let height3: string = '';
     switch (true) {
         case traitGroup === "personalityTraits":
-            height0 = "240px"
-            height1 = "265px"
-            height2 = "285px"
-            height3 = "310px"
+            height0 = "244px"
+            height1 = "267px"
+            height2 = "290px"
+            height3 = "312px"
             break;
         case traitGroup === "ideals":
-            height0 = "370px"
-            height1 = "392px"
-            height2 = "415px"
+            height0 = "372px"
+            height1 = "395px"
+            height2 = "418px"
             break;
 
         case traitGroup === "bonds":
-            height0 = "470px"
-            height1 = "492px"
-            height2 = "515px"
+            height0 = "472px"
+            height1 = "495px"
+            height2 = "518px"
             break;
 
         case traitGroup === "flaws":
-            height0 = "570px"
-            height1 = "593px"
-            height2 = "617px"
+            height0 = "572px"
+            height1 = "595px"
+            height2 = "618px"
             break;
 
     }
