@@ -45,7 +45,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             isInternet: true,
             loadingAd: false,
             // showAds: store.getState().user.premium ? false : store.getState().firstLoginAd,
-            showAds: true,
+            showAds: false,
             error: false,
             loading: true,
             userInfo: this.context,
@@ -90,7 +90,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
             setTimeout(() => {
                 this.setState({ loadingAd: false, loading: false })
-            }, 1500);
+            }, 1300);
         })
     }
 

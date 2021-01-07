@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image } from 'react-native';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image, Modal } from 'react-native';
 import 'react-native-gesture-handler';
 import * as Font from 'expo-font'
 import { NavigationContainer } from '@react-navigation/native'
@@ -26,10 +26,13 @@ import { StartAnimation } from './app/animations/StartAnimation';
 import OfflineNavigator from './app/navigators/OfflineNavigator';
 import * as Updates from 'expo-updates';
 import logger from './utility/logger';
-import * as FacebookAds from 'expo-ads-facebook';
+import * as Facebook from 'expo-facebook';
+import MainAds from './app/Ads/MainAds';
 
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
+
+Facebook.initializeAsync('118004343480971', 'DnCreate');
 
 interface AppState {
   fontsLoaded: boolean
@@ -38,10 +41,10 @@ interface AppState {
   AppMainLoadAnimation: boolean
   colorScheme: boolean
   offLineMode: boolean
+  bannerCallTime: boolean
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
-  public interstitialAd: string;
   public bannerAd: string;
   public facebookBannerAd: string
   navigationSubscription: any;
@@ -50,17 +53,17 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   constructor(props: any) {
     super(props)
     this.state = {
+      bannerCallTime: false,
       offLineMode: false,
       AppMainLoadAnimation: false,
       isReady: false,
       user: new UserModel(),
       fontsLoaded: false,
-      colorScheme: false
+      colorScheme: false,
     }
     this.UnsubscribeStore = store.subscribe(() => {
       this.setState({ user: store.getState().user, colorScheme: store.getState().colorScheme })
     })
-    this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
     this.bannerAd = Platform.OS === 'ios' ? Config.iosBanner : Config.androidBanner
     this.facebookBannerAd = Config.facebookBannerAd
   }
@@ -102,7 +105,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
             'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
           }).then(() => this.setState({ fontsLoaded: true, AppMainLoadAnimation: true }, () => {
             setTimeout(() => {
-              this.setState({ AppMainLoadAnimation: false })
+              this.setState({ AppMainLoadAnimation: false, bannerCallTime: true })
             }, 2300);
           }))
         })
@@ -159,24 +162,12 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     }
   }
 
+
   pickBannerAd = () => {
-    const random = Math.random();
-    if (random) {
-      return <FacebookAds.BannerAd
-        placementId={this.facebookBannerAd}
-        type="standard"
-        onPress={() => console.log('click')}
-        onError={error => console.log('error', error)}
-      />
-    } else {
-      return <AdMobBanner
-        style={{ alignItems: "center", }}
-        bannerSize="banner"
-        adUnitID={this.bannerAd}
-        servePersonalizedAds={false} />
+    if (this.state.user && this.state.user._id && this.state.user.premium) {
+      return <View></View>
     }
   }
-
 
 
   render() {
@@ -196,19 +187,12 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
                 </NavigationContainer>
             }
           </AuthContext.Provider>}
-        {this.state.AppMainLoadAnimation || !this.state.isReady ?
-          null
-          :
-          (this.state.user && this.state.user._id && this.state.user._id !== 'Offline') && (this.state.user.premium) ? null :
-            <View>
-              <FacebookAds.BannerAd
-                placementId={this.facebookBannerAd}
-                type="standard"
-                onPress={() => console.log('click')}
-                onError={error => console.log('error', error)}
-              />
-            </View>
-        }
+        { this.state.bannerCallTime && <View>{
+          <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
+          // this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
+          //   :
+          //   <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
+        }</View>}
       </SafeAreaView>
     );
   }
