@@ -6,12 +6,12 @@ import { NavigationContainer } from '@react-navigation/native'
 import navigationTheme from './app/navigators/navigationTheme';
 import AppNavigator from './app/navigators/AppNavigator';
 import AuthNavigator from './app/navigators/AuthNavigation';
-import { AppLoading } from 'expo';
 import { Unsubscribe } from 'redux';
 import { store } from './app/redux/store';
 import { UserModel } from './app/models/userModel';
 import AuthContext from './app/auth/context';
 import storage from './app/auth/storage';
+import AppLoading from 'expo-app-loading';
 import { ActionType } from './app/redux/action-type';
 import JwtDecode from 'jwt-decode';
 import TokenHandler from './app/auth/TokenHandler';
@@ -34,7 +34,7 @@ import { AppMainError } from './app/components/AppMainError';
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
-Facebook.initializeAsync('118004343480971', 'DnCreate');
+Facebook.initializeAsync({ appId: "118004343480971", appName: "DnCreate" });
 
 interface AppState {
   fontsLoaded: boolean
@@ -186,7 +186,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
         { this.state.appError ? <View><AppMainError /></View> :
           <View style={{ flex: 1 }}>
-            {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
+            {!this.state.isReady ? <AppLoading onError={(error) => { logger.log(error) }} startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
               <AuthContext.Provider value={{ user, setUser }}>
                 {this.state.AppMainLoadAnimation ?
                   <StartAnimation />
