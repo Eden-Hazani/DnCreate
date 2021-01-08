@@ -68,12 +68,13 @@ const ValidationSchema = Yup.object().shape({
 export class NewCharInfo extends Component<{ route: any, navigation: any }, NewCharInfoState> {
     static contextType = AuthContext;
     private unsubscribeStore: Unsubscribe
+    private scrollView: any
     constructor(props: any) {
         super(props)
         this.state = {
-            pickedAge: 0,
-            pickedHeight: 0,
-            pickedWeight: 0,
+            pickedAge: 1,
+            pickedHeight: 1,
+            pickedWeight: 1,
             colorPickOrder: '',
             pickedEyeColor: '',
             pickedHairColor: '',
@@ -86,6 +87,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         this.unsubscribeStore = store.subscribe(() => {
             store.getState().character
         })
+        this.scrollView
     }
 
     setInfoAndContinue = (values: any) => {
@@ -104,18 +106,6 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         }
         if (this.state.pickedSkinColor === '') {
             alert('Please pick skin color.');
-            return
-        }
-        if (this.state.pickedAge === 0) {
-            alert('Please pick age.');
-            return
-        }
-        if (this.state.pickedHeight === 0) {
-            alert('Please pick height.');
-            return
-        }
-        if (this.state.pickedWeight === 0) {
-            alert('Please pick weight.');
             return
         }
         characterInfo.name = values.fullName;
@@ -145,7 +135,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
 
     render() {
         return (
-            <ScrollView keyboardShouldPersistTaps="always">
+            <ScrollView keyboardShouldPersistTaps="always" ref={view => this.scrollView = view}>
                 <View style={styles.container}>
                     {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                         <View>
@@ -159,6 +149,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                                         style={{ width: Dimensions.get('screen').width }}
                                         fieldName={"fullName"}
                                         name="fullName"
+                                        moveToErrorPosition={() => this.scrollView.scrollTo({ x: 0, y: 0, animated: true })}
                                         iconName={"text-short"}
                                         placeholder={"Character Full Name..."} />
                                     <View style={{ paddingLeft: 35, paddingRight: 35, paddingBottom: 10 }}>

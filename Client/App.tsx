@@ -28,6 +28,8 @@ import * as Updates from 'expo-updates';
 import logger from './utility/logger';
 import * as Facebook from 'expo-facebook';
 import MainAds from './app/Ads/MainAds';
+import { AppText } from './app/components/AppText';
+import { AppMainError } from './app/components/AppMainError';
 
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
@@ -42,6 +44,7 @@ interface AppState {
   colorScheme: boolean
   offLineMode: boolean
   bannerCallTime: boolean
+  appError: boolean
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
@@ -60,6 +63,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       user: new UserModel(),
       fontsLoaded: false,
       colorScheme: false,
+      appError: false
     }
     this.UnsubscribeStore = store.subscribe(() => {
       this.setState({ user: store.getState().user, colorScheme: store.getState().colorScheme })
@@ -169,30 +173,37 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     }
   }
 
+  componentDidCatch(error: any, info: any) {
+    this.setState({ appError: true })
+    const errorObject = { error, info }
+    logger.log(new Error(JSON.stringify(errorObject)))
+  }
 
   render() {
-
     const user = this.state.user
     const { setUser } = this
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
-        {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
-          <AuthContext.Provider value={{ user, setUser }}>
-            {this.state.AppMainLoadAnimation ?
-              <StartAnimation />
-              :
-              !this.state.fontsLoaded ? <AppLoading /> :
-                <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
-                  {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
-                </NavigationContainer>
-            }
-          </AuthContext.Provider>}
-        { this.state.bannerCallTime && <View>{
-          <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
-          // this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
-          //   :
-          //   <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
-        }</View>}
+        { this.state.appError ? <View><AppMainError /></View> :
+          <View style={{ flex: 1 }}>
+            {!this.state.isReady ? <AppLoading startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
+              <AuthContext.Provider value={{ user, setUser }}>
+                {this.state.AppMainLoadAnimation ?
+                  <StartAnimation />
+                  :
+                  !this.state.fontsLoaded ? <AppLoading /> :
+                    <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
+                      {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
+                    </NavigationContainer>
+                }
+              </AuthContext.Provider>}
+            {this.state.bannerCallTime && <View>{
+              this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
+                :
+                <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
+            }</View>}
+          </View>
+        }
       </SafeAreaView>
     );
   }

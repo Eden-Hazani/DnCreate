@@ -8,19 +8,18 @@ function MainAds({ faceBookBannerId, adMobBannerId }: any) {
     const random = Math.random()
     return (
         <View>
-            {!random
-                ? <AdMobBanner
-                    style={{ alignItems: "center", }}
-                    bannerSize="banner"
-                    adUnitID={adMobBannerId}
-                    servePersonalizedAds={false} />
-                :
-                <FacebookAds.BannerAd
+            <AdMobBanner
+                style={{ alignItems: "center", }}
+                bannerSize="banner"
+                adUnitID={adMobBannerId}
+                servePersonalizedAds={false} />
+
+            {/* <FacebookAds.BannerAd
                     placementId={faceBookBannerId}
                     type="standard"
                     onError={(error: any) => { logger.log(new Error(JSON.stringify(error.nativeEvent))) }}
-                />
-            }
+                /> */}
+
 
         </View>
     );

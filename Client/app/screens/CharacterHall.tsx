@@ -44,8 +44,8 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         this.state = {
             isInternet: true,
             loadingAd: false,
-            // showAds: store.getState().user.premium ? false : store.getState().firstLoginAd,
-            showAds: false,
+            showAds: store.getState().user.premium ? false : store.getState().firstLoginAd,
+            // showAds: true,
             error: false,
             loading: true,
             userInfo: this.context,
@@ -85,13 +85,22 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
     }
 
     requestAd = async () => {
-        // AdMobInterstitial.setAdUnitID(this.interstitialAd);
-        // await AdMobInterstitial.requestAdAsync().then(async () => { await AdMobInterstitial.showAdAsync() })
-        FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
-            setTimeout(() => {
-                this.setState({ loadingAd: false, loading: false })
-            }, 1300);
-        })
+        AdMobInterstitial.setAdUnitID(this.interstitialAd);
+        await AdMobInterstitial.requestAdAsync().then(async () => {
+            await AdMobInterstitial.showAdAsync().then(() => {
+                this.setState({ loading: false, loadingAd: false })
+            }).catch(() => { this.setState({ loading: false, loadingAd: false }) })
+        }).catch(() => { this.setState({ loading: false, loadingAd: false }) })
+        setTimeout(() => {
+            if (this.state.loading || this.state.loadingAd) {
+                this.setState({ loading: false, loadingAd: false })
+            }
+        }, 1500);
+        // FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
+        //     setTimeout(() => {
+        //         this.setState({ loadingAd: false, loading: false })
+        //     }, 1300);
+        // })
     }
 
     componentStartLoadWithoutAds = async () => {

@@ -34,8 +34,6 @@ export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any
             character: this.props.character
         }
     }
-    componentDidMount() {
-    }
 
     applyChanges = (values: any) => {
         const character = { ...this.state.character }

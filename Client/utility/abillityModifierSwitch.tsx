@@ -1,7 +1,7 @@
 
 
 const switchModifier = (score: number) => {
-    let modifier = null;
+    let modifier = 0;
     switch (true) {
         case score === 1:
             modifier = -5;
