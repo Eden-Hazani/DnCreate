@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, Modal, Linking, Alert, Switch, Dimensions, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, Linking, Alert, Switch, Dimensions, ScrollView } from 'react-native';
 import { Unsubscribe } from 'redux';
 import { Config } from '../../config';
 import authApi from '../api/authApi';
@@ -19,7 +19,10 @@ import errorHandler from '../../utility/errorHander';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Image as CashImage } from 'react-native-expo-image-cache';
-//Account with profileImages
+import Modal from 'react-native-modal';
+import { IconGen } from '../components/IconGen';
+import { ListItemSeparator } from '../components/ListItemSeparator';
+
 
 const ValidationSchema = Yup.object().shape({
     profileImg: Yup.string().required().label("Profile Image").typeError("Must Choose A picture, Press on the camera Icon"),
@@ -31,6 +34,7 @@ interface AccountState {
     changeProfileModal: boolean
     darkModeOn: boolean
     loading: boolean
+    settingsModal: boolean
 }
 
 export class Account extends Component<{ props: any, navigation: any }, AccountState> {
@@ -43,7 +47,8 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
             loading: false,
             darkModeOn: store.getState().colorScheme,
             changeProfileModal: false,
-            userInfo: store.getState().user
+            userInfo: store.getState().user,
+            settingsModal: false
         }
         this.UnsubscribeStore = store.subscribe(() => { })
     }
@@ -120,7 +125,13 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                             <View style={{ flex: .2, padding: 10 }}>
                                 <AppButton title="Change Profile Picture" onPress={() => this.setState({ changeProfileModal: true })} borderRadius={15} fontSize={18} backgroundColor={Colors.bitterSweetRed} width={150} />
                             </View>
-                            <Modal visible={this.state.changeProfileModal}>
+                            <Modal isVisible={this.state.changeProfileModal} style={{
+                                backgroundColor: Colors.pageBackground,
+                                margin: 0,
+                                marginTop: 30,
+                                alignItems: undefined,
+                                justifyContent: undefined,
+                            }}>
                                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: Colors.pageBackground }}>
                                     <View style={{ flex: .8, paddingTop: 120 }}>
                                         <AppForm
@@ -143,9 +154,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     </View>
                                 </View>
                             </Modal>
-                            <View style={{ flex: .2 }}>
-                                <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Privacy Policy"} textAlign={"center"} fontSize={15} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
-                            </View>
+
                             <View style={{ flex: .3, padding: 10, justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'}>Wish to remove ads?</AppText>
                                 <AppText textAlign={'center'}>Consider supporting DnCreate on Patreon</AppText>
@@ -158,38 +167,68 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                 <AppButton disabled={true} borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Create Custom Path"}
                                     textAlign={"center"} fontSize={15} onPress={() => { this.props.navigation.navigate("CreateNewPath") }} />
                             </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <AppText>Dark mode</AppText>
-                                <Switch value={this.state.darkModeOn} onValueChange={() => {
-                                    if (this.state.darkModeOn) {
-                                        this.setState({ darkModeOn: false, loading: true }, async () => {
-                                            await AsyncStorage.setItem('colorScheme', "light").then(() => {
-                                                Colors.InitializeAsync().then(() => {
-                                                    store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
-                                                    this.setState({ loading: false })
-                                                })
-                                            });
-                                        })
-                                        return;
-                                    }
-                                    this.setState({ darkModeOn: true, loading: true }, async () => {
-                                        await AsyncStorage.setItem('colorScheme', "dark").then(() => {
-                                            Colors.InitializeAsync().then(() => {
-                                                store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
-                                                this.setState({ loading: false })
-                                            })
-                                        });
-                                    })
-                                }} />
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flex: .4 }}>
+
+                            <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flex: .4, paddingTop: 30, paddingBottom: 30 }}>
                                 <View style={{ flex: .5 }}>
                                     <AppButton onPress={() => { this.logout() }} width={100} height={100} borderRadius={100} fontSize={20} color={Colors.black} backgroundColor={Colors.yellow} title={"Logout"} />
                                 </View>
-                                <View style={{ flex: .5 }}>
-                                    <AppButton onPress={() => { this.deleteAccount() }} width={100} height={100} borderRadius={100} fontSize={20} color={Colors.black} backgroundColor={Colors.danger} title={"Delete Account"} />
-                                </View>
+                                <TouchableOpacity style={{ flex: .5 }} onPress={() => { this.setState({ settingsModal: true }) }}>
+                                    <IconGen name="cog" size={100} backgroundColor={Colors.bitterSweetRed} />
+                                </TouchableOpacity>
                             </View>
+
+
+                            <Modal isVisible={this.state.settingsModal}
+                                animationIn="slideInLeft"
+                                swipeDirection={["left", "right"]}
+                                swipeThreshold={20}
+                                onSwipeComplete={(e) => { this.setState({ settingsModal: false }) }}
+                                style={{
+                                    backgroundColor: Colors.pageBackground,
+                                    margin: 0,
+                                    marginRight: 50,
+                                    alignItems: undefined,
+                                    justifyContent: undefined,
+                                }}>
+                                <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 10 }}>
+                                        <AppText fontSize={20}>Dark mode</AppText>
+                                        <Switch value={this.state.darkModeOn} onValueChange={() => {
+                                            if (this.state.darkModeOn) {
+                                                this.setState({ darkModeOn: false, loading: true }, async () => {
+                                                    await AsyncStorage.setItem('colorScheme', "light").then(() => {
+                                                        Colors.InitializeAsync().then(() => {
+                                                            store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
+                                                            this.setState({ loading: false })
+                                                        })
+                                                    });
+                                                })
+                                                return;
+                                            }
+                                            this.setState({ darkModeOn: true, loading: true }, async () => {
+                                                await AsyncStorage.setItem('colorScheme', "dark").then(() => {
+                                                    Colors.InitializeAsync().then(() => {
+                                                        store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
+                                                        this.setState({ loading: false })
+                                                    })
+                                                });
+                                            })
+                                        }} />
+                                    </View>
+                                    <ListItemSeparator thick={true} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
+                                        <AppText fontSize={20}>Privacy Policy</AppText>
+                                        <AppButton borderRadius={15} width={100} height={50} backgroundColor={Colors.bitterSweetRed}
+                                            title={"Policy"} textAlign={"center"} fontSize={20} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
+                                    </View>
+                                    <ListItemSeparator thick={true} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
+                                        <AppText fontSize={20}>Delete Account</AppText>
+                                        <AppButton onPress={() => { this.deleteAccount() }} width={100} height={50} borderRadius={15}
+                                            fontSize={20} color={Colors.black} backgroundColor={Colors.danger} title={"Delete"} />
+                                    </View>
+                                </View>
+                            </Modal>
                         </View>
                 }
             </ScrollView>

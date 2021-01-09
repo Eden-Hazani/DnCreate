@@ -62,7 +62,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             this.getLeadingAdv()
             this.getParticipatingAdv()
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -87,7 +87,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -121,7 +121,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -134,7 +134,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -172,7 +172,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -186,7 +186,7 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             }
             this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

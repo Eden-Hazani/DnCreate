@@ -85,7 +85,7 @@ export class AppSkillItemPicker extends Component<{
             }
             this.props.setAdditionalSkillPicks(this.state.amountToPick)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {
@@ -112,7 +112,7 @@ export class AppSkillItemPicker extends Component<{
             }
             this.pickSkillFuc(skill, index)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -144,7 +144,7 @@ export class AppSkillItemPicker extends Component<{
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -183,7 +183,7 @@ export class AppSkillItemPicker extends Component<{
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

@@ -38,7 +38,7 @@ export class AppPathAddSpecificSpell extends Component<{
                 this.props.updateSpecificSpell({ name: this.props.spell, notCountAgainstKnownCantrips: this.props.notCountAgainstKnownCantrips })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

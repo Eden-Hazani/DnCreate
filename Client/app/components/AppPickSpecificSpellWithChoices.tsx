@@ -46,7 +46,7 @@ export class AppPickSpecificSpellWithChoices extends Component<{ character: Char
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

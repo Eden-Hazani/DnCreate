@@ -28,7 +28,7 @@ export class StartAdventure extends Component<{ navigation: any }> {
                 this.props.navigation.navigate("SelectedLeadingAdv", { adventure: adventure.data })
             });
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

@@ -13,7 +13,7 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
     const [allowed, setAllowed] = useState(true);
 
     const requestPermission = async () => {
-        const result = await ImagePicker.requestCameraRollPermissionsAsync();
+        const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (result.granted) {
             setAllowed(true)
         }

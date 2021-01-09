@@ -26,7 +26,7 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
                     this.setState({ inspectionRemaining: parseInt(result) })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -37,7 +37,7 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
                     this.setState({ inspectionRemaining: result })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     decrease = () => {
@@ -47,7 +47,7 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
                     this.setState({ inspectionRemaining: result })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

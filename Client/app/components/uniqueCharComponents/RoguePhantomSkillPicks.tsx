@@ -34,7 +34,7 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
                 this.setState({ pickedSkill: JSON.parse(skill) })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     skillCheck = (skill: string) => {
@@ -50,7 +50,7 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
             }
             return 0
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -61,7 +61,7 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
             skillClicked[index] = true;
             this.setState({ pickedSkill: skill, skillClicked }, () => this.setInStorage())
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -69,7 +69,7 @@ export class RoguePhantomSkillPicks extends Component<{ character: CharacterMode
         try {
             await AsyncStorage.setItem(`${this.props.character._id}PhantomRogueSkill`, JSON.stringify(this.state.pickedSkill))
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

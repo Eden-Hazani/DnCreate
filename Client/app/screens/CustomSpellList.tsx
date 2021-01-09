@@ -64,7 +64,7 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
                 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

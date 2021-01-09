@@ -49,7 +49,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 this.setState({ adventure })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -61,7 +61,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 this.setState({ adventure })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -84,7 +84,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 e.preventDefault();
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     back = () => {
@@ -106,7 +106,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -123,7 +123,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 this.props.navigation.navigate("SelectCharacter", { character: char.data, isDm: true })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -139,7 +139,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 this.back();
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -168,7 +168,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                 }
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

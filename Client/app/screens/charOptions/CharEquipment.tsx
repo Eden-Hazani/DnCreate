@@ -74,7 +74,7 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
             })
             this.setState({ pickedImg: "" })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -89,7 +89,7 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
                 this.setState({ addNewEquipmentModal: false })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -107,7 +107,7 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -130,7 +130,7 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
                 return []
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

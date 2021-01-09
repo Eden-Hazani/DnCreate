@@ -118,7 +118,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

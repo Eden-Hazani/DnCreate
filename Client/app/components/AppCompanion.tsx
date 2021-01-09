@@ -62,7 +62,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
             }
             return []
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
             return []
         }
     }
@@ -100,7 +100,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 userCharApi.updateChar(this.state.character)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -118,7 +118,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -185,7 +185,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 userCharApi.updateChar(this.state.character)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -216,7 +216,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 return
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -233,7 +233,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -255,7 +255,7 @@ export class AppCompanion extends Component<{ isDm: boolean, closeModal: any, ch
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

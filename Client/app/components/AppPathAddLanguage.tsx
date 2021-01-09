@@ -24,7 +24,7 @@ export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, 
             }
             this.props.languagesToPick(true)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {
@@ -46,7 +46,7 @@ export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, 
                 this.props.languagesToPick(false)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

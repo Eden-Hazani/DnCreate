@@ -41,7 +41,7 @@ export class CompleteSkillList extends Component<{ character: CharacterModel }, 
                 this.setState({ skillList: modifiedSkills })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

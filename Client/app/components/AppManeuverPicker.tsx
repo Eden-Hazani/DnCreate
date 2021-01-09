@@ -41,7 +41,7 @@ export class AppManeuverPicker extends Component<{
                 this.setState({ beforeChangeChar: JSON.parse(beforeChangeCharString) })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -61,7 +61,7 @@ export class AppManeuverPicker extends Component<{
                 this.setState({ loading: false })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {
@@ -137,7 +137,7 @@ export class AppManeuverPicker extends Component<{
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

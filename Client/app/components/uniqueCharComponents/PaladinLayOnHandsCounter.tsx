@@ -39,7 +39,7 @@ export class PaladinLayOnHandsCounter extends Component<{ character: CharacterMo
                 this.setState({ layOnHandsTotal: result.layOnHandsAmount, layOnHandsRemaining: parseInt(result.storedNumber) })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -57,7 +57,7 @@ export class PaladinLayOnHandsCounter extends Component<{ character: CharacterMo
                 this.setState({ changeWindow: result.stayOpen, layOnHandsRemaining: result.newNumber })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

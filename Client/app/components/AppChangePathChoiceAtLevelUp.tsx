@@ -51,7 +51,7 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -64,7 +64,7 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
             this.setState({ choiceClicked })
             this.props.newPathChoice(item)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

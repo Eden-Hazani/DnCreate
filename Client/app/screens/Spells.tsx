@@ -85,7 +85,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 this.loadSpells(this.state.shownSpells)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -104,7 +104,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             }
             return newSpells
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     loadSpells = (shownSpells: any[]) => {
@@ -148,7 +148,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 }, 1000);
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -161,7 +161,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 }, 500);
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -183,7 +183,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 this.loadSpells(this.state.shownSpells)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -201,7 +201,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -319,7 +319,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
 
     }

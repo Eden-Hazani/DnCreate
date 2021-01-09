@@ -46,7 +46,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                 this.setState({ loading: false })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

@@ -45,7 +45,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -60,7 +60,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                 await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(this.state.availableMagic));
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -78,7 +78,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

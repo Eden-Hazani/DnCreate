@@ -27,7 +27,7 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
                     this.setState({ rageRemaining: parseInt(result) })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -38,7 +38,7 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
                     this.setState({ rageRemaining: result })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     decrease = () => {
@@ -48,7 +48,7 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
                     this.setState({ rageRemaining: result })
                 })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

@@ -11,7 +11,7 @@ export class AppPathAddSpellPickAvailability extends Component<{ spellList: stri
         try {
             this.props.loadSpells(this.props.spellList)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {

@@ -46,7 +46,7 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstK
                 this.props.returnMagic(this.state.character)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

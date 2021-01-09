@@ -10,7 +10,7 @@ export class AppPathArmorAdding extends Component<{ armorList: any, loadArmors: 
         try {
             this.props.loadArmors(this.props.armorList)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

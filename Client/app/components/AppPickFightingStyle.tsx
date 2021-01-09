@@ -63,7 +63,7 @@ export class AppPickFightingStyle extends Component<{ itemList: [], character: C
                 this.props.fightingStylesToPick(false)
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

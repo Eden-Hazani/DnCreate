@@ -32,7 +32,7 @@ export class AppAddSpellChoice extends Component<{
         try {
             this.props.updateSpellList({ spells: 0, limit: this.props.spellListWithLimiter.limit })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -60,7 +60,7 @@ export class AppAddSpellChoice extends Component<{
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -68,7 +68,7 @@ export class AppAddSpellChoice extends Component<{
         try {
             this.props.updateSpellList({ spells: this.state.pickedSpellList, limit: this.props.spellListWithLimiter.limit })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

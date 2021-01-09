@@ -7,6 +7,6 @@ export function clericDomainSpellsPicker(level: number, domain: string, characte
         const spells = spellsList.Cleric[domain][level].spellList;
         return spells
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

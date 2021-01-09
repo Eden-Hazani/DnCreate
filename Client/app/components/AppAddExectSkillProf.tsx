@@ -34,7 +34,7 @@ export class AppAddExactSkillProf extends Component<{ character: CharacterModel,
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
 
     }

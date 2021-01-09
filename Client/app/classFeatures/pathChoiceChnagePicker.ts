@@ -12,7 +12,7 @@ function pathChoiceChangePicker(character: CharacterModel) {
         }
         return featureTree;
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }
 
@@ -26,7 +26,7 @@ function allowedChangingPaths(character: CharacterModel) {
         }
         return isTrue;
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }
 

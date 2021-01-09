@@ -49,7 +49,7 @@ export class AppExtraPathChoicePicker extends Component<{
             }
 
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {

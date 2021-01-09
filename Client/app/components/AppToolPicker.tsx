@@ -43,7 +43,7 @@ export class AppToolPicker extends Component<{
             }
             this.props.setAdditionalToolPicks(true)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentWillUnmount() {
@@ -86,7 +86,7 @@ export class AppToolPicker extends Component<{
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

@@ -2,9 +2,9 @@ import Bugsnag from '@bugsnag/expo'
 const log = (error: any) => Bugsnag.notify(error);
 
 const start = () => {
-    // if (__DEV__) {
-    //     return
-    // }
+    if (__DEV__) {
+        return
+    }
     Bugsnag.start();
 };
 

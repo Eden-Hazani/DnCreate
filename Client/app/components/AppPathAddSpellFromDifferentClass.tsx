@@ -30,7 +30,7 @@ export class AppPathAddSpellFromDifferentClass extends Component<{
                 this.props.loadSpellsFromOtherClasses(this.state.character)
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

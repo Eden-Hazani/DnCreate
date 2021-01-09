@@ -24,6 +24,6 @@ export function generateSavingThrowsPathConditions(character: CharacterModel, it
         if (extraSavingThrowsToPick < 0) { extraSavingThrowsToPick = 0 }
         return { extraSavingThrowsToPick, pickedSkillFromStart }
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

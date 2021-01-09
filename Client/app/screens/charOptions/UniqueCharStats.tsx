@@ -58,7 +58,7 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
             }
             return choices;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
             return []
         }
     }

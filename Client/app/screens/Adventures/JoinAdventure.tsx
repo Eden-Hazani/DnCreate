@@ -54,7 +54,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                 this.setState({ characters: characters.data })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -72,7 +72,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                 }
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -102,7 +102,7 @@ export class JoinAdventure extends Component<{ props: any, navigation: any }, Jo
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

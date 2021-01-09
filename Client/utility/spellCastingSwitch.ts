@@ -50,7 +50,7 @@ export function SpellCastingSwitch(character: CharacterModel, currentProficiency
         }
         return { spellcastingAbility, spellSaveDc, spellAttackModifier }
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
         const spellcastingAbility = 'none';
         const spellSaveDc = 0;
         const spellAttackModifier = 0;

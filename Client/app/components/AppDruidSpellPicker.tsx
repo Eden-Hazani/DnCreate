@@ -51,7 +51,7 @@ export class AppDruidSpellPicker extends Component<{ pickDruidCircle: any, chara
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -81,7 +81,7 @@ export class AppDruidSpellPicker extends Component<{ pickDruidCircle: any, chara
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
 
     }

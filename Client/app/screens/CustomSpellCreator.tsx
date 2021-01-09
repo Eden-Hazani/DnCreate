@@ -88,7 +88,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 this.setState({ oldSpellValues, classClicked, classPicked, schoolClicked, pickedSchool, levelClicked, pickedLevel })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -99,7 +99,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
             levelClicked[index] = true;
             this.setState({ pickedLevel: level, levelClicked })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -111,7 +111,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
             schoolClicked[index] = true;
             this.setState({ pickedSchool: school, schoolClicked })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -132,7 +132,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 this.setState({ classClicked, classPicked });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -173,7 +173,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 this.props.navigation.navigate('CustomSpellList');
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -209,7 +209,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

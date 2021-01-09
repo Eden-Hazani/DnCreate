@@ -4,6 +4,7 @@ import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal
 import { Unsubscribe } from 'redux';
 import switchModifier from '../../../utility/abillityModifierSwitch';
 import { attributeColorCodedGuide } from '../../../utility/attributeColorCodedGuide';
+import logger from '../../../utility/logger';
 import { RollingDiceAnimation } from '../../animations/RollingDiceAnimation';
 import { VibrateAnimation } from '../../animations/vibrateAnimation';
 import userCharApi from '../../api/userCharApi';
@@ -81,43 +82,47 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         this.setState({ colorCodedGuideArray })
     }
     onFocus = async () => {
-        let attributes = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
-        let characterInfo = { ...this.state.characterInfo };
-        let dicePool = this.state.dicePool;
-        const rollDisabled = this.state.rollDisabled;
-        const diceStorage = await AsyncStorage.getItem(`DicePool`)
-        if (diceStorage) {
-            dicePool = JSON.parse(diceStorage)
-        }
-        const item = await AsyncStorage.getItem(`AttributeStage`)
-        if (item) {
-            characterInfo = JSON.parse(item)
-        }
-        for (let att of attributes) {
-            if (this.state.pickedRace.abilityBonus && characterInfo[att] !== this.state.pickedRace.abilityBonus[att]) {
-                let diceScore = characterInfo[att] - this.state.pickedRace.abilityBonus[att];
-                let indexes = dicePool.map((dice, i) => dice === diceScore ? i : -1)
-                    .filter(index => index !== -1);
-                for (let index of indexes) {
-                    if (rollDisabled[index] !== true) {
-                        rollDisabled[index] = true;
-                        break;
-                    }
-                }
-                rollDisabled[dicePool.indexOf(diceScore)] = true;
+        try {
+            let attributes = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
+            let characterInfo = { ...this.state.characterInfo };
+            let dicePool = this.state.dicePool;
+            const rollDisabled = this.state.rollDisabled;
+            const diceStorage = await AsyncStorage.getItem(`DicePool`)
+            if (diceStorage) {
+                dicePool = JSON.parse(diceStorage)
             }
+            const item = await AsyncStorage.getItem(`AttributeStage`)
+            if (item) {
+                characterInfo = JSON.parse(item)
+            }
+            for (let att of attributes) {
+                if (this.state.pickedRace.abilityBonus && characterInfo[att] !== this.state.pickedRace.abilityBonus[att]) {
+                    let diceScore = characterInfo[att] - this.state.pickedRace.abilityBonus[att];
+                    let indexes = dicePool.map((dice, i) => dice === diceScore ? i : -1)
+                        .filter(index => index !== -1);
+                    for (let index of indexes) {
+                        if (rollDisabled[index] !== true) {
+                            rollDisabled[index] = true;
+                            break;
+                        }
+                    }
+                    rollDisabled[dicePool.indexOf(diceScore)] = true;
+                }
+            }
+            if (dicePool.length === 6) {
+                this.setState({ finishRolls: true })
+            }
+            if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength !== undefined
+                && this.state.characterInfo.modifiers.constitution !== undefined
+                && this.state.characterInfo.modifiers.dexterity !== undefined
+                && this.state.characterInfo.modifiers.intelligence !== undefined
+                && this.state.characterInfo.modifiers.wisdom !== undefined
+                && this.state.characterInfo.modifiers.charisma !== undefined
+            ) { this.setState({ finishRolls: true }) }
+            this.setState({ characterInfo, dicePool, rollDisabled })
+        } catch (err) {
+            logger.log(new Error(err))
         }
-        if (dicePool.length === 6) {
-            this.setState({ finishRolls: true })
-        }
-        if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength !== undefined
-            && this.state.characterInfo.modifiers.constitution !== undefined
-            && this.state.characterInfo.modifiers.dexterity !== undefined
-            && this.state.characterInfo.modifiers.intelligence !== undefined
-            && this.state.characterInfo.modifiers.wisdom !== undefined
-            && this.state.characterInfo.modifiers.charisma !== undefined
-        ) { this.setState({ finishRolls: true }) }
-        this.setState({ characterInfo, dicePool, rollDisabled })
     }
     componentWillUnmount() {
         this.unsubscribeStore()

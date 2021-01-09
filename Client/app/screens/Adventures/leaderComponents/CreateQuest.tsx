@@ -86,7 +86,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -126,7 +126,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

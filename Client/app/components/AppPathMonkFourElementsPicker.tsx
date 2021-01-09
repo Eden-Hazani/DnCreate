@@ -43,7 +43,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -74,7 +74,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -152,7 +152,7 @@ export class AppPathMonkFourElementsPicker extends Component<{
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

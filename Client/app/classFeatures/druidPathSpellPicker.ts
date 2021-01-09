@@ -6,6 +6,6 @@ export function druidPathSpellPicker(level: number, path: string,) {
         const spells = spellsList.Druid[path][level].spellList;
         return spells
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

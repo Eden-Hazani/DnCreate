@@ -94,19 +94,6 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         const characterInfo = { ...this.state.characterInfo };
         if (this.state.pickedGender === '') {
             alert('Please pick a gender');
-            return
-        }
-        if (this.state.pickedHairColor === '') {
-            alert('Please pick hair color.');
-            return
-        }
-        if (this.state.pickedEyeColor === '') {
-            alert('Please pick eye color.');
-            return
-        }
-        if (this.state.pickedSkinColor === '') {
-            alert('Please pick skin color.');
-            return
         }
         characterInfo.name = values.fullName;
         characterInfo.age = this.state.pickedAge;

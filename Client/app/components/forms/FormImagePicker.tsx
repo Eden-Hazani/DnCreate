@@ -15,7 +15,7 @@ export function FormImagePicker({ name }: any) {
                 imageUri={values[name]}
                 onChangeImage={(uri: any) => handleChangeImage(uri)} />
             <View style={{ width: 400, top: -70 }}>
-                <ErrorMessage visible={touched[name]} error={errors[name]} />
+                <ErrorMessage returnInfo={() => { }} visible={touched[name]} error={errors[name]} />
             </View>
         </>
     )

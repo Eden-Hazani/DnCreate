@@ -46,7 +46,7 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -64,7 +64,7 @@ export class CharMagicLists extends Component<{ isDm: boolean, reloadChar: any, 
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

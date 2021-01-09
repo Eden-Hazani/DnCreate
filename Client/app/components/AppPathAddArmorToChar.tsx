@@ -32,7 +32,7 @@ export class AppPathAddArmorToChar extends Component<{ character: CharacterModel
             }
             this.props.armorToLoad(armor)
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     componentDidMount() {

@@ -12,7 +12,7 @@ export class AppAddMagicToNonMagic extends Component<{ character: CharacterModel
         try {
             this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType))
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {

@@ -27,7 +27,7 @@ export function eldritchInvocations(level: number, character: CharacterModel) {
         })
         return eldritchInvocationsArray;
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
         return []
     }
 }

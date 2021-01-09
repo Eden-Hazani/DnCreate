@@ -25,7 +25,7 @@ export class MonkKiPointCounter extends Component<{ character: CharacterModel },
                 this.setState({ kiRemaining: parseInt(result) })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -35,7 +35,7 @@ export class MonkKiPointCounter extends Component<{ character: CharacterModel },
                 this.setState({ kiRemaining: result })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     decrease = () => {
@@ -44,7 +44,7 @@ export class MonkKiPointCounter extends Component<{ character: CharacterModel },
                 this.setState({ kiRemaining: result })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

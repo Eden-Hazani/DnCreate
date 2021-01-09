@@ -21,6 +21,7 @@ import { AdMobInterstitial } from 'expo-ads-admob'
 import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../components/AppNoInternet';
 import * as FacebookAds from 'expo-ads-facebook';
+import logger from '../../utility/logger';
 
 interface CharacterHallState {
     characters: CharacterModel[]
@@ -89,18 +90,20 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         await AdMobInterstitial.requestAdAsync().then(async () => {
             await AdMobInterstitial.showAdAsync().then(() => {
                 this.setState({ loading: false, loadingAd: false })
-            }).catch(() => { this.setState({ loading: false, loadingAd: false }) })
-        }).catch(() => { this.setState({ loading: false, loadingAd: false }) })
-        setTimeout(() => {
-            if (this.state.loading || this.state.loadingAd) {
-                this.setState({ loading: false, loadingAd: false })
-            }
-        }, 1500);
-        // FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
-        //     setTimeout(() => {
-        //         this.setState({ loadingAd: false, loading: false })
-        //     }, 1300);
-        // })
+            }).catch(() => { this.loadFacebookAd() })
+        }).catch(() => { this.loadFacebookAd() })
+
+    }
+
+    loadFacebookAd = () => {
+        FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
+            setTimeout(() => {
+                this.setState({ loadingAd: false, loading: false })
+            }, 1300);
+        }).catch((error: any) => {
+            logger.log(new Error(JSON.stringify(error.nativeEvent)));
+            this.setState({ loadingAd: false, loading: false })
+        })
     }
 
     componentStartLoadWithoutAds = async () => {

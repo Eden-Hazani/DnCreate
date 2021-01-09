@@ -64,7 +64,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             }
             this.setState({ character })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -82,7 +82,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -93,7 +93,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             diceClicked[index] = true
             this.setState({ dicePicked: dice, diceClicked })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -104,7 +104,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             }
             return true
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -136,7 +136,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             AsyncStorage.setItem(`${this.state.character._id}WeaponList`, JSON.stringify(newWeaponList))
             this.setState({ addWeapon: false, weaponList: newWeaponList });
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -150,7 +150,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 this.setState({ weaponList: newWeaponList });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -170,7 +170,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -187,7 +187,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 userCharApi.updateChar(this.state.character);
             });
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

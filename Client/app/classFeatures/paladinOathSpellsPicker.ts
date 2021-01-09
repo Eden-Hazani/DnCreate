@@ -7,6 +7,6 @@ export function paladinOathSpellsPicker(level: number, domain: string, character
         const spells = spellsList.Paladin[domain][level].spellList;
         return spells
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

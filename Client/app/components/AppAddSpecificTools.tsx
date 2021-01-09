@@ -28,7 +28,7 @@ export class AppAddSpecificTools extends Component<{ tools: [], character: Chara
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

@@ -256,7 +256,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -271,7 +271,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 await AsyncStorage.setItem(`${this.state.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -302,7 +302,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -314,7 +314,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ reloadingSkills: false })
             }, 500);
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -385,7 +385,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
 
     }
@@ -400,7 +400,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -412,7 +412,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -424,7 +424,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -439,7 +439,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             stats.push(['charisma', this.state.charisma]);
             return stats
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
             return []
         }
     }
@@ -461,7 +461,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints - 1 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -477,7 +477,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ abilityClicked, totalAbilityPoints: this.state.totalAbilityPoints + 1 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -502,7 +502,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ fightingStyle, fightingStyleClicked })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -526,7 +526,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ metaMagic, metamagicClicked })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     addMetaMagic = () => {
@@ -537,7 +537,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -550,7 +550,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -564,7 +564,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return difference === 0 ? '' : ` + ${difference} new!`;
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -589,7 +589,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ invocations, invocationsClicked })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -601,7 +601,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -629,7 +629,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -641,7 +641,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return true;
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -656,7 +656,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 charisma: this.props.character.charisma ? this.props.character.charisma : 0
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     disableExtraPathChoice = () => {
@@ -666,7 +666,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             this.setState({ extraPathChoice: false })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -677,7 +677,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             this.setState({ extraPathChoice: true })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -704,7 +704,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 this.setState({ extraPathChoiceValue })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -720,7 +720,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             newArmorList.push(this.state.armorToLoad)
             AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -768,7 +768,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             return newArmorAc
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -1060,7 +1060,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 })
             })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -1078,7 +1078,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -1100,7 +1100,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 // return levelFeatures
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -1112,7 +1112,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 return this.state.customPathFeatureList
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
             return []
         }
     }

@@ -12,7 +12,7 @@ const featurePicker = (level: number, className: string) => {
 
         return { features }
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 
 }

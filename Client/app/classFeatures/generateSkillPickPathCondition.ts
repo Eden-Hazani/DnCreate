@@ -31,6 +31,6 @@ export function generateSkillPickPathCondition(character: CharacterModel, items:
         let extraSkillsToPick: number = 0
         let pickedSkillFromStart: string = ""
         return { extraSkillsToPick, pickedSkillFromStart }
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

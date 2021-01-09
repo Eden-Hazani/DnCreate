@@ -7,6 +7,6 @@ export function rangerConclaveSpells(level: number, domain: string, character: C
         const spells = spellsList.Ranger[domain][level].spellList;
         return spells
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

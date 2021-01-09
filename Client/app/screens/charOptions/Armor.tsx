@@ -61,7 +61,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                 this.setState({ armorList: JSON.parse(armorList) })
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -103,7 +103,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
             AsyncStorage.setItem(`${this.state.character._id}ArmorList`, JSON.stringify(newArmorList))
             this.setState({ addArmor: false, armorList: newArmorList, lightArmor: false, mediumArmor: false, heavyArmor: false });
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     removeSet = async (setId: string) => {
@@ -116,7 +116,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                 this.setState({ armorList: newArmorList });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     removeEquippedSet = () => {
@@ -140,7 +140,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                 userCharApi.updateChar(this.state.character);
             });
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -158,7 +158,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                 await AsyncStorage.setItem('offLineCharacterList', JSON.stringify(characters))
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 
@@ -179,7 +179,7 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                 });
             }
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
 

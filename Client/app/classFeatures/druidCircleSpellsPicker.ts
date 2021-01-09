@@ -7,6 +7,6 @@ export function druidCircleSpellsPicker(level: number, druidCircle: string, char
         const spells = druidSpells.druidCircleSpellLists[druidCircle][level].spellList;
         return spells
     } catch (err) {
-        logger.log(err)
+        logger.log(new Error(err))
     }
 }

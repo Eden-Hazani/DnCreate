@@ -30,7 +30,7 @@ export class AppPathAddSpellsList extends Component<{ loadSpells: any, path: str
             }
             this.setState({ character })
         } catch (err) {
-            logger.log(err)
+            logger.log(new Error(err))
         }
     }
     render() {
