@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "481925545005",
+    "project_id": "dncreate-65866",
+    "storage_bucket": "dncreate-65866.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481925545005:android:08264632d9992a45170ca4",
+        "android_client_info": {
+          "package_name": "com.DnCreate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481925545005-fg0a222gb721haume2s7il70u5p8u41p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDatNNVf1iLdhki4xaIoblY6BZBeunFWbM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481925545005-fg0a222gb721haume2s7il70u5p8u41p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

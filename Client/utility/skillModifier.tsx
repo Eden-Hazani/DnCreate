@@ -4,7 +4,7 @@ function skillModifier(skill: string) {
     const skills = [['Athletics'], ['Acrobatics', 'Sleight of Hand', 'Stealth'], ['Arcana', 'History', 'Investigation', 'Nature', 'Religion'],
     ['Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival'], ['Deception', 'Intimidation', 'Performance', 'Persuasion']];
 
-    let result: number = null;
+    let result: number = 0;
     skills.filter((item, index) => {
         if (item.includes(skill[0])) {
             result = index

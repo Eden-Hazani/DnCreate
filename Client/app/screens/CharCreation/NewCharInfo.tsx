@@ -94,6 +94,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         const characterInfo = { ...this.state.characterInfo };
         if (this.state.pickedGender === '') {
             alert('Please pick a gender');
+            return;
         }
         characterInfo.name = values.fullName;
         characterInfo.age = this.state.pickedAge;

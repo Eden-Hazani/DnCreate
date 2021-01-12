@@ -57,7 +57,6 @@ export class CreatePDF extends Component<{ route: any, navigation: any }, Create
 
     componentDidMount() {
         this._ismounted = true;
-        console.log(this.state.uri)
         this.innerHTML()
         this.maxHpCheck()
     }

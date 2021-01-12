@@ -6,6 +6,10 @@ const verifyUserInAdventure = require('../middleware/verifyUserInAdventure');
 const validateUserIsLeader = require('../middleware/validateUserIsLeader');
 var multer = require('multer');
 const Adventure = require("../models/AdventureModel");
+const sendPushNotification = require("../utilities/pushNotifications");
+const authLogic = require("../business-logic/auth-logic");
+const userLogic = require("../business-logic/user-logic")
+const { Expo } = require("expo-server-sdk");
 var upload = multer({})
 
 router.post("/createAdventure", verifyLogged, upload.none(), async (request, response) => {
@@ -33,7 +37,13 @@ router.post("/getUsersProfilePic", verifyLogged, upload.none(), async (request, 
 
 router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, response) => {
     try {
+        const targetUser = await authLogic.validateInSystem(JSON.parse(request.body.adventure).leader_id)
+        const joiningUserCharacter = await userLogic.getChar(JSON.parse(request.body.adventure).participants_id[JSON.parse(request.body.adventure).participants_id.length - 1])
         const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const { expoPushToken } = targetUser;
+        if (Expo.isExpoPushToken(expoPushToken))
+            await sendPushNotification(expoPushToken, "New adventurer has joined", `${joiningUserCharacter.name} has joined ${adventure.adventureName}`);
+
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         response.json(updatedAdventure);
     } catch (err) {

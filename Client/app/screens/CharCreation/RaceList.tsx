@@ -190,7 +190,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                         <View style={{
                                             width: width / 2, position: "absolute", zIndex: 10,
                                             alignSelf: 'center',
-                                            top: '4%',
+                                            top: '9%',
                                         }}>
                                             <SearchBar
                                                 searchIcon={false}

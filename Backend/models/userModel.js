@@ -21,6 +21,9 @@ const userSchema = mongoose.Schema({
     activated: {
         type: Boolean
     },
+    expoPushToken: {
+        type: String
+    },
     premium: {
         type: Boolean
     }

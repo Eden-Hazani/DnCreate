@@ -22,6 +22,9 @@ import { Image as CashImage } from 'react-native-expo-image-cache';
 import Modal from 'react-native-modal';
 import { IconGen } from '../components/IconGen';
 import { ListItemSeparator } from '../components/ListItemSeparator';
+import * as Updates from 'expo-updates';
+import logger from '../../utility/logger';
+import { CheckForUpdates } from '../components/CheckForUpdates';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -35,6 +38,7 @@ interface AccountState {
     darkModeOn: boolean
     loading: boolean
     settingsModal: boolean
+    lookingForUpdates: boolean
 }
 
 export class Account extends Component<{ props: any, navigation: any }, AccountState> {
@@ -48,7 +52,8 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
             darkModeOn: store.getState().colorScheme,
             changeProfileModal: false,
             userInfo: store.getState().user,
-            settingsModal: false
+            settingsModal: false,
+            lookingForUpdates: false
         }
         this.UnsubscribeStore = store.subscribe(() => { })
     }
@@ -98,6 +103,36 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                 }
             },
             { text: 'No' }])
+    }
+
+    checkForUpdates = async () => {
+        try {
+            this.setState({ lookingForUpdates: true })
+            const updates = await Updates.checkForUpdateAsync();
+            if (updates.isAvailable) {
+                Alert.alert("New Update", "DnCreate has a new update, would you like to download it?",
+                    [{
+                        text: 'Yes', onPress: async () => {
+                            Updates.fetchUpdateAsync().then(() => {
+                                Updates.reloadAsync();
+                                return;
+                            }).catch(() => {
+                                this.setState({ lookingForUpdates: false })
+                            })
+                        }
+                    }, {
+                        text: 'No', onPress: () => {
+                            this.setState({ lookingForUpdates: false })
+                        }
+                    }])
+            } else if (!updates.isAvailable) {
+                alert("No New updates found");
+                this.setState({ lookingForUpdates: false })
+            }
+        } catch (err) {
+            logger.log(new Error('Error in updates'))
+            logger.log(new Error(err))
+        }
     }
 
     render() {
@@ -227,7 +262,25 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                         <AppButton onPress={() => { this.deleteAccount() }} width={100} height={50} borderRadius={15}
                                             fontSize={20} color={Colors.black} backgroundColor={Colors.danger} title={"Delete"} />
                                     </View>
+                                    <ListItemSeparator thick={true} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
+                                        <AppText fontSize={20}>Look For Updates</AppText>
+                                        <AppButton onPress={() => {
+                                            this.checkForUpdates()
+                                        }} width={100} height={50} borderRadius={15}
+                                            fontSize={20} color={Colors.black} backgroundColor={Colors.pastelPink} title={"Check"} />
+                                    </View>
                                 </View>
+                            </Modal>
+                            <Modal
+                                style={{
+                                    backgroundColor: Colors.pageBackground,
+                                    margin: 0,
+                                    alignItems: undefined,
+                                    justifyContent: undefined,
+                                }}
+                                isVisible={this.state.lookingForUpdates}>
+                                <CheckForUpdates />
                             </Modal>
                         </View>
                 }

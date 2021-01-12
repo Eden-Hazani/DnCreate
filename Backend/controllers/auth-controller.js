@@ -261,6 +261,17 @@ router.post("/register", upload.none(), verifyInSystem, async (request, response
     }
 });
 
+router.post("/storeExpoToken", upload.none(), async (request, response) => {
+    try {
+        const user = new User(JSON.parse(request.body.user));
+        authLogic.updateUser(user)
+        console.log("User registered for notifications: ", user);
+        response.status(201).send();
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
+    }
+});
+
 
 router.post("/login", upload.none(), async (request, response) => {
     try {
@@ -275,11 +286,25 @@ router.post("/login", upload.none(), async (request, response) => {
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));
     }
-}); 4
+});
 
 router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
     try {
         response.json(true);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/isActivated", verifyLoggedIn, async (request, response) => {
+    try {
+        const user = await authLogic.validateInSystem(response.locals.user._id);
+        if (user.activated) {
+            response.json(true);
+        }
+        if (!user.activated) {
+            response.json(false);
+        }
     } catch (err) {
         response.status(500).send(err.message);
     }

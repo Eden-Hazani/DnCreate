@@ -21,6 +21,7 @@ import authApi from '../api/authApi';
 import { HomeMessage } from '../components/HomeMessage';
 import { CacheManager } from 'react-native-expo-image-cache';
 import logger from '../../utility/logger';
+import { FeedBack } from '../components/FeedBack';
 
 interface HomeState {
     loading: boolean
@@ -53,8 +54,8 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             darkModeOn: store.getState().colorScheme,
             carouselItems: [
                 {
-                    title: "Welcome to DnCreate",
-                    text: "Have Fun Creating!",
+                    title: "Send us your ideas and feedback!",
+                    message: true,
                     image: { img: require('../../assets/homeDragon1.png') }
                 },
                 {
@@ -73,17 +74,12 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+
     componentWillUnmount() {
         this.UnsubscribeStore()
     }
     async componentDidMount() {
         try {
-            // const readHomeMessage = await AsyncStorage.getItem('readHomeMessage');
-            // if (!readHomeMessage) {
-            //     this.setState({ homeMessageModal: true }, async () => {
-            //         await AsyncStorage.setItem('readHomeMessage', "true")
-            //     })
-            // }
             const date = new Date().toISOString().slice(0, 10)
             const clearCashOnceADay = await AsyncStorage.getItem('clearCashOnceADay');
             if (!clearCashOnceADay) {
@@ -154,8 +150,8 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                     <AppText fontSize={22} textAlign={'center'} color={Colors.berries}>{item.title}</AppText>
                     <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>{item.text}</AppText>
                     {item.message &&
-                        <AppButton fontSize={18} title={'Important message'} onPress={() => { this.setState({ homeMessageModal: true }) }}
-                            backgroundColor={Colors.earthYellow} width={120} height={50} borderRadius={25} />
+                        <AppButton fontSize={18} title={'Feedback'} onPress={() => { this.setState({ homeMessageModal: true }) }}
+                            backgroundColor={Colors.berries} width={120} height={50} borderRadius={25} />
                     }
                 </View>
             </View>
@@ -198,17 +194,18 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     />
                                 </View>
                                 <View style={styles.buttonsView}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
-                                        if (!this.state.activated && this.state.characters.length >= 1) {
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                        const isActive = await authApi.isActivated();
+                                        if (!isActive.data && this.state.characters.length >= 1) {
                                             this.setState({ errorModal: true })
-                                            return
+                                            return;
                                         }
                                         this.props.navigation.navigate("RaceList")
                                     }} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                                 </View>
                                 <Modal visible={this.state.homeMessageModal} animationType="slide">
-                                    <HomeMessage close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
+                                    <FeedBack close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
                                 </Modal>
                                 <Modal visible={this.state.errorModal}>
                                     <View style={{ flex: .6, backgroundColor: Colors.pageBackground, justifyContent: "center", alignItems: "center" }}>

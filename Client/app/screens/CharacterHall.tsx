@@ -46,7 +46,6 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             isInternet: true,
             loadingAd: false,
             showAds: store.getState().user.premium ? false : store.getState().firstLoginAd,
-            // showAds: true,
             error: false,
             loading: true,
             userInfo: this.context,
@@ -90,8 +89,13 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
         await AdMobInterstitial.requestAdAsync().then(async () => {
             await AdMobInterstitial.showAdAsync().then(() => {
                 this.setState({ loading: false, loadingAd: false })
-            }).catch(() => { this.loadFacebookAd() })
-        }).catch(() => { this.loadFacebookAd() })
+            }).catch(() => {
+                this.loadFacebookAd()
+                return
+            })
+        }).catch(() => {
+            this.loadFacebookAd()
+        })
 
     }
 

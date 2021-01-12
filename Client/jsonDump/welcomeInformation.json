@@ -1,0 +1,34 @@
+{
+    "list": [
+        {
+            "headline": "Hi There!",
+            "leftTextBlock": "Welcome to DnCreate",
+            "rightTextBlock": "We wanted to show you DnCreate's main features",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/fighterDragon.png"
+        },
+        {
+            "headline": "Complete Character Sheet",
+            "leftTextBlock": "DnCreate offers a full character sheet that updates as you go, level up gaining more abilities and features all explained into detail for new and veteran players alike.",
+            "rightTextBlock": "With multiple systems like items, wearable equipment, full spellbook and much more.",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/wizardDragon.png"
+        },
+        {
+            "headline": "Adventure System",
+            "leftTextBlock": "DnCreate allows you to band with your friends under your DM as a party.",
+            "rightTextBlock": "Your DM will be able to access the party members character sheets and view all the different stats you have.",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/bardDragon.png"
+        },
+        {
+            "headline": "Quest System",
+            "leftTextBlock": "Coming with the adventure system, the quest system allows the DM to issue party quests for all the banding adventurers.",
+            "rightTextBlock": "Once the DM issues a quest, every party member will be able to view it's details and track it.",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/warlockDragon.png"
+        },
+        {
+            "headline": "New Features",
+            "leftTextBlock": "We are always thinking of ways to improve DnCreate",
+            "rightTextBlock": "The app updates regularly, and you should expect tons of new exiting content",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/druidDragon.png"
+        }
+    ]
+}

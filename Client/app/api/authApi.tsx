@@ -57,10 +57,19 @@ const deleteAccount = (user_id: string) => {
 
 const resendActivationEmail = (userInfo: UserModel) => { return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/resendActivationEmail`, userInfo) }
 
+const isUserLogged = () => client.get(`${endpoint}/isUserLogged`);
 
-const isUserLogged = () => client.get(`${endpoint}/isUserLogged`)
+const isActivated = () => client.get(`${endpoint}/isActivated`);
+
+const registerNotificationToken = ((user: UserModel, token: string) => {
+    user.expoPushToken = token;
+    let formData: FormData = new FormData();
+    formData.append("user", JSON.stringify(user))
+    client.post(`${endpoint}/storeExpoToken`, formData)
+})
 
 export default {
+    registerNotificationToken,
     register,
     login,
     updateProfilePic,
@@ -68,5 +77,6 @@ export default {
     sendResetEmail,
     deleteAccount,
     isUserLogged,
-    resendActivationEmail
+    resendActivationEmail,
+    isActivated
 }

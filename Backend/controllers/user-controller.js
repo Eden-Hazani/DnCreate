@@ -6,7 +6,42 @@ const validateCharInSystem = require('../middleware/validateCharInSystem');
 const Character = require("../models/characterModel");
 var multer = require('multer');
 const removeEmptySpecificObj = require("../middleware/removeEmptySpecificObj");
+const mailgun = require("mailgun-js");
+const mg = mailgun({ apiKey: config.mailGun_API.api, domain: config.mailGun_API.domain });
 var upload = multer({})
+const errorHandler = require('../utilities/error-handler')
+
+
+
+router.post("/feedBack", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const info = JSON.parse(request.body.info);
+        const data = {
+            from: 'userFeedBack@DncCreate.com',
+            to: 'dncreateteam@gmail.com',
+            subject: 'New user feedback',
+            html: `
+                <h2> The following feedback has been sent</h2>
+                <br><br>
+                <h3>from ${info.username}</h3>
+                <br><br>
+                <p>${info.text}</p>
+                </center>
+            `
+        };
+        mg.messages().send(data, async function (error, body) {
+            if (error) {
+                console.log(error.message)
+                return response.json({
+                    message: error.message
+                })
+            }
+            return response.json({ message: "Feedback has been sent, thanks!" })
+        });
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
+    }
+});
 
 
 

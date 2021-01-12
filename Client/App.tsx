@@ -1,5 +1,5 @@
-import React, { Component, useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image, Modal } from 'react-native';
+import React from 'react';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image, Modal, Alert } from 'react-native';
 import 'react-native-gesture-handler';
 import * as Font from 'expo-font'
 import { NavigationContainer } from '@react-navigation/native'
@@ -29,7 +29,17 @@ import logger from './utility/logger';
 import * as Facebook from 'expo-facebook';
 import MainAds from './app/Ads/MainAds';
 import { AppText } from './app/components/AppText';
-import { AppMainError } from './app/components/AppMainError';
+import { CheckForUpdates } from './app/components/CheckForUpdates';
+import * as Notifications from 'expo-notifications';
+import { navigationRef } from './app/navigators/rootNavigation';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
@@ -44,7 +54,7 @@ interface AppState {
   colorScheme: boolean
   offLineMode: boolean
   bannerCallTime: boolean
-  appError: boolean
+  lookingForUpdates: boolean
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
@@ -63,7 +73,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       user: new UserModel(),
       fontsLoaded: false,
       colorScheme: false,
-      appError: false
+      lookingForUpdates: false
     }
     this.UnsubscribeStore = store.subscribe(() => {
       this.setState({ user: store.getState().user, colorScheme: store.getState().colorScheme })
@@ -72,14 +82,38 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     this.facebookBannerAd = Config.facebookBannerAd
   }
 
-  checkForUpdates = async () => {
-    if ((await Updates.checkForUpdateAsync()).isAvailable) {
-      Updates.fetchUpdateAsync().then(() => {
-        Updates.reloadAsync();
+  checkForUpdates = () => {
+    try {
+      this.setState({ lookingForUpdates: true }, async () => {
+        const updates = await Updates.checkForUpdateAsync();
+        if (updates.isAvailable) {
+          Alert.alert("New Update", "DnCreate has a new update, would you like to download it?",
+            [{
+              text: 'Yes', onPress: async () => {
+                Updates.fetchUpdateAsync().then(() => {
+                  Updates.reloadAsync();
+                }).catch(() => {
+                  this.setState({ lookingForUpdates: false })
+                  this.loadApp()
+                })
+              }
+            }, {
+              text: 'No', onPress: () => {
+                this.setState({ lookingForUpdates: false })
+                this.loadApp()
+              }
+            }])
+        } else if (!updates.isAvailable) {
+          this.setState({ lookingForUpdates: false })
+          this.loadApp()
+        }
       })
+    } catch (err) {
+      logger.log(new Error('Error in updates'))
+      logger.log(new Error(err))
     }
-    this.loadApp()
   }
+
 
   loadApp = async () => {
     try {
@@ -120,15 +154,17 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   }
 
 
-  componentDidMount() {
+  async componentDidMount() {
     logger.start();
-    if (!__DEV__) {
-      this.setState({ isReady: false }, async () => {
-        await this.checkForUpdates()
-        return
-      })
+    try {
+      if (!__DEV__) {
+        this.checkForUpdates()
+        return;
+      }
+      this.loadApp()
+    } catch (err) {
+      logger.log(new Error(err))
     }
-    this.loadApp()
   }
 
   loadColors = async () => {
@@ -174,8 +210,8 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   }
 
   componentDidCatch(error: any, info: any) {
-    this.setState({ appError: true })
     const errorObject = { error, info }
+    logger.log(new Error('Component Catch Error'))
     logger.log(new Error(JSON.stringify(errorObject)))
   }
 
@@ -184,7 +220,9 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     const { setUser } = this
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
-        { this.state.appError ? <View><AppMainError /></View> :
+        {this.state.lookingForUpdates ?
+          <CheckForUpdates />
+          :
           <View style={{ flex: 1 }}>
             {!this.state.isReady ? <AppLoading onError={(error) => { logger.log(error) }} startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
               <AuthContext.Provider value={{ user, setUser }}>
@@ -192,7 +230,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
                   <StartAnimation />
                   :
                   !this.state.fontsLoaded ? <AppLoading /> :
-                    <NavigationContainer onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
+                    <NavigationContainer ref={navigationRef} onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
                       {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
                     </NavigationContainer>
                 }

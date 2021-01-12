@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Modal, ScrollView, Vibration, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Vibration, Image, Dimensions } from 'react-native';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
 import { AppTextHeadline } from '../components/AppTextHeadline';
 import { AppText } from '../components/AppText';
@@ -14,14 +14,17 @@ import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import Carousel from 'react-native-snap-carousel';
 import AuthContext from '../auth/context';
 import { UserModel } from '../models/userModel';
+import Modal from 'react-native-modal';
+import WelcomeInformationScroller from '../components/WelcomeInformationScroller';
 
-
+Modal
 interface WelcomeState {
     newUserModal: boolean
     colorModal: boolean
     darkModeOn: boolean
     loading: boolean
     carouselItems: any[]
+    firstUseModal: boolean
 }
 
 
@@ -30,6 +33,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
     constructor(props: any) {
         super(props)
         this.state = {
+            firstUseModal: false,
             loading: false,
             newUserModal: false,
             colorModal: false,
@@ -81,11 +85,13 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
     }
 
     async componentDidMount() {
-        this.clearStorageJunk()
-        const colorScheme = await AsyncStorage.getItem("colorScheme");
-        if (colorScheme === "firstUse") {
-            this.setState({ colorModal: true })
+        const firstUse = await AsyncStorage.getItem('isFirstUse')
+        console.log(firstUse)
+        if (!firstUse) {
+            this.setState({ firstUseModal: true })
         }
+
+        this.clearStorageJunk()
     }
 
     nonUserStart = () => {
@@ -133,7 +139,15 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                             onPress={() => this.useAppOffline()} borderRadius={100} width={100} height={100} title={"Use Offline"} />
                                     </View>
                                 </View>
-                                <Modal visible={this.state.newUserModal} animationType={"slide"}>
+                                <Modal
+                                    style={{
+                                        backgroundColor: Colors.pageBackground,
+                                        margin: 0,
+                                        marginTop: 30,
+                                        alignItems: undefined,
+                                        justifyContent: undefined,
+                                    }}
+                                    isVisible={this.state.newUserModal}>
                                     <View style={{ flex: 1, paddingTop: 25, backgroundColor: Colors.pageBackground }} >
                                         <AppText textAlign={'center'} color={Colors.berries} fontSize={30}>Hi There!</AppText>
                                         <View style={{ paddingTop: 25 }}>
@@ -162,7 +176,15 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                         </View>
                                     </View>
                                 </Modal>
-                                <Modal visible={this.state.colorModal}>
+                                <Modal
+                                    style={{
+                                        backgroundColor: Colors.pageBackground,
+                                        margin: 0,
+                                        marginTop: 30,
+                                        alignItems: undefined,
+                                        justifyContent: undefined,
+                                    }}
+                                    isVisible={this.state.colorModal}>
                                     <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
                                         <View style={{ flex: 0.1, paddingTop: 150 }}>
                                             <AppText textAlign={'center'} fontSize={22} color={Colors.whiteInDarkMode}>Pick your style.</AppText>
@@ -214,6 +236,23 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                     </View>
                                 </Modal>
                             </View>
+                            <Modal
+                                style={{
+                                    backgroundColor: Colors.pageBackground,
+                                    margin: 0,
+                                    alignItems: undefined,
+                                    justifyContent: undefined,
+                                }}
+                                isVisible={this.state.firstUseModal}>
+                                <WelcomeInformationScroller PressClose={async (val: boolean) => {
+                                    this.setState({ firstUseModal: val })
+                                    await AsyncStorage.setItem('isFirstUse', "false")
+                                    const colorScheme = await AsyncStorage.getItem("colorScheme");
+                                    if (colorScheme === "firstUse") {
+                                        this.setState({ colorModal: true })
+                                    }
+                                }} />
+                            </Modal>
                         </AnimateContactUpwards>
                     </View>
                 }

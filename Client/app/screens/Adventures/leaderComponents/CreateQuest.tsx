@@ -139,7 +139,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
 
     render() {
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 {this.state.completed ? <AppConfirmation visible={this.state.completed} /> :
                     <View>
                         <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>

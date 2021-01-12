@@ -18,7 +18,7 @@ const Indicator = ({ scrollX, races }: any) => {
         , [])
     const [newColor, setColor] = useState(baseColor)
     return (
-        <View style={{ flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-start", alignItems: "flex-start", }}>
+        <View style={{ flexWrap: "wrap", flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-start", alignItems: "flex-start", }}>
             {races.map((_: any, i: any) => {
                 const inputRange = [(i - 1) * width, i * width, (i + 1) * width]
                 const scale: any = scrollX.interpolate({
@@ -107,20 +107,20 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
                         <TouchableOpacity style={{ flex: .3 }} onPress={() => onPress(item)}>
                             <Image uri={`${Config.serverUrl}/assets/${item.image}`} style={{
                                 borderRadius: 100, resizeMode: "contain",
-                                width: Dimensions.get('screen').scale < 3 ? width / 2.5 : width / 1.8, height: Dimensions.get('screen').scale < 3 ? height / 4.5 : height / 4
+                                width: Dimensions.get('screen').scale < 3 ? width / 2.2 : width / 2.5,
+                                height: Dimensions.get('screen').scale < 3 ? height / 4.5 : height / 5
                             }} />
                         </TouchableOpacity>
-                        <View style={{ flex: .05 }}>
+                        <View style={{ flex: .1 }}>
                             <AppText color={Colors.black} fontWeight={"800"} fontSize={25}>{item.name}</AppText>
                         </View>
-                        <View style={{ flex: .45 }}>
+                        <View style={{ flex: .3 }}>
                             <ScrollView style={{}}>
                                 <AppText paddingBottom={110} color={Colors.black} fontSize={17} textAlign={'center'}>{item.description}</AppText>
                             </ScrollView>
                         </View>
                     </View>} />
             <Indicator scrollX={scrollX} races={data} />
-
         </View>
     )
 }

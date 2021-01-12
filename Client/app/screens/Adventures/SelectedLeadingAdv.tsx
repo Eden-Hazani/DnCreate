@@ -233,7 +233,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                     onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: true }) }}
                                     fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
                             </View>
-                            <Modal visible={this.state.questCreationModal}>
+                            <Modal visible={this.state.questCreationModal} animationType="slide">
                                 <CreateQuest edit={{ true: false }} adventure={this.state.adventure} close={(val: boolean) => {
                                     this.setState({ questCreationModal: val })
                                     this.reloadAdventureAfterQuest();

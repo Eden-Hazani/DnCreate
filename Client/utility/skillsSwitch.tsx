@@ -3,7 +3,7 @@
 const skillSwitch = (charClass: string) => {
     let skills: any = {};
     skills.skillList = [''];
-    skills.amount = null
+    skills.amount = 0
     switch (true) {
         case charClass === 'Barbarian':
             skills.skillList = ['Animal Handling', 'Athletics', 'Intimidation', 'Nature', 'Perception', 'Survival'];

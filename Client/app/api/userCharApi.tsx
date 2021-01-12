@@ -22,6 +22,13 @@ const validateCharName = (name: string, user_id: string) => client.get(`${endpoi
 const deleteChar = (char_id: string) => client.delete(`${endpoint}/deleteChar/${char_id}`);
 
 
+const feedBack = (info: any) => {
+    let formData: FormData = new FormData();
+    formData.append("info", JSON.stringify(info))
+    return client.post(`${endpoint}/feedBack`, formData);
+};
+
+
 const updateChar = (character: CharacterModel) => {
     let formData: FormData = new FormData();
     formData.append("charInfo", JSON.stringify(character))
@@ -31,6 +38,7 @@ const updateChar = (character: CharacterModel) => {
 
 
 export default {
+    feedBack,
     getChar,
     saveChar,
     getChars,
