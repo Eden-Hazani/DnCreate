@@ -170,14 +170,21 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
 
 
 
-                                    <AppButton highlightText={true} backgroundColor={this.state.pickedEyeColor ? this.state.pickedEyeColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                    <AppButton highlightText={true}
+                                        highLightColor={Colors.pageBackground}
+                                        backgroundColor={this.state.pickedEyeColor ? this.state.pickedEyeColor : Colors.lightGray} width={110}
+                                        height={110} borderRadius={110}
                                         title={'Pick Eye Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedEyeColor" }) }} />
                                     <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
 
-                                        <AppButton highlightText={true} backgroundColor={this.state.pickedHairColor ? this.state.pickedHairColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                        <AppButton highlightText={true}
+                                            highLightColor={Colors.pageBackground}
+                                            backgroundColor={this.state.pickedHairColor ? this.state.pickedHairColor : Colors.lightGray} width={110} height={110} borderRadius={110}
                                             title={'Pick Hair Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedHairColor" }) }} />
 
-                                        <AppButton highlightText={true} backgroundColor={this.state.pickedSkinColor ? this.state.pickedSkinColor : Colors.lightGray} width={110} height={110} borderRadius={110}
+                                        <AppButton highlightText={true}
+                                            highLightColor={Colors.pageBackground}
+                                            backgroundColor={this.state.pickedSkinColor ? this.state.pickedSkinColor : Colors.lightGray} width={110} height={110} borderRadius={110}
                                             title={'Pick Skin Color'} onPress={() => { this.setState({ colorPickWindow: true, colorPickOrder: "pickedSkinColor" }) }} />
                                     </View>
 

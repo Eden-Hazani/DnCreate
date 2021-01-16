@@ -54,7 +54,9 @@ export default function InformationDrawer({ expendedWidth, expendedHeight, infor
                         </View>
                         :
                         <Animated.View style={[animationStatus.getLayout(), { padding: 25 }]}>
-                            <AppText color={Colors.totalWhite}>{information.replace(/\. /g, '.\n\n')}</AppText>
+                            {information &&
+                                <AppText color={Colors.totalWhite}>{information.replace(/\. /g, '.\n\n')}</AppText>
+                            }
                         </Animated.View>
                     }
                 </View>
