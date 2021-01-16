@@ -276,12 +276,13 @@ router.post("/storeExpoToken", upload.none(), async (request, response) => {
 router.post("/login", upload.none(), async (request, response) => {
     try {
         const credentials = new User(JSON.parse(request.body.credentials));
+        const options = JSON.parse(request.body.options)
         const user = await authLogic.login(credentials);
         if (!user) {
             response.status(401).send("Incorrect username or password");
             return;
         }
-        const token = jwt.sign({ user }, config.jwt.secretKey, { expiresIn: "50h" })
+        const token = jwt.sign({ user }, config.jwt.secretKey, !options.remainLoggedIn && { expiresIn: "2d" })
         response.json({ token });
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));
@@ -326,7 +327,6 @@ router.post("/databaseLoginAdmin", cors(), async (request, response) => {
 
 router.post("/databaseFindPersonAdmin", cors(), async (request, response) => {
     try {
-        console.log(request.body)
         const user = await authLogic.findUserAsAdmin(request.body.username);
         response.json({ user });
     } catch (err) {
@@ -336,10 +336,8 @@ router.post("/databaseFindPersonAdmin", cors(), async (request, response) => {
 
 router.post("/changePremiumStatusAdmin", cors(), async (request, response) => {
     try {
-        console.log(request.body)
         const userToUpdate = new User(request.body);
         const user = await authLogic.updateUser(userToUpdate)
-        console.log(user)
         response.json({ user });
     } catch (err) {
         response.status(500).send(err.message);

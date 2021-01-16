@@ -32,6 +32,7 @@ import { AppText } from './app/components/AppText';
 import { CheckForUpdates } from './app/components/CheckForUpdates';
 import * as Notifications from 'expo-notifications';
 import { navigationRef } from './app/navigators/rootNavigation';
+import { CacheManager } from 'react-native-expo-image-cache'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -90,8 +91,12 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           Alert.alert("New Update", "DnCreate has a new update, would you like to download it?",
             [{
               text: 'Yes', onPress: async () => {
-                Updates.fetchUpdateAsync().then(() => {
-                  Updates.reloadAsync();
+                Updates.fetchUpdateAsync().then(({ isNew }) => {
+                  if (isNew) {
+                    setTimeout(() => {
+                      Updates.reloadAsync();
+                    }, 2000);
+                  }
                 }).catch(() => {
                   this.setState({ lookingForUpdates: false })
                   this.loadApp()
@@ -155,6 +160,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
 
 
   async componentDidMount() {
+    CacheManager.clearCache()
     logger.start();
     try {
       if (!__DEV__) {

@@ -114,7 +114,9 @@ export class CreatePDF extends Component<{ route: any, navigation: any }, Create
         let fullList: any[] = []
         let html: string = '';
         let hightIndex: number = 695;
-        if (this.state.character.raceId && this.state.character.raceId.raceAbilities && this.state.character.raceId.raceAbilities.uniqueAbilities && this.state.character.feats && this.state.character.pathFeatures) {
+        if (this.state.character.raceId && this.state.character.raceId.raceAbilities &&
+            this.state.character.raceId.raceAbilities.uniqueAbilities && this.state.character.feats &&
+            this.state.character.pathFeatures) {
             for (let item of this.state.character.raceId.raceAbilities.uniqueAbilities) {
                 fullList.push([item.name, item.description.slice(0, 50)])
             }

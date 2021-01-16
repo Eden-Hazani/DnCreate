@@ -33,9 +33,10 @@ const updateProfilePic = (value: any, userInfo: UserModel) => {
     return client.patch<any>(`${endpoint}/addProfilePicture`, formData);
 }
 
-const login = (values: any) => {
+const login = (values: any, remainLoggedIn: boolean) => {
     let formData: FormData = new FormData();
     formData.append("credentials", JSON.stringify(values))
+    formData.append("options", JSON.stringify({ alwaysLogged: remainLoggedIn }))
     return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/login`, formData)
 };
 

@@ -86,7 +86,6 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
 
     async componentDidMount() {
         const firstUse = await AsyncStorage.getItem('isFirstUse')
-        console.log(firstUse)
         if (!firstUse) {
             this.setState({ firstUseModal: true })
         }

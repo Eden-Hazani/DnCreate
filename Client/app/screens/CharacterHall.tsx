@@ -22,6 +22,7 @@ import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../components/AppNoInternet';
 import * as FacebookAds from 'expo-ads-facebook';
 import logger from '../../utility/logger';
+import CharacterHallList from '../components/CharacterHallList';
 
 interface CharacterHallState {
     characters: CharacterModel[]
@@ -228,23 +229,10 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                                         <View style={{ justifyContent: "center", alignItems: "center" }}>
                                             <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
                                         </View> :
-                                        <FlatList
-                                            data={this.state.characters as any}
-                                            keyExtractor={characters => characters._id.toString()}
-                                            renderItem={({ item }) => <ListItem
-                                                title={item.name}
-                                                subTitle={`${item.characterClass} ${item.race}`}
-                                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
-                                                direction={'row'}
-                                                padding={20} width={60} height={60}
-                                                headTextAlign={"left"}
-                                                subTextAlign={"left"}
-                                                justifyContent={"flex-start"} textDistanceFromImg={10}
-                                                renderRightActions={() =>
-                                                    <ListItemDelete onPress={() =>
-                                                        Alert.alert("Delete", "Are you sure you want to delete this character? (this action is irreversible)", [{ text: 'Yes', onPress: () => this.handleDelete(item) }, { text: 'No' }])} />}
-                                                onPress={() => this.characterWindow(item)} />}
-                                            ItemSeparatorComponent={ListItemSeparator} />}
+                                        <CharacterHallList characters={this.state.characters}
+                                            deleteChar={(val: CharacterModel) => { this.handleDelete(val) }}
+                                            openCharacter={(val: CharacterModel) => { this.characterWindow(val) }} />
+                                    }
                                 </View>}
                         </View>}
             </View>

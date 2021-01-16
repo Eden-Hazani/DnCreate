@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, Modal, View } from 'react-native';
+import { Dimensions, Modal, Switch, View } from 'react-native';
 import { AppTextHeadline } from '../components/AppTextHeadline';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
 import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
@@ -25,6 +25,7 @@ interface LoginState {
     error: boolean,
     forgotPasswordModel: boolean,
     resetPassEmail: string
+    remainLoggedIn: boolean
 }
 
 const ValidationSchema = Yup.object().shape({
@@ -38,6 +39,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
     constructor(props: any) {
         super(props)
         this.state = {
+            remainLoggedIn: false,
             resetPassEmail: '',
             forgotPasswordModel: false,
             loading: false,
@@ -56,7 +58,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
             password: values.password
         }
         this.setState({ loading: true })
-        await authApi.login(newValues).then(result => {
+        await authApi.login(newValues, this.state.remainLoggedIn).then(result => {
             const userInfo: any = result.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
                 const { user, setUser } = this.context
@@ -103,7 +105,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                             initialValues={{ username: '', password: '' }}
                             onSubmit={(values: any) => this.login(values)}
                             validationSchema={ValidationSchema}>
-                            <View style={{ marginBottom: 40, justifyContent: "center", alignItems: "center" }}>
+                            <View style={{ marginBottom: 5, justifyContent: "center", alignItems: "center" }}>
                                 <AppFormField
                                     width={Dimensions.get('screen').width / 1.2}
                                     fieldName={"username"}
@@ -115,6 +117,16 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                     fieldName={"password"}
                                     iconName={"lock-outline"}
                                     placeholder={"password..."} />
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 25 }}>
+                                <AppText>Remain Logged</AppText>
+                                <Switch value={this.state.remainLoggedIn} onValueChange={() => {
+                                    if (this.state.remainLoggedIn) {
+                                        this.setState({ remainLoggedIn: false })
+                                        return;
+                                    }
+                                    this.setState({ remainLoggedIn: true })
+                                }} />
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18} marginBottom={1}

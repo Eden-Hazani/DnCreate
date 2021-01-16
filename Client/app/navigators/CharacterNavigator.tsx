@@ -3,7 +3,6 @@ import { Colors } from '../config/colors';
 import { HomeScreen } from '../screens/HomeScreen';
 import { RaceList } from '../screens/CharCreation/RaceList';
 import { NewCharInfo } from '../screens/CharCreation/NewCharInfo';
-import { ClassPick } from '../screens/CharCreation/ClassPick';
 import { AttributePicking } from '../screens/CharCreation/AttributePicking';
 import { CharBackstory } from '../screens/CharCreation/CharBackstory';
 import { CharacterHall } from '../screens/CharacterHall';
@@ -36,6 +35,7 @@ import { CitiesNote } from '../screens/charOptions/personalNoteTypes/CitiesNotes
 import { LocationNotes } from '../screens/charOptions/personalNoteTypes/LocationNotes';
 import { PeopleNotes } from '../screens/charOptions/personalNoteTypes/PeopleNotes';
 import { OtherNotes } from '../screens/charOptions/personalNoteTypes/OtherNotes';
+import ClassPick from '../screens/CharCreation/ClassPick';
 
 const Stack = createStackNavigator();
 
@@ -63,7 +63,7 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "", headerTintColor: Colors.black }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "" }} name="NewCharInfo" component={NewCharInfo} />
-        <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick} />
+        <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick as any} />
         <Stack.Screen options={{ title: "" }} name="CharSkillPick" component={CharSkillPick} />
         <Stack.Screen options={{ title: "" }} name="AttributePicking" component={AttributePicking} />
         <Stack.Screen options={{ title: "Personality Traits", headerShown: false }} name="CharPersonalityTraits" component={CharPersonalityTraits} />

@@ -17,6 +17,8 @@ import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { CreateQuest } from './leaderComponents/CreateQuest';
 import logger from '../../../utility/logger';
+import { io } from 'socket.io-client';
+const socket = io(Config.serverUrl);
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
@@ -24,6 +26,7 @@ interface SelectedLeadingAdvState {
     refreshing: boolean
     profilePicList: any[]
     questCreationModal: boolean
+    innerLoading: boolean
 }
 
 export class SelectedLeadingAdv extends Component<{ navigation: any, route: any }, SelectedLeadingAdvState> {
@@ -37,6 +40,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
             adventure: this.props.route.params.adventure,
             loading: true,
             refreshing: false,
+            innerLoading: false
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -65,24 +69,36 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         }
     }
 
+    getUserProfileImg = async (adventure: AdventureModel) => {
+        let userArray: string[] = []
+        if (adventure.participants_id !== undefined) {
+            for (let item of adventure.participants_id) {
+                if (item.user_id !== undefined) {
+                    userArray.push(item.user_id)
+                }
+            }
+            const userPicList: any = await adventureApi.getUserProfileImages(userArray)
+            const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
+            this.setState({ profilePicList: picList }, () => {
+                this.setState({ loading: false })
+            })
+        }
+    }
+
     async componentDidMount() {
         try {
-            let userArray: string[] = []
-            if (this.state.adventure.participants_id !== undefined) {
-                for (let item of this.state.adventure.participants_id) {
-                    if (item.user_id !== undefined) {
-                        userArray.push(item.user_id)
-                    }
-                }
-                const userPicList: any = await adventureApi.getUserProfileImages(userArray)
-                const picList = userArray.map((item, index) => [item, userPicList.data.list[index]])
-                this.setState({ profilePicList: picList }, () => {
-                    this.setState({ loading: false })
-                })
-            }
+            await this.getUserProfileImg(this.state.adventure)
             this.props.navigation.addListener('beforeRemove', (e: any) => {
                 e.preventDefault();
             })
+            socket.on(`adventure-${this.state.adventure._id}-change`, (updatedAdventure: any) => {
+                this.setState({ innerLoading: true }, async () => {
+                    await this.getUserProfileImg(updatedAdventure)
+                    this.setState({ adventure: updatedAdventure, innerLoading: false })
+                    store.dispatch({ type: ActionType.ReplaceLeadAdventure, payload: updatedAdventure })
+                })
+            });
+
         } catch (err) {
             logger.log(new Error(err))
         }
@@ -191,38 +207,40 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                             </View>
                             :
                             <View style={{ flex: .8 }}>
-                                <FlatList
-                                    data={adventure.participants_id}
-                                    keyExtractor={(currentParticipants, index) => index.toString()}
-                                    renderItem={({ item, index }) => <ListItem
-                                        title={item.name}
-                                        subTitle={item.characterClass}
-                                        imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
-                                        direction={'row'}
-                                        headerFontSize={18}
-                                        headColor={Colors.bitterSweetRed}
-                                        subFontSize={15}
-                                        padding={20} width={60} height={60}
-                                        headTextAlign={"left"}
-                                        subTextAlign={"left"}
-                                        justifyContent={"flex-start"} textDistanceFromImg={10}
-                                        renderRightActions={() =>
-                                            <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
-                                        onPress={() => this.characterWindow(item)} />}
-                                    ItemSeparatorComponent={ListItemSeparator}
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={() => {
-                                        if (adventure.adventureIdentifier) {
-                                            this.reloadAdventure(adventure.adventureIdentifier)
-                                        }
-                                    }} />
+                                {this.state.innerLoading ? <AppActivityIndicator visible={this.state.innerLoading} /> :
+                                    <FlatList
+                                        data={adventure.participants_id}
+                                        keyExtractor={(currentParticipants, index) => index.toString()}
+                                        renderItem={({ item, index }) => <ListItem
+                                            title={item.name}
+                                            subTitle={item.characterClass}
+                                            imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
+                                            direction={'row'}
+                                            headerFontSize={18}
+                                            headColor={Colors.bitterSweetRed}
+                                            subFontSize={15}
+                                            padding={20} width={60} height={60}
+                                            headTextAlign={"left"}
+                                            subTextAlign={"left"}
+                                            justifyContent={"flex-start"} textDistanceFromImg={10}
+                                            renderRightActions={() =>
+                                                <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
+                                            onPress={() => this.characterWindow(item)} />}
+                                        ItemSeparatorComponent={ListItemSeparator}
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={() => {
+                                            if (adventure.adventureIdentifier) {
+                                                this.reloadAdventure(adventure.adventureIdentifier)
+                                            }
+                                        }} />
+                                }
                             </View>
                         }
                         <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
                             <AppText fontSize={18}>Adventure identifier:</AppText>
                             <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                         </View>
-                        <View>
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
                             <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ questCreationModal: true }) }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Quest Creator"} />
                             <View style={{ flexDirection: "row" }}>

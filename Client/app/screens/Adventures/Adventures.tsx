@@ -17,6 +17,9 @@ import { AdventureModel } from '../../models/AdventureModel';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
+import { io } from 'socket.io-client';
+import { Config } from '../../../config';
+const socket = io(Config.serverUrl);
 
 interface AdventuresState {
     loading: boolean
@@ -43,12 +46,14 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             this.setState({ leadingAdventures: store.getState().leadingAdv })
             this.setState({ participatingAdventures: store.getState().participatingAdv })
         })
-        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
-
     }
 
-    onFocus = async () => {
+
+    componentDidMount() {
         try {
+            setTimeout(() => {
+                this.setState({ loading: false })
+            }, 800);
             if (this.state.characters.length === 0) {
                 const characters = store.getState().characters;
                 this.setState({ characters: characters }, () => {
@@ -61,15 +66,29 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
             }
             this.getLeadingAdv()
             this.getParticipatingAdv()
+            //same socket for delete and remove user to lower connection costs, preferred way is two sockets
+            socket.on(`adventure-removedChange`, (adventureIdentifier: string) => {
+                this.refreshParticipating(adventureIdentifier || '')
+            });
         } catch (err) {
-            logger.log(new Error(err))
+            logger.log(err)
         }
     }
 
-    componentDidMount() {
-        setTimeout(() => {
-            this.setState({ loading: false })
-        }, 800);
+    refreshParticipating = (adventureIdentifier: string) => {
+        const participatingAdventures = this.state.participatingAdventures;
+        let index = 0;
+        for (let adventure of this.state.participatingAdventures) {
+            if (adventureIdentifier === adventure.adventureIdentifier) {
+                this.setState({ loading: true }, async () => {
+                    participatingAdventures.splice(index, 1)
+                    this.setState({ participatingAdventures, loading: false }, () => {
+                        store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: participatingAdventures })
+                    })
+                })
+            }
+            index++
+        }
     }
 
     componentWillUnmount() {

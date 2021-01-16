@@ -80,35 +80,35 @@ export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any
                                     keyboardType={"numeric"}
                                     fieldName={"constitution"}
                                     name="constitution"
-                                    iconName={"lock-outline"}
+                                    iconName={"text-short"}
                                     placeholder={"Constitution..."} />
                                 <AppFormField
                                     style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     keyboardType={"numeric"}
                                     fieldName={"dexterity"}
                                     name="dexterity"
-                                    iconName={"lock-outline"}
+                                    iconName={"text-short"}
                                     placeholder={"Dexterity..."} />
                                 <AppFormField
                                     style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     keyboardType={"numeric"}
                                     fieldName={"intelligence"}
                                     name="intelligence"
-                                    iconName={"lock-outline"}
+                                    iconName={"text-short"}
                                     placeholder={"Intelligence..."} />
                                 <AppFormField
                                     style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     keyboardType={"numeric"}
                                     fieldName={"wisdom"}
                                     name="wisdom"
-                                    iconName={"lock-outline"}
+                                    iconName={"text-short"}
                                     placeholder={"Wisdom..."} />
                                 <AppFormField
                                     style={{ width: Dimensions.get('screen').width / 1.2 }}
                                     keyboardType={"numeric"}
                                     fieldName={"charisma"}
                                     name="charisma"
-                                    iconName={"lock-outline"}
+                                    iconName={"text-short"}
                                     placeholder={"Charisma..."} />
 
                             </View>

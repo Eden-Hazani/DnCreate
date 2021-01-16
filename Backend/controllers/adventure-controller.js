@@ -25,7 +25,6 @@ router.post("/createAdventure", verifyLogged, upload.none(), async (request, res
 
 router.post("/getUsersProfilePic", verifyLogged, upload.none(), async (request, response) => {
     try {
-        console.log(JSON.parse(request.body.userList))
         const userList = JSON.parse(request.body.userList);
         const picList = await adventureLogic.getUsersProfilePicture(userList)
         response.json({ list: picList });
@@ -40,11 +39,13 @@ router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, re
         const targetUser = await authLogic.validateInSystem(JSON.parse(request.body.adventure).leader_id)
         const joiningUserCharacter = await userLogic.getChar(JSON.parse(request.body.adventure).participants_id[JSON.parse(request.body.adventure).participants_id.length - 1])
         const adventure = new Adventure(JSON.parse(request.body.adventure))
+        console.log(JSON.parse(request.body.adventure).leader_id)
         const { expoPushToken } = targetUser;
-        if (Expo.isExpoPushToken(expoPushToken))
+        if (Expo.isExpoPushToken(expoPushToken)) {
             await sendPushNotification(expoPushToken, "New adventurer has joined", `${joiningUserCharacter.name} has joined ${adventure.adventureName}`);
-
+        }
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
         response.json(updatedAdventure);
     } catch (err) {
         response.status(500).send(err.message);
@@ -65,6 +66,7 @@ router.patch("/leaveAdventure", verifyLogged, upload.none(), async (request, res
     try {
         const adventure = new Adventure(JSON.parse(request.body.adventure));
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        global.socketServer.emit(`adventure-removedChange`, updatedAdventure.adventureIdentifier);
         response.json(updatedAdventure);
     } catch (err) {
         response.status(500).send(err.message);
@@ -126,6 +128,7 @@ router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, 
     try {
         const adventureIdentifier = request.params.adventureIdentifier;
         await adventureLogic.removeAdventure(adventureIdentifier);
+        global.socketServer.emit(`adventure-removedChange`, adventureIdentifier);
         response.sendStatus(204);
     } catch (err) {
         response.status(500).send(err.message);

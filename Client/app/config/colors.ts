@@ -27,6 +27,7 @@ export class Colors {
     public static burgundy: string;
     public static pastelPink: string;
     public static earthYellow: string;
+    public static deepGold: string;
     public static async InitializeAsync() {
         await AsyncStorage.getItem('colorScheme').then(scheme => {
             if (scheme === "firstUse") {
@@ -54,6 +55,7 @@ export class Colors {
                 Colors.burgundy = "#7B0D1E"
                 Colors.pastelPink = "#EFA7A7"
                 Colors.earthYellow = "#E0A458"
+                Colors.deepGold = "#D1B000"
             }
             if (scheme === "light") {
                 Colors.primary = '#F2A65A'
@@ -80,6 +82,7 @@ export class Colors {
                 Colors.burgundy = "#7B0D1E"
                 Colors.pastelPink = "#EFA7A7"
                 Colors.earthYellow = "#E0A458"
+                Colors.deepGold = "#D1B000"
 
             }
             if (scheme === "dark") {
@@ -107,6 +110,7 @@ export class Colors {
                 Colors.burgundy = "#7B0D1E"
                 Colors.pastelPink = "#EFA7A7"
                 Colors.earthYellow = "#E0A458"
+                Colors.deepGold = "#D1B000"
             }
         })
     }

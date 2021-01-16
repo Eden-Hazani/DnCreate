@@ -18,6 +18,7 @@ const compression = require("compression");
 const config = require("config");
 const app = express();
 const cors = require('cors')
+const socketIo = require('socket.io');
 
 //..
 app.use(express.static(__dirname + '/public'));
@@ -36,6 +37,5 @@ app.use("/api/user", userController);
 app.use("/api/adventures", adventureController);
 
 const port = process.env.PORT || config.get("port");
-app.listen(port, function () {
-  console.log(`Server started on port ${port}...`);
-});
+const listener = app.listen(port, function () { console.log(`Server started on port ${port}...`); });
+global.socketServer = socketIo(listener);

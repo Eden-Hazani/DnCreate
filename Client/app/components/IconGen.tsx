@@ -14,6 +14,8 @@ export class IconGen extends Component<any>{
     render() {
         return (
             <View style={{
+                borderColor: this.props.borderColor ? this.props.borderColor : null,
+                borderWidth: this.props.borderWidth ? this.props.borderWidth : null,
                 width: this.props.size,
                 height: this.props.size,
                 borderRadius: this.props.size / 2,

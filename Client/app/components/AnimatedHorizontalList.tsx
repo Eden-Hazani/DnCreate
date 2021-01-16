@@ -10,6 +10,9 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('screen');
 
+
+
+
 const Indicator = ({ scrollX, races }: any) => {
     const { subscribe } = store
     let baseColor = Colors.bitterSweetRed
@@ -17,31 +20,38 @@ const Indicator = ({ scrollX, races }: any) => {
         () => setColor(Colors.bitterSweetRed))
         , [])
     const [newColor, setColor] = useState(baseColor)
+    let innerHeight = 0;
+    let innerLeft = 0
     return (
-        <View style={{ flexWrap: "wrap", flexDirection: 'row', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-start", alignItems: "flex-start", }}>
-            {races.map((_: any, i: any) => {
-                const inputRange = [(i - 1) * width, i * width, (i + 1) * width]
-                const scale: any = scrollX.interpolate({
-                    inputRange,
-                    outputRange: [0.8, 1.4, 0.8],
-                    extrapolate: 'clamp'
-                })
-                const opacity: any = scrollX.interpolate({
-                    inputRange,
-                    outputRange: [0.4, 0.9, 0.6],
-                    extrapolate: 'clamp'
-                })
-                return <Animated.View key={`indicator-${i}`}
+        races.map((_: any, i: any) => {
+            innerHeight = innerHeight + 30;
+            const inputRange = [(i - 1) * width, i * width, (i + 1) * width]
+            const scale: any = scrollX.interpolate({
+                inputRange,
+                outputRange: [0.8, 1.4, 0.8],
+                extrapolate: 'clamp'
+            })
+            const opacity: any = scrollX.interpolate({
+                inputRange,
+                outputRange: [0.4, 0.9, 0.6],
+                extrapolate: 'clamp'
+            })
+            if (innerHeight >= height - 120) {
+                innerHeight = 30;
+                innerLeft = width - 30;
+            }
+            return <View style={{ flexWrap: "wrap", position: 'absolute', top: innerHeight, left: innerLeft }} key={`indicator-${i}`}>
+                <Animated.View
                     style={{
                         height: 10, width: 10, borderRadius: 5,
                         backgroundColor: newColor, margin: 10,
                         transform: [{ scale }],
                         opacity
                     }}>
-
                 </Animated.View>
-            })}
-        </View>
+            </View>
+        })
+        // </View>
     )
 }
 

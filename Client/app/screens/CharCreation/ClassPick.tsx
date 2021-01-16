@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, Linking } from 'react-native';
+import React, { Component, useEffect, useState } from 'react';
+import { View, StyleSheet, Linking, FlatList, Dimensions, Animated, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
@@ -16,8 +16,54 @@ import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Image } from 'react-native-expo-image-cache';
+import { Image, CacheManager } from 'react-native-expo-image-cache';
 import { Config } from '../../../config';
+import { IconGen } from '../../components/IconGen';
+import Modal from 'react-native-modal';
+import { useNavigation } from '@react-navigation/native';
+import InformationDrawer from '../../components/InformationDrawer';
+
+const { width, height } = Dimensions.get('window');
+
+const dragonClasses = {
+    Starting: `${Config.serverUrl}/assets/classDragons/pickDragon.png`,
+    Barbarian: `${Config.serverUrl}/assets/classDragons/barbarianDragon.png`,
+    Bard: `${Config.serverUrl}/assets/classDragons/bardDragon.png`,
+    Fighter: `${Config.serverUrl}/assets/classDragons/fighterDragon.png`,
+    Druid: `${Config.serverUrl}/assets/classDragons/druidDragon.png`,
+    Cleric: `${Config.serverUrl}/assets/classDragons/clericDragon.png`,
+    Monk: `${Config.serverUrl}/assets/classDragons/monkDragon.png`,
+    Paladin: `${Config.serverUrl}/assets/classDragons/paladinDragon.png`,
+    Ranger: `${Config.serverUrl}/assets/classDragons/rangerDragon.png`,
+    Rogue: `${Config.serverUrl}/assets/classDragons/rogueDragon.png`,
+    Sorcerer: `${Config.serverUrl}/assets/classDragons/sorcererDragon.png`,
+    Warlock: `${Config.serverUrl}/assets/classDragons/warlockDragon.png`,
+    Wizard: `${Config.serverUrl}/assets/classDragons/wizardDragon.png`,
+}
+const classesBackgrounds = {
+    Starting: `${Config.serverUrl}/assets/classBackGrounds/Starting.png`,
+    Barbarian: `${Config.serverUrl}/assets/classBackGrounds/BarbarianFinal.png`,
+    Bard: `${Config.serverUrl}/assets/classBackGrounds/BardFinal.jpg`,
+    Fighter: `${Config.serverUrl}/assets/classBackGrounds/FighterFinal.jpg`,
+    Druid: `${Config.serverUrl}/assets/classBackGrounds/DruidFinal.png`,
+    Cleric: `${Config.serverUrl}/assets/classBackGrounds/ClericFinal.jpg`,
+    Monk: `${Config.serverUrl}/assets/classBackGrounds/MonkFinal.png`,
+    Paladin: `${Config.serverUrl}/assets/classBackGrounds/PaladinFinal.jpg`,
+    Ranger: `${Config.serverUrl}/assets/classBackGrounds/RangerFinal.png`,
+    Rogue: `${Config.serverUrl}/assets/classBackGrounds/RogueFinal.png`,
+    Sorcerer: `${Config.serverUrl}/assets/classBackGrounds/SorcererFinal.png`,
+    Warlock: `${Config.serverUrl}/assets/classBackGrounds/WarlockFinal.png`,
+    Wizard: `${Config.serverUrl}/assets/classBackGrounds/WizardFinal.jpg`,
+}
+
+const starterImg = [
+    {
+        name: "Starting",
+        text: "In this section you will need to pick your characters class.",
+        description: "Each class has it's own benefits and weaknesses, work with your team to create a versatile party!"
+    }
+]
+
 interface ClassPickState {
     loading: boolean
     classes: ClassModel[] | undefined
@@ -28,146 +74,189 @@ interface ClassPickState {
     confirmed: boolean
 }
 
-export class ClassPick extends Component<{ route: any, placeholder: string, navigation: any }, ClassPickState>{
-    private UnsubscribeStore: Unsubscribe;
-    private dragonClasses: any
-    constructor(props: any) {
-        super(props)
-        this.state = {
-            isUserOffline: false,
-            confirmed: false,
-            loading: false,
-            error: false,
-            classes: [],
-            pickedClass: new ClassModel(),
-            characterInfo: store.getState().character
-        }
-        this.UnsubscribeStore = store.subscribe(() => {
-            store.getState().character
-        })
-        this.dragonClasses = {
-            Barbarian: `${Config.serverUrl}/assets/classDragons/barbarianDragon.png`,
-            Bard: `${Config.serverUrl}/assets/classDragons/bardDragon.png`,
-            Fighter: `${Config.serverUrl}/assets/classDragons/fighterDragon.png`,
-            Druid: `${Config.serverUrl}/assets/classDragons/druidDragon.png`,
-            Cleric: `${Config.serverUrl}/assets/classDragons/clericDragon.png`,
-            Monk: `${Config.serverUrl}/assets/classDragons/monkDragon.png`,
-            Paladin: `${Config.serverUrl}/assets/classDragons/paladinDragon.png`,
-            Ranger: `${Config.serverUrl}/assets/classDragons/rangerDragon.png`,
-            Rogue: `${Config.serverUrl}/assets/classDragons/rogueDragon.png`,
-            Sorcerer: `${Config.serverUrl}/assets/classDragons/sorcererDragon.png`,
-            Warlock: `${Config.serverUrl}/assets/classDragons/warlockDragon.png`,
-            Wizard: `${Config.serverUrl}/assets/classDragons/wizardDragon.png`,
-        }
-    }
-    componentWillUnmount() {
-        this.UnsubscribeStore()
-    }
 
-    insertInfoAndContinue = () => {
-        const characterInfo = { ...this.state.characterInfo };
-        characterInfo.characterClass = this.state.pickedClass.name;
-        this.state.isUserOffline ? characterInfo.characterClassId = this.state.pickedClass : characterInfo.characterClassId = this.state.pickedClass._id as any;
-        this.setState({ confirmed: true })
-        this.setState({ characterInfo }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-        })
-        setTimeout(() => {
-            this.props.navigation.navigate("AttributePicking", { race: this.props.route.params.race })
-        }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
-    }
-    async componentDidMount() {
+export default function ClassPick({ route, placeholder }: any) {
+    useEffect(() => {
+        checkIfOffline()
+        getClasses()
+    }, [])
+    const navigation = useNavigation();
+    const [isUserOffline, setIsUserOffline] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [confirmed, setConfirmed] = useState(false);
+    const [error, setError] = useState(false);
+    const [classes, setClasses] = useState([]);
+    const [pickedClass, setPickedClass] = useState(new ClassModel());
+    const [characterInfo, setCharacterInfo] = useState(store.getState().character);
+    const scrollX = React.useRef(new Animated.Value(0)).current;
+    const checkIfOffline = async () => {
         const isOffline = await AsyncStorage.getItem('isOffline');
         if (isOffline) {
-            this.setState({ isUserOffline: JSON.parse(isOffline) })
+            setIsUserOffline(JSON.parse(isOffline))
         }
-        this.getClasses()
     }
 
-    getClasses = async () => {
+    const insertInfoAndContinue = () => {
+        characterInfo.characterClass = pickedClass.name;
+        isUserOffline ? characterInfo.characterClassId = pickedClass : characterInfo.characterClassId = pickedClass._id as any;
+        setConfirmed(true)
+        setCharacterInfo(characterInfo)
+        store.dispatch({ type: ActionType.SetInfoToChar, payload: characterInfo })
+        setTimeout(() => {
+            navigation.navigate("AttributePicking", { race: route.params.race })
+        }, 800);
+        setTimeout(() => {
+            setConfirmed(false)
+        }, 1100);
+    }
+
+
+    const getClasses = async () => {
         AsyncStorage.removeItem('classList')
-        this.setState({ loading: true })
         const cachedClasses = await AsyncStorage.getItem('classList');
-        this.setState({ loading: true })
         if (cachedClasses) {
             const classes = JSON.parse(cachedClasses);
-            this.setState({ classes }, () => {
-                this.setState({ loading: false })
-            })
+            const wholeClasses: any = starterImg.concat(classes)
+            setClasses(wholeClasses)
+            setLoading(false)
             return;
         }
         const result = await charClassApi.getClassesList();
         await AsyncStorage.setItem('classList', JSON.stringify(result.data));
-        this.setState({ loading: false })
-        const classes = result.data;
-        this.setState({ classes, error: errorHandler(result) })
-
+        const classes: any = result.data;
+        const wholeClasses: any = starterImg.concat(classes)
+        setClasses(wholeClasses)
+        setLoading(false)
     }
+    return (
+        <View style={styles.container}>
+            {confirmed ? <AppConfirmation visible={confirmed} /> :
+                <View style={styles.container}>
+                    {loading ? <AppActivityIndicator visible={loading} /> :
+                        error ? <AppError /> :
+                            <View style={{ height }}>
+                                <View
+                                    style={[StyleSheet.absoluteFillObject]}>
+                                    {classes?.map((item: ClassModel, index) => {
+                                        const inputRange = [
+                                            (index - 1) * width,
+                                            index * width,
+                                            (index + 1) * width
+                                        ];
+                                        const opacity = scrollX.interpolate({
+                                            inputRange,
+                                            outputRange: [0, 1, 0]
+                                        })
+                                        return <Animated.Image
+                                            blurRadius={1.6}
 
-    render() {
-        return (
-            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
-                {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
-                    <View style={styles.container}>
-                        {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                            this.state.error ? <AppError /> :
-                                <View style={{ flex: 1 }}>
-                                    <View style={{ paddingTop: 50, padding: 10, paddingBottom: 0 }}>
-                                        <AppText textAlign={"center"} fontSize={20}>In this section you will need to pick your characters class.</AppText>
-                                        <AppText textAlign={"center"} fontSize={18}>Each class has it's own benefits and weaknesses, work with your team to create a versatile party!</AppText>
-                                    </View>
-                                    <View style={{ flex: .15 }}>
-                                        <AppPicker itemList={this.state.classes} selectedItemIcon={this.state.pickedClass.icon} selectedItem={this.state.pickedClass.name} selectItem={(pickedClass: any) => { this.setState({ pickedClass: pickedClass }) }} numColumns={3} placeholder={"Pick Class"} iconName={"apps"} />
-                                    </View>
-                                    {this.state.pickedClass.name &&
-                                        <View style={styles.infoContainer}>
-                                            <View >
-                                                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                                    <Image style={{ width: 150, height: 150 }} uri={this.dragonClasses[this.state.pickedClass.name]} />
-                                                </View>
-                                                <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {this.state.pickedClass.name}</AppText>
-                                                <AppText fontSize={20} textAlign={"center"}>{this.state.pickedClass.description && this.state.pickedClass.description.replace(/\. /g, '.\n\n')}</AppText>
-                                                <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.brifInfo && this.state.pickedClass.brifInfo.replace(/\. /g, '.\n\n')}</AppText>
-                                                <View style={{ flexWrap: "wrap", alignItems: "center", flexDirection: "row", justifyContent: "space-around" }}>
-                                                    <View style={{ width: "50%", marginTop: 10 }}>
-                                                        <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
-                                                        <AppText textAlign={"center"} fontSize={15}>{this.state.pickedClass.recommendation}</AppText>
+                                            style={[StyleSheet.absoluteFillObject, { opacity, resizeMode: "stretch" }]}
+                                            key={index} source={{ uri: classesBackgrounds[item.name || ''] }} />
+                                    })}
+                                </View>
+                                <Animated.FlatList
+                                    data={classes}
+                                    horizontal
+                                    pagingEnabled
+                                    onScroll={Animated.event(
+                                        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                                        { useNativeDriver: true }
+                                    )}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(_, index) => index.toString()}
+                                    renderItem={({ item, index }: any) => {
+                                        const inputRange = [
+                                            (index - 1) * width,
+                                            index * width,
+                                            (index + 1) * width
+                                        ];
+                                        const scale = scrollX.interpolate({
+                                            inputRange,
+                                            outputRange: [0, 1, 0]
+                                        })
+                                        return <View key={index} style={{ width, justifyContent: "center", alignItems: "center" }}>
+                                            {index === 0 ?
+                                                <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
+                                                    <Image uri={dragonClasses[item.name || '']}
+                                                        style={{ width: 250, height: 250 }} />
+                                                    <View style={{ width: width * 0.9 }}>
+                                                        <View style={{ padding: 20, backgroundColor: Colors.burgundy, borderRadius: 25 }}>
+                                                            <AppText textAlign={'center'} fontSize={20} color={Colors.deepGold}>{item.text}</AppText>
+                                                            <AppText textAlign={'center'} fontSize={17} color={Colors.deepGold}>{item.description}</AppText>
+                                                        </View>
                                                     </View>
-                                                    <View style={{ width: "50%" }}>
-                                                        <AppText textAlign={"center"} fontSize={18} color={Colors.bitterSweetRed}>Saving Throws</AppText>
-                                                        {this.state.pickedClass.savingThrows && this.state.pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={15}>{item}</AppText>)}
-                                                    </View>
-                                                    <View style={{ padding: 10 }}>
-                                                        <AppButton borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"More Information"} textAlign={"center"} fontSize={15} onPress={() => {
-                                                            if (this.state.pickedClass.information) {
-                                                                Linking.openURL(this.state.pickedClass.information)
-                                                            }
-                                                        }} />
-                                                    </View>
-                                                </View>
+                                                </Animated.View>
+                                                :
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        setPickedClass(item)
+                                                    }}
+                                                >
+                                                    <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
+                                                        <Image uri={dragonClasses[item.name || '']}
+                                                            style={{ width: 250, height: 250 }} />
+                                                        <AppText fontSize={30} color={Colors.deepGold}>{item.name}</AppText>
+                                                        <IconGen iconColor={Colors.deepGold} name={item.icon} size={120} />
+                                                    </Animated.View>
+                                                </TouchableOpacity>
+                                            }
+                                        </View>
+                                    }}
+                                />
+                                <Modal
+                                    isVisible={pickedClass._id ? true : false}
+                                    swipeDirection={["up", "down"]}
+                                    swipeThreshold={5}
+                                    onSwipeComplete={(e) => {
+                                        setPickedClass(new ClassModel())
+                                    }}
+                                    style={{
+                                        backgroundColor: Colors.pageBackground,
+                                        margin: 0,
+                                        flex: 1,
+                                        marginTop: 40,
+                                        alignItems: undefined,
+                                        justifyContent: undefined,
+                                    }}>
+                                    <View style={{ flex: 1 }}>
+                                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                            <Image style={{ width: 150, height: 150 }} uri={dragonClasses[pickedClass.name || '']} />
+                                        </View>
+                                        <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {pickedClass.name}</AppText>
+                                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+                                            <View style={{ width: "50%", marginTop: 10 }}>
+                                                <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
+                                                <AppText textAlign={"center"} fontSize={13}>{pickedClass.recommendation}</AppText>
                                             </View>
-                                            <View>
-                                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
+                                            <View style={{ width: "50%" }}>
+                                                <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Saving Throws</AppText>
+                                                {pickedClass.savingThrows && pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={13}>{item}</AppText>)}
                                             </View>
                                         </View>
-                                    }
-                                </View>
-                        }
-                    </View>}
-            </ScrollView>
-        )
-    }
+                                        <AppText fontSize={17} textAlign={"center"}>{pickedClass.description && pickedClass.description.replace(/\. /g, '.\n')}</AppText>
+                                        <View style={{ alignItems: "center", padding: 15 }}>
+                                            <InformationDrawer expendedHeight={500} expendedWidth={width} information={pickedClass.brifInfo} />
+                                        </View>
+                                        <View>
+                                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                                                height={100} title={"Continue"} onPress={() => {
+                                                    insertInfoAndContinue()
+                                                    setPickedClass(new ClassModel())
+                                                }} />
+                                        </View>
+                                    </View>
+                                </Modal>
+                            </View>
+                    }
+                </View>}
+        </View>
+    )
 }
+
 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    }, infoContainer: {
-        flex: .8,
-        padding: 20
     }
 });

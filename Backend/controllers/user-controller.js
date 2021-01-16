@@ -64,7 +64,6 @@ router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, re
     try {
         const cleanChar = removeEmptySpecificObj(JSON.parse(request.body.charInfo))
         const char = new Character(cleanChar);
-        console.log(char)
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)
@@ -80,7 +79,6 @@ router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, re
 
 router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
     try {
-        console.log(JSON.parse(request.body.charInfo))
         const char = new Character(JSON.parse(request.body.charInfo));
         char.magic = {
             cantrips: null,

@@ -8,7 +8,7 @@ import { ResetPassword } from '../screens/ResetPassword';
 import { RaceList } from '../screens/CharCreation/RaceList';
 import { SpacialProficiencyRaces } from '../screens/CharCreation/SpacialProficiencyRaces';
 import { NewCharInfo } from '../screens/CharCreation/NewCharInfo';
-import { ClassPick } from '../screens/CharCreation/ClassPick';
+import ClassPick from '../screens/CharCreation/ClassPick';
 import { CharSkillPick } from '../screens/CharCreation/CharSkillPick';
 import { AttributePicking } from '../screens/CharCreation/AttributePicking';
 import { CharBackground } from '../screens/CharCreation/CharBackground';
@@ -25,7 +25,7 @@ const AuthNavigator = () => {
         <Stack.Screen options={{ title: "Race List", headerTransparent: false }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ title: "" }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "" }} name="NewCharInfo" component={NewCharInfo} />
-        <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick} />
+        <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick as any} />
         <Stack.Screen options={{ title: "" }} name="CharSkillPick" component={CharSkillPick} />
         <Stack.Screen options={{ title: "" }} name="AttributePicking" component={AttributePicking} />
         <Stack.Screen options={{ title: "" }} name="CharBackground" component={CharBackground} />

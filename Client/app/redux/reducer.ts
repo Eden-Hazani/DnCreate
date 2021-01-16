@@ -85,6 +85,26 @@ export function reduce(currentState: AppState | undefined = initialState, action
                 newState.participatingAdv.push(adv)
             }
             break;
+        case ActionType.ReplaceLeadAdventure:
+            const newLeadingAdv = newState.leadingAdv.map((item, index) => {
+                if (item._id === action.payload._id) {
+                    item = action.payload
+                    return item
+                }
+                return item
+            })
+            newState.leadingAdv = newLeadingAdv;
+            break;
+        case ActionType.ReplaceParticipateAdventure:
+            const newParticipateAdv = newState.participatingAdv.map((item, index) => {
+                if (item._id === action.payload._id) {
+                    item = action.payload
+                    return item
+                }
+                return item
+            })
+            newState.participatingAdv = newParticipateAdv;
+            break;
 
         case ActionType.SetLeadingAdv:
             for (let adv of action.payload) {

@@ -9,6 +9,8 @@ export enum ActionType {
     CleanCreator,
     SetParticipatingAdv,
     SetLeadingAdv,
+    ReplaceLeadAdventure,
+    ReplaceParticipateAdventure,
     UpdateLeadingAdv,
     UpdateParticipatingAdv,
     SetCharacters,
