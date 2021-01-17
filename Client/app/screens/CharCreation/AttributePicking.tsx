@@ -19,6 +19,7 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import { AttributeHelp } from './AttributeHelp';
 import { ManualAttribute } from './ManualAttribute';
+import { StandardStatArray } from './StandardStatArray';
 
 interface AttributePickingState {
     finishRolls: boolean
@@ -38,6 +39,10 @@ interface AttributePickingState {
     confirmed: boolean
     colorCodedGuide: boolean
     colorCodedGuideArray: any[]
+    diceRollOrStatArray: boolean
+    firstPick: boolean
+    placedResult: number
+    returnScoreToAverageList: number
 }
 
 export class AttributePicking extends Component<{ route: any, navigation: any }, AttributePickingState> {
@@ -46,6 +51,10 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     constructor(props: any) {
         super(props)
         this.state = {
+            returnScoreToAverageList: 0,
+            placedResult: -1,
+            firstPick: false,
+            diceRollOrStatArray: false,
             colorCodedGuideArray: [],
             colorCodedGuide: false,
             confirmed: false,
@@ -188,7 +197,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
             characterInfo.modifiers[attribute] = (switchModifier(characterInfo[attribute]));
             this.setState({ characterInfo }, () => {
                 AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
-                this.setState({ jiggleOn: false, sumOfDice: 0 })
+                this.setState({ jiggleOn: false, sumOfDice: 0, placedResult: this.state.sumOfDice })
             })
         }
     }
@@ -234,7 +243,11 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     returnScores = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
         const rollDisabled = this.state.rollDisabled;
+        console.log(attribute)
         if (this.state.pickedRace.abilityBonus && characterInfo.modifiers) {
+            if (this.state.diceRollOrStatArray) {
+                this.setState({ returnScoreToAverageList: characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute] });
+            }
             const diceScore = characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute];
             characterInfo[attribute] = this.state.pickedRace.abilityBonus[attribute];
             characterInfo.modifiers[attribute] = undefined;
@@ -281,7 +294,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             isOn={this.state.jiggleOn}
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[0] : null}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.strength !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('strength');
                                                     return;
                                                 }
@@ -300,7 +313,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[1] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.constitution && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.constitution !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('constitution');
                                                     return;
                                                 }
@@ -319,7 +332,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[2] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.dexterity && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.dexterity !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('dexterity');
                                                     return;
                                                 }
@@ -338,7 +351,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[3] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.intelligence && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.intelligence !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('intelligence');
                                                     return;
                                                 }
@@ -357,7 +370,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[4] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.wisdom && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.wisdom !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('wisdom');
                                                     return;
                                                 }
@@ -376,7 +389,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                             colorCode={this.state.colorCodedGuide ? this.state.colorCodedGuideArray[5] : null}
                                             isOn={this.state.jiggleOn}
                                             onPress={() => {
-                                                if (this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.charisma && this.state.sumOfDice === 0) {
+                                                if ((this.state.characterInfo.modifiers && this.state.characterInfo.modifiers.charisma !== undefined) && this.state.sumOfDice === 0) {
                                                     this.returnScores('charisma');
                                                     return;
                                                 }
@@ -403,96 +416,125 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                             <View >
                                 <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
-                                        width={Dimensions.get('screen').width / 3.2} fontSize={18} onPress={() => this.state.finishRolls ? alert("No rolls left!") : this.rollDice()} />
-                                    <AttributeHelp />
+                                        width={Dimensions.get('screen').width / 3.2} fontSize={18} onPress={() => {
+                                            this.setState({ firstPick: true })
+                                            this.state.finishRolls ? alert("No rolls left!") : this.rollDice()
+                                        }} />
+                                    <AttributeHelp mode={this.state.diceRollOrStatArray} />
                                     <ManualAttribute character={this.state.characterInfo} race={this.props.route.params.race}
                                         finishedRollsAndInsertInfo={(rolls: boolean, characterInfo: CharacterModel) => { this.setState({ finishRolls: rolls, characterInfo }) }} />
                                 </View>
-                                <View style={styles.dicePool}>
-                                    <AppText fontSize={25} color={Colors.bitterSweetRed}>Dice Pool</AppText>
-                                    <View style={{ flexDirection: "row" }}>
-                                        {this.state.dicePool.map((result, index) =>
-                                            <View key={index} style={{ padding: 5 }}>
-                                                <AppButton disabled={this.state.rollDisabled[index] || !this.state.finishRolls || this.state.sumOfDice > 0}
-                                                    borderRadius={10} backgroundColor={Colors.bitterSweetRed} title={result.toString()}
-                                                    onPress={() => { this.setSumAndDisableRoll(result, index) }}
-                                                    width={50} height={40} fontSize={15} key={result} />
-                                            </View>
+                                <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                    <AppText padding={20} textAlign={'center'}>Switch between average list and Dice rolls (help menu will change accordingly)</AppText>
+                                    <Switch disabled={this.state.firstPick} value={this.state.diceRollOrStatArray} onValueChange={() => {
+                                        if (this.state.diceRollOrStatArray) {
+                                            this.setState({ diceRollOrStatArray: false })
+                                            return;
+                                        }
+                                        this.setState({ diceRollOrStatArray: true })
+                                    }} />
+                                </View>
+                                {this.state.diceRollOrStatArray ?
+                                    <StandardStatArray
+                                        resetPickedResult={() => { this.setState({ placedResult: -1 }) }}
+                                        resetReturnValues={() => { this.setState({ returnScoreToAverageList: -1 }) }}
+                                        returnScore={this.state.returnScoreToAverageList}
+                                        placedResult={this.state.placedResult}
+                                        onCancel={() => {
+                                            this.setState({ jiggleOn: false })
+                                        }}
+                                        onPress={(val: number) => {
+                                            this.setState({ sumOfDice: val, finishRolls: true, jiggleOn: true, firstPick: true })
+                                        }} />
+                                    :
+                                    <View>
+                                        <View style={styles.dicePool}>
+                                            <AppText fontSize={25} color={Colors.bitterSweetRed}>Dice Pool</AppText>
+                                            <View style={{ flexDirection: "row" }}>
+                                                {this.state.dicePool.map((result, index) =>
+                                                    <View key={index} style={{ padding: 5 }}>
+                                                        <AppButton disabled={this.state.rollDisabled[index] || !this.state.finishRolls || this.state.sumOfDice > 0}
+                                                            borderRadius={10} backgroundColor={Colors.bitterSweetRed} title={result.toString()}
+                                                            onPress={() => { this.setSumAndDisableRoll(result, index) }}
+                                                            width={50} height={40} fontSize={15} key={result} />
+                                                    </View>
 
-                                        )}
+                                                )}
+                                            </View>
+                                        </View>
+                                        <View style={styles.diceSumContainer}>
+                                            <AppText>Sum Of Dice</AppText>
+                                            <TouchableOpacity style={styles.rolledDice} >
+                                                <AppText fontSize={35} textAlign={"center"} >{this.state.sumOfDice}</AppText>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <View style={styles.container} pointerEvents={this.state.diceResults.length === 0 ? "none" : "auto"}>
+                                            <View style={styles.rolledDiceContainer} >
+                                                <AppText>Dice I</AppText>
+                                                <TouchableOpacity style={[styles.rolledDice, {
+                                                    borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                                    borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                                    backgroundColor: this.state.diceI ? Colors.berries : Colors.pageBackground
+                                                }]}
+                                                    disabled={!this.state.diceI && this.state.numberOfPickedDice === 3 ? true : false}
+                                                    onPress={() => {
+                                                        this.addDice(this.state.diceResults[0], this.state.diceI);
+                                                        this.state.diceI ? this.setState({ diceI: false }) : this.setState({ diceI: true })
+                                                    }}>
+                                                    <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[0]}</AppText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={styles.rolledDiceContainer}>
+                                                <AppText>Dice II</AppText>
+                                                <TouchableOpacity style={[styles.rolledDice, {
+                                                    borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                                    borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                                    backgroundColor: this.state.diceII ? Colors.berries : Colors.pageBackground
+                                                }]}
+                                                    disabled={!this.state.diceII && this.state.numberOfPickedDice === 3 ? true : false}
+                                                    onPress={() => {
+                                                        this.addDice(this.state.diceResults[1], this.state.diceII);
+                                                        this.setState({ diceII: true })
+                                                        this.state.diceII ? this.setState({ diceII: false }) : this.setState({ diceII: true })
+                                                    }}>
+                                                    <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[1]}</AppText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={styles.rolledDiceContainer}>
+                                                <AppText>Dice III</AppText>
+                                                <TouchableOpacity style={[styles.rolledDice, {
+                                                    borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                                    borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                                    backgroundColor: this.state.diceIII ? Colors.berries : Colors.pageBackground
+                                                }]}
+                                                    disabled={!this.state.diceIII && this.state.numberOfPickedDice === 3 ? true : false}
+                                                    onPress={() => {
+                                                        this.addDice(this.state.diceResults[2], this.state.diceIII);
+                                                        this.setState({ diceIII: true })
+                                                        this.state.diceIII ? this.setState({ diceIII: false }) : this.setState({ diceIII: true })
+                                                    }}>
+                                                    <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[2]}</AppText>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={styles.rolledDiceContainer}>
+                                                <AppText>Dice IV</AppText>
+                                                <TouchableOpacity style={[styles.rolledDice, {
+                                                    borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
+                                                    borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
+                                                    backgroundColor: this.state.diceIV ? Colors.berries : Colors.pageBackground
+                                                }]}
+                                                    disabled={!this.state.diceIV && this.state.numberOfPickedDice === 3 ? true : false}
+                                                    onPress={() => {
+                                                        this.addDice(this.state.diceResults[3], this.state.diceIV);
+                                                        this.setState({ diceIV: true })
+                                                        this.state.diceIV ? this.setState({ diceIV: false }) : this.setState({ diceIV: true })
+                                                    }}>
+                                                    <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[3]}</AppText>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={styles.diceSumContainer}>
-                                    <AppText>Sum Of Dice</AppText>
-                                    <TouchableOpacity style={styles.rolledDice} >
-                                        <AppText fontSize={35} textAlign={"center"} >{this.state.sumOfDice}</AppText>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.container} pointerEvents={this.state.diceResults.length === 0 ? "none" : "auto"}>
-                                    <View style={styles.rolledDiceContainer} >
-                                        <AppText>Dice I</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, {
-                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
-                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
-                                            backgroundColor: this.state.diceI ? Colors.berries : Colors.pageBackground
-                                        }]}
-                                            disabled={!this.state.diceI && this.state.numberOfPickedDice === 3 ? true : false}
-                                            onPress={() => {
-                                                this.addDice(this.state.diceResults[0], this.state.diceI);
-                                                this.state.diceI ? this.setState({ diceI: false }) : this.setState({ diceI: true })
-                                            }}>
-                                            <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[0]}</AppText>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={styles.rolledDiceContainer}>
-                                        <AppText>Dice II</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, {
-                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
-                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
-                                            backgroundColor: this.state.diceII ? Colors.berries : Colors.pageBackground
-                                        }]}
-                                            disabled={!this.state.diceII && this.state.numberOfPickedDice === 3 ? true : false}
-                                            onPress={() => {
-                                                this.addDice(this.state.diceResults[1], this.state.diceII);
-                                                this.setState({ diceII: true })
-                                                this.state.diceII ? this.setState({ diceII: false }) : this.setState({ diceII: true })
-                                            }}>
-                                            <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[1]}</AppText>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={styles.rolledDiceContainer}>
-                                        <AppText>Dice III</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, {
-                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
-                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
-                                            backgroundColor: this.state.diceIII ? Colors.berries : Colors.pageBackground
-                                        }]}
-                                            disabled={!this.state.diceIII && this.state.numberOfPickedDice === 3 ? true : false}
-                                            onPress={() => {
-                                                this.addDice(this.state.diceResults[2], this.state.diceIII);
-                                                this.setState({ diceIII: true })
-                                                this.state.diceIII ? this.setState({ diceIII: false }) : this.setState({ diceIII: true })
-                                            }}>
-                                            <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[2]}</AppText>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={styles.rolledDiceContainer}>
-                                        <AppText>Dice IV</AppText>
-                                        <TouchableOpacity style={[styles.rolledDice, {
-                                            borderColor: this.state.diceResults.length > 0 ? Colors.pinkishSilver : Colors.whiteInDarkMode,
-                                            borderWidth: this.state.diceResults.length > 0 ? 5 : 1,
-                                            backgroundColor: this.state.diceIV ? Colors.berries : Colors.pageBackground
-                                        }]}
-                                            disabled={!this.state.diceIV && this.state.numberOfPickedDice === 3 ? true : false}
-                                            onPress={() => {
-                                                this.addDice(this.state.diceResults[3], this.state.diceIV);
-                                                this.setState({ diceIV: true })
-                                                this.state.diceIV ? this.setState({ diceIV: false }) : this.setState({ diceIV: true })
-                                            }}>
-                                            <AppText fontSize={35} textAlign={"center"} >{this.state.diceResults[3]}</AppText>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
+                                }
                             </View>
                         </View>
                         <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
