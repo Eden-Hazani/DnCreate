@@ -116,6 +116,8 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     } catch (err) {
       logger.log(new Error('Error in updates'))
       logger.log(new Error(err))
+      this.setState({ lookingForUpdates: false })
+      this.loadApp()
     }
   }
 

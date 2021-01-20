@@ -29,6 +29,13 @@
             "leftTextBlock": "We are always thinking of ways to improve DnCreate",
             "rightTextBlock": "The app updates regularly, and you should expect tons of new exiting content",
             "ImgUrl": "https://dncreate.azurewebsites.net/assets/classDragons/druidDragon.png"
+        },
+        {
+            "headline": "Ready?",
+            "leftTextBlock": "We hope you enjoy DnCreate",
+            "rightTextBlock": "Now, Let's start making Characters!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/backgroundDragons/folkHeroDragon.png",
+            "finishButton": true
         }
     ]
 }

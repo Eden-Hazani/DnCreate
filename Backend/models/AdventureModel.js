@@ -18,6 +18,9 @@ const AdventureSchema = mongoose.Schema({
     adventureIdentifier: {
         type: String
     },
+    backgroundImage: {
+        type: String
+    },
     quests: {
         type: Array
     }

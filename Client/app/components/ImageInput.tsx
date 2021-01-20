@@ -8,12 +8,13 @@ import { IconGen } from './IconGen';
 
 export function ImageInput({ imageUri, onChangeImage }: any) {
     useEffect(() => {
-        requestPermission();
+        // requestPermission();
     }, [])
     const [allowed, setAllowed] = useState(true);
 
     const requestPermission = async () => {
         const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        console.log(result)
         if (result.granted) {
             setAllowed(true)
         }

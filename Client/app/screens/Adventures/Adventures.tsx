@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Modal } from 'react-native';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
 import logger from '../../../utility/logger';
@@ -19,257 +19,79 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import { io } from 'socket.io-client';
 import { Config } from '../../../config';
+import AsyncStorage from '@react-native-community/async-storage';
+import InformationScroller from '../../components/InformationScroller';
+import adventureInfo from '../../../jsonDump/adventuresInformation.json'
 const socket = io(Config.serverUrl);
 
 interface AdventuresState {
-    loading: boolean
-    participatingAdventures: AdventureModel[]
-    leadingAdventures: AdventureModel[]
-    refreshing: boolean
-    characters: CharacterModel[]
+    firstLookModal: boolean
 }
 
 export class Adventures extends Component<{ props: any, navigation: any }, AdventuresState>{
-    private UnsubscribeStore: Unsubscribe
     navigationSubscription: any;
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
-            characters: store.getState().characters,
-            loading: true,
-            refreshing: false,
-            leadingAdventures: store.getState().leadingAdv,
-            participatingAdventures: store.getState().participatingAdv
+            firstLookModal: false
         }
-        this.UnsubscribeStore = store.subscribe(() => {
-            this.setState({ leadingAdventures: store.getState().leadingAdv })
-            this.setState({ participatingAdventures: store.getState().participatingAdv })
-        })
+    }
+
+    checkForFirstLook = async () => {
+        const firstUse = await AsyncStorage.getItem('isAdventureFirstUse')
+        if (!firstUse) {
+            this.setState({ firstLookModal: true })
+        }
     }
 
 
     componentDidMount() {
-        try {
-            setTimeout(() => {
-                this.setState({ loading: false })
-            }, 800);
-            if (this.state.characters.length === 0) {
-                const characters = store.getState().characters;
-                this.setState({ characters: characters }, () => {
-                    store.dispatch({ type: ActionType.SetCharacters, payload: this.state.characters })
-                    this.getLeadingAdv()
-                    this.getParticipatingAdv()
-                    this.setState({ loading: false })
-                });
-                return;
-            }
-            this.getLeadingAdv()
-            this.getParticipatingAdv()
-            //same socket for delete and remove user to lower connection costs, preferred way is two sockets
-            socket.on(`adventure-removedChange`, (adventureIdentifier: string) => {
-                this.refreshParticipating(adventureIdentifier || '')
-            });
-        } catch (err) {
-            logger.log(err)
-        }
+        this.checkForFirstLook()
     }
-
-    refreshParticipating = (adventureIdentifier: string) => {
-        const participatingAdventures = this.state.participatingAdventures;
-        let index = 0;
-        for (let adventure of this.state.participatingAdventures) {
-            if (adventureIdentifier === adventure.adventureIdentifier) {
-                this.setState({ loading: true }, async () => {
-                    participatingAdventures.splice(index, 1)
-                    this.setState({ participatingAdventures, loading: false }, () => {
-                        store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: participatingAdventures })
-                    })
-                })
-            }
-            index++
-        }
-    }
-
-    componentWillUnmount() {
-        this.UnsubscribeStore()
-    }
-
-    getLeadingAdv = async () => {
-        try {
-            if (this.state.leadingAdventures.length === 0) {
-                const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
-                if (leadingAdventures.data !== undefined && leadingAdventures.ok) {
-                    this.setState({ leadingAdventures: leadingAdventures.data }, () => {
-                        store.dispatch({ type: ActionType.SetLeadingAdv, payload: this.state.leadingAdventures })
-                    })
-                }
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-
-    getParticipatingAdv = async () => {
-        try {
-            if (this.state.participatingAdventures.length === 0) {
-                let charIds = [];
-                for (let character of this.state.characters) {
-                    if (character._id !== undefined) {
-                        charIds.push(character._id)
-                    }
-                }
-                const adventures = await adventureApi.getParticipationAdventures(charIds);
-                let participatingAdventures: any = []
-                if (!adventures.ok) {
-                    errorHandler(adventures)
-                    return;
-                }
-                if (adventures.data.length === 0) {
-                    this.setState({ participatingAdventures })
-                    return;
-                }
-                if (adventures.data[0] === undefined) {
-                    return;
-                }
-                for (let adventure of adventures.data) {
-                    participatingAdventures.push(adventure[0])
-                }
-                this.setState({ participatingAdventures }, () => {
-                    store.dispatch({ type: ActionType.SetParticipatingAdv, payload: this.state.participatingAdventures })
-                })
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-
-    getLeadingFromServer = async () => {
-        try {
-            const leadingAdventures = await adventureApi.getLeadingAdventures(this.context.user._id);
-            if (leadingAdventures.data !== undefined && leadingAdventures.ok) {
-                this.setState({ leadingAdventures: leadingAdventures.data }, () => {
-                    store.dispatch({ type: ActionType.ClearLeadingAdv, payload: this.state.leadingAdventures })
-                })
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-
-
-    getParticipatingFromServer = async () => {
-        try {
-            let charIds = [];
-            for (let character of this.state.characters) {
-                if (character._id !== undefined) {
-                    charIds.push(character._id)
-                }
-            }
-            const adventures = await adventureApi.getParticipationAdventures(charIds);
-            let participatingAdventures: any = []
-            if (!adventures.ok) {
-                errorHandler(adventures)
-                return;
-            }
-            if (adventures.data.length === 0) {
-                this.setState({ participatingAdventures }, () => {
-                    store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
-                })
-                return;
-            }
-            if (adventures.data[0] === undefined) {
-                return;
-            }
-            for (let adventure of adventures.data) {
-                if (adventure.length === 0) {
-                    continue;
-                }
-                participatingAdventures.push(adventure[0])
-            }
-            this.setState({ participatingAdventures }, () => {
-                store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
-            })
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-
-    goToParticipatingAdv = async (adventure: any) => {
-        try {
-            const response = await adventureApi.userInAdv(adventure.adventureIdentifier, this.context.user._id);
-            if (!response.ok) {
-                errorHandler(response)
-                this.getParticipatingFromServer();
-                return;
-            }
-            this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-
 
 
     render() {
         return (
             <View style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
-                {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                    <View style={styles.container}>
-                        <View style={{ flex: .5 }}>
-                            <View style={styles.participating}>
-                                <AppText fontSize={20} color={Colors.bitterSweetRed}>Participating In:</AppText>
-                            </View>
-                            <FlatList
-                                style={{ marginBottom: 10 }}
-                                data={this.state.participatingAdventures}
-                                keyExtractor={(adventures, index) => index.toString()}
-                                renderItem={({ item }) => <ListItem
-                                    title={`Adventure name: ${item.adventureName}`}
-                                    subTitle={`Summery: ${item.adventureSetting}`}
-                                    alignListItem={'flex-start'}
-                                    headTextAlign={"left"}
-                                    subTextAlign={"left"}
-                                    headerFontSize={19}
-                                    headColor={Colors.bitterSweetRed}
-                                    subFontSize={15}
-                                    totalPadding={20}
-                                    padding={10}
-                                    direction={'column'} onPress={() => { this.goToParticipatingAdv(item) }} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
-                                onRefresh={() => {
-                                    this.getParticipatingFromServer()
-                                }} />
-                        </View>
-                        <View style={{ flex: .5 }}>
-                            <View style={styles.leading}>
-                                <AppText fontSize={20} color={Colors.bitterSweetRed}>Leading:</AppText>
-                            </View>
-                            <FlatList
-                                data={this.state.leadingAdventures}
-                                keyExtractor={(adventures, index) => index.toString()}
-                                renderItem={({ item }) => <ListItem
-                                    title={`Adventure name: ${item.adventureName}`}
-                                    subTitle={`Summery: ${item.adventureSetting}`}
-                                    alignListItem={'flex-start'}
-                                    headTextAlign={"left"}
-                                    subTextAlign={"left"}
-                                    headerFontSize={19}
-                                    headColor={Colors.bitterSweetRed}
-                                    subFontSize={15}
-                                    totalPadding={20}
-                                    padding={10}
-                                    direction={'column'} onPress={() => { this.props.navigation.navigate("SelectedLeadingAdv", { adventure: item }) }} />} ItemSeparatorComponent={ListItemSeparator} refreshing={this.state.refreshing}
-                                onRefresh={() => {
-                                    this.getLeadingFromServer()
-                                }} />
+                <View style={styles.container}>
+                    <AppText fontSize={25} textAlign={'center'} color={Colors.berries}>Adventures</AppText>
+                    <View style={{ flex: .5 }}>
+                        <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, padding: 15, margin: 10 }}>
+                            <AppText textAlign={'center'} fontSize={16}>This is where you can enter your existing adventures.</AppText>
+                            <AppText textAlign={'center'} fontSize={16}>Leading adventures are the ones you created.</AppText>
+                            <AppText textAlign={'center'} fontSize={16}>Participating adventures are the ones you joined on.</AppText>
                         </View>
                         <View style={styles.buttons}>
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("StartAdventure") }} fontSize={18} borderRadius={25} width={125} height={100} title={"Start Adventure"} />
+                                onPress={() => { this.props.navigation.navigate("ParticipatingAdventureList") }} fontSize={18}
+                                borderRadius={25} width={125} height={100} title={"Participating Adventures"} />
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("JoinAdventure") }} fontSize={18} borderRadius={25} width={125} height={100} title={"Join Adventure"} />
+                                onPress={() => { this.props.navigation.navigate("LeadingAdventureList") }} fontSize={18} borderRadius={25}
+                                width={125} height={100} title={"Leading Adventures"} />
                         </View>
-                    </View>}
+                    </View>
+                    <View style={{ flex: .5 }}>
+                        <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, padding: 15, margin: 10 }}>
+                            <AppText textAlign={'center'} fontSize={16}>This is where you can create or join adventures.</AppText>
+                        </View>
+                        <View style={styles.buttons}>
+                            <AppButton backgroundColor={Colors.bitterSweetRed}
+                                onPress={() => { this.props.navigation.navigate("StartAdventure") }} fontSize={18} borderRadius={25}
+                                width={125} height={100} title={"Start Adventure"} />
+                            <AppButton backgroundColor={Colors.bitterSweetRed}
+                                onPress={() => { this.props.navigation.navigate("JoinAdventure") }} fontSize={18} borderRadius={25}
+                                width={125} height={100} title={"Join Adventure"} />
+                        </View>
+                    </View>
+                </View>
+                <Modal visible={this.state.firstLookModal}>
+                    <InformationScroller list={adventureInfo.list} PressClose={async (val: boolean) => {
+                        console.log(val)
+                        this.setState({ firstLookModal: val })
+                        await AsyncStorage.setItem('isAdventureFirstUse', "false")
+                    }} />
+                </Modal>
             </View>
         )
     }
@@ -279,19 +101,12 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: "center",
     },
     buttons: {
-        flex: .2,
+        flex: .7,
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "space-evenly"
     },
-    participating: {
-        backgroundColor: Colors.softBlack,
-        padding: 10
-    },
-    leading: {
-        backgroundColor: Colors.softBlack,
-        padding: 10
-    }
 });

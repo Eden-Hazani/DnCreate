@@ -6,6 +6,8 @@ import { ActiveQuestList } from '../screens/Adventures/adventureComponents/Activ
 import { CompletedQuestList } from '../screens/Adventures/adventureComponents/CompletedQuestList';
 import { Adventures } from '../screens/Adventures/Adventures';
 import { JoinAdventure } from '../screens/Adventures/JoinAdventure';
+import { LeadingAdventureList } from '../screens/Adventures/LeadingAdventureList';
+import { ParticipatingAdventureList } from '../screens/Adventures/ParticipatingAdventureList';
 import { SelectedLeadingAdv } from '../screens/Adventures/SelectedLeadingAdv';
 import { SelectedParticipationAdv } from '../screens/Adventures/SelectedParticipationAdv';
 import { StartAdventure } from '../screens/Adventures/StartAdventure';
@@ -27,6 +29,8 @@ const AdventuresNavigator = () => {
         <Stack.Screen options={{ title: "", headerShown: false }} name="SelectedLeadingAdv" component={SelectedLeadingAdv} />
         <Stack.Screen options={{ title: "", }} name="ActiveQuestList" component={ActiveQuestList} />
         <Stack.Screen options={{ title: "", }} name="CompletedQuestList" component={CompletedQuestList} />
+        <Stack.Screen options={{ title: "", }} name="ParticipatingAdventureList" component={ParticipatingAdventureList} />
+        <Stack.Screen options={{ title: "", }} name="LeadingAdventureList" component={LeadingAdventureList} />
     </Stack.Navigator>
 }
 

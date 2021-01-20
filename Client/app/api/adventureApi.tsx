@@ -6,7 +6,15 @@ const endpoint = '/adventures'
 
 const saveAdventure = (adventure: AdventureModel) => {
     let formData = new FormData();
+    const image: any = adventure.backgroundImage
     formData.append("adventure", JSON.stringify(adventure));
+    if (image) {
+        formData.append('backgroundImage', {
+            uri: image,
+            type: 'image/jpeg',
+            name: `image`
+        });
+    }
     return client.post(`${endpoint}/createAdventure`, formData);
 };
 

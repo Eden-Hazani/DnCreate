@@ -19,6 +19,11 @@ const register = (values: any) => {
     formData.append("userInfo", JSON.stringify(values))
     return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/register`, formData);
 }
+const googleRegister = (values: any) => {
+    let formData: FormData = new FormData();
+    formData.append("userInfo", JSON.stringify(values))
+    return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/googleRegister`, formData);
+}
 
 const updateProfilePic = (value: any, userInfo: UserModel) => {
     const image = value.profileImg
@@ -79,5 +84,6 @@ export default {
     deleteAccount,
     isUserLogged,
     resendActivationEmail,
-    isActivated
+    isActivated,
+    googleRegister
 }

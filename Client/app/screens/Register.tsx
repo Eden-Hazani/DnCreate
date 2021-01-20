@@ -69,7 +69,6 @@ export class Register extends Component<{ navigation: any, route: any, isTutoria
             this.setState({ loading: false }, () => {
                 alert(userInfo.message)
                 this.login(loginValues)
-
             });
         }).catch(err => {
             this.setState({ loading: false })
@@ -86,7 +85,7 @@ export class Register extends Component<{ navigation: any, route: any, isTutoria
             password: values.password
         }
         this.setState({ loading: true })
-        await authApi.login(newValues).then(result => {
+        await authApi.login(newValues, false).then(result => {
             const userInfo: any = result.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
                 const { user, setUser } = this.context

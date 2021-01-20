@@ -15,7 +15,9 @@ import Carousel from 'react-native-snap-carousel';
 import AuthContext from '../auth/context';
 import { UserModel } from '../models/userModel';
 import Modal from 'react-native-modal';
-import WelcomeInformationScroller from '../components/WelcomeInformationScroller';
+import InformationScroller from '../components/InformationScroller';
+import WelcomeInfo from '../../jsonDump/welcomeInformation.json'
+
 
 Modal
 interface WelcomeState {
@@ -243,7 +245,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                     justifyContent: undefined,
                                 }}
                                 isVisible={this.state.firstUseModal}>
-                                <WelcomeInformationScroller PressClose={async (val: boolean) => {
+                                <InformationScroller list={WelcomeInfo.list} PressClose={async (val: boolean) => {
                                     this.setState({ firstUseModal: val })
                                     await AsyncStorage.setItem('isFirstUse', "false")
                                     const colorScheme = await AsyncStorage.getItem("colorScheme");

@@ -279,6 +279,7 @@ router.post("/login", upload.none(), async (request, response) => {
         const options = JSON.parse(request.body.options)
         const user = await authLogic.login(credentials);
         if (!user) {
+            console.log(user)
             response.status(401).send("Incorrect username or password");
             return;
         }
@@ -343,6 +344,25 @@ router.post("/changePremiumStatusAdmin", cors(), async (request, response) => {
         response.status(500).send(err.message);
     }
 });
+
+
+router.post("/googleRegister", upload.none(), verifyInSystem, async (request, response) => {
+    try {
+        const newUser = new User(JSON.parse(request.body.userInfo));
+        const error = await newUser.validate();
+        if (error) {
+            response.status(400).send(error.message);
+            return;
+        }
+        newUser.activated = true;
+        const user = await authLogic.register(newUser);
+        return response.json({ message: "Welcome to DnCreate, your account has been activated!", user: user })
+
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
+    }
+});
+
 
 
 

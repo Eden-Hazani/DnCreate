@@ -2,10 +2,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component, useContext } from 'react';
 import { View, StyleSheet, Text, Dimensions, Animated, } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
-import { AppButton } from '../components/AppButton';
-import { AppText } from '../components/AppText';
+import { AppButton } from './AppButton';
+import { AppText } from './AppText';
 import { Colors } from '../config/colors';
-import WelcomeInfo from '../../jsonDump/welcomeInformation.json'
 
 
 const { width, height } = Dimensions.get('window')
@@ -80,7 +79,6 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
                 <Animated.View style={{ paddingTop: 40 }}>
                     <AppButton color={Colors.white} title={"Let's Start!"} width={120} height={70} fontSize={22} backgroundColor={Colors.bitterSweetRed}
                         borderRadius={20} onPress={async () => {
-                            await AsyncStorage.setItem('isFirstUse', JSON.stringify(false))
                             setTimeout(() => {
                                 PressClose(false)
                             }, 300);
@@ -96,24 +94,14 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
 
 
 
-export default function WelcomeInformationScroller({ PressClose }: any) {
+export default function InformationScroller({ PressClose, list }: any) {
     const scrollY = React.useRef(new Animated.Value(0)).current
-    const list: any = WelcomeInfo.list;
-    const finishedList = list.concat([
-        {
-            "headline": "Ready?",
-            "leftTextBlock": "We hope you enjoy DnCreate",
-            "rightTextBlock": "Now, Let's start making Characters!",
-            "ImgUrl": "https://dncreate.azurewebsites.net/assets/backgroundDragons/folkHeroDragon.png",
-            "finishButton": true
-        }
-    ])
     return (
         <View style={styles.container}>
             <Animated.FlatList
                 style={{ zIndex: 10, flex: 1 }}
                 keyExtractor={(item: any, index: any) => index.toString()}
-                data={finishedList}
+                data={list}
                 renderItem={({ item, index }: any) => <Item {...item} index={index} scrollY={scrollY} PressClose={PressClose} />}
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
@@ -125,7 +113,7 @@ export default function WelcomeInformationScroller({ PressClose }: any) {
                 )}
                 scrollEventThrottle={16}
             />
-            <Indicator scrollY={scrollY} items={Object.values(finishedList)} />
+            <Indicator scrollY={scrollY} items={Object.values(list)} />
         </View>
     )
 }

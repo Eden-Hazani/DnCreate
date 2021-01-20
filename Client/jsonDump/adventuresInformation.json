@@ -1,0 +1,35 @@
+{
+    "list": [
+        {
+            "headline": "Adventures!",
+            "leftTextBlock": "using DnCreate's adventure mode you have the ability to connect with your friends under your DM and set into adventure.",
+            "rightTextBlock": "(It's FREE!)",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/adventureDragon1.png"
+        },
+        {
+            "headline": "Lead Adventure",
+            "leftTextBlock": "As the DM you can initiate a new adventure and invite your players.",
+            "rightTextBlock": "Once your players have joined you will have partial access to their character sheets and the ability to view their information instantly!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/adventureDragon2.png"
+        },
+        {
+            "headline": "Join Adventure",
+            "leftTextBlock": "After your DM hosts a new adventure in DnCreate he will be able to invite you using the adventure's identifier number.",
+            "rightTextBlock": "Once you join the adventure you will have the ability to view your team mates names and view party quests.",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/adventureDragon3.png"
+        },
+        {
+            "headline": "Quest System",
+            "leftTextBlock": "As the DM you have the ability to issue quests to your players",
+            "rightTextBlock": "Once you issue a quest, your players will have the ability to view and track it!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/adventureDragon4.png"
+        },
+        {
+            "headline": "Ready For Adventure?",
+            "leftTextBlock": "We hope you enjoy Adventure mode",
+            "rightTextBlock": "Go, explore the vast universe of imagination!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/backgroundDragons/folkHeroDragon.png",
+            "finishButton": true
+        }
+    ]
+}

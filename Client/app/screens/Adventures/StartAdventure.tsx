@@ -11,11 +11,13 @@ import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import { ScrollView } from 'react-native-gesture-handler';
 import logger from '../../../utility/logger';
+import { FormImagePicker } from '../../components/forms/FormImagePicker';
 
 
 const ValidationSchema = Yup.object().shape({
     adventureName: Yup.string().required().label("Adventure Name"),
-    adventureSetting: Yup.string().required().label('Adventure Setting')
+    adventureSetting: Yup.string().required().label('Adventure Setting'),
+    backGroundImage: Yup.string().label("Background Image").typeError("Must Choose A picture")
 })
 
 
@@ -59,6 +61,10 @@ export class StartAdventure extends Component<{ navigation: any }> {
                             name="adventureSetting"
                             iconName={"text-short"}
                             placeholder={"Adventure Setting..."} />
+                        <View style={{ paddingBottom: 15 }}>
+                            <AppText padding={20} textAlign={'center'} fontSize={18}>Optional - Upload a background Image for your adventure!</AppText>
+                            <FormImagePicker name="backgroundImage" />
+                        </View>
                     </View>
                     <SubmitButton width={250} title={"Start Adventure"} />
                 </AppForm>

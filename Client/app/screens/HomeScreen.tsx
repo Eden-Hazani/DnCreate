@@ -18,10 +18,10 @@ import { CharacterModel } from '../models/characterModel';
 import errorHandler from '../../utility/errorHander';
 import Carousel from 'react-native-snap-carousel';
 import authApi from '../api/authApi';
-import { HomeMessage } from '../components/HomeMessage';
 import { CacheManager } from 'react-native-expo-image-cache';
 import logger from '../../utility/logger';
 import { FeedBack } from '../components/FeedBack';
+import { UpdateMessage } from '../components/UpdateMessage';
 
 interface HomeState {
     loading: boolean
@@ -34,6 +34,7 @@ interface HomeState {
     activated: boolean
     emailSentTimer: number
     homeMessageModal: boolean
+    updateNews: boolean
 }
 
 export class HomeScreen extends Component<{ props: any, navigation: any }, HomeState>{
@@ -43,6 +44,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     constructor(props: any) {
         super(props)
         this.state = {
+            updateNews: false,
             homeMessageModal: false,
             emailSentTimer: 0,
             activated: false,
@@ -73,11 +75,17 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         this.UnsubscribeStore = store.subscribe(() => { })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
-
-
     componentWillUnmount() {
         this.UnsubscribeStore()
     }
+
+    checkForNews = async () => {
+        const newsFlag = await AsyncStorage.getItem('newsFlag');
+        if (!newsFlag || newsFlag !== '1.9.12') {
+            this.setState({ updateNews: true })
+        }
+    }
+
     async componentDidMount() {
         try {
             const date = new Date().toISOString().slice(0, 10)
@@ -92,7 +100,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                     await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
                 }
             }
-            const isOffline = await AsyncStorage.getItem('isOffline');
+            this.checkForNews();
             if (store.getState().nonUser) {
                 this.setState({ loading: true }, () => {
                     setTimeout(() => {
@@ -206,6 +214,13 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 </View>
                                 <Modal visible={this.state.homeMessageModal} animationType="slide">
                                     <FeedBack close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
+                                </Modal>
+                                <Modal visible={this.state.updateNews} animationType="slide">
+                                    <UpdateMessage close={(val: boolean) => {
+                                        this.setState({ updateNews: val }, async () => {
+                                            AsyncStorage.setItem('newsFlag', '1.9.12')
+                                        })
+                                    }} />
                                 </Modal>
                                 <Modal visible={this.state.errorModal}>
                                     <View style={{ flex: .6, backgroundColor: Colors.pageBackground, justifyContent: "center", alignItems: "center" }}>

@@ -3,11 +3,8 @@ import { Action } from "./action";
 import { ActionType } from "./action-type";
 import { UserModel } from "../models/userModel";
 import storage from "../auth/storage";
-import TokenHandler from "../auth/TokenHandler";
-import reduxToken from "../auth/reduxToken";
 import { CharacterModel } from "../models/characterModel";
-import jwtDecode from 'jwt-decode';
-import AsyncStorage from "@react-native-community/async-storage";
+import * as GoogleSignIn from 'expo-google-sign-in';
 
 const initialState: AppState = new AppState();
 
@@ -58,6 +55,7 @@ export function reduce(currentState: AppState | undefined = initialState, action
             break;
 
         case ActionType.Logout:
+            GoogleSignIn.signOutAsync();
             newState.user = new UserModel();
             newState.character = new CharacterModel();
             newState.characters = [];

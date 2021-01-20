@@ -9,6 +9,7 @@ export class AdventureModel {
         public leader_id?: string,
         public adventureSetting?: string,
         public adventureIdentifier?: string,
+        public backgroundImage?: string,
         public quests?: QuestModal[]
     ) { }
 }

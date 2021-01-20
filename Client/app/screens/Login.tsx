@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, Modal, Switch, View } from 'react-native';
+import { Dimensions, Modal, ScrollView, Switch, View } from 'react-native';
 import { AppTextHeadline } from '../components/AppTextHeadline';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
 import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
@@ -19,6 +19,7 @@ import { Colors } from '../config/colors';
 import { AppText } from '../components/AppText';
 import { AppTextInput } from '../components/forms/AppTextInput';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
+import { GoogleLogin } from '../auth/GoogleLogin';
 
 interface LoginState {
     loading: boolean,
@@ -70,7 +71,6 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
             this.setState({ loading: false })
             errorHandler(err.request)
         })
-
     }
     componentWillUnmount() {
         this.UnsubscribeStore()
@@ -96,7 +96,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
     }
     render() {
         return (
-            <View style={{ marginTop: 35 }}>
+            <ScrollView style={{ marginTop: 35 }}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <AnimateContactUpwards>
                         <AnimatedLogo />
@@ -128,12 +128,16 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                     this.setState({ remainLoggedIn: true })
                                 }} />
                             </View>
+                            <View>
+                                <GoogleLogin />
+                            </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18} marginBottom={1}
                                     color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"Forgot   Password?"} />
                                 <SubmitButton title={"Login"} marginBottom={1} />
                             </View>
                         </AppForm>
+
                         <Modal visible={this.state.forgotPasswordModel}>
                             <View style={{ flex: 1, paddingTop: 150, backgroundColor: Colors.pageBackground }}>
                                 <View style={{ padding: 20 }}>
@@ -153,7 +157,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                             </View>
                         </Modal>
                     </AnimateContactUpwards>}
-            </View>
+            </ScrollView>
         )
     }
 }

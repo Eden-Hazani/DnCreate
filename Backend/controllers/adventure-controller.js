@@ -10,11 +10,28 @@ const sendPushNotification = require("../utilities/pushNotifications");
 const authLogic = require("../business-logic/auth-logic");
 const userLogic = require("../business-logic/user-logic")
 const { Expo } = require("expo-server-sdk");
-var upload = multer({})
+const uuid = require('uuid');
+const fs = require('fs');
 
-router.post("/createAdventure", verifyLogged, upload.none(), async (request, response) => {
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/adventure-backgrounds')
+    },
+    filename: function (req, file, cb) {
+        const name = JSON.parse(req.body.adventure).backgroundImage
+        const ext = name.substr(name.lastIndexOf('.'));
+        cb(null, Date.now() + uuid.v4() + ext)
+    }
+})
+var upload = multer({ storage: storage })
+
+router.post("/createAdventure", verifyLogged, upload.single('backgroundImage'), async (request, response) => {
     try {
         const adventure = new Adventure(JSON.parse(request.body.adventure))
+        if (request.file) {
+            adventure.backgroundImage = request.file.filename;
+        }
         adventure.adventureIdentifier = Math.floor((Math.random() * 1000000) + 1);
         const savedAdventure = await adventureLogic.createAdventure(adventure);
         response.json(savedAdventure);
@@ -127,6 +144,13 @@ router.get("/findAdventure/:adventureIdentifier", verifyLogged, async (request, 
 router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, validateUserIsLeader, async (request, response) => {
     try {
         const adventureIdentifier = request.params.adventureIdentifier;
+        const adventure = await adventureLogic.findAdventure(adventureIdentifier);
+        if (adventure[0].backgroundImage) {
+            fs.unlink(`./public/uploads/adventure-backgrounds/${adventure[0].backgroundImage}`, function (err) {
+                if (err) return console.log(err);
+                console.log('file deleted successfully');
+            });
+        }
         await adventureLogic.removeAdventure(adventureIdentifier);
         global.socketServer.emit(`adventure-removedChange`, adventureIdentifier);
         response.sendStatus(204);
