@@ -17,7 +17,7 @@ const raceSchema = mongoose.Schema({
     languages: {
         type: Array
     },
-    raceColor: {
+    raceColors: {
         type: String
     },
     raceAbilities: {
@@ -27,13 +27,37 @@ const raceSchema = mongoose.Schema({
         speed: { type: Number },
         languages: { type: String },
         uniqueAbilities: { type: Array }
+    },
+    baseWeaponProficiencies: { type: Array },
+    baseArmorProficiencies: { type: Array },
+    baseAddedSkills: { type: Array },
+    skillPickChoice: { type: Object },
+    toolProficiencyPick: { type: Object },
+    extraLanguages: { type: Number },
+    changeBaseAttributePoints: { type: Object },
+
+    customWeaponProficiencies: { type: Object },
+    customArmorProficiencies: { type: Object },
+    addedSpells: { type: Array },
+    addedACPoints: { type: Number },
+    baseAddedTools: { type: Array },
+    visibleToEveryone: { type: Boolean },
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: [true, "userId is required"]
     }
 
 }, {
     versionKey: false
 })
 
-
+raceSchema.virtual("users", {
+    ref: "User",
+    localField: "user_id",
+    foreignField: "_id",
+    justOne: true
+})
 
 
 const Race = mongoose.model("Race", raceSchema, "races");

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
-import spacialRaceProficiency from '../../../utility/spacialRaceProficiency';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
@@ -60,7 +59,7 @@ export class SpacialProficiencyRaces extends Component<{ navigation: any, route:
         setTimeout(() => {
             this.setState({ loading: false })
         }, 1000);
-        this.setState({ totalPoints: spacialRaceProficiency(this.state.characterInfo.race ? this.state.characterInfo.race : "") })
+        this.setState({ totalPoints: this.state.race.changeBaseAttributePoints?.amount || 0 })
         const abilityClicked = [];
         for (let item of abilities) {
             abilityClicked.push(false);

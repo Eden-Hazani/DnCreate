@@ -37,6 +37,7 @@ import { CharEquipmentTree } from '../components/characterEquipment/CharEquipmen
 import logger from '../../utility/logger';
 import { Easing } from 'react-native-reanimated';
 import { PersonalInfo } from '../components/PersonalInfo';
+import { RaceModel } from '../models/raceModel';
 /**
  * 
  * @param  image: image url-string || URI
@@ -396,7 +397,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={styles.upperContainer}>
                                     <Animated.View style={[this.state.startingAnimations[6].getLayout(), { flexDirection: "column", paddingLeft: 2 }]}>
                                         <TouchableOpacity onPress={() => { this.setState({ personalInfoModal: true }) }}>
-                                            <Image style={styles.image} source={{ uri: `${Config.serverUrl}/assets/${this.state.character.image}` }} />
+                                            <Image style={styles.image} source={{ uri: this.state.character.image ? `${Config.serverUrl}/assets/races/${this.state.character.image}` : `${Config.serverUrl}/assets/backgroundDragons/blankDragon.png` }} />
                                         </TouchableOpacity>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}</AppText>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.race}</AppText>
@@ -446,7 +447,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{
                                                         armorBonusCalculator(this.state.character, this.state.character.equippedArmor && this.state.character.equippedArmor.ac ? this.state.character.equippedArmor.ac : 0,
-                                                            this.state.character.equippedArmor ? this.state.character.equippedArmor.armorBonusesCalculationType : "") + racialArmorBonuses(this.state.character.race ? this.state.character.race : "")}</AppText>
+                                                            this.state.character.equippedArmor ? this.state.character.equippedArmor.armorBonusesCalculationType : "") + racialArmorBonuses(this.state.character.raceId ? this.state.character.raceId : new RaceModel())}</AppText>
                                                 </View>
                                                 <AppText>AC</AppText>
                                             </View>

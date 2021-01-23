@@ -57,6 +57,7 @@ const Indicator = ({ scrollX, races }: any) => {
 
 const BackDrop = ({ scrollX, backDropColors }: any) => {
     const bgs = backDropColors;
+    console.log(backDropColors)
     const backgroundColor: any = scrollX.interpolate({
         inputRange: bgs.map((_: any, i: any) => i * Dimensions.get('screen').width),
         outputRange: bgs.map((bg: any) => bg)
@@ -115,7 +116,7 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
                 renderItem={({ item }: any) =>
                     <View style={{ height, width, justifyContent: "center", alignItems: "center", padding: 25 }}>
                         <TouchableOpacity style={{ flex: .3 }} onPress={() => onPress(item)}>
-                            <Image uri={`${Config.serverUrl}/assets/${item.image}`} style={{
+                            <Image uri={item.image ? `${Config.serverUrl}/assets/races/${item.image}` : `${Config.serverUrl}/assets/backgroundDragons/blankDragon.png`} style={{
                                 borderRadius: 100, resizeMode: "contain",
                                 width: Dimensions.get('screen').scale < 3 ? width / 2.2 : width / 2.5,
                                 height: Dimensions.get('screen').scale < 3 ? height / 4.5 : height / 5

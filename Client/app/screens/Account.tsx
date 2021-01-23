@@ -39,6 +39,7 @@ interface AccountState {
     loading: boolean
     settingsModal: boolean
     lookingForUpdates: boolean
+    homebrewRaces: boolean
 }
 
 export class Account extends Component<{ props: any, navigation: any }, AccountState> {
@@ -47,6 +48,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
     constructor(props: any) {
         super(props)
         this.state = {
+            homebrewRaces: false,
             isUserOffline: false,
             loading: false,
             darkModeOn: store.getState().colorScheme,
@@ -269,6 +271,21 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                             this.checkForUpdates()
                                         }} width={100} height={50} borderRadius={15}
                                             fontSize={20} color={Colors.black} backgroundColor={Colors.pastelPink} title={"Check"} />
+                                    </View>
+                                    <ListItemSeparator thick={true} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
+                                        <AppText fontSize={20}>Allow Homebrew races</AppText>
+                                        <Switch value={this.state.homebrewRaces} onValueChange={() => {
+                                            if (this.state.homebrewRaces) {
+                                                this.setState({ homebrewRaces: false }, async () => {
+                                                    await AsyncStorage.setItem('showPublicRaces', "false")
+                                                })
+                                                return;
+                                            }
+                                            this.setState({ homebrewRaces: true }, async () => {
+                                                await AsyncStorage.setItem('showPublicRaces', "true");
+                                            })
+                                        }} />
                                     </View>
                                 </View>
                             </Modal>

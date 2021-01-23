@@ -5,6 +5,7 @@ import { UserModel } from "../models/userModel";
 import storage from "../auth/storage";
 import { CharacterModel } from "../models/characterModel";
 import * as GoogleSignIn from 'expo-google-sign-in';
+import { RaceModel } from "../models/raceModel";
 
 const initialState: AppState = new AppState();
 
@@ -128,9 +129,11 @@ export function reduce(currentState: AppState | undefined = initialState, action
             const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
             newState.leadingAdv[index] = action.payload;
             break;
-
+        case ActionType.UpdateCustomRace:
+            newState.customRace = action.payload
             break;
-
+        case ActionType.cleanCustomRace:
+            newState.customRace = new RaceModel()
         default: break;
     }
 

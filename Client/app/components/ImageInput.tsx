@@ -6,7 +6,7 @@ import { Colors } from '../config/colors';
 import { IconGen } from './IconGen';
 
 
-export function ImageInput({ imageUri, onChangeImage }: any) {
+export function ImageInput({ imageUri, onChangeImage, idDisabled }: any) {
     useEffect(() => {
         // requestPermission();
     }, [])
@@ -48,7 +48,7 @@ export function ImageInput({ imageUri, onChangeImage }: any) {
     }
 
     return (
-        <TouchableWithoutFeedback onPress={() => handelPress()}>
+        <TouchableWithoutFeedback disabled={idDisabled} onPress={() => handelPress()}>
             <View style={styles.container}>
                 {!imageUri && <IconGen name={"camera"} size={100} backgroundColor={Colors.lightGray} iconColor={Colors.white} />}
                 {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}

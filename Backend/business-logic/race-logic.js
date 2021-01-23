@@ -8,7 +8,12 @@ function searchRaces(text) {
     return Race.find({ name: { $regex: text, $options: "i" } }).exec();
 }
 
+function createRace(race) {
+    return race.save();
+}
+
 module.exports = {
     getAllRaces,
-    searchRaces
+    searchRaces,
+    createRace
 }

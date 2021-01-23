@@ -4,7 +4,7 @@ import { ErrorMessage } from './ErrorMessage';
 import { useFormikContext } from 'formik'
 import { View } from 'react-native';
 
-export function FormImagePicker({ name }: any) {
+export function FormImagePicker({ name, idDisabled }: any) {
     const { setFieldValue, errors, values, touched } = useFormikContext<any>();
     const handleChangeImage = (uri: string) => {
         setFieldValue(name, uri)
@@ -12,6 +12,7 @@ export function FormImagePicker({ name }: any) {
     return (
         <>
             <ImageInput
+                idDisabled={idDisabled}
                 imageUri={values[name]}
                 onChangeImage={(uri: any) => handleChangeImage(uri)} />
             <View style={{ width: 400, top: -70 }}>

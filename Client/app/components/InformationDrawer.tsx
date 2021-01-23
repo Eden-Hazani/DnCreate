@@ -10,7 +10,7 @@ if (Platform.OS === "android") {
     }
 }
 
-export default function InformationDrawer({ expendedWidth, expendedHeight, information }: any) {
+export default function InformationDrawer({ headLine, expendedWidth, expendedHeight, information }: any) {
     const [animationStatus, setAnimationStatus] = useState(new Animated.ValueXY({ x: -1000, y: 0 }))
     const [drawerStatus, setDrawerStatus] = useState(false)
     const handlePress = useCallback(() => {
@@ -49,13 +49,16 @@ export default function InformationDrawer({ expendedWidth, expendedHeight, infor
                 <View style={[styles.box, drawerStatus ? expendedStyle() : undefined, { backgroundColor: Colors.burgundy }]}>
                     {!drawerStatus ?
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                            <AppText color={Colors.totalWhite}>More Information</AppText>
+                            <AppText color={Colors.totalWhite}>{headLine ? headLine : 'More Information'}</AppText>
                             <IconGen name={'chevron-double-right'} size={50} iconColor={Colors.totalWhite} />
                         </View>
                         :
                         <Animated.View style={[animationStatus.getLayout(), { padding: 25 }]}>
-                            {information &&
+                            {typeof (information) === 'string' &&
                                 <AppText color={Colors.totalWhite}>{information.replace(/\. /g, '.\n\n')}</AppText>
+                            }
+                            {typeof (information) !== 'string' &&
+                                information
                             }
                         </Animated.View>
                     }

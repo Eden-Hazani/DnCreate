@@ -128,9 +128,11 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                     this.setState({ remainLoggedIn: true })
                                 }} />
                             </View>
-                            <View>
-                                <GoogleLogin />
-                            </View>
+                            {!__DEV__ &&
+                                <View>
+                                    <GoogleLogin />
+                                </View>
+                            }
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <AppButton onPress={() => { this.setState({ forgotPasswordModel: true }) }} width={100} height={100} borderRadius={100} fontSize={18} marginBottom={1}
                                     color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"Forgot   Password?"} />

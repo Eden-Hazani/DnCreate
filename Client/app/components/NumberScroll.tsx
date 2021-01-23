@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, Animated, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { number } from 'yup';
 import { Colors } from '../config/colors';
@@ -8,6 +8,8 @@ import { AppTextInput } from './forms/AppTextInput';
 import { IconGen } from './IconGen';
 
 const { width, height } = Dimensions.get('window')
+
+
 
 const Item = ({ item, scrollX, index }: any) => {
     const inputRange = [(index - 1) * (width / 3), index * (width / 3), (index + 1) * (width / 3)];
@@ -27,11 +29,33 @@ const Item = ({ item, scrollX, index }: any) => {
 }
 
 
-export default function NumberScroll({ max, getValue }: any) {
-    const [primeIndex, setPrimeIndex] = useState(0)
+/**
+ * Horizontal Number scroller
+ * @param {Number} max - max number allowed with the scroller 
+ * @param {Function} getValue - gets the current shown value as a callback 
+ * @param {Boolean} startFromZero - starts the Number List from zero - default is false (list starts at 1) 
+ * @param {Boolean} startingVal - Jumps to index of this item in the list 
+ */
+export default function NumberScroll({ startingVal, max, getValue, startFromZero }: any) {
+    useEffect(() => {
+        getValue(numberArray[0])
+        if (startingVal) {
+            console.log(primeIndex)
+            setTimeout(() => {
+                moveIndexRef.current.scrollToIndex({ animation: false, index: primeIndex })
+
+            }, 200);
+        }
+    }, [])
+
+    const getPrimeIndexToStart = (): number => {
+        return startFromZero ? startingVal : startingVal - 1
+    }
+
+    const [primeIndex, setPrimeIndex] = useState(startingVal ? getPrimeIndexToStart() : 0)
     const [manualWindow, setManualWindow] = useState(false)
     const increment: any = React.useRef(null);
-    const numberArray: number[] = Array.from({ length: max }, (x, i) => i + 1);
+    const numberArray: number[] = startFromZero ? Array.from({ length: max + 1 }, (x, i) => i) : Array.from({ length: max }, (x, i) => i + 1)
     const scrollX = React.useRef(new Animated.Value(0)).current
     const moveIndexRef: any = React.useRef(null)
     const onViewRef = React.useRef((viewableItems: any) => {
@@ -39,7 +63,7 @@ export default function NumberScroll({ max, getValue }: any) {
             return
         }
         setPrimeIndex(viewableItems.viewableItems[0].index)
-        getValue(viewableItems)
+        getValue(viewableItems.viewableItems[0].item)
     })
     const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: (width / 3) })
 
@@ -80,12 +104,12 @@ export default function NumberScroll({ max, getValue }: any) {
                 <View>
                     <AppText fontSize={18} textAlign={'center'}>Set Manually</AppText>
                     <AppTextInput keyboardType="numeric" onChangeText={(newIndex: number) => {
-                        setPrimeIndex(newIndex - 1)
+                        startFromZero ? setPrimeIndex(newIndex) : setPrimeIndex(newIndex - 1)
                     }} />
                     <AppButton backgroundColor={Colors.bitterSweetRed} width={110} height={110} borderRadius={110}
                         title={'Done'} onPress={() => {
                             if (primeIndex <= 0 || primeIndex >= numberArray.length) {
-                                alert(`Range is between 1 - ${numberArray.length}`)
+                                alert(`Range is between ${numberArray[0]} - ${numberArray[numberArray.length - 1]}`)
                                 return;
                             }
                             moveIndexRef.current.scrollToIndex({ animation: false, index: primeIndex })

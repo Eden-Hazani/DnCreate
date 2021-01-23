@@ -89,7 +89,7 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                         openCharacter(item)
                                     }}
                                     style={{ alignItems: "center" }}>
-                                    <Image uri={`${Config.serverUrl}/assets/${item.image}`}
+                                    <Image uri={`${Config.serverUrl}/assets/races/${item.image}`}
                                         style={{ width: 150, height: 150 }} />
                                     <View style={{
                                         backgroundColor: Colors.burgundy, padding: 15, justifyContent: "center",

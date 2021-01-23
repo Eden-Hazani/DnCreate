@@ -23,4 +23,6 @@ export enum ActionType {
     firstLoginAd,
     StartAsNonUser,
     colorScheme,
+    UpdateCustomRace,
+    cleanCustomRace
 }

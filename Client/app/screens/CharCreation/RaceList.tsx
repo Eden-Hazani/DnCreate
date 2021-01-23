@@ -23,6 +23,7 @@ import { AnimatedHorizontalList } from '../../components/AnimatedHorizontalList'
 import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../../components/AppNoInternet';
 import { AppButton } from '../../components/AppButton';
+import AuthContext from '../../auth/context';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -46,6 +47,7 @@ interface RaceListState {
 
 
 export class RaceList extends Component<{ props: any, navigation: any }, RaceListState> {
+    static contextType = AuthContext;
     private unsubscribeStore: Unsubscribe;
     private NetUnSub: any;
     constructor(props: any) {
@@ -86,9 +88,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         if (isOffline) {
             this.setState({ isUserOffline: JSON.parse(isOffline) })
         }
-        this.getRacesFromServer().then(() => {
-            this.setState({ loading: false })
-        });
+        this.getRacesFromServer();
     }
     componentWillUnmount() {
         this.NetUnSub();
@@ -118,13 +118,24 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
     getRacesFromServer = async () => {
         let raceColors = [];
+        const races: any = [];
         const result: any = await racesApi.getRaceList();
+        const raceType = await AsyncStorage.getItem('showPublicRaces');
+        for (let item of result.data) {
+            if (!raceType || raceType === 'false') {
+                if (item.user_id === this.context.user._id || item.visibleToEveryone === undefined) {
+                    races.push(item)
+                }
+            } if (raceType === 'true') {
+                races.push(item)
+            }
+        }
         await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
-        const races: any = result.data;
+
         for (let item of races) {
             raceColors.push(item.raceColors)
         }
-        this.setState({ races, error: errorHandler(result), raceColors })
+        this.setState({ races, error: errorHandler(result), raceColors, loading: false })
     }
 
     updateSearch = async (search: string) => {
@@ -162,7 +173,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
-            if (characterInfo.race === 'Half Elf' || characterInfo.race === 'Changeling' || characterInfo.race === 'Warforged') {
+            if (race.changeBaseAttributePoints?.changePoints) {
                 this.props.navigation.navigate("SpacialProficiencyRaces", { race: race });
                 return;
             }

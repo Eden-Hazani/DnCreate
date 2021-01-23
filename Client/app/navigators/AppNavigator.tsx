@@ -13,6 +13,7 @@ import * as Notifications from 'expo-notifications';
 import logger from '../../utility/logger';
 import authApi from '../api/authApi';
 import navigation from './rootNavigation';
+import CreationNavigator from './CreationNavigator';
 
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
@@ -49,6 +50,7 @@ const AppNavigator = () => {
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"home"} iconColor={color} /> }} name="Home" component={CharNavigator} />
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"account"} iconColor={color} /> }} name="Account" component={AccNavigator} />
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"map-outline"} iconColor={color} /> }} name="Adventures" component={AdventuresNavigator} />
+        <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"creation"} iconColor={color} /> }} name="Creation" component={CreationNavigator} />
     </Tab.Navigator>
 }
 

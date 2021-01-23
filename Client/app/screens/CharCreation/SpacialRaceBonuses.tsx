@@ -12,22 +12,19 @@ import { AppTextInput } from '../../components/forms/AppTextInput';
 import { RaceModel } from '../../models/raceModel';
 import skillJson from '../../../jsonDump/skillList.json';
 import toolJson from '../../../jsonDump/toolList.json';
+import { PickSingleItem } from './helperFunctions/PickSingleItem';
 
 interface SpacialRaceBonusesState {
     character: CharacterModel
-    choice: any
-    itemClicked: boolean[],
-    itemPicked: any[]
-    amountToPick: number
     confirmed: boolean
     extraLanguages: string[]
-    extraLanguagesNumber: number
     race: RaceModel
     weaponProficiencies: string[]
-    weaponProficienciesNumber: number
-    secondItemClicked: boolean[]
-    secondItemPicked: any[]
-    secondAmountToPick: number
+
+    pickedSkills: any[]
+    pickedTools: any[]
+    customWeapons: any[]
+    customArmor: any[]
 }
 
 export class SpacialRaceBonuses extends Component<{ navigation: any, route: any }, SpacialRaceBonusesState>{
@@ -36,19 +33,16 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         super(props)
         this.state = {
             weaponProficiencies: [],
-            weaponProficienciesNumber: 0,
             extraLanguages: [],
             confirmed: false,
-            amountToPick: 0,
-            itemClicked: [],
-            itemPicked: [],
-            choice: null,
             character: store.getState().character,
-            extraLanguagesNumber: 0,
             race: this.props.route.params.race,
-            secondItemClicked: [],
-            secondItemPicked: [],
-            secondAmountToPick: 0
+
+
+            customWeapons: [],
+            customArmor: [],
+            pickedSkills: [],
+            pickedTools: []
         }
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
@@ -65,103 +59,10 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         })
     }
 
-    componentDidMount() {
-        const character = { ...this.state.character };
-        if (this.state.character.race === "DragonBorn") {
-            this.setState({ amountToPick: 1 })
-        }
-        if (this.state.character.race === "Lizardfolk") {
-            this.setState({ amountToPick: 2 })
-        }
-        if (this.state.character.race === "Orc") {
-            this.setState({ amountToPick: 2 })
-        }
-        if (this.state.character.race === "Hobgoblin") {
-            this.setState({ weaponProficienciesNumber: 2 })
-        }
-        if (this.state.character.race === "Warforged") {
-            this.setState({ amountToPick: 1, secondAmountToPick: 1, extraLanguagesNumber: 1 })
-        }
-        if (this.state.character.race === "Human") {
-            this.setState({ extraLanguagesNumber: 1 })
-        }
-        if (this.state.character.race === "Kalashtar") {
-            this.setState({ extraLanguagesNumber: 1 })
-        }
-        if (this.state.character.race === "Tabaxi") {
-            this.setState({ extraLanguagesNumber: 1 })
-        }
-        if (this.state.character.race === "Leonin") {
-            this.setState({ amountToPick: 1 })
-        }
-        if (this.state.character.race === "Dwarf") {
-            this.setState({ amountToPick: 1 })
-        }
-        if (this.state.character.race === "Kenku") {
-            this.setState({ amountToPick: 2 })
-        }
-        if (this.state.character.race === "Half Elf") {
-            this.setState({ extraLanguagesNumber: 1, amountToPick: 2 })
-        }
-        if (this.state.character.race === "Changeling") {
-            this.setState({ extraLanguagesNumber: 2, amountToPick: 2 })
-        }
-        this.setState({ character })
-    }
-
-    pickItem = (item: any, index: number) => {
-        if (!this.state.itemClicked[index]) {
-            if (this.state.amountToPick === this.state.itemPicked.length) {
-                alert(`You can only pick ${this.state.amountToPick}`)
-                return
-            }
-            const itemPicked = this.state.itemPicked;
-            const itemClicked = this.state.itemClicked;
-            itemClicked[index] = true;
-            itemPicked.push(item)
-            this.setState({ itemClicked, itemPicked });
-        }
-        else if (this.state.itemClicked[index]) {
-            const oldPickedItems = this.state.itemPicked;
-            const itemClicked = this.state.itemClicked;
-            itemClicked[index] = false;
-            if (this.state.character.race === "Changeling") {
-                const itemPicked = oldPickedItems.filter(skill => skill[0] !== item[0]);
-                this.setState({ itemClicked, itemPicked });
-                return
-            }
-            const itemPicked = oldPickedItems.filter(item => item.name !== item.name);
-            this.setState({ itemClicked, itemPicked });
-        }
-    }
-
-    pickSecondItem = (item: any, index: number) => {
-        if (!this.state.secondItemClicked[index]) {
-            if (this.state.secondAmountToPick === this.state.secondItemPicked.length) {
-                alert(`You can only pick ${this.state.secondAmountToPick}`)
-                return
-            }
-            const secondItemPicked = this.state.secondItemPicked;
-            const secondItemClicked = this.state.secondItemClicked;
-            secondItemClicked[index] = true;
-            secondItemPicked.push(item)
-            this.setState({ secondItemClicked, secondItemPicked });
-        }
-        else if (this.state.secondItemClicked[index]) {
-            const oldPickedItems = this.state.secondItemPicked;
-            const secondItemClicked = this.state.secondItemClicked;
-            secondItemClicked[index] = false;
-            if (this.state.character.race === "Changeling") {
-                const secondItemPicked = oldPickedItems.filter(skill => skill[0] !== item[0]);
-                this.setState({ secondItemClicked, secondItemPicked });
-                return
-            }
-            const secondItemPicked = oldPickedItems.filter(item => item.name !== item.name);
-            this.setState({ secondItemClicked, secondItemPicked });
-        }
-    }
-
     insertInfoAndContinue = () => {
+        if (!this.validate()) {
+            return
+        }
         const character = { ...this.state.character };
         character.languages = [];
         character.skills = [];
@@ -169,157 +70,41 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         character.addedArmorProf = [];
         character.tools = [];
         character.languages = [];
-        if (this.state.character.race === "Changeling") {
-            character.languages.push("Common")
-        }
-        if (this.state.character.race === "Goblin") {
-            character.languages.push("Common", "Goblin")
-        }
-        if (this.state.character.race === "Kenku") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick 2 skills from the list')
-                return;
-            }
-            for (let item of this.state.itemPicked) {
-                character.skills.push([item, 0])
-            }
-            character.languages.push("Common", "Auran")
-        }
-        if (this.state.character.race === "DragonBorn") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick ancestry')
-                return
-            }
-            if (character.charSpecials) {
-                character.charSpecials.dragonBornAncestry = this.state.itemPicked[0];
-            }
-            character.languages.push("Common", "Draconic")
-        }
-        if (this.state.character.race === "Human") {
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You have another language to add')
-                return
-            }
-            character.languages.push("Common")
-        }
-        if (this.state.character.race === "Dwarf") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick tool proficiency')
-                return
-            }
-            character.addedWeaponProf.push("battleaxe", "handaxe", "light hammer", "warhammer")
-            character.languages.push("Common", "Dwarvish")
-            character.tools.push([this.state.itemPicked[0], 0])
-        }
-        if (this.state.character.race === "Elf") {
-            character.skills.push(["Perception", 0])
-            character.languages.push("Common", "Elven")
-        }
-        if (this.state.character.race === "Bugbear") {
-            character.skills.push(["Stealth", 0])
-        }
-        if (this.state.character.race === "Half Orc") {
-            character.skills.push(["Intimidation", 0])
-            character.languages.push("Common", "Orc")
-        }
-        if (this.state.character.race === "Goliath") {
-            character.skills.push(["Athletics", 0])
-        }
-        if (this.state.character.race === "Tabaxi") {
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You can learn another language')
-                return;
-            }
-            character.skills.push(["Perception", 0], ["Stealth", 0])
-        }
-        if (this.state.character.race === "Kalashtar") {
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You can learn another language')
-                return;
-            }
-        }
-        if (this.state.character.race === "Gnome") {
-            character.languages.push("Common", "Gnomish")
-        }
-        if (this.state.character.race === "Leonin") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick a skill')
-                return;
-            }
-            for (let item of this.state.itemPicked) {
-                character.skills.push([item, 0])
-            }
-        }
-        if (this.state.character.race === "Lizardfolk") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('You have 2 skills to pick')
-                return;
-            }
-            for (let item of this.state.itemPicked) {
-                character.skills.push([item, 0])
-            }
-        }
-        if (this.state.character.race === "Orc") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('You have 2 skills to pick')
-                return;
-            }
-            for (let item of this.state.itemPicked) {
-                character.skills.push([item, 0])
-            }
-        }
-        if (this.state.character.race === "Half Elf") {
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You have another language to add')
-                return
-            }
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick 2 skills from the list')
-                return;
-            }
-            for (let item of this.state.itemPicked) {
-                character.skills.push([item, 0])
-            }
-            character.languages.push("Common", "Elven")
-        }
-        if (this.state.character.race === "Halfling") {
-            character.languages.push("Common", "Halfling")
-        }
-        if (this.state.character.race === "Tiefling") {
-            character.languages.push("Common", "Infernal")
-        }
 
-        if (this.state.character.race === "Warforged") {
-            if (this.state.amountToPick > this.state.itemPicked.length) {
-                alert('Must pick 1 tool from the list')
-                return;
-            }
-            if (this.state.secondAmountToPick > this.state.secondItemPicked.length) {
-                alert('Must pick 1 skill from the list')
-                return;
-            }
-            if (this.state.extraLanguagesNumber > this.state.extraLanguages.length) {
-                alert('You have another language to add')
-                return
-            }
-        }
-        if (this.state.character.race === "Hobgoblin") {
-            if (this.state.weaponProficiencies.length < this.state.weaponProficienciesNumber) {
-                alert("You have another weapon proficiency to add");
-                return;
-            }
-            character.addedArmorProf.push("Light Armor")
-            for (let item of this.state.weaponProficiencies) {
-                character.addedWeaponProf.push(item)
-            }
-        }
         if (this.state.race?.languages) {
             for (let language of this.state.race?.languages) {
                 character.languages.push(language)
             }
         }
+        if (this.state.race.baseAddedSkills) {
+            for (let item of this.state.race.baseAddedSkills) {
+                character.skills.push([item, 0])
+            }
+        }
+        if (this.state.race.baseArmorProficiencies) {
+            for (let item of this.state.race.baseArmorProficiencies) {
+                character.addedArmorProf.push(item)
+            }
+        }
+        if (this.state.race.baseWeaponProficiencies) {
+            for (let item of this.state.race.baseWeaponProficiencies) {
+                character.addedWeaponProf.push(item)
+            }
+        }
         for (let item of this.state.extraLanguages) {
             character.languages.push(item)
+        }
+        for (let item of this.state.pickedSkills) {
+            character.skills.push([item, 0])
+        }
+        for (let item of this.state.pickedTools) {
+            character.tools.push([item, 0])
+        }
+        for (let item of this.state.customArmor) {
+            character.addedArmorProf.push(item)
+        }
+        for (let item of this.state.customWeapons) {
+            character.addedWeaponProf.push(item)
         }
         this.setState({ character, confirmed: true }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
@@ -332,16 +117,70 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         })
     }
 
+    displayExtraLanguages = (amount: number) => {
+        let jsx: any[] = []
+        for (let i = 0; i < amount; i++) {
+            jsx.push(<AppTextInput key={i} placeholder={"Language..."} onChangeText={(txt: string) => {
+                const extraLanguages = this.state.extraLanguages;
+                extraLanguages[i] = txt;
+                this.setState({ extraLanguages })
+            }} />)
+        }
+        return jsx
+    }
+    displayCustomWeapons = (amount: number) => {
+        let jsx: any[] = []
+        for (let i = 0; i < amount; i++) {
+            jsx.push(<AppTextInput key={i} placeholder={"Weapon..."} onChangeText={(txt: string) => {
+                const customWeapons = this.state.customWeapons;
+                customWeapons[i] = txt;
+                this.setState({ customWeapons })
+            }} />)
+        }
+        return jsx
+    }
+    displayCustomArmor = (amount: number) => {
+        let jsx: any[] = []
+        for (let i = 0; i < amount; i++) {
+            jsx.push(<AppTextInput key={i} placeholder={"Armor..."} onChangeText={(txt: string) => {
+                const customArmor = this.state.customArmor;
+                customArmor[i] = txt;
+                this.setState({ customArmor })
+            }} />)
+        }
+        return jsx
+    }
+
+    validate = () => {
+        if (this.state.race.extraLanguages && this.state.race.extraLanguages > 0) {
+            if (this.state.extraLanguages.length < this.state.race.extraLanguages) {
+                alert("You still have languages to pick");
+                return false;
+            }
+            for (let item of this.state.extraLanguages) {
+                if (item === '') {
+                    alert("You still have languages to pick");
+                    return false;
+                }
+            }
+        }
+        if (this.state.race.skillPickChoice && this.state.race.skillPickChoice?.amountToPick > 0) {
+            if (this.state.pickedSkills.length < this.state.race.skillPickChoice?.amountToPick) {
+                alert("You still have skills to pick");
+                return false;
+            }
+        }
+        if (this.state.race.toolProficiencyPick && this.state.race.toolProficiencyPick?.amountToPick > 0) {
+            if (this.state.pickedTools.length < this.state.race.toolProficiencyPick?.amountToPick) {
+                alert("You still have tools to pick");
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     render() {
-        const OrcSkills = ["Animal Handling", "Insight", "Intimidation", "Medicine", "Survival", "Nature", "Perception"]
-        const dwarfTools = ["Smith's tools", "Brewer's supplies", "Mason's tools"];
-        const lizardFolkSkills = ["Animal Handling", "Nature", "Perception", "Stealth", "Survival"]
-        const kenkuSkills = ["Acrobatics", "Deception", "Stealth", "Sleight of Hand"]
-        const leoninSkills = ["Athletics", "Intimidation", "Perception", "Survival"]
-        const fullSkillList = ['Athletics', 'Acrobatics', 'Sleight of Hand', 'Stealth', 'Arcana', 'History', 'Investigation',
-            'Nature', 'Religion', 'Animal Handling', 'Insight', 'Medicine', 'Perception', 'Survival', 'Deception',
-            'Intimidation', 'Performance', 'Persuasion']
         return (
             <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
@@ -364,7 +203,53 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.languages !== undefined) && this.state.race.raceAbilities.languages.replace(/\. /g, '.\n\n')}</AppText>
                             <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Size:</AppText>
                             <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{(this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.size !== undefined) && this.state.race.raceAbilities.size.replace(/\. /g, '.\n\n')}</AppText>
-                            <AppText fontSize={18} padding={10} color={Colors.berries} textAlign={'center'}>Speed: {this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.speed}ft</AppText>
+                            <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>Speed: {this.state.race.raceAbilities !== undefined && this.state.race.raceAbilities.speed}ft</AppText>
+                            {(this.state.race.addedACPoints !== 0) &&
+                                <View>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>AC Bonus Points: {this.state.race.addedACPoints}</AppText>
+                                </View>
+                            }
+                            {this.state.race.baseAddedSkills && this.state.race.baseAddedSkills?.length > 0 &&
+                                <View>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following skill proficiencies:</AppText>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                        {this.state.race.baseAddedSkills.map((item, index) => <View style={{ margin: 3 }} key={index}>
+                                            <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
+                                        </View>
+                                        )}
+                                    </View>
+                                </View>
+                            }
+                            {this.state.race.baseAddedTools && this.state.race.baseAddedTools?.length > 0 &&
+                                <View>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following tool proficiencies:</AppText>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                        {this.state.race.baseAddedTools.map((item, index) => <View style={{ margin: 3 }} key={index}>
+                                            <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
+                                        </View>)}
+                                    </View>
+                                </View>
+                            }
+                            {this.state.race.baseWeaponProficiencies && this.state.race.baseWeaponProficiencies?.length > 0 &&
+                                <View>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following weapon proficiencies:</AppText>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                        {this.state.race.baseWeaponProficiencies.map((item, index) => <View style={{ margin: 3 }} key={index}>
+                                            <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
+                                        </View>)}
+                                    </View>
+                                </View>
+                            }
+                            {this.state.race.baseArmorProficiencies && this.state.race.baseArmorProficiencies?.length > 0 &&
+                                <View>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following Armor proficiencies:</AppText>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                        {this.state.race.baseArmorProficiencies.map((item, index) => <View style={{ margin: 3 }} key={index}>
+                                            <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
+                                        </View>)}
+                                    </View>
+                                </View>
+                            }
                         </View>
                         {this.state.race.raceAbilities?.uniqueAbilities &&
                             Object.values(this.state.race.raceAbilities.uniqueAbilities)
@@ -372,185 +257,44 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                     <AppText fontSize={22}>{item.name}</AppText>
                                     <AppText fontSize={17} color={Colors.berries}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                                 </View>)}
-
-                        {this.state.character.race === "Changeling" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Changeling you can read speak and write Common.</AppText>
+                        {this.state.race.extraLanguages && this.state.race.extraLanguages !== 0 &&
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.extraLanguages} extra languages</AppText>
+                                {this.displayExtraLanguages(this.state.race.extraLanguages).map((item, index) => item)}
                             </View>
                         }
-                        {this.state.character.race === "Kenku" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Kenku You can read and write Common and Auran, but you can speak only by using your Mimicry trait.</AppText>
-                                <AppText textAlign={'center'} fontSize={18}>You also gain proficiency in two skills of your choice</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {kenkuSkills.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                            </View>
-                        }
-                        {this.state.character.race === "Leonin" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>You  gain proficiency in a skill of your choice</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {leoninSkills.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                            </View>
-                        }
-                        {this.state.character.race === "Lizardfolk" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>You gain proficiency in 2 skills of your choice</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {lizardFolkSkills.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                            </View>
-                        }
-                        {this.state.character.race === "Orc" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>You gain proficiency in 2 skills of your choice</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {OrcSkills.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                            </View>
-                        }
-                        {this.state.character.race === "DragonBorn" &&
+                        {this.state.race.skillPickChoice && this.state.race.skillPickChoice?.amountToPick > 0 &&
                             <View>
-                                <View style={{ padding: 15 }}>
-                                    <AppText textAlign={'center'} fontSize={18}>As a DragonBorn you gain damage resistance to the damage type associated with your ancestry.</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>You also read speak and write Draconic</AppText>
-                                </View>
-                                <AppText textAlign={'center'} fontSize={18}>Pick your Draconic ancestry</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                                    {dragonAncestry.ancestry.map((ancestry, index) =>
-                                        <TouchableOpacity key={index} style={[styles.largeItem, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray, borderColor: Colors.whiteInDarkMode }]}
-                                            onPress={() => this.pickItem(ancestry, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>Dragon color: {ancestry.color}</AppText>
-                                            <AppText textAlign={'center'} fontSize={18}>Damage type: {ancestry.damageType}</AppText>
-                                            <AppText textAlign={'center'} fontSize={18}>Breath Attack: {ancestry.breath}</AppText>
-                                        </TouchableOpacity>)}
+                                <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.skillPickChoice.amountToPick} extra skills</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
+                                    <PickSingleItem amountToPick={this.state.race.skillPickChoice.amountToPick}
+                                        onPick={(pickedSkills: any) => this.setState({ pickedSkills })}
+                                        itemList={this.state.race.skillPickChoice.skillList} />
                                 </View>
                             </View>
                         }
-                        {this.state.character.race === "Human" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Human you can read speak and write Common and another extra language of your choice.</AppText>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
-                            </View>
-                        }
-                        {this.state.character.race === "Kalashtar" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Kalashtar you can read speak and write Common, Quori, and another extra language of your choice.</AppText>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
-                            </View>
-                        }
-                        {this.state.character.race === "Tabaxi" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Tabaxi you can speak, read, and write Common and one other language of your choice.</AppText>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
-                            </View>
-                        }
-                        {this.state.character.race === "Dwarf" &&
+                        {this.state.race.toolProficiencyPick && this.state.race.toolProficiencyPick?.amountToPick > 0 &&
                             <View>
-                                <View style={{ padding: 15 }}>
-                                    <AppText textAlign={'center'} fontSize={22}>You also get to pick one tool to get proficiency with</AppText>
-                                </View>
+                                <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.toolProficiencyPick.amountToPick} extra tools</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {dwarfTools.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
+                                    <PickSingleItem amountToPick={this.state.race.toolProficiencyPick.amountToPick}
+                                        onPick={(pickedTools: any) => this.setState({ pickedTools })}
+                                        itemList={this.state.race.toolProficiencyPick.toolList} />
                                 </View>
                             </View>
                         }
-
-                        {this.state.character.race === "Warforged" &&
-                            <View>
-                                <View style={{ padding: 15 }}>
-                                    <AppText textAlign={'center'} fontSize={22}>As a Warforged you get to pick one tool proficiency</AppText>
-                                </View>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {toolJson.tools.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                                <View style={{ padding: 15 }}>
-                                    <AppText textAlign={'center'} fontSize={22}>You also pick one skill proficiency</AppText>
-                                </View>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {skillJson.skillList.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.secondItemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                                            onPress={() => this.pickSecondItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                                <AppText textAlign={'center'} fontSize={22}>And one extra language</AppText>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
+                        {this.state.race.customWeaponProficiencies &&
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customWeaponProficiencies.amount} extra
+                                 {this.state.race.customWeaponProficiencies.type} Weapon Proficiencies</AppText>
+                                {this.displayCustomWeapons(this.state.race.customWeaponProficiencies.amount).map((item, index) => item)}
                             </View>
                         }
-                        {this.state.character.race === "Hobgoblin" &&
-                            <View>
-                                <AppText textAlign={'center'} fontSize={18}>As a Hobgoblin you can pick two martial weapons to be proficient with.</AppText>
-                                <AppTextInput placeholder={"Weapon..."} onChangeText={(txt: string) => {
-                                    const weaponProficiencies = this.state.weaponProficiencies;
-                                    weaponProficiencies[0] = txt;
-                                    this.setState({ weaponProficiencies })
-                                }} />
-                                <AppTextInput placeholder={"Weapon..."} onChangeText={(txt: string) => {
-                                    const weaponProficiencies = this.state.weaponProficiencies;
-                                    weaponProficiencies[1] = txt;
-                                    this.setState({ weaponProficiencies })
-                                }} />
-                            </View>
-                        }
-                        {this.state.character.race === "Half Elf" &&
-                            <View style={{ padding: 15 }}>
-                                <AppText textAlign={'center'} fontSize={18}>As a Half Elf you can read speak and write Common, Elven and another extra language of your choice.</AppText>
-                                <AppText textAlign={'center'} fontSize={18}> You also gain proficiency in two skills of your choice.</AppText>
-                                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    {fullSkillList.map((item, index) =>
-                                        <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray, borderColor: Colors.whiteInDarkMode }]}
-                                            onPress={() => this.pickItem(item, index)}>
-                                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
-                                        </TouchableOpacity>)}
-                                </View>
-                                <AppTextInput placeholder={"Language..."} onChangeText={(txt: string) => {
-                                    const extraLanguages = this.state.extraLanguages;
-                                    extraLanguages[0] = txt;
-                                    this.setState({ extraLanguages })
-                                }} />
+                        {this.state.race.customArmorProficiencies &&
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customArmorProficiencies.amount}
+                                extra {this.state.race.customArmorProficiencies.type} Armor Proficiencies</AppText>
+                                {this.displayCustomArmor(this.state.race.customArmorProficiencies.amount).map((item, index) => item)}
                             </View>
                         }
                         <View style={{ paddingBottom: 25 }}>

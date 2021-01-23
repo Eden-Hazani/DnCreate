@@ -148,14 +148,14 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                                         <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Age</AppText>
                                             <NumberScroll max={5000} getValue={(val: any) => {
-                                                this.setState({ pickedAge: val.viewableItems[0].item })
+                                                this.setState({ pickedAge: val })
                                             }} />
                                         </View>
 
                                         <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Height</AppText>
                                             <NumberScroll max={450} getValue={(val: any) => {
-                                                this.setState({ pickedHeight: val.viewableItems[0].item })
+                                                this.setState({ pickedHeight: val })
                                             }} />
                                         </View>
                                     </View>
@@ -163,7 +163,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                                         <View style={{ width: Dimensions.get('window').width / 2, borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Weight</AppText>
                                             <NumberScroll max={1000} getValue={(val: any) => {
-                                                this.setState({ pickedWeight: val.viewableItems[0].item })
+                                                this.setState({ pickedWeight: val })
                                             }} />
                                         </View>
                                     </View>

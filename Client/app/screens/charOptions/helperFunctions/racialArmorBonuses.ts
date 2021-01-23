@@ -1,9 +1,12 @@
-export function racialArmorBonuses(race: string) {
+import { RaceModel } from "../../../models/raceModel";
+
+export function racialArmorBonuses(race: RaceModel) {
     let bonus: number = 0;
-    switch (true) {
-        case race === "Warforged":
-            bonus = 1
-            break;
-    }
+    if (race.addedACPoints)
+        switch (true) {
+            case race.addedACPoints > 0:
+                bonus = race.addedACPoints
+                break;
+        }
     return bonus;
 }

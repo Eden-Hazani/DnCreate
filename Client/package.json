@@ -20,6 +20,7 @@
     "@types/react-native-snap-carousel": "^3.8.2",
     "@types/yup": "^0.29.6",
     "apisauce": "^1.1.2",
+    "bad-words": "^3.0.4",
     "expo": "^40.0.0",
     "expo-ads-admob": "~8.4.0",
     "expo-ads-facebook": "~8.4.1",

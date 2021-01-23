@@ -29,6 +29,7 @@ import { allowedChangingPaths, pathChoiceChangePicker } from '../../classFeature
 import { addRacialSpells } from './helperFunctions/addRacialSpells';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
+import { RaceModel } from '../../models/raceModel';
 
 
 interface LevelUpOptionsState {
@@ -208,7 +209,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 const beforeAnyChanges = JSON.parse(JSON.stringify(character))
                 this.setState({ character, beforeAnyChanges }, async () => {
                     if (this.props.character.level === 1 && this.props.character.race !== undefined) {
-                        addRacialSpells(this.props.character.race).forEach(item => {
+                        addRacialSpells(this.props.character.raceId || new RaceModel()).forEach(item => {
                             const spell = spellsJSON.find(spell => spell.name === item)
                             if (spell && character.spells !== undefined && character.magic !== undefined && this.state.character.magic !== undefined) {
                                 const spellLevel = spellLevelChanger(spell.level)
@@ -225,7 +226,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }
             if (this.props.character.level === 1 && !(this.props.options.spells || this.props.options.spellsKnown)) {
                 if (this.props.character.race) {
-                    addRacialSpells(this.props.character.race).forEach(item => {
+                    addRacialSpells(this.props.character.raceId || new RaceModel()).forEach(item => {
                         const spell = spellsJSON.find(spell => spell.name === item)
                         if (spell && character.spells !== undefined) {
                             const spellLevel = spellLevelChanger(spell.level)
