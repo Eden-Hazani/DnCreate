@@ -51,7 +51,7 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
         if (customRace.languages) {
             customRace.languages.push('')
         }
-        this.setState({ customRace }, () => console.log(this.state.customRace.languages))
+        this.setState({ customRace })
     }
 
     confirmAndContinue = () => {

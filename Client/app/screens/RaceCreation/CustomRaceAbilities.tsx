@@ -95,7 +95,7 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
                                                 const customRace = { ...this.state.customRace };
                                                 if (customRace.raceAbilities?.uniqueAbilities) {
                                                     customRace.raceAbilities.uniqueAbilities[index].name = name
-                                                    this.setState({ customRace }, () => console.log(this.state.customRace))
+                                                    this.setState({ customRace })
                                                 }
                                             }} />
                                         <AppTextInput

@@ -87,7 +87,6 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                 </View>
                 <Modal visible={this.state.firstLookModal}>
                     <InformationScroller list={adventureInfo.list} PressClose={async (val: boolean) => {
-                        console.log(val)
                         this.setState({ firstLookModal: val })
                         await AsyncStorage.setItem('isAdventureFirstUse', "false")
                     }} />

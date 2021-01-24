@@ -35,7 +35,6 @@ export class CustomRaceBaseSkills extends Component<{ navigation: any }, CustomR
     }
     onFocus = () => {
         const pickedSkills = store.getState().customRace.baseAddedSkills;
-        console.log(pickedSkills)
         let clickedSkills: any[] = []
         if (pickedSkills && pickedSkills?.length > 0) {
             for (let item of pickedSkills) {

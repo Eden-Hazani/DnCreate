@@ -25,7 +25,6 @@ export class PickSingleItem extends Component<{ amountToPick: number, itemList: 
 
     componentDidMount() {
         if (this.state.itemList[0] === "allSkillsAvailable") {
-            console.log(this.state.itemList)
             const itemList = skillJson.skillList;
             this.setState({ itemList })
         }

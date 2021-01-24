@@ -14,7 +14,6 @@ export function ImageInput({ imageUri, onChangeImage, idDisabled }: any) {
 
     const requestPermission = async () => {
         const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        console.log(result)
         if (result.granted) {
             setAllowed(true)
         }

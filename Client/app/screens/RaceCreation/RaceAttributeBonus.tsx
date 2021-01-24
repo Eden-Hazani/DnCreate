@@ -63,7 +63,6 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                     storeItem.abilityBonus[item] = this.state.customRace.abilityBonus[item]
                 }
             }
-            console.log(storeItem.abilityBonus)
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: storeItem })
         })
         setTimeout(() => {
@@ -93,7 +92,6 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                                         startFromZero={true}
                                         max={10}
                                         getValue={(amount: number) => {
-                                            console.log(amount)
                                             let customRace = { ...this.state.customRace };
                                             if (customRace.abilityBonus) {
                                                 customRace.abilityBonus[item[0]] = amount

@@ -81,7 +81,6 @@ export class CustomRaceBaseTools extends Component<{ navigation: any }, CustomRa
         this.setState({ confirmed: true })
         this.setState({ customRace }, () => {
             const storeItem = { ...store.getState().customRace };
-            console.log(storeItem)
             if (!storeItem.baseAddedTools) {
                 storeItem.baseAddedTools = []
             }

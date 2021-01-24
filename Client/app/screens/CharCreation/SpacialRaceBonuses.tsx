@@ -211,7 +211,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             }
                             {this.state.race.baseAddedSkills && this.state.race.baseAddedSkills?.length > 0 &&
                                 <View>
-                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following skill proficiencies:</AppText>
+                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'center'}>You gain the following skill proficiencies:</AppText>
                                     <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                                         {this.state.race.baseAddedSkills.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
@@ -222,7 +222,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             }
                             {this.state.race.baseAddedTools && this.state.race.baseAddedTools?.length > 0 &&
                                 <View>
-                                    <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following tool proficiencies:</AppText>
+                                    <AppText textAlign={'center'} fontSize={20} padding={5} color={Colors.whiteInDarkMode} >You gain the following tool proficiencies:</AppText>
                                     <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                                         {this.state.race.baseAddedTools.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
@@ -251,18 +251,21 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                             }
                         </View>
+
                         {this.state.race.raceAbilities?.uniqueAbilities &&
                             Object.values(this.state.race.raceAbilities.uniqueAbilities)
                                 .map((item, index) => <View key={index} style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
                                     <AppText fontSize={22}>{item.name}</AppText>
                                     <AppText fontSize={17} color={Colors.berries}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                                 </View>)}
-                        {this.state.race.extraLanguages && this.state.race.extraLanguages !== 0 &&
+
+                        {this.state.race.extraLanguages !== undefined && this.state.race.extraLanguages !== 0 &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.extraLanguages} extra languages</AppText>
                                 {this.displayExtraLanguages(this.state.race.extraLanguages).map((item, index) => item)}
                             </View>
                         }
+
                         {this.state.race.skillPickChoice && this.state.race.skillPickChoice?.amountToPick > 0 &&
                             <View>
                                 <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.skillPickChoice.amountToPick} extra skills</AppText>
@@ -273,6 +276,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                             </View>
                         }
+
                         {this.state.race.toolProficiencyPick && this.state.race.toolProficiencyPick?.amountToPick > 0 &&
                             <View>
                                 <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.toolProficiencyPick.amountToPick} extra tools</AppText>
@@ -283,6 +287,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 </View>
                             </View>
                         }
+
                         {this.state.race.customWeaponProficiencies &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customWeaponProficiencies.amount} extra
@@ -290,6 +295,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 {this.displayCustomWeapons(this.state.race.customWeaponProficiencies.amount).map((item, index) => item)}
                             </View>
                         }
+
                         {this.state.race.customArmorProficiencies &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customArmorProficiencies.amount}
@@ -297,6 +303,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 {this.displayCustomArmor(this.state.race.customArmorProficiencies.amount).map((item, index) => item)}
                             </View>
                         }
+
                         <View style={{ paddingBottom: 25 }}>
                             <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                         </View>

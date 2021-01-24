@@ -40,7 +40,6 @@ export default function NumberScroll({ startingVal, max, getValue, startFromZero
     useEffect(() => {
         getValue(numberArray[0])
         if (startingVal) {
-            console.log(primeIndex)
             setTimeout(() => {
                 moveIndexRef.current.scrollToIndex({ animation: false, index: primeIndex })
 

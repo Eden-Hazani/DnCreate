@@ -243,7 +243,6 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     returnScores = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
         const rollDisabled = this.state.rollDisabled;
-        console.log(attribute)
         if (this.state.pickedRace.abilityBonus && characterInfo.modifiers) {
             if (this.state.diceRollOrStatArray) {
                 this.setState({ returnScoreToAverageList: characterInfo[attribute] - this.state.pickedRace.abilityBonus[attribute] });

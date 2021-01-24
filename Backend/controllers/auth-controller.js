@@ -176,7 +176,7 @@ router.post("/resendActivationEmail", upload.none(), async (request, response) =
                             <tr>
                             <td align="center" bgcolor="#37882f" style="background-color: #37882f; margin: auto; max-width: 600px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 15px 20px; " width="100%">
                             <!--[if mso]>&nbsp;<![endif]-->
-                                <a href="${config.baseUrl}/api/auth/activate/${token}" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #37882f; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
+                                <a href="${config.baseUrl}api/auth/activate/${token}" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #37882f; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
                                     <span style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; line-height:1.5em; text-align:center;">Activate</span>
                                 </a>
                             <!--[if mso]>&nbsp;<![endif]-->
@@ -231,7 +231,7 @@ router.post("/register", upload.none(), verifyInSystem, async (request, response
                             <tr>
                             <td align="center" bgcolor="#37882f" style="background-color: #37882f; margin: auto; max-width: 600px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 15px 20px; " width="100%">
                             <!--[if mso]>&nbsp;<![endif]-->
-                                <a href="${config.baseUrl}/api/auth/activate/${token}" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #37882f; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
+                                <a href="${config.baseUrl}api/auth/activate/${token}" target="_blank" style="16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; text-align:center; background-color: #37882f; text-decoration: none; border: none; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; display: inline-block;">
                                     <span style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-weight:normal; line-height:1.5em; text-align:center;">Activate</span>
                                 </a>
                             <!--[if mso]>&nbsp;<![endif]-->

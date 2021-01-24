@@ -57,7 +57,6 @@ const Indicator = ({ scrollX, races }: any) => {
 
 const BackDrop = ({ scrollX, backDropColors }: any) => {
     const bgs = backDropColors;
-    console.log(backDropColors)
     const backgroundColor: any = scrollX.interpolate({
         inputRange: bgs.map((_: any, i: any) => i * Dimensions.get('screen').width),
         outputRange: bgs.map((bg: any) => bg)

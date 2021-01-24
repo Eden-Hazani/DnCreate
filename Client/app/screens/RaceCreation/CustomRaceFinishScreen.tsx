@@ -30,7 +30,6 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         customRace.user_id = user
         const color = Math.floor(Math.random() * 16777215).toString(16);
         customRace.raceColors = `#${color}`
-        console.log(customRace)
         racesApi.addRace(customRace).then(() => {
             this.setState({ finished: true })
         }).catch((err) => {

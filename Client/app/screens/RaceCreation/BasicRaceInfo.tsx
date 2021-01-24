@@ -82,7 +82,6 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
             uniqueAbilities: [],
             speed: this.state.speed
         }
-        console.log(customRace)
         this.setState({ confirmed: true })
         this.setState({ customRace }, () => {
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: this.state.customRace })

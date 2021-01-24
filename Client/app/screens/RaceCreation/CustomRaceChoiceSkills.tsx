@@ -94,7 +94,6 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
                 storeItem.skillPickChoice.skillList = this.state.customRace.skillPickChoice.skillList
                 storeItem.skillPickChoice.amountToPick = this.state.customRace.skillPickChoice.amountToPick
             }
-            console.log(storeItem.skillPickChoice)
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: storeItem })
 
         })
