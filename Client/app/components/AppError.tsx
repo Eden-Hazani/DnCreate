@@ -20,9 +20,9 @@ export class AppError extends Component<any>{
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        paddingTop: 100,
         justifyContent: "center",
         alignItems: "center",
-        flex: 1
-
     }
 });

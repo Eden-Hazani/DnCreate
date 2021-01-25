@@ -3,9 +3,9 @@ import client from './client';
 
 const endpoint = '/races'
 
-const getRaceList = () => client.get(`${endpoint}/raceList`);
+const getRaceList = (start: number, end: number, _id: string, raceType: any) => client.get(`${endpoint}/raceList/${start}/${end}/${_id}/${raceType}`);
 
-const SearchRaceList = (search: any) => client.get(`${endpoint}/searchRace/${search}`)
+const SearchRaceList = (search: any, raceType: any, user_id: any) => client.get(`${endpoint}/searchRace/${search}/${raceType}/${user_id}`)
 
 const addRace = (race: RaceModel) => {
     let formData: FormData = new FormData();

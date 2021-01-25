@@ -19,9 +19,14 @@ const storage = multer.diskStorage({
 })
 var upload = multer({ storage: storage })
 
-router.get("/raceList", async (request, response) => {
+router.get("/raceList/:start/:end/:user_id/:raceType", async (request, response) => {
     try {
-        const races = await raceLogic.getAllRaces();
+        const start = request.params.start;
+        const end = request.params.end;
+        const _id = request.params.user_id;
+        const raceType = request.params.raceType;
+        const races = await raceLogic.getAllRaces(start, end, _id, raceType);
+        console.log(races)
         response.json(races);
     } catch (err) {
         response.status(500).send(err.message);
@@ -29,9 +34,11 @@ router.get("/raceList", async (request, response) => {
 });
 
 
-router.get("/searchRace/:text", async (request, response) => {
+router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => {
     try {
-        const items = await raceLogic.searchRaces(request.params.text);
+        const raceType = request.params.raceType;
+        const user_id = request.params.user_id;
+        const items = await raceLogic.searchRaces(request.params.text, raceType, user_id);
         response.json(items);
     } catch (err) {
         response.status(500).send(err.message);

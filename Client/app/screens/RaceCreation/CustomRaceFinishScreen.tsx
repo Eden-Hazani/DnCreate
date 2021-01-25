@@ -23,13 +23,22 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         }
     }
 
+    getRandomColor = () => {
+        let letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
     sendRaceToServer = () => {
         const customRace = { ...store.getState().customRace };
         const user: any = store.getState().user._id
         customRace.visibleToEveryone = this.state.racePublic;
         customRace.user_id = user
-        const color = Math.floor(Math.random() * 16777215).toString(16);
-        customRace.raceColors = `#${color}`
+        const color = this.getRandomColor()
+        customRace.raceColors = color
         racesApi.addRace(customRace).then(() => {
             this.setState({ finished: true })
         }).catch((err) => {
@@ -57,7 +66,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                             borderRadius={25} title={'Done'} onPress={() => { this.finish() }} />
                     </View>
                     :
-                    <View>
+                    <View style={{ justifyContent: 'center', alignItems: "center" }}>
                         <AppText fontSize={25} padding={5} textAlign={'center'}>Almost Done!</AppText>
                         <AppText fontSize={18} padding={15} textAlign={'center'}>Would you like to share your creation with everyone on DnCreate?</AppText>
                         <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish for this race to become public and visible everyone toggle the option below</AppText>
@@ -82,7 +91,5 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
 const styles = StyleSheet.create({
     container: {
         paddingTop: 100,
-        justifyContent: "center",
-        alignItems: "center"
     }
 });

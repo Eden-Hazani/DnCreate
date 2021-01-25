@@ -23,8 +23,17 @@ import { Image } from 'react-native-expo-image-cache';
  *   
  */
 
+interface ListItemState {
+    currentImgUri: string
+}
 
-export class ListItem extends Component<any>{
+export class ListItem extends Component<any, ListItemState>{
+    constructor(props: any) {
+        super(props)
+        this.state = {
+            currentImgUri: this.props.imageUrl
+        }
+    }
     render() {
         return (
             <Swipeable renderLeftActions={this.props.renderLeftActions}
@@ -40,8 +49,10 @@ export class ListItem extends Component<any>{
                                     <View style={{ backgroundColor: Colors.bitterSweetRed, padding: 5, borderRadius: 50, borderColor: Colors.whiteInDarkMode, borderWidth: 1 }}>
                                         <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} uri={this.props.imageUrl} />
                                     </View>
-                                    : <Image style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }} uri={this.props.imageUrl} />
-
+                                    : <Image
+                                        onError={() => this.setState({ currentImgUri: this.props.directPicRoute })}
+                                        style={{ height: this.props.height, width: this.props.width, resizeMode: "cover", borderRadius: 50 }}
+                                        uri={this.state.currentImgUri} />
                                 : null}
                         </View>
                         <View style={{ paddingLeft: this.props.textDistanceFromImg }}>

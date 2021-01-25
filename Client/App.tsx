@@ -227,30 +227,32 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     const user = this.state.user
     const { setUser } = this
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
+      <View style={{ flex: 1 }}>
         {this.state.lookingForUpdates ?
           <CheckForUpdates />
           :
-          <View style={{ flex: 1 }}>
-            {!this.state.isReady ? <AppLoading onError={(error) => { logger.log(error) }} startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
-              <AuthContext.Provider value={{ user, setUser }}>
-                {this.state.AppMainLoadAnimation ?
-                  <StartAnimation />
+          <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
+            <View style={{ flex: 1 }}>
+              {!this.state.isReady ? <AppLoading onError={(error) => { logger.log(error) }} startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
+                <AuthContext.Provider value={{ user, setUser }}>
+                  {this.state.AppMainLoadAnimation ?
+                    <StartAnimation />
+                    :
+                    !this.state.fontsLoaded ? <AppLoading /> :
+                      <NavigationContainer ref={navigationRef} onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
+                        {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
+                      </NavigationContainer>
+                  }
+                </AuthContext.Provider>}
+              {this.state.bannerCallTime && <View>{
+                this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
                   :
-                  !this.state.fontsLoaded ? <AppLoading /> :
-                    <NavigationContainer ref={navigationRef} onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
-                      {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
-                    </NavigationContainer>
-                }
-              </AuthContext.Provider>}
-            {this.state.bannerCallTime && <View>{
-              this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
-                :
-                <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
-            }</View>}
-          </View>
+                  <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
+              }</View>}
+            </View>
+          </SafeAreaView>
         }
-      </SafeAreaView>
+      </View>
     );
   }
 }

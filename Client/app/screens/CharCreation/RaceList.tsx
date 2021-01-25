@@ -10,7 +10,6 @@ import { CharacterModel } from '../../models/characterModel';
 import racesApi from '../../api/racesApi'
 import { Config } from '../../../config';
 import errorHandler from '../../../utility/errorHander';
-import { AppError } from '../../components/AppError';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { ModifiersModel } from '../../models/modifiersModel';
 import { RaceModel } from '../../models/raceModel';
@@ -24,6 +23,7 @@ import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../../components/AppNoInternet';
 import { AppButton } from '../../components/AppButton';
 import AuthContext from '../../auth/context';
+import logger from '../../../utility/logger';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -43,6 +43,7 @@ interface RaceListState {
     isInternet: boolean
     isUserOffline: boolean
     disclaimerModal: boolean
+    currentLoadedRaces: number
 }
 
 
@@ -65,7 +66,8 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             userInfo: store.getState().user,
             characterInfo: store.getState().character,
             refreshing: false,
-            error: false
+            error: false,
+            currentLoadedRaces: 0
         }
         setTimeout(() => {
             this.NetUnSub = NetInfo.addEventListener(netInfo => {
@@ -106,7 +108,8 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 return;
             }
             this.setState({ loading: true })
-            const result = await racesApi.getRaceList();
+            const raceType = await AsyncStorage.getItem('showPublicRaces');
+            const result = await racesApi.getRaceList(0, 35, this.context.user._id, raceType);
             await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
             this.setState({ loading: false })
             const races = result.data;
@@ -117,43 +120,46 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     }
 
     getRacesFromServer = async () => {
-        let raceColors = [];
-        const races: any = [];
-        const result: any = await racesApi.getRaceList();
-        const raceType = await AsyncStorage.getItem('showPublicRaces');
-        for (let item of result.data) {
-            if (!raceType || raceType === 'false') {
-                if (item.user_id === this.context.user._id || item.visibleToEveryone === undefined) {
-                    races.push(item)
-                }
-            } if (raceType === 'true') {
-                races.push(item)
+        try {
+            let raceColors = [];
+            const races: any = this.state.races;
+            let raceType = await AsyncStorage.getItem('showPublicRaces');
+            if (raceType === null) {
+                raceType = 'false'
             }
-        }
-        await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
+            const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, this.context.user._id, raceType);
+            console.log(result.data)
+            if (!result.ok) {
+                this.setState({ error: true, loading: false })
+                return
+            }
+            this.setState({ currentLoadedRaces: this.state.currentLoadedRaces + 10 })
+            for (let item of result.data) {
+                console.log(item.name)
+            }
+            const newRaces = races.concat(result.data)
+            for (let item of newRaces) {
+                raceColors.push(item.raceColors)
+            }
+            await AsyncStorage.setItem('raceList', JSON.stringify(newRaces));
 
-        for (let item of races) {
-            raceColors.push(item.raceColors)
+            this.setState({ races: newRaces, error: errorHandler(result), raceColors, loading: false })
+        } catch (err) {
+            console.log(err)
+            logger.log(err)
         }
-        this.setState({ races, error: errorHandler(result), raceColors, loading: false })
     }
 
     updateSearch = async (search: string) => {
         this.setState({ search })
+        const raceType = await AsyncStorage.getItem('showPublicRaces');
         if (search.trim() === "") {
-            this.getRaces()
+            this.setState({ currentLoadedRaces: 0, races: [] }, () => this.getRacesFromServer())
             return;
         }
-        const races = [];
-        const cachedRaces = await AsyncStorage.getItem('raceList');
-        if (cachedRaces) {
-            for (let race of JSON.parse(cachedRaces)) {
-                if (race.name.includes(search)) {
-                    races.push(race);
-                }
-            }
-            this.setState({ races })
-        }
+        const searchedRaces = await racesApi.SearchRaceList(search, raceType, this.context.user._id);
+        this.setState({ races: searchedRaces.data })
+
     }
 
     pickRace = (race: RaceModel) => {
@@ -183,6 +189,15 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             this.setState({ confirmed: false })
         }, 1100);
     }
+    showTimedErrorMessage = () => {
+        setTimeout(() => {
+            return <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 200 }}>
+                <AppText textAlign={'center'} fontSize={30}>Opps...</AppText>
+                <AppText textAlign={'center'} fontSize={22}>Either we have a problem with our servers or your version of DnCreate is not updated</AppText>
+                <AppText textAlign={'center'} fontSize={22}>Please check if you downloaded the latest version of DnCreate from the app store.</AppText>
+            </View>
+        }, 3000);
+    }
     render() {
         return (
             <View>
@@ -193,9 +208,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                     :
                     this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                         this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                            <View>
-                                {this.state.error ? <>
-                                    <AppError onPress={() => { this.getRaces() }} />
+                            <View >
+                                {this.state.races.length === 0 ? <>
+                                    {this.showTimedErrorMessage()}
                                 </> :
                                     <View>
                                         <View style={{
@@ -214,7 +229,13 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                             />
                                         </View>
                                         <View>
-                                            <AnimatedHorizontalList data={this.state.races} backDropColors={this.state.raceColors}
+                                            <AnimatedHorizontalList
+                                                loadNextRaceBatch={() => {
+                                                    if (this.state.search === '') {
+                                                        this.getRacesFromServer()
+                                                    }
+                                                }}
+                                                data={this.state.races} backDropColors={this.state.raceColors}
                                                 onPress={(val: any) => { this.pickRace(val) }} />
                                         </View>
                                     </View>}

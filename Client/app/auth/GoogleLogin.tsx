@@ -73,7 +73,7 @@ export class GoogleLogin extends Component<{}, GoogleLoginState>{
                     username: user?.email.toLowerCase(),
                     password: user?.uid
                 }
-                this.findIfRegistered(values)
+                this.findIfRegistered(values, user?.photoURL)
                 this._syncUserWithStateAsync();
             }
         } catch ({ message }) {
@@ -81,7 +81,7 @@ export class GoogleLogin extends Component<{}, GoogleLoginState>{
         }
     };
 
-    findIfRegistered = async (values: any) => {
+    findIfRegistered = async (values: any, photoURL: any) => {
         authApi.login(values, false).then(answer => {
             const userInfo: any = answer.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
@@ -91,12 +91,17 @@ export class GoogleLogin extends Component<{}, GoogleLoginState>{
                 this.setState({ loading: false })
             })
         }).catch(async () => {
-            this.registerWithGoogle(values)
+            this.registerWithGoogle(values, photoURL)
         });
     }
 
-    registerWithGoogle = async (values: any) => {
-        await authApi.googleRegister(values).then(answer => {
+    registerWithGoogle = async (values: any, photoURL: any) => {
+        const fullValues = {
+            username: values.username,
+            password: values.password,
+            profileImg: photoURL,
+        }
+        await authApi.googleRegister(fullValues).then(answer => {
             Alert.alert("Welcome!", `${answer.data.message}`, [{
                 text: 'Ok', onPress: () => {
                     this.setState({ loading: false })

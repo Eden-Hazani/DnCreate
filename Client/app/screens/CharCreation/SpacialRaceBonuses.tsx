@@ -212,7 +212,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             {this.state.race.baseAddedSkills && this.state.race.baseAddedSkills?.length > 0 &&
                                 <View>
                                     <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'center'}>You gain the following skill proficiencies:</AppText>
-                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: 'wrap' }}>
                                         {this.state.race.baseAddedSkills.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
                                         </View>
@@ -223,7 +223,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             {this.state.race.baseAddedTools && this.state.race.baseAddedTools?.length > 0 &&
                                 <View>
                                     <AppText textAlign={'center'} fontSize={20} padding={5} color={Colors.whiteInDarkMode} >You gain the following tool proficiencies:</AppText>
-                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: 'wrap' }}>
                                         {this.state.race.baseAddedTools.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
                                         </View>)}
@@ -233,7 +233,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             {this.state.race.baseWeaponProficiencies && this.state.race.baseWeaponProficiencies?.length > 0 &&
                                 <View>
                                     <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following weapon proficiencies:</AppText>
-                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: 'wrap' }}>
                                         {this.state.race.baseWeaponProficiencies.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
                                         </View>)}
@@ -243,7 +243,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             {this.state.race.baseArmorProficiencies && this.state.race.baseArmorProficiencies?.length > 0 &&
                                 <View>
                                     <AppText fontSize={20} padding={10} color={Colors.whiteInDarkMode} textAlign={'left'}>You gain the following Armor proficiencies:</AppText>
-                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: 'wrap' }}>
                                         {this.state.race.baseArmorProficiencies.map((item, index) => <View style={{ margin: 3 }} key={index}>
                                             <AppText color={Colors.berries} fontSize={17}>{item},</AppText>
                                         </View>)}

@@ -95,13 +95,17 @@ const Square = ({ scrollX }: any) => {
     </Animated.View>
 }
 
-export function AnimatedHorizontalList({ onPress, data, backDropColors }: any) {
+export function AnimatedHorizontalList({ onPress, data, backDropColors, loadNextRaceBatch }: any) {
     const scrollX = React.useRef(new Animated.Value(0)).current;
     return (
         <View>
             <BackDrop scrollX={scrollX} backDropColors={backDropColors} />
             <Square scrollX={scrollX} />
             <Animated.FlatList
+                onEndReachedThreshold={2}
+                onEndReached={() => {
+                    loadNextRaceBatch()
+                }}
                 horizontal
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { x: scrollX } } }],

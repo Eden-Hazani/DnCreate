@@ -214,7 +214,8 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                         renderItem={({ item, index }) => <ListItem
                                             title={item.name}
                                             subTitle={item.characterClass}
-                                            imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
+                                            directPicRoute={this.state.profilePicList[index][1]}
+                                            imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}`}
                                             direction={'row'}
                                             headerFontSize={18}
                                             headColor={Colors.bitterSweetRed}

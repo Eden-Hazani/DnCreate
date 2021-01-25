@@ -42,6 +42,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             }
             const userPicList: any = await adventureApi.getUserProfileImages(userArray)
             const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
+            console.log(picList)
             this.setState({ profilePicList: picList }, () => {
                 this.setState({ loading: false })
             })
@@ -72,7 +73,8 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                 renderItem={({ item, index }) => <ListItem
                                     title={item.name}
                                     subTitle={item.characterClass}
-                                    imageUrl={(this.state.profilePicList.length > 0 && this.state.profilePicList[index][1]) ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/${item.image}`}
+                                    directPicRoute={this.state.profilePicList[index][1]}
+                                    imageUrl={(this.state.profilePicList.length > 0 && this.state.profilePicList[index][1]) ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}`}
                                     direction={'row'}
                                     headerFontSize={18}
                                     headColor={Colors.bitterSweetRed}

@@ -40,6 +40,7 @@ interface AccountState {
     settingsModal: boolean
     lookingForUpdates: boolean
     homebrewRaces: boolean
+    currentImgUri: string
 }
 
 export class Account extends Component<{ props: any, navigation: any }, AccountState> {
@@ -55,14 +56,23 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
             changeProfileModal: false,
             userInfo: store.getState().user,
             settingsModal: false,
-            lookingForUpdates: false
+            lookingForUpdates: false,
+            currentImgUri: `${Config.serverUrl}/uploads/profile-imgs/${store.getState().user.profileImg}` || ''
         }
         this.UnsubscribeStore = store.subscribe(() => { })
     }
 
     componentDidMount() {
+        this.setHomeBrewRaces()
         if (store.getState().user._id === "Offline") {
             this.setState({ isUserOffline: true })
+        }
+    }
+
+    setHomeBrewRaces = async () => {
+        const showPublicRaces = await AsyncStorage.getItem('showPublicRaces')
+        if (showPublicRaces === 'true') {
+            this.setState({ homebrewRaces: true })
         }
     }
 
@@ -154,7 +164,8 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                         :
                         <View style={{ alignItems: "center", flex: 1 }}>
                             <View style={{ flex: .4 }}>
-                                <Image style={styles.image} source={{ uri: `${Config.serverUrl}/uploads/profile-imgs/${this.state.userInfo.profileImg}` }} />
+                                <Image onError={(e) => { this.setState({ currentImgUri: this.state.userInfo.profileImg || 'empty' }) }}
+                                    style={styles.image} source={{ uri: this.state.currentImgUri }} />
                             </View>
                             <View style={{ flex: .1 }}>
                                 <AppText fontSize={20}>{this.state.userInfo.username}</AppText>

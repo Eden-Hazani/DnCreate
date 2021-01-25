@@ -11,22 +11,19 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.12</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.24</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={17}>Adventure mode has been updated!</AppText>
-                    <AppText textAlign={'center'} fontSize={17}>You can now add background images to your adventure to give them that unique feel!</AppText>
-                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>Once someone joins your adventure he will see that image as the adventure background</AppText>
+                    <AppText textAlign={'center'} fontSize={30}>Race Creator!</AppText>
+                    <AppText textAlign={'center'} fontSize={25}>You can now create your very own race!</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>Using DnCreate's race creator you are able to create and share your races with DnCreate's community!</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>To create your first race go to the creation tab and DnCreate will walk you through the entire creation process</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>You have the ability to save the race for yourself or share it with all of DnCreate!</AppText>
                 </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30}>Average list attribute system!</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>The newly added average list attribute system will allow you to pick your attribute score with the standard array method</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>This option is toggleable in the attribute screen</AppText>
-                </View>
-
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30}>DnCreate's Patreon has a new goal!</AppText>
                     <AppText textAlign={'center'} fontSize={22}>If we reach this goal I will be able to add the ability for the DM (and party members) to upload images directly into their adventure.</AppText>
+                    <AppText textAlign={'center'} fontSize={22}>Plus, I will be able to add the ability to upload race portraits!.</AppText>
                     <AppText textAlign={'center'} fontSize={22}>This will enable all of you to share custom dungeon maps, city layouts, NPC faces, or just adventure memes.</AppText>
                     <AppText textAlign={'center'} fontSize={22}>If you want to help DnCreate reach this goal, please visit our Patreon page {"<3"}</AppText>
                 </View>
