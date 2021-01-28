@@ -29,6 +29,7 @@ app.use(compression());
 app.options('/api/auth/databaseLoginAdmin', cors())
 app.options('/api/auth/databaseFindPersonAdmin', cors())
 app.options('/api/auth/changePremiumStatusAdmin', cors())
+app.options('/api/auth/sendAdminNotification', cors())
 
 app.use("/api/auth", authController);
 app.use("/api/races", raceController);

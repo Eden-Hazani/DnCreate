@@ -26,6 +26,9 @@ const userSchema = mongoose.Schema({
     },
     premium: {
         type: Boolean
+    },
+    isAdmin: {
+        type: Boolean
     }
 
 }, {

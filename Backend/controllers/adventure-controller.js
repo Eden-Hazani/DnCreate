@@ -56,7 +56,6 @@ router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, re
         const targetUser = await authLogic.validateInSystem(JSON.parse(request.body.adventure).leader_id)
         const joiningUserCharacter = await userLogic.getChar(JSON.parse(request.body.adventure).participants_id[JSON.parse(request.body.adventure).participants_id.length - 1])
         const adventure = new Adventure(JSON.parse(request.body.adventure))
-        console.log(JSON.parse(request.body.adventure).leader_id)
         const { expoPushToken } = targetUser;
         if (Expo.isExpoPushToken(expoPushToken)) {
             await sendPushNotification(expoPushToken, "New adventurer has joined", `${joiningUserCharacter.name} has joined ${adventure.adventureName}`);

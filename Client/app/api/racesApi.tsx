@@ -5,6 +5,8 @@ const endpoint = '/races'
 
 const getRaceList = (start: number, end: number, _id: string, raceType: any) => client.get(`${endpoint}/raceList/${start}/${end}/${_id}/${raceType}`);
 
+const getPrimeList = () => client.get(`${endpoint}/getPrimeRaceList`);
+
 const SearchRaceList = (search: any, raceType: any, user_id: any) => client.get(`${endpoint}/searchRace/${search}/${raceType}/${user_id}`)
 
 const addRace = (race: RaceModel) => {
@@ -25,5 +27,6 @@ const addRace = (race: RaceModel) => {
 export default {
     getRaceList,
     SearchRaceList,
-    addRace
+    addRace,
+    getPrimeList
 }

@@ -11,12 +11,15 @@ const verifyLoggedIn = require('../middleware/verify-logged-in')
 const validateExistingImage = require('../middleware/validateExistingImage')
 const fs = require('fs');
 const cors = require('cors')
+const { Expo } = require("expo-server-sdk");
+const sendPushNotification = require("../utilities/pushNotifications");
 
 
 
 const mailgun = require("mailgun-js");
 const { response } = require("express");
 const validateUserInSystem = require("../middleware/validateUserInSystem");
+const verifyIsAdmin = require("../middleware/verifyIsAdmin");
 const mg = mailgun({ apiKey: config.mailGun_API.api, domain: config.mailGun_API.domain });
 
 const storage = multer.diskStorage({
@@ -133,7 +136,7 @@ router.get('/activate/:token', async (request, response) => {
                     }
                     return response.status(400).json({ error: err.message })
                 }
-                const verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
+                const verify = await authLogic.validateRegister(decodedToken.userInfo.username);
                 if (verify.activated) {
                     return response.status(403).send('User has already been activated')
                 }
@@ -316,17 +319,21 @@ router.get("/isActivated", verifyLoggedIn, async (request, response) => {
 router.post("/databaseLoginAdmin", cors(), async (request, response) => {
     try {
         const user = await authLogic.login(request.body);
-        if (user.username === "mr.edenhazani@gmail.com") {
-            response.json(true);
-        } else {
-            response.json(false);
+        if (!user || !user.isAdmin) {
+            console.log(user)
+            response.status(403).send('Not authorized');
+            return;
         }
+        console.log(user.isAdmin)
+        const token = jwt.sign({ user }, config.jwt.secretKey, { expiresIn: "1h" })
+        response.json(token);
+
     } catch (err) {
         response.status(500).send(err.message);
     }
 });
 
-router.post("/databaseFindPersonAdmin", cors(), async (request, response) => {
+router.post("/databaseFindPersonAdmin", cors(), verifyIsAdmin, async (request, response) => {
     try {
         const user = await authLogic.findUserAsAdmin(request.body.username);
         response.json({ user });
@@ -335,7 +342,20 @@ router.post("/databaseFindPersonAdmin", cors(), async (request, response) => {
     }
 });
 
-router.post("/changePremiumStatusAdmin", cors(), async (request, response) => {
+router.post("/sendAdminNotification", cors(), verifyIsAdmin, async (request, response) => {
+    try {
+        const targetUser = request.body
+        if (Expo.isExpoPushToken(targetUser.token)) {
+            await sendPushNotification(targetUser.token, "Your feedback has been answered!", `Look at your email, we have responded to your feedback 📬`);
+        }
+        response.json({ true: "true" });
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+
+router.post("/changePremiumStatusAdmin", cors(), verifyIsAdmin, async (request, response) => {
     try {
         const userToUpdate = new User(request.body);
         const user = await authLogic.updateUser(userToUpdate)
@@ -362,8 +382,6 @@ router.post("/googleRegister", upload.none(), verifyInSystem, async (request, re
         response.status(500).send(errorHandler.getError(err));
     }
 });
-
-
 
 
 

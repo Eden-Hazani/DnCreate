@@ -42,7 +42,6 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             }
             const userPicList: any = await adventureApi.getUserProfileImages(userArray)
             const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
-            console.log(picList)
             this.setState({ profilePicList: picList }, () => {
                 this.setState({ loading: false })
             })

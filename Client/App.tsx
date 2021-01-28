@@ -162,7 +162,6 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
 
 
   async componentDidMount() {
-    CacheManager.clearCache()
     logger.start();
     try {
       if (!__DEV__) {

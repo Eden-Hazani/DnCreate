@@ -63,8 +63,8 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
     })
 
     return (
-        <View style={[styles.itemStyle]}>
-            <View style={[styles.textContainer, {}]}>
+        <View style={[styles.itemStyle, { backgroundColor: Colors.pageBackground }]}>
+            <View style={[styles.textContainer]}>
                 <Animated.Text style={[styles.heading,
                 { transform: [{ translateY: translateYHeadline }], color: Colors.bitterSweetRed }
                 ]}>{headline}</Animated.Text>

@@ -67,7 +67,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             characterInfo: store.getState().character,
             refreshing: false,
             error: false,
-            currentLoadedRaces: 0
+            currentLoadedRaces: 20
         }
         setTimeout(() => {
             this.NetUnSub = NetInfo.addEventListener(netInfo => {
@@ -90,33 +90,30 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         if (isOffline) {
             this.setState({ isUserOffline: JSON.parse(isOffline) })
         }
-        this.getRacesFromServer();
+        this.getPrimeRaces();
     }
     componentWillUnmount() {
         this.NetUnSub();
         this.unsubscribeStore()
     }
-    getRaces = async () => {
-        try {
-            const cachedRaces = await AsyncStorage.getItem('raceList');
-            this.setState({ loading: true })
-            if (cachedRaces) {
-                const races = JSON.parse(cachedRaces);
-                this.setState({ races }, () => {
-                    this.setState({ loading: false })
-                })
-                return;
+
+
+    getPrimeRaces = async () => {
+        let cashedRaces = await AsyncStorage.getItem('cashedRaces');
+        let raceColors = [];
+        if (!cashedRaces) {
+            const result = await racesApi.getPrimeList();
+            await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
+            for (let item of result.data as any) {
+                raceColors.push(item.raceColors)
             }
-            this.setState({ loading: true })
-            const raceType = await AsyncStorage.getItem('showPublicRaces');
-            const result = await racesApi.getRaceList(0, 35, this.context.user._id, raceType);
-            await AsyncStorage.setItem('raceList', JSON.stringify(result.data));
-            this.setState({ loading: false })
-            const races = result.data;
-            this.setState({ races, error: errorHandler(result) })
-        } catch (err) {
-            console.log(err.message)
+            this.setState({ races: result.data, raceColors, loading: false })
+            return;
         }
+        for (let item of JSON.parse(cashedRaces)) {
+            raceColors.push(item.raceColors)
+        }
+        this.setState({ races: JSON.parse(cashedRaces), raceColors, loading: false })
     }
 
     getRacesFromServer = async () => {
@@ -128,20 +125,15 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 raceType = 'false'
             }
             const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, this.context.user._id, raceType);
-            console.log(result.data)
             if (!result.ok) {
                 this.setState({ error: true, loading: false })
                 return
             }
             this.setState({ currentLoadedRaces: this.state.currentLoadedRaces + 10 })
-            for (let item of result.data) {
-                console.log(item.name)
-            }
             const newRaces = races.concat(result.data)
             for (let item of newRaces) {
                 raceColors.push(item.raceColors)
             }
-            await AsyncStorage.setItem('raceList', JSON.stringify(newRaces));
 
             this.setState({ races: newRaces, error: errorHandler(result), raceColors, loading: false })
         } catch (err) {
@@ -154,10 +146,11 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         this.setState({ search })
         const raceType = await AsyncStorage.getItem('showPublicRaces');
         if (search.trim() === "") {
-            this.setState({ currentLoadedRaces: 0, races: [] }, () => this.getRacesFromServer())
+            this.setState({ currentLoadedRaces: 20, races: [] }, () => this.getPrimeRaces())
             return;
         }
         const searchedRaces = await racesApi.SearchRaceList(search, raceType, this.context.user._id);
+        console.log(searchedRaces.data)
         this.setState({ races: searchedRaces.data })
 
     }
@@ -189,15 +182,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             this.setState({ confirmed: false })
         }, 1100);
     }
-    showTimedErrorMessage = () => {
-        setTimeout(() => {
-            return <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 200 }}>
-                <AppText textAlign={'center'} fontSize={30}>Opps...</AppText>
-                <AppText textAlign={'center'} fontSize={22}>Either we have a problem with our servers or your version of DnCreate is not updated</AppText>
-                <AppText textAlign={'center'} fontSize={22}>Please check if you downloaded the latest version of DnCreate from the app store.</AppText>
-            </View>
-        }, 3000);
-    }
+
     render() {
         return (
             <View>
@@ -209,38 +194,35 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                     this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                         this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                             <View >
-                                {this.state.races.length === 0 ? <>
-                                    {this.showTimedErrorMessage()}
-                                </> :
+                                <View>
+                                    <View style={{
+                                        width: width / 2, position: "absolute", zIndex: 10,
+                                        alignSelf: 'center',
+                                        top: '9%',
+                                    }}>
+                                        <SearchBar
+                                            searchIcon={false}
+                                            containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
+                                            inputContainerStyle={{ backgroundColor: this.state.searchColor }}
+                                            lightTheme={this.state.searchColor === "#121212" ? false : true}
+                                            placeholder="Search For Race"
+                                            onChangeText={this.updateSearch}
+                                            value={this.state.search}
+                                        />
+                                    </View>
                                     <View>
-                                        <View style={{
-                                            width: width / 2, position: "absolute", zIndex: 10,
-                                            alignSelf: 'center',
-                                            top: '9%',
-                                        }}>
-                                            <SearchBar
-                                                searchIcon={false}
-                                                containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
-                                                inputContainerStyle={{ backgroundColor: this.state.searchColor }}
-                                                lightTheme={this.state.searchColor === "#121212" ? false : true}
-                                                placeholder="Search For Race"
-                                                onChangeText={this.updateSearch}
-                                                value={this.state.search}
-                                            />
-                                        </View>
-                                        <View>
-                                            <AnimatedHorizontalList
-                                                loadNextRaceBatch={() => {
-                                                    if (this.state.search === '') {
-                                                        this.getRacesFromServer()
-                                                    }
-                                                }}
-                                                data={this.state.races} backDropColors={this.state.raceColors}
-                                                onPress={(val: any) => { this.pickRace(val) }} />
-                                        </View>
-                                    </View>}
+                                        <AnimatedHorizontalList
+                                            loadNextRaceBatch={() => {
+                                                if (this.state.search === '') {
+                                                    this.getRacesFromServer()
+                                                }
+                                            }}
+                                            data={this.state.races} backDropColors={this.state.raceColors}
+                                            onPress={(val: any) => { this.pickRace(val) }} />
+                                    </View>
+                                </View>
                                 <Modal visible={this.state.disclaimerModal} animationType="slide">
-                                    <View>
+                                    <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                         <AppText textAlign={'center'} fontSize={22}>Important notice</AppText>
                                         <AppText textAlign={'center'} fontSize={17}>Purchasing the 5e players handbook is a must if you wish to have the full game experience.</AppText>
                                         <AppText textAlign={'center'} fontSize={17}>DnCreate is only a tool to ease character creation and the leveling process.</AppText>

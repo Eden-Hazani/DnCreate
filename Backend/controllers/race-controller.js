@@ -33,6 +33,15 @@ router.get("/raceList/:start/:end/:user_id/:raceType", async (request, response)
     }
 });
 
+router.get("/getPrimeRaceList", async (request, response) => {
+    try {
+        const races = await raceLogic.getPrimeRaces();
+        response.json(races);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 
 router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => {
     try {
