@@ -11,14 +11,19 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.24</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.3</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30}>Race Creator!</AppText>
-                    <AppText textAlign={'center'} fontSize={25}>You can now create your very own race!</AppText>
-                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>Using DnCreate's race creator you are able to create and share your races with DnCreate's community!</AppText>
-                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>To create your first race go to the creation tab and DnCreate will walk you through the entire creation process</AppText>
-                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>You have the ability to save the race for yourself or share it with all of DnCreate!</AppText>
+                    <AppText textAlign={'center'} fontSize={30}>SubClass Creator!</AppText>
+                    <AppText textAlign={'center'} fontSize={25}>You can now create your very own Subclass!</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>Using DnCreate's Custom Class creator you are able to create and share your subclasses with DnCreate's community!</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>To create your first subclass go to the creation tab and DnCreate will walk you through the entire creation process</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>You have the ability to save the subclass for yourself or share it with all of DnCreate!</AppText>
+                </View>
+                <View style={{ padding: 15 }}>
+                    <AppText textAlign={'center'} fontSize={30}>Shields!</AppText>
+                    <AppText textAlign={'center'} fontSize={25}>Shields have been added to DnCreate!</AppText>
+                    <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>You can now equip and unequip shields in the armor section!</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30}>DnCreate's Patreon has a new goal!</AppText>
