@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -8,6 +8,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
@@ -18,7 +19,11 @@ interface CharFlawsState {
     characterInfo: CharacterModel
     confirmed: boolean
     updateFlaws: boolean
+    openAutoComplete: boolean[]
 }
+
+const fillingList: string[] = ['I judge others harshly, and myself even more severely', "I can't resist a pretty face", "I turn tail and run when things go bad.",
+    "I'll do anything to win fame and renown", "I am slow to trust members of other races", "In fact, the world does revolve around me"]
 
 export class CharFlaws extends Component<{ route: any, navigation: any, updateFlaws: boolean }, CharFlawsState>{
     private UnsubscribeStore: Unsubscribe;
@@ -26,6 +31,7 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
     constructor(props: any) {
         super(props)
         this.state = {
+            openAutoComplete: [],
             baseState: '',
             updateFlaws: this.props.route.params.updateFlaws,
             confirmed: false,
@@ -142,6 +148,32 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
         });
     }
 
+    changeAutoCompleteState = (index: number, action: boolean) => {
+        const openAutoComplete = this.state.openAutoComplete;
+        openAutoComplete[index] = action;
+        console.log(openAutoComplete)
+        this.setState({ openAutoComplete })
+    }
+
+    generateJSX = (flaws: any) => {
+        let jsxList: any[] = [];
+        for (let i: number = 0; i < 6; i++) {
+            jsxList.push(<View key={i}>
+                <AppTextInput
+                    onBlur={() => this.changeAutoCompleteState(i, false)}
+                    onFocus={() => this.changeAutoCompleteState(i, true)} value={flaws ? flaws[i] : ''}
+                    onChangeText={(trait: string) => { this.addTrait(trait, i) }} padding={10}
+                    placeholder={fillingList[i]} width={"80%"} />
+                <TextInputDropDown sendText={(val: string) => {
+                    this.changeAutoCompleteState(i, false)
+                    this.addTrait(val, i)
+                }} expendedWidth={Dimensions.get('window').width / 1.2} expendedHeight={450}
+                    information={fillingList} isOpen={this.state.openAutoComplete[i]} />
+            </View>)
+        }
+        return jsxList
+    }
+
     render() {
         const flaws = this.state.characterInfo.flaws;
         return (
@@ -154,12 +186,7 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
                             <AppText fontSize={18} textAlign={"center"}>Anyone has flaws even your character, Try to fit your flaws towards the playstyle you want to take.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Flaws can be dangerous... especially with a cunning DM, be cautious.</AppText>
                         </View>
-                        <AppTextInput value={flaws ? flaws[0] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 0) }} padding={10} placeholder={"I judge others harshly, and myself even more severely..."} width={"80%"} />
-                        <AppTextInput value={flaws ? flaws[1] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 1) }} padding={10} placeholder={"I can't resist a pretty face..."} width={"80%"} />
-                        <AppTextInput value={flaws ? flaws[2] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 2) }} padding={10} placeholder={'I turn tail and run when things go bad...'} width={"80%"} />
-                        <AppTextInput value={flaws ? flaws[3] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 3) }} padding={10} placeholder={"I'll do anything to win fame and renown..."} width={"80%"} />
-                        <AppTextInput value={flaws ? flaws[4] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 4) }} padding={10} placeholder={'I am slow to trust members of other races...'} width={"80%"} />
-                        <AppTextInput value={flaws ? flaws[5] : ''} onChangeText={(flaw: string) => { this.addTrait(flaw, 5) }} padding={10} placeholder={"In fact, the world does revolve around me..."} width={"80%"} />
+                        {this.generateJSX(flaws)}
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateFlaws ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>

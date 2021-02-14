@@ -17,6 +17,7 @@ import { UserModel } from '../models/userModel';
 import Modal from 'react-native-modal';
 import InformationScroller from '../components/InformationScroller';
 import WelcomeInfo from '../../jsonDump/welcomeInformation.json'
+import { Config } from '../../config';
 
 
 Modal
@@ -44,17 +45,17 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                 {
                     title: "Welcome to DnCreate!",
                     text: "Please scroll down and choose how you want to experience the app!",
-                    image: { img: require('../../assets/welcomeDragon.png') }
+                    image: `${Config.serverUrl}/assets/specificDragons/welcomeDragon.png`
                 },
                 {
                     title: "DnCreate allows you to produce fully flushed out characters in minutes.",
                     text: "Level up and progress through your subclass choices and spellcasting abilities",
-                    image: { img: require('../../assets/welcomeDragon2.png') }
+                    image: `${Config.serverUrl}/assets/specificDragons/welcomeDragon2.png`
                 },
                 {
                     title: "Connect with your friends using DnCreate's adventure mode.",
                     text: "Sign up now and unlock DnCreate's full potential",
-                    image: { img: require('../../assets/welcomeDragon3.png') }
+                    image: `${Config.serverUrl}/assets/specificDragons/welcomeDragon3.png`
                 },
             ]
         }
@@ -149,7 +150,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                         justifyContent: undefined,
                                     }}
                                     isVisible={this.state.newUserModal}>
-                                    <View style={{ flex: 1, paddingTop: 25, backgroundColor: Colors.pageBackground }} >
+                                    <ScrollView style={{ flex: 1, paddingTop: 25, backgroundColor: Colors.pageBackground }} >
                                         <AppText textAlign={'center'} color={Colors.berries} fontSize={30}>Hi There!</AppText>
                                         <View style={{ paddingTop: 25 }}>
                                             <AppText textAlign={'center'} fontSize={22}>Welcome to DnCreate</AppText>
@@ -175,7 +176,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                         <View style={{ paddingTop: 50 }}>
                                             <AppButton fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.berries} onPress={() => this.setState({ newUserModal: false })} borderRadius={25} width={250} height={70} title={"Wait! I'm already a user"} />
                                         </View>
-                                    </View>
+                                    </ScrollView>
                                 </Modal>
                                 <Modal
                                     style={{

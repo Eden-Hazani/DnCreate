@@ -24,5 +24,6 @@ export enum ActionType {
     StartAsNonUser,
     colorScheme,
     UpdateCustomRace,
-    cleanCustomRace
+    cleanCustomRace,
+    UpdateSubclass,
 }

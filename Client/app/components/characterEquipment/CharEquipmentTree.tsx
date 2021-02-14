@@ -11,6 +11,7 @@ import { AppButton } from '../AppButton';
 import { WeaponModal } from '../../models/WeaponModal';
 import { EquipmentModal } from '../../models/EquipmentModal';
 import logger from '../../../utility/logger';
+import { ShieldModel } from '../../models/ShieldModel';
 
 
 interface CharEquipmentTreeState {
@@ -20,18 +21,22 @@ interface CharEquipmentTreeState {
     weaponModal: boolean,
     currentArmor: EquippedArmorModel
     currentWeapon: WeaponModal
+    currentShield: any
+    shieldModal: boolean
 }
 
 export class CharEquipmentTree extends Component<{ character: CharacterModel }, CharEquipmentTreeState> {
     constructor(props: any) {
         super(props)
         this.state = {
+            shieldModal: false,
             equipmentModal: false,
             weaponModal: false,
             armorModal: false,
             pickedEquipment: new EquipmentModal(),
             currentArmor: this.props.character.equippedArmor || new EquippedArmorModel(),
-            currentWeapon: this.props.character.currentWeapon || new WeaponModal()
+            currentWeapon: this.props.character.currentWeapon || new WeaponModal(),
+            currentShield: this.props.character.equippedShield || new ShieldModel()
         }
     }
 
@@ -112,6 +117,37 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
                         </TouchableOpacity>
                     </View>
                 </View>
+                <View style={{ alignItems: "center" }}>
+                    <AppText>Current Shield</AppText>
+                    {(this.state.currentShield.name && this.state.currentShield.name !== null) && <AppText>{this.state.currentShield.name}</AppText>}
+                    <TouchableOpacity onPress={() => {
+                        if (this.state.currentShield.name && this.state.currentShield.name !== null && this.state.currentShield.name !== "No Shield Equipped") {
+                            this.setState({ shieldModal: true })
+                        }
+                    }}
+                        style={[styles.square, { margin: 10, alignSelf: "center", borderColor: Colors.whiteInDarkMode }]}>
+                        {console.log(this.state.currentShield)}
+                        {this.state.currentShield.name && this.state.currentShield.name !== null && this.state.currentShield.name !== "No Shield Equipped" ?
+                            <View>
+                                <View style={{
+                                    position: 'absolute', justifyContent: "flex-start", alignItems: "center", top: 0, right: 0,
+                                    left: 0, bottom: 0, zIndex: 10
+                                }}>
+                                    <AppText fontSize={12}>Equipped</AppText>
+                                </View>
+                                <View style={{ justifyContent: "space-evenly", alignItems: "center", top: 5 }}>
+                                    <Image style={{ width: 120, height: 120 }} uri={`${Config.serverUrl}/assets/charEquipment/fShield.png`} />
+                                </View>
+                            </View>
+                            :
+                            <View style={{
+                                position: 'absolute', justifyContent: "center", alignItems: "center", top: 0, right: 0, left: 0, bottom: 0, zIndex: 10,
+                                transform: [{ rotate: '-15deg' }]
+                            }}>
+                                <AppText textAlign={'center'} fontSize={11}>Shield{'\n'}unEquipped</AppText>
+                            </View>}
+                    </TouchableOpacity>
+                </View>
                 <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>Side Equipment</AppText>
                 <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
                     {this.props.character.equipment &&
@@ -168,6 +204,20 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
                             }
                             <View style={{ marginTop: 15 }}>
                                 <AppButton title={"Close"} width={70} borderRadius={15} height={50} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ armorModal: false }) }} />
+                            </View>
+                        </ScrollView>
+                    }
+                </Modal>
+                <Modal visible={this.state.shieldModal} animationType="slide">
+                    {(this.state.currentShield.name && this.state.currentShield._id !== "0") &&
+                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                            <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 100 }}>
+                                <AppText color={Colors.berries} fontSize={22} textAlign={'center'}>{this.state.currentShield.name}</AppText>
+                                <AppText fontSize={17} textAlign={'center'}>AC - {this.state.currentShield.ac}</AppText>
+                            </View>
+                            <View style={{ marginTop: 15 }}>
+                                <AppButton title={"Close"} width={70} borderRadius={15} height={50}
+                                    backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ shieldModal: false }) }} />
                             </View>
                         </ScrollView>
                     }

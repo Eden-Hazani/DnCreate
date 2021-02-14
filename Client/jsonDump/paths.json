@@ -185,6 +185,7 @@
                 "I": {
                     "name": "Origin of the Beast ",
                     "description": "You can choose the origin of your feral might or determine it by rolling a 1D4 dice.",
+                    "numberOfChoices": 1,
                     "choice": [
                         {
                             "name": "Origin",

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, PixelRatio } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 import { Colors } from '../config/colors';
@@ -15,7 +15,6 @@ import { Colors } from '../config/colors';
  */
 
 
-
 export class AppText extends Component<any, any> {
     constructor(props: any) {
         super(props)
@@ -29,7 +28,7 @@ export class AppText extends Component<any, any> {
                 fontWeight: this.props.fontWeight,
                 width: this.props.width,
                 flex: this.props.flex,
-                fontSize: this.props.fontSize,
+                fontSize: this.props.fontSize && PixelRatio.get() <= 2.7 ? this.props.fontSize * .8 : this.props.fontSize,
                 padding: this.props.padding,
                 textAlign: this.props.textAlign,
                 fontFamily: "KumbhSans-Light",

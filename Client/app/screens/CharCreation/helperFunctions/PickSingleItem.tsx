@@ -12,7 +12,7 @@ interface PickSingleItemState {
     itemPicked: any[],
 }
 
-export class PickSingleItem extends Component<{ amountToPick: number, itemList: any[], onPick: any }, PickSingleItemState>{
+export class PickSingleItem extends Component<{ isObject: boolean, amountToPick: number, itemList: any[], onPick: any }, PickSingleItemState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -52,11 +52,6 @@ export class PickSingleItem extends Component<{ amountToPick: number, itemList: 
             const oldPickedItems = this.state.itemPicked;
             const itemClicked = this.state.itemClicked;
             itemClicked[index] = false;
-            // if (this.state.character.race === "Changeling") {
-            //     const itemPicked = oldPickedItems.filter(skill => skill[0] !== item[0]);
-            //     this.setState({ itemClicked, itemPicked });
-            //     return
-            // }
             const itemPicked = oldPickedItems.filter(item => item.name !== item.name);
             this.setState({ itemClicked, itemPicked }, () => {
                 this.props.onPick(itemPicked)
@@ -70,7 +65,12 @@ export class PickSingleItem extends Component<{ amountToPick: number, itemList: 
                 {this.state.itemList.map((item, index) =>
                     <TouchableOpacity key={index} style={[styles.item, { backgroundColor: this.state.itemClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
                         onPress={() => this.pickItem(item, index)}>
-                        <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                        {this.props.isObject ?
+                            Object.entries(item).map((result, index) => <View key={index}>
+                                <AppText textAlign={'center'} fontSize={18}>{result[0]} - {result[1]}</AppText>
+                            </View>) :
+                            <AppText textAlign={'center'} fontSize={18}>{item}</AppText>
+                        }
                     </TouchableOpacity>)}
             </View>
         )

@@ -7,10 +7,10 @@ export class ListItemSeparator extends Component<any>{
         return (
             <View style={styles.container}>
                 {this.props.thick ?
-                    <View style={styles.thickSeparator} />
+                    <View style={[styles.thickSeparator, { backgroundColor: Colors.borderLight }]} />
 
                     :
-                    <View style={styles.separator} />
+                    <View style={[styles.separator, { backgroundColor: Colors.borderLight }]} />
 
                 }
             </View>
@@ -26,11 +26,9 @@ const styles = StyleSheet.create({
     separator: {
         width: '70%',
         height: 1,
-        backgroundColor: Colors.borderLight,
     },
     thickSeparator: {
         width: '70%',
         height: 1.5,
-        backgroundColor: Colors.borderLight,
     }
 })

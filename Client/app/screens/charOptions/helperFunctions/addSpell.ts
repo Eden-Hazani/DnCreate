@@ -6,9 +6,10 @@ export function addSpell(spellLevel: string, character: CharacterModel) {
     if (character.characterClass === "Warlock") {
         let slots = [];
         const warSlotLevel = parseInt(character.charSpecials && character.charSpecials.warlockSpellSlotLevel ? character.charSpecials.warlockSpellSlotLevel.substring(0) : "0");
-        for (let i = 1; i < warSlotLevel; i++) {
+        for (let i = 1; i <= warSlotLevel; i++) {
             slots.push(i);
         }
+        console.log(warSlotLevel)
         let result: boolean = false
         switch (true) {
             case character.magic && character.magic.cantrips && spellLevel.includes('cantrip'):

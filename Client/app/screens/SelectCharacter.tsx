@@ -38,12 +38,15 @@ import logger from '../../utility/logger';
 import { Easing } from 'react-native-reanimated';
 import { PersonalInfo } from '../components/PersonalInfo';
 import { RaceModel } from '../models/raceModel';
+import { ChangeMaxHp } from '../components/ChangeMaxHp';
+import { TutorialScreen } from '../components/TutorialScreen';
 /**
  * 
  * @param  image: image url-string || URI
  *   
  */
 interface SelectCharacterState {
+    tutorialZIndex: boolean[]
     attackRollTutorialModal: boolean
     currentHp: string
     levelUpFunctionActive: boolean
@@ -61,15 +64,23 @@ interface SelectCharacterState {
     cashedSavingThrows: any[]
     startingAnimations: Animated.ValueXY[]
     personalInfoModal: boolean
+    maxHpChangeModal: boolean
+    tutorialOn: boolean
+    containerHeight: number
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
     private UnsubscribeStore: Unsubscribe;
     navigationSubscription: any;
+    private scrollView: any
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
+            tutorialZIndex: [],
+            containerHeight: 0,
+            tutorialOn: false,
+            maxHpChangeModal: false,
             personalInfoModal: false,
             startingAnimations: [],
             cashedSavingThrows: [],
@@ -91,6 +102,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         this.UnsubscribeStore = store.subscribe(() => {
         })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+        this.scrollView
     }
 
     componentWillUnmount() {
@@ -154,6 +166,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows()
+            if (!await AsyncStorage.getItem('newPlayer')) {
+                Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
+                    [{
+                        text: 'Yes', onPress: () => {
+                            this.setState({ tutorialOn: true })
+                        }
+                    }, { text: 'No', onPress: async () => await AsyncStorage.setItem('newPlayer', "true") }])
+            }
             if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
                 const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
@@ -378,12 +398,37 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         }
     }
 
+    endTutorial = async () => {
+        await AsyncStorage.setItem('newPlayer', "true");
+        this.setState({ tutorialOn: false })
+    }
+
     render() {
         const isDm = this.state.isDm;
         return (
-            <ScrollView keyboardShouldPersistTaps="always">
+            <ScrollView
+                onLayout={(evt) => {
+                    const { height } = evt.nativeEvent.layout;
+                    const { containerHeight } = this.state;
+                    if (!containerHeight || containerHeight !== height) {
+                        this.setState({ containerHeight: height })
+                    }
+                }}
+                style={{ flex: 1 }} keyboardShouldPersistTaps="always" ref={view => this.scrollView = view}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                     <View style={styles.container}>
+                        {this.state.tutorialOn &&
+                            <>
+                                <TutorialScreen
+                                    zIndex={(val: number) => {
+                                        let tutorialZIndex = { ...this.state.tutorialZIndex };
+                                        tutorialZIndex = []
+                                        tutorialZIndex[val] = true
+                                        this.setState({ tutorialZIndex })
+                                    }}
+                                    pageHeight={this.state.containerHeight} end={() => this.endTutorial()} changeScrollPosition={(val: any) => this.scrollView.scrollTo({ x: val.x, y: val.y, animated: true })} />
+                            </>}
+                        {this.state.tutorialOn && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
                         <Modal visible={this.state.levelUpFunctionActive} animationType="slide">
                             <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
@@ -403,7 +448,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.race}</AppText>
                                         <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.characterClass}</AppText>
                                     </Animated.View>
-                                    <View style={{ flex: 1, marginLeft: 10 }}>
+                                    <View pointerEvents={this.state.tutorialZIndex[0] ? "none" : "auto"}
+                                        style={{ flex: 1, marginLeft: 10, zIndex: this.state.tutorialZIndex[0] ? 10 : 0 }}>
                                         <Animated.View style={[this.state.startingAnimations[6].getLayout(), { flexDirection: "row", alignItems: "center" }]}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Initiative</AppText>
@@ -431,10 +477,20 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                             </View>
                                             <View style={{ alignItems: "center", flex: .3 }}>
                                                 <AppText>Max HP</AppText>
-                                                <View style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                <TouchableOpacity onPress={() => this.setState({ maxHpChangeModal: true })}
+                                                    style={[styles.triContainer, { backgroundColor: Colors.bitterSweetRed }]}>
                                                     <AppText color={Colors.totalWhite} fontSize={25}>{`${this.state.character.maxHp}`}</AppText>
-                                                </View>
+                                                </TouchableOpacity>
                                             </View>
+                                            <Modal visible={this.state.maxHpChangeModal} animationType="slide">
+                                                <ChangeMaxHp character={this.state.character}
+                                                    sendNewMax={(val: number) => {
+                                                        const character = this.state.character;
+                                                        character.maxHp = val;
+                                                        this.setState({ character }, () => this.setState({ maxHpChangeModal: false }))
+                                                    }}
+                                                    currentMax={this.state.character.maxHp} />
+                                            </Modal>
                                         </Animated.View>
                                         <Animated.View style={[this.state.startingAnimations[5].getLayout(), { flexDirection: "row" }]}>
                                             <View style={{ alignItems: "center", flex: .3 }}>
@@ -469,236 +525,245 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
-                        <Animated.View style={[this.state.startingAnimations[4].getLayout(), styles.secRowIconContainer]}>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
-                                <IconGen size={80} backgroundColor={Colors.primary} name={"book-open-page-variant"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}'s Story</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
-                                <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
-                                    <View style={{ flex: .8, padding: 25 }}>
-                                        <AppText textAlign={"left"} fontSize={35} color={Colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
-                                        <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
+                        <View pointerEvents={this.state.tutorialZIndex[1] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[1] ? 10 : 0 }}>
+                            <Animated.View style={[this.state.startingAnimations[4].getLayout(), styles.secRowIconContainer]}>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
+                                    <IconGen size={80} backgroundColor={Colors.primary} name={"book-open-page-variant"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>{this.state.character.name}'s Story</AppText>
                                     </View>
-                                    <View style={{ flex: .1, padding: 25 }}>
-                                        <AppText textAlign={"left"} fontSize={25}>{this.state.character.background && this.state.character.background.backgroundName}</AppText>
-                                        <View>
-                                            {this.state.character.background && this.state.character.background.backgroundFeatureName === '' ?
-                                                <View>
-                                                    <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>No background feature.</AppText>
-                                                </View>
-                                                :
-                                                <View>
-                                                    <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
-                                                    <AppText textAlign={"left"} fontSize={20}>{this.state.character.background && this.state.character.background.backgroundFeatureName}</AppText>
-                                                    <AppText textAlign={"left"} fontSize={17}>{this.state.character.background && this.state.character.background.backgroundFeatureDescription}</AppText>
-                                                </View>
-                                            }
+                                </TouchableOpacity>
+                                <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
+                                    <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                        <View style={{ flex: .8, padding: 25 }}>
+                                            <AppText textAlign={"left"} fontSize={35} color={Colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
+                                            <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
                                         </View>
-                                    </View>
-                                    <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
-                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
-                                        <AppButton disabled={isDm} backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
-                                            this.setState({ backGroundStoryVisible: false }, () => {
-                                                this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
-                                            })
-                                        }} />
-                                    </View>
-                                </ScrollView>
-                            </Modal>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ statsVisible: true })}>
-                                <IconGen size={80} backgroundColor={Colors.bitterSweetRed} name={"sword"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Ability Score &amp; Modifiers</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <Modal visible={this.state.statsVisible} animationType="slide">
-                                <View style={{ flex: .9, alignItems: "center", backgroundColor: Colors.pageBackground }}>
-                                    <AppText color={Colors.bitterSweetRed} fontSize={35}>Stats</AppText>
-                                    <AppText fontSize={30} >{`${this.state.character.race} ${this.state.character.characterClass}`}</AppText>
-                                    <FlatList
-                                        data={this.listStats()}
-                                        keyExtractor={(stats: [string, number, number]) => stats[0].toString()}
-                                        numColumns={2}
-                                        renderItem={({ item }) =>
-                                            <View style={styles.modifier}>
-                                                <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
-                                                    <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
-                                                    <View style={{ paddingTop: 10 }}>
-                                                        <AppText textAlign={"center"}>{`Attribute score ${item[2]}`}</AppText>
-                                                    </View>
-                                                    <View style={{ paddingTop: 5 }}>
-                                                        <AppText textAlign={"center"}>Modifier</AppText>
-                                                        <AppText textAlign={"center"}>{item[1]}</AppText>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        } />
-                                </View>
-                                <View style={{ flex: .1, backgroundColor: Colors.pageBackground }}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
-                                </View>
-                            </Modal>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems", { isDm: this.state.isDm ? this.props.route.params.character : null }) }}>
-                                <IconGen size={80} backgroundColor={Colors.danger} name={"sack"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Items And Currency</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </Animated.View>
-                        <Animated.View style={[this.state.startingAnimations[3].getLayout(), styles.secRowIconContainer]}>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.shadowBlue} name={"pentagon"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Features</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeats", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.orange} name={"atlassian"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Feats</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.berries} name={"fire"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Spell Book</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </Animated.View>
-                        <Animated.View style={[this.state.startingAnimations[2].getLayout(), styles.secRowIconContainer]}>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character, isDm: this.state.isDm }) }}>
-                                <IconGen size={80} backgroundColor={Colors.paleGreen} name={"tshirt-crew"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Armor</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PathFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.metallicBlue} name={"chart-arc"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Path Features</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("RaceFeatures", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.pinkishSilver} name={"human-handsdown"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Race Features</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </Animated.View>
-                        <Animated.View style={[this.state.startingAnimations[1].getLayout(), styles.secRowIconContainer]}>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CreatePDF", { char: this.state.character, proficiency: this.state.currentProficiency }) }}>
-                                <IconGen size={80} backgroundColor={Colors.burgundy} name={"file-pdf-box"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Generate Pdf</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharWeapons", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.pastelPink} name={"sword-cross"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Weapons</AppText>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharEquipment", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.earthYellow} name={"necklace"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Wearable Equipment</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </Animated.View>
-                        <Animated.View style={[this.state.startingAnimations[0].getLayout(), styles.secRowIconContainer]}>
-                            <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
-                                <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
-                                <View style={{ width: 90, marginTop: 10 }}>
-                                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
-                                </View>
-                            </TouchableOpacity>
-                        </Animated.View>
-                        <View>
-                            <CharEquipmentTree character={this.state.character} />
-                        </View>
-                        <View>
-                            <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
-                        </View>
-                        <View>
-                            <AppText fontSize={20} textAlign={'center'}>Saving Throws</AppText>
-                            <View style={{ borderWidth: 1, borderRadius: 15, borderColor: Colors.bitterSweetRed, margin: 20, padding: 15 }}>
-                                <AppText fontSize={18} padding={5} textAlign={'center'}>Proficient Saving Throws</AppText>
-                                <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
-                                    {this.state.cashedSavingThrows.map((sThrow, index) => <View key={index}>
-                                        <AppText>{sThrow}</AppText>
-                                    </View>)}
-                                </View>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
-                                {this.setSavingThrows()}
-                            </View>
-                        </View>
-                        <View style={styles.infoContainer}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <View style={[styles.list, { width: '40%' }]}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={18} width={100} height={50} borderRadius={25} title={'complete skill list'}
-                                        onPress={() => { this.setState({ completeSkillModel: true }) }} />
-                                    <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
-                                    {this.state.character.skills && this.state.character.skills.map((skill: any) =>
-                                        <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
-                                            <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
-                                            <AppText fontSize={20} color={Colors.bitterSweetRed}
-                                                textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
-                                        </View>
-                                    )}
-                                    <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
-                                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
-                                            <CompleteSkillList character={this.state.character} />
+                                        <View style={{ flex: .1, padding: 25 }}>
+                                            <AppText textAlign={"left"} fontSize={25}>{this.state.character.background && this.state.character.background.backgroundName}</AppText>
                                             <View>
-                                                <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
-                                                    onPress={() => { this.setState({ completeSkillModel: false }) }} />
+                                                {this.state.character.background && this.state.character.background.backgroundFeatureName === '' ?
+                                                    <View>
+                                                        <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>No background feature.</AppText>
+                                                    </View>
+                                                    :
+                                                    <View>
+                                                        <AppText textAlign={"left"} fontSize={20} color={Colors.berries}>Background feature</AppText>
+                                                        <AppText textAlign={"left"} fontSize={20}>{this.state.character.background && this.state.character.background.backgroundFeatureName}</AppText>
+                                                        <AppText textAlign={"left"} fontSize={17}>{this.state.character.background && this.state.character.background.backgroundFeatureDescription}</AppText>
+                                                    </View>
+                                                }
                                             </View>
-                                        </ScrollView>
-                                    </Modal>
+                                        </View>
+                                        <View style={{ flex: .1, flexDirection: "row", justifyContent: "space-evenly", alignContent: "center" }}>
+                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Close'} onPress={() => this.setState({ backGroundStoryVisible: false })} />
+                                            <AppButton disabled={isDm} backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Update Story'} onPress={() => {
+                                                this.setState({ backGroundStoryVisible: false }, () => {
+                                                    this.props.navigation.navigate("CharBackstory", { updateStory: true, character: this.state.character })
+                                                })
+                                            }} />
+                                        </View>
+                                    </ScrollView>
+                                </Modal>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ statsVisible: true })}>
+                                    <IconGen size={80} backgroundColor={Colors.bitterSweetRed} name={"sword"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Ability Score &amp; Modifiers</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <Modal visible={this.state.statsVisible} animationType="slide">
+                                    <View style={{ flex: .9, alignItems: "center", backgroundColor: Colors.pageBackground }}>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={35}>Stats</AppText>
+                                        <AppText fontSize={30} >{`${this.state.character.race} ${this.state.character.characterClass}`}</AppText>
+                                        <FlatList
+                                            data={this.listStats()}
+                                            keyExtractor={(stats: [string, number, number]) => stats[0].toString()}
+                                            numColumns={2}
+                                            renderItem={({ item }) =>
+                                                <View style={styles.modifier}>
+                                                    <View style={[styles.innerModifier, { backgroundColor: Colors.bitterSweetRed }]}>
+                                                        <AppText fontSize={18} color={Colors.totalWhite} textAlign={"center"}>{item[0]}</AppText>
+                                                        <View style={{ paddingTop: 10 }}>
+                                                            <AppText textAlign={"center"}>{`Attribute score ${item[2]}`}</AppText>
+                                                        </View>
+                                                        <View style={{ paddingTop: 5 }}>
+                                                            <AppText textAlign={"center"}>Modifier</AppText>
+                                                            <AppText textAlign={"center"}>{item[1]}</AppText>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            } />
+                                    </View>
+                                    <View style={{ flex: .1, backgroundColor: Colors.pageBackground }}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'close'} onPress={() => this.setState({ statsVisible: false })} />
+                                    </View>
+                                </Modal>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharItems", { isDm: this.state.isDm ? this.props.route.params.character : null }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.danger} name={"sack"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Items And Currency</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                            <Animated.View style={[this.state.startingAnimations[3].getLayout(), styles.secRowIconContainer]}>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeatures", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.shadowBlue} name={"pentagon"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Features</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharFeats", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.orange} name={"atlassian"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Feats</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Spells", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.berries} name={"fire"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Spell Book</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                            <Animated.View style={[this.state.startingAnimations[2].getLayout(), styles.secRowIconContainer]}>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("Armor", { char: this.state.character, isDm: this.state.isDm }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.paleGreen} name={"tshirt-crew"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Armor</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PathFeatures", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.metallicBlue} name={"chart-arc"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Path Features</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("RaceFeatures", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.pinkishSilver} name={"human-handsdown"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Race Features</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                            <Animated.View style={[this.state.startingAnimations[1].getLayout(), styles.secRowIconContainer]}>
+                                <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CreatePDF", { char: this.state.character, proficiency: this.state.currentProficiency }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.burgundy} name={"file-pdf-box"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Generate Pdf</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharWeapons", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.pastelPink} name={"sword-cross"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Weapons</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("CharEquipment", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.earthYellow} name={"necklace"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Wearable Equipment</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                            <Animated.View style={[this.state.startingAnimations[0].getLayout(), styles.secRowIconContainer]}>
+                                <TouchableOpacity disabled={this.state.isDm} style={{ alignItems: "center" }} onPress={() => { this.props.navigation.navigate("PersonalNotes", { char: this.state.character }) }}>
+                                    <IconGen size={80} backgroundColor={Colors.primaryBackground} name={"feather"} iconColor={Colors.white} />
+                                    <View style={{ width: 90, marginTop: 10 }}>
+                                        <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Personal notes</AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        </View>
+
+                        <View pointerEvents={this.state.tutorialZIndex[2] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[2] ? 10 : 0 }}>
+                            <View>
+                                <CharEquipmentTree character={this.state.character} />
+                            </View>
+                            <View>
+                                <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
+                            </View>
+                        </View>
+                        <View pointerEvents={this.state.tutorialZIndex[3] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[3] ? 10 : 0 }}>
+                            <View>
+                                <AppText fontSize={20} textAlign={'center'}>Saving Throws</AppText>
+                                <View style={{ borderWidth: 1, borderRadius: 15, borderColor: Colors.bitterSweetRed, margin: 20, padding: 15 }}>
+                                    <AppText fontSize={18} padding={5} textAlign={'center'}>Proficient Saving Throws</AppText>
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
+                                        {this.state.cashedSavingThrows.map((sThrow, index) => <View key={index}>
+                                            <AppText>{sThrow}</AppText>
+                                        </View>)}
+                                    </View>
                                 </View>
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
-                                    {this.state.character.currentWeapon && this.state.character.currentWeapon.name ?
-                                        <View style={{ borderColor: Colors.whiteInDarkMode, borderRadius: 15, borderWidth: 1 }}>
-                                            <AppText fontSize={25} textAlign={'center'}>Weapon Hit Dice</AppText>
-                                            <AppText fontSize={15} textAlign={'center'}>Your currently equipped weapon does the following damage</AppText>
-                                            <AppText fontSize={25} textAlign={'center'} color={Colors.bitterSweetRed}>{this.state.character.currentWeapon.diceAmount}-{this.state.character.currentWeapon.dice}</AppText>
+                                <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
+                                    {this.setSavingThrows()}
+                                </View>
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <View style={[styles.list, { width: '40%' }]}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={18} width={100} height={50} borderRadius={25} title={'complete skill list'}
+                                            onPress={() => { this.setState({ completeSkillModel: true }) }} />
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
+                                        {this.state.character.skills && this.state.character.skills.map((skill: any) =>
+                                            <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
+                                                <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
+                                                <AppText fontSize={20} color={Colors.bitterSweetRed}
+                                                    textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
+                                            </View>
+                                        )}
+                                        <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
+                                            <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                                <CompleteSkillList character={this.state.character} />
+                                                <View>
+                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
+                                                        onPress={() => { this.setState({ completeSkillModel: false }) }} />
+                                                </View>
+                                            </ScrollView>
+                                        </Modal>
+                                    </View>
+                                    <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
+                                        {this.state.character.currentWeapon && this.state.character.currentWeapon.name ?
+                                            <View style={{ borderColor: Colors.whiteInDarkMode, borderRadius: 15, borderWidth: 1 }}>
+                                                <AppText fontSize={25} textAlign={'center'}>Weapon Hit Dice</AppText>
+                                                <AppText fontSize={15} textAlign={'center'}>Your currently equipped weapon does the following damage</AppText>
+                                                <AppText fontSize={25} textAlign={'center'} color={Colors.bitterSweetRed}>{this.state.character.currentWeapon.diceAmount}-{this.state.character.currentWeapon.dice}</AppText>
+                                            </View>
+                                            : null}
+                                        <AppText fontSize={25}>Base Hit Dice</AppText>
+                                        <AppText fontSize={25} color={Colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
+                                        <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
+                                        <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                            <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.strength && this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.strength} for melee weapons</AppText>
                                         </View>
-                                        : null}
-                                    <AppText fontSize={25}>Base Hit Dice</AppText>
-                                    <AppText fontSize={25} color={Colors.bitterSweetRed}>{`D${hitDiceSwitch(this.state.character.characterClass)}`}</AppText>
-                                    <AppText textAlign={'center'} fontSize={18}>Attack Modifiers {'\n'} (Add to damage roll)</AppText>
-                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.strength && this.state.character.modifiers.strength > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.strength} for melee weapons</AppText>
-                                    </View>
-                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.dexterity && this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.dexterity} for ranged weapons</AppText>
-                                    </View>
-                                    <AppText textAlign={'center'} fontSize={18}>Proficient weapons {'\n'} (add to attack roll)</AppText>
-                                    <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
-                                        <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
-                                            <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
+                                        <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                            <AppText textAlign={'center'} fontSize={16}>{this.state.character.modifiers && this.state.character.modifiers.dexterity && this.state.character.modifiers.dexterity > 0 ? '+' : null} {this.state.character.modifiers && this.state.character.modifiers.dexterity} for ranged weapons</AppText>
                                         </View>
-                                        <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId && this.state.character.characterClassId.weaponProficiencies &&
-                                            this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
-                                    </View>
-                                    {this.state.character.addedWeaponProf && this.state.character.addedWeaponProf.length > 0 &&
+                                        <AppText textAlign={'center'} fontSize={18}>Proficient weapons {'\n'} (add to attack roll)</AppText>
                                         <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
                                             <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
                                                 <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
                                             </View>
-                                            <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.addedWeaponProf.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
-                                        </View>}
-                                    <View>
-                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
-                                        <Modal visible={this.state.attackRollTutorialModal} animationType={'slide'}>
-                                            <AttackRollTutorial closeWindow={(boolean: boolean) => { this.setState({ attackRollTutorialModal: boolean }) }} />
-                                        </Modal>
+                                            <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.characterClassId && this.state.character.characterClassId.weaponProficiencies &&
+                                                this.state.character.characterClassId.weaponProficiencies.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
+                                        </View>
+                                        {this.state.character.addedWeaponProf && this.state.character.addedWeaponProf.length > 0 &&
+                                            <View style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, marginBottom: 10 }}>
+                                                <View style={{ borderWidth: 1, borderColor: Colors.berries, borderRadius: 15, backgroundColor: Colors.pinkishSilver }}>
+                                                    <AppText textAlign={'center'} fontSize={16}>+{this.state.currentProficiency} + the fitting ability modifier for the weapon</AppText>
+                                                </View>
+                                                <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.addedWeaponProf.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
+                                            </View>}
+                                        <View>
+                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
+                                            <Modal visible={this.state.attackRollTutorialModal} animationType={'slide'}>
+                                                <AttackRollTutorial closeWindow={(boolean: boolean) => { this.setState({ attackRollTutorialModal: boolean }) }} />
+                                            </Modal>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
+                        </View>
+                        <View pointerEvents={this.state.tutorialZIndex[4] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[4] ? 10 : 0 }}>
                             {this.state.character.languages &&
                                 <View style={[styles.list, { width: '100%' }]}>
                                     <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
@@ -717,6 +782,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     </View>
                                 )}
                             </View>
+                        </View>
+                        <View pointerEvents={this.state.tutorialZIndex[5] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[5] ? 10 : 0 }}>
                             <View style={styles.personality}>
                                 <View style={{ width: '30%', paddingLeft: 18 }}>
                                     <AppText textAlign={'center'}>To change a personality feature press and hold on its title.</AppText>
@@ -747,7 +814,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
-                        <View>
+                        <View pointerEvents={this.state.tutorialZIndex[6] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[6] ? 10 : 0 }}>
                             <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={30}>Magic</AppText>
                             {charHasMagic(this.state.character) ? <CharMagic isDm={this.state.isDm} reloadChar={() => {
                                 this.setState({ character: store.getState().character })

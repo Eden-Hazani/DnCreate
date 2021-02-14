@@ -92,6 +92,9 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         }
         this.getPrimeRaces();
     }
+
+
+
     componentWillUnmount() {
         this.NetUnSub();
         this.unsubscribeStore()
@@ -100,8 +103,11 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
     getPrimeRaces = async () => {
         let cashedRaces = await AsyncStorage.getItem('cashedRaces');
+        let todayCashed = await AsyncStorage.getItem('cashedRacesToday');
         let raceColors = [];
-        if (!cashedRaces) {
+        if (!cashedRaces || !todayCashed || JSON.parse(todayCashed) !== new Date().getDate()) {
+            let today = new Date().getDate();
+            await AsyncStorage.setItem('cashedRacesToday', JSON.stringify(today))
             const result = await racesApi.getPrimeList();
             await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
             for (let item of result.data as any) {
@@ -150,7 +156,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             return;
         }
         const searchedRaces = await racesApi.SearchRaceList(search, raceType, this.context.user._id);
-        console.log(searchedRaces.data)
         this.setState({ races: searchedRaces.data })
 
     }
@@ -172,6 +177,11 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
+            console.log(race.userPickedFeatures)
+            if (race.userPickedFeatures && race.userPickedFeatures.length > 0) {
+                this.props.navigation.navigate("AddFeaturesToRace", { race: race });
+                return;
+            }
             if (race.changeBaseAttributePoints?.changePoints) {
                 this.props.navigation.navigate("SpacialProficiencyRaces", { race: race });
                 return;

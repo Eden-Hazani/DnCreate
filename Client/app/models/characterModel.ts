@@ -8,6 +8,7 @@ import { RaceModel } from "./raceModel";
 import { EquipmentModal } from "./EquipmentModal";
 import { SpellsModel } from "./spellsModel";
 import { WeaponModal } from "./WeaponModal";
+import { ShieldModel } from "./ShieldModel";
 
 export class CharacterModel {
     public constructor(
@@ -16,7 +17,7 @@ export class CharacterModel {
         public name?: string,
         public race?: string,
         public age?: number,
-        public height?: number,
+        public height?: number | string,
         public weight?: number,
         public eyes?: string,
         public gender?: string,
@@ -60,15 +61,21 @@ export class CharacterModel {
         public addedArmorProf?: any[],
         public feats?: any[],
         public equippedArmor?: EquippedArmorModel,
+        public equippedShield?: ShieldModel,
         public languages?: any[],
         public spellCastingClass?: string,
         public nonClassAvailableSpells?: string[],
         public background?: BackgroundModal,
         public currentWeapon?: WeaponModal,
-        public equipment?: EquipmentModal[]
+        public equipment?: EquipmentModal[],
+        public addSpellAvailabilityByName?: string[],
+        public addedRaceFeatures?: any[]
     ) {
         if (!modifiers) {
             this.modifiers = new ModifiersModel();
+        }
+        if (!equippedShield) {
+            this.equippedShield = new ShieldModel()
         }
         if (!magic) {
             this.magic = new MagicModel();

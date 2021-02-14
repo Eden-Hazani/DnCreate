@@ -13,25 +13,25 @@ export function SpellCastingSwitch(character: CharacterModel, currentProficiency
         let spellAttackModifier: number = 0
 
         if (character.modifiers && character.race) {
-            baseSpellSaveDc = scoresJson[character.characterClass]?.baseSpellSaveDc || scoresJson[character.path?.name]?.baseSpellSaveDc || scoresJson[character.race]?.baseSpellSaveDc
-            spellcastingAbility = scoresJson[character.characterClass]?.spellcastingAbility || scoresJson[character.path?.name]?.spellcastingAbility || scoresJson[character.race]?.spellcastingAbility
-            baseSpellAttackModifier = scoresJson[character.characterClass]?.spellAttackModifier || scoresJson[character.path?.name]?.spellAttackModifier || scoresJson[character.race]?.spellAttackModifier
+            baseSpellSaveDc = scoresJson[character?.spellCastingClass as any].baseSpellSaveDc || scoresJson[character.characterClass]?.baseSpellSaveDc || scoresJson[character.path?.name]?.baseSpellSaveDc || scoresJson[character.race]?.baseSpellSaveDc || 'none'
+            spellcastingAbility = scoresJson[character.spellCastingClass as any].spellcastingAbility || scoresJson[character.characterClass]?.spellcastingAbility || scoresJson[character.path?.name]?.spellcastingAbility || scoresJson[character.race]?.spellcastingAbility || 'none'
+            baseSpellAttackModifier = scoresJson[character.spellCastingClass as any].spellAttackModifier || scoresJson[character.characterClass]?.spellAttackModifier || scoresJson[character.path?.name]?.spellAttackModifier || scoresJson[character.race]?.spellAttackModifier || 'none'
             const modifiers = [['wisdom', character.modifiers.wisdom], ['strength', character.modifiers.strength],
             ['dexterity', character.modifiers.dexterity], ['constitution', character.modifiers.constitution], ['intelligence', character.modifiers.intelligence], ['charisma', character.modifiers.charisma]]
 
-
-            let spellAttackModifier: number = 0
             if (baseSpellAttackModifier === undefined) {
                 baseSpellAttackModifier = "none"
             }
             if (baseSpellAttackModifier !== "none") {
-                for (let item of baseSpellAttackModifier.split('+')) {
-                    if (item === 'proficiency') {
-                        item = currentProficiency;
-                    }
-                    modifiers.forEach(v => v[0] === item ? item = v[1] : 0)
-                    spellAttackModifier = spellAttackModifier + parseInt(item)
+                let proficiency = 0;
+                let modifier: any = "0";
+                const item = baseSpellAttackModifier.split('+');
+                if (item[0] === 'proficiency') {
+                    proficiency = currentProficiency;
                 }
+                modifiers.forEach(v => v[0] === item[1] ? modifier = v[1] : 0)
+                spellAttackModifier = proficiency + parseInt(modifier)
+
             }
 
             if (baseSpellSaveDc === undefined) {

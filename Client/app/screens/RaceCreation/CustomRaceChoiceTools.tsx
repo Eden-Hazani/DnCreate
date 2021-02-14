@@ -135,7 +135,7 @@ export class CustomRaceChoiceTools extends Component<{ navigation: any }, Custom
                                 </View>
                                 <AppText fontSize={18} textAlign={'center'} padding={15}>Amount of available picks from the list </AppText>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15 }}>
-                                    <NumberScroll
+                                    <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem}
                                         max={toolsJson.tools.length}
                                         getValue={(amount: number) => {

@@ -25,7 +25,7 @@ export function AppFormField({ ...props }: any) {
                     {...props}
                     onBlur={() => setFieldTouched(props.fieldName)}
                     onChangeText={handleChange(props.fieldName)} />
-                <ErrorMessage visible={touched[props.fieldName]} error={errors[props.fieldName]} returnInfo={(val: any) => props.moveToErrorPosition && props.moveToErrorPosition(val)} />
+                <ErrorMessage errorPosition={props.numberOfLines === 7 ? 'long' : 'short'} visible={touched[props.fieldName]} error={errors[props.fieldName]} returnInfo={(val: any) => props.moveToErrorPosition && props.moveToErrorPosition(val)} />
             </View>
             {touched[props.fieldName] &&
                 <View style={{ position: "absolute", right: 15 }}>

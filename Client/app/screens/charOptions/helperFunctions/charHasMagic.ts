@@ -11,8 +11,11 @@ export function charHasMagic(character: CharacterModel) {
                 return true
             }
         }
+        if (character.spellCastingClass === "Barbarian" || character.spellCastingClass === "Monk" || character.spellCastingClass === "Fighter" || character.spellCastingClass === "Rouge") {
+            return false
+        }
         for (let item of magic) {
-            if (item !== null && item !== 0) {
+            if (item !== null) {
                 return true
             }
         }

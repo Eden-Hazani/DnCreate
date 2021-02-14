@@ -8,12 +8,12 @@ import { Colors } from '../config/colors';
 
 
 const { width, height } = Dimensions.get('window')
-const scaledHeight = Dimensions.get('window').scale < 3 ? (height - 25) : height;
+// const height = Dimensions.get('window').scale < 3 ? (height - 25) : height;
 const Indicator = ({ scrollY, items }: any) => {
     return (
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-end", alignItems: "flex-end", }}>
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-end", zIndex: 40, width: 30 }}>
             {items.map((_: any, i: any) => {
-                const inputRange = [(i - 1) * scaledHeight, i * scaledHeight, (i + 1) * scaledHeight]
+                const inputRange = [(i - 1) * height, i * height, (i + 1) * height]
                 const scale: any = scrollY.interpolate({
                     inputRange,
                     outputRange: [0.8, 1.4, 0.8],
@@ -39,22 +39,23 @@ const Indicator = ({ scrollY, items }: any) => {
 }
 
 const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl, finishButton, PressClose }: any) => {
-    const inputRange = [(index - 1) * 1, index * scaledHeight, (index + 1) * scaledHeight];
+    const inputRange = [(index - 1) * 1, index * height, (index + 1) * height];
     const scale = scrollY.interpolate({
         inputRange,
         outputRange: [0, 1, 0]
     })
     const translateYHeadline = scrollY.interpolate({
         inputRange,
-        outputRange: [scaledHeight * 0.5, 0, -scaledHeight * 0.5]
+        outputRange: [height / 2, 0, height / 2]
     })
     const translateXRTB = scrollY.interpolate({
         inputRange,
-        outputRange: [-width * 1.8, 0, -width * 1.8]
+        outputRange: [-width, 0, -width]
     })
+    console.log(translateXRTB)
     const translateXLTB = scrollY.interpolate({
         inputRange,
-        outputRange: [width * 2, 0, +width * 2]
+        outputRange: [width, 0, +width]
     })
     const opacity: any = scrollY.interpolate({
         inputRange,
@@ -63,12 +64,12 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
     })
 
     return (
-        <View style={[styles.itemStyle, { backgroundColor: Colors.pageBackground }]}>
-            <View style={[styles.textContainer]}>
-                <Animated.Text style={[styles.heading,
-                { transform: [{ translateY: translateYHeadline }], color: Colors.bitterSweetRed }
-                ]}>{headline}</Animated.Text>
-            </View>
+        <View style={[styles.itemStyle, {
+            backgroundColor: Colors.pageBackground, flex: 1, width, height: height - 25,
+        }]}>
+            <Animated.Text style={[styles.heading,
+            { transform: [{ translateY: translateYHeadline }], color: Colors.bitterSweetRed }
+            ]}>{headline.replace(' ', '\n')}</Animated.Text>
             <Animated.Text style={[styles.description,
             { transform: [{ translateX: translateXLTB }], lineHeight: 25, paddingBottom: 10, color: Colors.whiteInDarkMode }
             ]}>{leftTextBlock}</Animated.Text>
@@ -123,6 +124,7 @@ const styles = StyleSheet.create({
     container: {
         zIndex: 10,
         flex: 1,
+        height
     },
     itemStyle: {
         justifyContent: "flex-start",

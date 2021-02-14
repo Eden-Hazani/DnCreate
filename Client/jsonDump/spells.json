@@ -1934,6 +1934,76 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "warlock"
+        ],
+        "components": {
+            "material": true,
+            "raw": "V, S, M (a cup of water)",
+            "verbal": true
+        },
+        "description": "A protective magical force surrounds you, manifesting as a spectral frost that covers you and your gear. You gain 5 temporary hit points for the duration. If a creature hits you with a melee attack while you have these hit points, the creature takes 5 cold damage.",
+        "duration": "1 hour",
+        "level": "1",
+        "name": "Armor of Agathys",
+        "range": "Touch",
+        "ritual": false,
+        "higher_levels": "When you cast this spell using a spell slot of 2nd level or higher, both the temporary hit points and the cold damage increase by 5 for each slot.",
+        "school": "abjuration",
+        "tags": [
+            "warlock",
+            "level1"
+        ],
+        "type": "1st-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "raw": "V, S, M (gold dust worth at least 25 gp, which the spell consumes)",
+            "verbal": true
+        },
+        "description": "You touch a closed door, window, gate, chest, or other entryway, and it becomes locked for the duration. You and the creatures you designate when you cast this spell can open the object normally. You can also set a password that, when spoken within 5 feet of the object, suppresses this spell for 1 minute. Otherwise, it is impassable until it is broken or the spell is dispelled or suppressed. Casting knock on the object suppresses arcane lock for 10 minutes. While affected by this spell, the object is more difficult to break or force open; the DC to break it or pick any locks on it increases by 10.",
+        "duration": "Until dispelled",
+        "level": "1",
+        "name": "Arcane Lock",
+        "range": "Touch",
+        "ritual": false,
+        "school": "abjuration",
+        "tags": [
+            "wizard",
+            "level2"
+        ],
+        "type": "2nd-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "raw": "V, S, M (a drop of mercury)",
+            "verbal": true
+        },
+        "description": "This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground. The disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. It can move across uneven terrain, up or down stairs, slopes, and the like, but it can’t cross an elevation change of 10 feet or more. For example, the disk can’t move across a 10-foot-deep pit, nor could it leave such a pit if it were created at the bottom. If you move more than 100 feet from the disk (typically because it can’t move around an obstacle to follow you), the spell ends.",
+        "duration": "1 hour",
+        "level": "1",
+        "name": "Tenser's Floating Disk",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "conjuration",
+        "tags": [
+            "wizard",
+            "level2"
+        ],
+        "type": "1st-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
             "cleric",
             "druid"
         ],

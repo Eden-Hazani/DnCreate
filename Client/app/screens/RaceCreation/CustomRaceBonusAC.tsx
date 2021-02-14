@@ -72,7 +72,7 @@ export class CustomRaceBonusAC extends Component<{ navigation: any }, CustomRace
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText fontSize={18} padding={5} textAlign={'center'}>How many bonus AC points?</AppText>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, height: 70, borderWidth: 1, borderRadius: 15, }}>
-                                    <NumberScroll
+                                    <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem}
                                         max={10} getValue={(bonusAmount: number) => {
                                             this.setState({ acAmount: bonusAmount })

@@ -17,6 +17,7 @@ import { EquippedArmorModel } from '../../models/EquippedArmorModel';
 import { armorBonusCalculator } from './helperFunctions/armorBonusCalculator';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
+import NumberScroll from '../../components/NumberScroll';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -35,6 +36,11 @@ interface ArmorState {
     tutorialOn: boolean
     armorType: string
     addArmor: boolean
+    addShield: boolean
+    shieldList: any[],
+    shieldSpecs: { _id: string, name: string, ac: number },
+    showArmor: boolean,
+    showShield: boolean
 }
 
 export class Armor extends Component<{ navigation: any, route: any }, ArmorState>{
@@ -42,6 +48,14 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
     constructor(props: any) {
         super(props)
         this.state = {
+            showArmor: true,
+            showShield: false,
+            shieldSpecs: {
+                _id: '',
+                name: '',
+                ac: 0
+            },
+            addShield: false,
             addArmor: false,
             armorType: '',
             heavyArmor: false,
@@ -51,14 +65,19 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
             dexModifier: false,
             disadvantageStealth: false,
             armorList: [],
+            shieldList: [],
             character: this.props.route.params.char
         }
     }
     async componentDidMount() {
         try {
             const armorList = await AsyncStorage.getItem(`${this.state.character._id}ArmorList`);
+            const shieldList = await AsyncStorage.getItem(`${this.state.character._id}shieldList`);
             if (armorList) {
                 this.setState({ armorList: JSON.parse(armorList) })
+            }
+            if (shieldList) {
+                this.setState({ shieldList: JSON.parse(shieldList) })
             }
         } catch (err) {
             logger.log(new Error(err))
@@ -183,11 +202,80 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
         }
     }
 
+    removeShield = async (shieldId: string) => {
+        try {
+            let shieldList = await AsyncStorage.getItem(`${this.state.character._id}shieldList`);
+            if (shieldList) {
+                let newShieldList = JSON.parse(shieldList)
+                newShieldList = newShieldList.filter((shield: any) => shield._id !== shieldId);
+                AsyncStorage.setItem(`${this.state.character._id}shieldList`, JSON.stringify(newShieldList))
+                this.setState({ shieldList: newShieldList });
+            }
+        } catch (err) {
+            logger.log(new Error(err))
+        }
+    }
+
+    removeEquippedShield = () => {
+        try {
+            const character = { ...this.state.character };
+            character.equippedShield = { _id: "0", ac: 0, name: "No Shield Equipped" }
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter();
+                    return;
+                }
+                userCharApi.updateChar(this.state.character);
+            });
+        } catch (err) {
+            logger.log(new Error(err))
+        }
+    }
+
+    equipShield = (shield: any) => {
+        try {
+            console.log(shield)
+            const character = { ...this.state.character };
+            character.equippedShield = shield;
+            this.setState({ character }, () => {
+                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                if (this.context.user._id === "Offline") {
+                    this.updateOfflineCharacter();
+                    return;
+                }
+                userCharApi.updateChar(this.state.character)
+            });
+        } catch (err) {
+            logger.log(new Error(err))
+        }
+    }
+
+    addShield = async () => {
+        if (this.state.shieldSpecs.name === '') {
+            alert('Shield Must Have A Name');
+            return;
+        }
+        const shield = { ...this.state.shieldSpecs };
+        shield._id = shield.name + Math.floor((Math.random() * 1000000) + 1)
+        let shieldList = await AsyncStorage.getItem(`${this.state.character._id}shieldList`);
+        if (!shieldList) {
+            const shieldList = [shield]
+            AsyncStorage.setItem(`${this.state.character._id}shieldList`, JSON.stringify(shieldList))
+            this.setState({ shieldSpecs: { _id: '', name: '', ac: 2 }, addShield: false, shieldList: shieldList })
+            return;
+        }
+        const newShieldList = JSON.parse(shieldList)
+        newShieldList.push(shield)
+        AsyncStorage.setItem(`${this.state.character._id}shieldList`, JSON.stringify(newShieldList))
+        this.setState({ shieldSpecs: { _id: "", name: '', ac: 2 }, addShield: false, shieldList: newShieldList })
+    }
+
 
     render() {
         return (
             <ScrollView style={styles.container}>
-                <View style={{ alignItems: 'center', padding: 20, marginBottom: 20 }}>
+                <View style={{ alignItems: 'center', padding: 20, marginBottom: 5 }}>
                     <AppText fontSize={18} color={Colors.bitterSweetRed}>Equipped Armor Set</AppText>
                     {this.state.character.equippedArmor &&
                         <View style={styles.equippedArmor}>
@@ -204,10 +292,49 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                             </View>
                         </View>}
                 </View>
-                <View>
+                <View style={{ alignItems: 'center', padding: 5, marginBottom: 20 }}>
+                    <AppText fontSize={18} color={Colors.bitterSweetRed}>Equipped Shield</AppText>
+                    {this.state.character.equippedShield &&
+                        <View style={styles.equippedArmor}>
+                            {this.state.character.equippedShield.name === 'No Shield Equipped' ? null :
+                                <TouchableOpacity style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}>
+                                    <AppButton backgroundColor={Colors.berries} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
+                                        title={'Remove Set'} onPress={() => { this.removeEquippedShield() }} />
+                                </TouchableOpacity>
+                            }
+                            <View>
+                                <AppText>Name: {this.state.character.equippedShield.name}</AppText>
+                                <AppText>AC: {this.state.character.equippedShield.ac}</AppText>
+                            </View>
+                        </View>}
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
                     <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} disabled={this.props.route.params.isDm}
                         title={'Add Armor Set'} onPress={() => { this.setState({ addArmor: true }) }} />
+                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} disabled={this.props.route.params.isDm}
+                        title={'Add Shield'} onPress={() => { this.setState({ addShield: true }) }} />
                 </View>
+                <Modal visible={this.state.addShield}>
+                    <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                        <AppTextInput placeholder={"Shield Name"} onChangeText={(txt: string) => {
+                            const shieldSpecs = { ...this.state.shieldSpecs }
+                            shieldSpecs.name = txt;
+                            this.setState({ shieldSpecs })
+                        }} />
+                        <AppText textAlign={'center'}>How much AC does this shield give you?</AppText>
+                        <AppText textAlign={'center'}>By official rules, shields should give your character an additional 2 AC points</AppText>
+                        <NumberScroll modelColor={Colors.pageBackground}
+                            startingVal={2}
+                            max={10}
+                            getValue={(amount: number) => {
+                                const shieldSpecs = { ...this.state.shieldSpecs }
+                                shieldSpecs.ac = amount;
+                                this.setState({ shieldSpecs })
+                            }} />
+                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                            title={'Confirm'} onPress={() => this.addShield()} />
+                    </ScrollView>
+                </Modal>
                 <Modal visible={this.state.addArmor}>
                     <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                         <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Add new armor to inventory</AppText>
@@ -299,7 +426,34 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
                         </AppForm>
                     </ScrollView>
                 </Modal>
-                {this.state.armorList &&
+                <View style={{ flexDirection: 'row', justifyContent: "space-evenly", paddingTop: 20 }}>
+                    <AppButton backgroundColor={this.state.showArmor ? Colors.earthYellow : Colors.lightGray} width={140} height={50} borderRadius={25} disabled={this.props.route.params.isDm}
+                        title={'Armor List'} onPress={() => { this.setState({ showArmor: true, showShield: false }) }} />
+                    <AppButton backgroundColor={this.state.showShield ? Colors.earthYellow : Colors.lightGray} width={140} height={50} borderRadius={25} disabled={this.props.route.params.isDm}
+                        title={'Shield List'} onPress={() => { this.setState({ showArmor: false, showShield: true }) }} />
+                </View>
+                {this.state.shieldList && this.state.showShield &&
+                    <View>
+                        {this.state.shieldList.map(shield =>
+                            <View key={shield._id} style={styles.armorUnit}>
+                                <View style={{ flexDirection: "row", position: 'absolute', right: 5, top: 10 }}>
+                                    <TouchableOpacity style={{ zIndex: 1 }}>
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
+                                            title={'Equip Set'} onPress={() => { this.equipShield(shield) }} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={{ zIndex: 1 }}>
+                                        <AppButton backgroundColor={Colors.berries} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
+                                            title={'Delete Set'} onPress={() => { this.removeShield(shield._id) }} />
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ width: '65%' }}>
+                                    <AppText fontSize={16}>Name: {shield.name}</AppText>
+                                    <AppText fontSize={16}>AC: {shield.ac}</AppText>
+                                </View>
+                            </View>)}
+                    </View>
+                }
+                {this.state.armorList && this.state.showArmor &&
                     <View>
                         {this.state.armorList.map(armor =>
                             <View key={armor.id} style={styles.armorUnit}>

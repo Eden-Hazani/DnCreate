@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions, Modal, ScrollView } from 'react-native';
+import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions, Modal, ScrollView, Linking } from 'react-native';
 import { Colors } from '../config/colors';
 import * as Font from 'expo-font';
 import { AppText } from '../components/AppText';
@@ -18,10 +18,12 @@ import { CharacterModel } from '../models/characterModel';
 import errorHandler from '../../utility/errorHander';
 import Carousel from 'react-native-snap-carousel';
 import authApi from '../api/authApi';
-import { CacheManager } from 'react-native-expo-image-cache';
+import { Image as CashedImage, CacheManager } from 'react-native-expo-image-cache';
 import logger from '../../utility/logger';
 import { FeedBack } from '../components/FeedBack';
 import { UpdateMessage } from '../components/UpdateMessage';
+import { Config } from '../../config';
+import { IconGen } from '../components/IconGen';
 
 interface HomeState {
     loading: boolean
@@ -56,19 +58,19 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             darkModeOn: store.getState().colorScheme,
             carouselItems: [
                 {
-                    title: "Send us your ideas and feedback!",
-                    message: true,
-                    image: { img: require('../../assets/homeDragon1.png') }
+                    title: "DnCreate is hard work",
+                    text: "Any donation is highly appreciated and will go towards making DnCreate better each update",
+                    patreonImage: `${Config.serverUrl}/assets/specificDragons/patreonDragon.png`
                 },
                 {
-                    title: "Use the character hall to access all of your characters",
-                    text: "Press on a character to use its character sheet.",
-                    image: { img: require('../../assets/homeDragon2.png') }
+                    title: "Send Us Your Feedback!",
+                    message: true,
+                    image: `${Config.serverUrl}/assets/specificDragons/homeDragon1.png`
                 },
                 {
                     title: "Use DnCreate's adventure mode to connect with friends",
                     text: "Show your DM all the information he needs to create the prefect adventure ",
-                    image: { img: require('../../assets/welcomeDragon3.png') }
+                    image: `${Config.serverUrl}/assets/specificDragons/welcomeDragon3.png`
                 },
             ]
         }
@@ -91,7 +93,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             const date = new Date().toISOString().slice(0, 10)
             const clearCashOnceADay = await AsyncStorage.getItem('clearCashOnceADay');
             if (!clearCashOnceADay) {
-                await CacheManager.clearCache();
                 await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
             }
             if (clearCashOnceADay) {
@@ -151,9 +152,16 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                 padding: 10,
                 width: Dimensions.get("screen").width
             }}>
-                <View>
-                    <Image style={{ width: 150, height: 150 }} source={item.image.img} />
-                </View>
+                {item.patreonImage ?
+                    <TouchableOpacity
+                        onPress={() => Linking.openURL('https://www.patreon.com/Edenhazani?fan_landing=true')}>
+                        <CashedImage uri={item.patreonImage} style={{ width: 150, height: 150 }} />
+                    </TouchableOpacity>
+                    :
+                    <View>
+                        <CashedImage uri={item.image} style={{ width: 150, height: 150 }} />
+                    </View>
+                }
                 <View style={{ padding: 0 }}>
                     <AppText fontSize={22} textAlign={'center'} color={Colors.berries}>{item.title}</AppText>
                     <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>{item.text}</AppText>
@@ -194,7 +202,14 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                             <AnimateContactUpwards>
                                 <View style={{ alignItems: "center", padding: 5, flex: .05 }}>
                                     <AppText color={Colors.whiteInDarkMode} fontSize={35}>DnCreate</AppText>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <IconGen name={'chevron-left'} size={50} iconColor={Colors.whiteInDarkMode} />
+                                        <IconGen name={'chevron-right'} size={50} iconColor={Colors.whiteInDarkMode} />
+                                    </View>
                                     <Carousel
+                                        autoplay
+                                        loop
+                                        autoplayInterval={3000}
                                         data={this.state.carouselItems}
                                         renderItem={this._renderItem.bind(this)}
                                         sliderWidth={Dimensions.get("screen").width}
@@ -313,7 +328,6 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: "center",
-        paddingTop: 20
     },
 
 })

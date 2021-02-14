@@ -20,7 +20,7 @@ interface SpacialRaceBonusesState {
     extraLanguages: string[]
     race: RaceModel
     weaponProficiencies: string[]
-
+    pickedAncestry: any,
     pickedSkills: any[]
     pickedTools: any[]
     customWeapons: any[]
@@ -32,6 +32,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     constructor(props: any) {
         super(props)
         this.state = {
+            pickedAncestry: null,
             weaponProficiencies: [],
             extraLanguages: [],
             confirmed: false,
@@ -89,6 +90,15 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         if (this.state.race.baseWeaponProficiencies) {
             for (let item of this.state.race.baseWeaponProficiencies) {
                 character.addedWeaponProf.push(item)
+            }
+        }
+        if (this.state.race.name === "DragonBorn") {
+            if (this.state.pickedAncestry === null) {
+                alert('Must pick Ancestry');
+                return
+            }
+            if (character.charSpecials) {
+                character.charSpecials.dragonBornAncestry = this.state.pickedAncestry
             }
         }
         for (let item of this.state.extraLanguages) {
@@ -259,6 +269,15 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                     <AppText fontSize={17} color={Colors.berries}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                                 </View>)}
 
+                        {this.state.character.addedRaceFeatures &&
+                            this.state.character.addedRaceFeatures.map((item, index) => {
+                                return <View key={index} style={[styles.featureItem, { backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries }]}>
+                                    <AppText fontSize={22}>{item.name}</AppText>
+                                    <AppText fontSize={17} color={Colors.berries}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
+                                </View>
+                            })
+                        }
+
                         {this.state.race.extraLanguages !== undefined && this.state.race.extraLanguages !== 0 &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.extraLanguages} extra languages</AppText>
@@ -270,7 +289,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             <View>
                                 <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.skillPickChoice.amountToPick} extra skills</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    <PickSingleItem amountToPick={this.state.race.skillPickChoice.amountToPick}
+                                    <PickSingleItem isObject={false} amountToPick={this.state.race.skillPickChoice.amountToPick}
                                         onPick={(pickedSkills: any) => this.setState({ pickedSkills })}
                                         itemList={this.state.race.skillPickChoice.skillList} />
                                 </View>
@@ -281,7 +300,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                             <View>
                                 <AppText textAlign={'center'} fontSize={18}>You can choose {this.state.race.toolProficiencyPick.amountToPick} extra tools</AppText>
                                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: 'center' }}>
-                                    <PickSingleItem amountToPick={this.state.race.toolProficiencyPick.amountToPick}
+                                    <PickSingleItem isObject={false} amountToPick={this.state.race.toolProficiencyPick.amountToPick}
                                         onPick={(pickedTools: any) => this.setState({ pickedTools })}
                                         itemList={this.state.race.toolProficiencyPick.toolList} />
                                 </View>
@@ -301,6 +320,22 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customArmorProficiencies.amount}
                                 extra {this.state.race.customArmorProficiencies.type} Armor Proficiencies</AppText>
                                 {this.displayCustomArmor(this.state.race.customArmorProficiencies.amount).map((item, index) => item)}
+                            </View>
+                        }
+
+                        {this.state.character.race === "DragonBorn" &&
+                            <View>
+                                <View style={{ padding: 15 }}>
+                                    <AppText textAlign={'center'} fontSize={18}>As a DragonBorn you gain damage resistance to the damage type associated with your ancestry.</AppText>
+                                    <AppText textAlign={'center'} fontSize={18}>You also read speak and write Draconic</AppText>
+                                </View>
+                                <AppText textAlign={'center'} fontSize={18}>Pick your Draconic ancestry</AppText>
+                                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                                    <PickSingleItem amountToPick={1}
+                                        onPick={(pickedAncestry: any) => this.setState({ pickedAncestry })}
+                                        isObject={true}
+                                        itemList={dragonAncestry.ancestry} />
+                                </View>
                             </View>
                         }
 

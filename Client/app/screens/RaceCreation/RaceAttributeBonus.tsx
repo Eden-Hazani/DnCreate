@@ -87,7 +87,7 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                             }}>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>{item[0]} bonus</AppText>
-                                    <NumberScroll
+                                    <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem[item[0]]}
                                         startFromZero={true}
                                         max={10}
@@ -116,7 +116,7 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                             }} />
                             {this.state.activatedInterface ?
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
-                                    <NumberScroll max={10}
+                                    <NumberScroll modelColor={Colors.pageBackground} max={10}
                                         startingVal={choiceAttStore}
                                         getValue={(bonusAmount: number) => {
                                             this.setState({ bonusAmount })

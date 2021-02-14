@@ -36,6 +36,7 @@ import { LocationNotes } from '../screens/charOptions/personalNoteTypes/Location
 import { PeopleNotes } from '../screens/charOptions/personalNoteTypes/PeopleNotes';
 import { OtherNotes } from '../screens/charOptions/personalNoteTypes/OtherNotes';
 import ClassPick from '../screens/CharCreation/ClassPick';
+import { AddFeaturesToRace } from '../screens/CharCreation/AddFeaturesToRace';
 
 const Stack = createStackNavigator();
 
@@ -61,6 +62,7 @@ const CharNavigator = () => {
     }}>
         <Stack.Screen options={{ headerShown: false }} name="HomeScreen" component={HomeScreen} />
         <Stack.Screen options={{ title: "", headerTintColor: Colors.black }} name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ title: "", headerTintColor: Colors.black }} name="AddFeaturesToRace" component={AddFeaturesToRace} />
         <Stack.Screen options={{ headerShown: false }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick as any} />

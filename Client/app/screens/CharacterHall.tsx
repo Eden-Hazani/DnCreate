@@ -91,13 +91,11 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             await AdMobInterstitial.showAdAsync().then(() => {
                 this.setState({ loading: false, loadingAd: false })
             }).catch(() => {
-                this.loadFacebookAd()
-                return
+                this.setState({ loadingAd: false, loading: false })
             })
         }).catch(() => {
-            this.loadFacebookAd()
+            this.setState({ loadingAd: false, loading: false })
         })
-
     }
 
     loadFacebookAd = () => {

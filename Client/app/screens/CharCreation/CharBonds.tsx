@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -8,6 +8,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
@@ -18,7 +19,12 @@ interface CharBondsState {
     characterInfo: CharacterModel
     confirmed: boolean
     updateBonds: boolean
+    openAutoComplete: boolean[]
 }
+
+const fillingList: string[] = ["Everything I do is for the common people", "I'm trying to pay off an old debt I owe to a generous benefactor",
+    "I want to be famous, whatever it takes", "I worked the land, I love the land, and I will protect the land", "I protect those who cannot protect themselves",
+    "I pursue wealth to secure someone's love"]
 
 export class CharBonds extends Component<{ route: any, navigation: any, updateBonds: boolean }, CharBondsState>{
     private UnsubscribeStore: Unsubscribe;
@@ -26,6 +32,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
     constructor(props: any) {
         super(props)
         this.state = {
+            openAutoComplete: [],
             baseState: '',
             updateBonds: this.props.route.params.updateBonds,
             confirmed: false,
@@ -142,6 +149,32 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
         });
     }
 
+    changeAutoCompleteState = (index: number, action: boolean) => {
+        const openAutoComplete = this.state.openAutoComplete;
+        openAutoComplete[index] = action;
+        console.log(openAutoComplete)
+        this.setState({ openAutoComplete })
+    }
+
+    generateJSX = (bonds: any) => {
+        let jsxList: any[] = [];
+        for (let i: number = 0; i < 6; i++) {
+            jsxList.push(<View key={i}>
+                <AppTextInput
+                    onBlur={() => this.changeAutoCompleteState(i, false)}
+                    onFocus={() => this.changeAutoCompleteState(i, true)} value={bonds ? bonds[i] : ''}
+                    onChangeText={(trait: string) => { this.addTrait(trait, i) }} padding={10}
+                    placeholder={fillingList[i]} width={"80%"} />
+                <TextInputDropDown sendText={(val: string) => {
+                    this.changeAutoCompleteState(i, false)
+                    this.addTrait(val, i)
+                }} expendedWidth={Dimensions.get('window').width / 1.2} expendedHeight={450}
+                    information={fillingList} isOpen={this.state.openAutoComplete[i]} />
+            </View>)
+        }
+        return jsxList
+    }
+
     render() {
         const bonds = this.state.characterInfo.bonds;
         return (
@@ -154,12 +187,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
                             <AppText fontSize={18} textAlign={"center"}>Bonds represent a character’s connections to people, places, and events in the world. They tie you to things from your background.</AppText>
                             <AppText fontSize={18} textAlign={"center"}>They can work very much like ideals, driving a character’s motivations and goals.</AppText>
                         </View>
-                        <AppTextInput value={bonds ? bonds[0] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 0) }} padding={10} placeholder={"Everything I do is for the common people..."} width={"80%"} />
-                        <AppTextInput value={bonds ? bonds[1] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 1) }} padding={10} placeholder={"I'm trying to pay off an old debt I owe to a generous benefactor..."} width={"80%"} />
-                        <AppTextInput value={bonds ? bonds[2] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 2) }} padding={10} placeholder={'I want to be famous, whatever it takes...'} width={"80%"} />
-                        <AppTextInput value={bonds ? bonds[3] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 3) }} padding={10} placeholder={"I worked the land, I love the land, and I will protect the land..."} width={"80%"} />
-                        <AppTextInput value={bonds ? bonds[4] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 4) }} padding={10} placeholder={'I protect those who cannot protect themselves..'} width={"80%"} />
-                        <AppTextInput value={bonds ? bonds[5] : ''} onChangeText={(bond: string) => { this.addTrait(bond, 5) }} padding={10} placeholder={"I pursue wealth to secure someone's love..."} width={"80%"} />
+                        {this.generateJSX(bonds)}
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateBonds ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>

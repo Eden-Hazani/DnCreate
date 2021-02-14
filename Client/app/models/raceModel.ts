@@ -12,6 +12,9 @@ export class RaceModel {
         public raceColors?: string,
         public languages?: string[],
 
+        public userPickedFeatures?: any[],
+        public numberOfFeaturesToPick?: number,
+
         public changeBaseAttributePoints?: {
             changePoints: boolean,
             amount: number

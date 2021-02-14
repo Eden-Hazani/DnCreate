@@ -17,6 +17,7 @@ import { AppConfirmation } from '../../components/AppConfirmation';
 import AsyncStorage from '@react-native-community/async-storage';
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import NumberScroll from '../../components/NumberScroll';
+import { Switch } from 'react-native-gesture-handler';
 
 interface NewCharInfoState {
     characterInfo: CharacterModel
@@ -27,9 +28,12 @@ interface NewCharInfoState {
     pickedHairColor: string
     pickedSkinColor: string
     pickedAge: number
-    pickedHeight: number
+    pickedHeight: number | string
     pickedWeight: number
     colorPickOrder: string
+    feetOrCent: boolean
+    feet: number,
+    inches: number
 }
 
 const ValidationSchema = Yup.object().shape({
@@ -72,6 +76,9 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
     constructor(props: any) {
         super(props)
         this.state = {
+            feet: 1,
+            inches: 1,
+            feetOrCent: false,
             pickedAge: 1,
             pickedHeight: 1,
             pickedWeight: 1,
@@ -145,24 +152,54 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                                         <AppText fontSize={16} textAlign={'center'}>You can also click the number to manually input.</AppText>
                                     </View>
                                     <View style={{ flexDirection: 'row', justifyContent: "space-evenly", paddingLeft: 20, paddingRight: 20 }}>
-                                        <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
+                                        <View style={{ height: 150, borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Age</AppText>
-                                            <NumberScroll max={5000} getValue={(val: any) => {
+                                            <NumberScroll modelColor={Colors.pageBackground} max={5000} getValue={(val: any) => {
                                                 this.setState({ pickedAge: val })
                                             }} />
                                         </View>
 
                                         <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Height</AppText>
-                                            <NumberScroll max={450} getValue={(val: any) => {
-                                                this.setState({ pickedHeight: val })
-                                            }} />
+                                            <View style={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+                                                <AppText textAlign={'center'} fontSize={18}>CM/Feet</AppText>
+                                                <Switch value={this.state.feetOrCent} onValueChange={() => {
+                                                    if (this.state.feetOrCent) {
+                                                        this.setState({ feetOrCent: false })
+                                                        return;
+                                                    }
+                                                    this.setState({ feetOrCent: true })
+                                                }} />
+                                            </View>
+                                            {this.state.feetOrCent ?
+                                                <View style={{ padding: 15 }}>
+                                                    <AppText textAlign={'center'}>CM</AppText>
+                                                    <NumberScroll modelColor={Colors.pageBackground} max={450} getValue={(val: any) => {
+                                                        this.setState({ pickedHeight: val })
+                                                    }} />
+                                                </View>
+                                                :
+                                                <View style={{ padding: 15 }}>
+                                                    <AppText textAlign={'center'}>Feet</AppText>
+                                                    <NumberScroll modelColor={Colors.pageBackground} max={450} getValue={(feet: any) => {
+                                                        this.setState({ feet }, () => {
+                                                            this.setState({ pickedHeight: `${this.state.feet}'${this.state.inches}` })
+                                                        })
+                                                    }} />
+                                                    <AppText textAlign={'center'}>Inches</AppText>
+                                                    <NumberScroll modelColor={Colors.pageBackground} max={12} getValue={(inches: any) => {
+                                                        this.setState({ inches }, () => {
+                                                            this.setState({ pickedHeight: `${this.state.feet}'${this.state.inches}` })
+                                                        })
+                                                    }} />
+                                                </View>
+                                            }
                                         </View>
                                     </View>
                                     <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 15, paddingBottom: 10 }}>
                                         <View style={{ width: Dimensions.get('window').width / 2, borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 50 }}>
                                             <AppText textAlign={'center'} fontSize={18}>Weight</AppText>
-                                            <NumberScroll max={1000} getValue={(val: any) => {
+                                            <NumberScroll modelColor={Colors.pageBackground} max={1000} getValue={(val: any) => {
                                                 this.setState({ pickedWeight: val })
                                             }} />
                                         </View>

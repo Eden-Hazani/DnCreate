@@ -32,6 +32,7 @@ const ValidationSchema = Yup.object().shape({
 })
 
 interface AccountState {
+    homebrewSubClasses: boolean
     isUserOffline: boolean
     userInfo: UserModel
     changeProfileModal: boolean
@@ -49,6 +50,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
     constructor(props: any) {
         super(props)
         this.state = {
+            homebrewSubClasses: false,
             homebrewRaces: false,
             isUserOffline: false,
             loading: false,
@@ -63,16 +65,20 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
     }
 
     componentDidMount() {
-        this.setHomeBrewRaces()
+        this.setHomeBrew()
         if (store.getState().user._id === "Offline") {
             this.setState({ isUserOffline: true })
         }
     }
 
-    setHomeBrewRaces = async () => {
+    setHomeBrew = async () => {
+        const homebrewSubClasses = await AsyncStorage.getItem('showPublicSubClasses')
         const showPublicRaces = await AsyncStorage.getItem('showPublicRaces')
         if (showPublicRaces === 'true') {
             this.setState({ homebrewRaces: true })
+        }
+        if (homebrewSubClasses === 'true') {
+            this.setState({ homebrewSubClasses: true })
         }
     }
 
@@ -284,8 +290,8 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                             fontSize={20} color={Colors.black} backgroundColor={Colors.pastelPink} title={"Check"} />
                                     </View>
                                     <ListItemSeparator thick={true} />
-                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
-                                        <AppText fontSize={20}>Allow Homebrew races</AppText>
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5, width: Dimensions.get('window').width - 100 }}>
+                                        <AppText fontSize={20}>Allow Public Homebrew races</AppText>
                                         <Switch value={this.state.homebrewRaces} onValueChange={() => {
                                             if (this.state.homebrewRaces) {
                                                 this.setState({ homebrewRaces: false }, async () => {
@@ -295,6 +301,21 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                             }
                                             this.setState({ homebrewRaces: true }, async () => {
                                                 await AsyncStorage.setItem('showPublicRaces', "true");
+                                            })
+                                        }} />
+                                    </View>
+                                    <ListItemSeparator thick={true} />
+                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5, width: Dimensions.get('window').width - 100 }}>
+                                        <AppText fontSize={20}>Allow Public Homebrew SubClasses</AppText>
+                                        <Switch value={this.state.homebrewSubClasses} onValueChange={() => {
+                                            if (this.state.homebrewSubClasses) {
+                                                this.setState({ homebrewSubClasses: false }, async () => {
+                                                    await AsyncStorage.setItem('showPublicSubClasses', "false")
+                                                })
+                                                return;
+                                            }
+                                            this.setState({ homebrewSubClasses: true }, async () => {
+                                                await AsyncStorage.setItem('showPublicSubClasses', "true");
                                             })
                                         }} />
                                     </View>

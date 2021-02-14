@@ -16,7 +16,7 @@ const CharacterSchema = mongoose.Schema({
         type: Number
     },
     height: {
-        type: Number
+        type: mongoose.Schema.Types.Mixed
     },
     weight: {
         type: Number
@@ -113,8 +113,14 @@ const CharacterSchema = mongoose.Schema({
     differentClassSpellsToPick: {
         type: Array
     },
+    addSpellAvailabilityByName: {
+        type: Array
+    },
     characterClass: {
         type: String,
+    },
+    addedRaceFeatures: {
+        type: Array,
     },
     characterClassId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -184,6 +190,11 @@ const CharacterSchema = mongoose.Schema({
         disadvantageStealth: { type: Boolean },
         armorType: { type: String },
         armorBonusesCalculationType: { type: String }
+    },
+    equippedShield: {
+        name: { type: String },
+        ac: { type: Number },
+        _id: { type: String },
     },
     equipment: { type: Array },
     currentWeapon: {

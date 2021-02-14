@@ -17,7 +17,6 @@ function getAllRaces(start, end, _id, raceType) {
 }
 
 function searchRaces(text, raceType, _id) {
-    console.log(raceType === 'null')
     if (raceType === 'true') {
         return Race.find({
             $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { visibleToEveryone: true }, { visibleToEveryone: { $exists: false } }],
@@ -25,7 +24,6 @@ function searchRaces(text, raceType, _id) {
         }).exec();
     }
     if (raceType === 'null' || raceType === 'false') {
-        console.log('fggggg')
         return Race.find({
             $or: [{ visibleToEveryone: { $eq: false } }, { visibleToEveryone: { $exists: false } }],
             $or: [{ user_id: { $eq: mongoose.Types.ObjectId(_id) } }, { user_id: { $exists: false } }],

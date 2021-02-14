@@ -31,7 +31,7 @@ export class AppPathAdditionalApply extends Component<{
     loadSkills: any, resetExpertiseSkills: any, loadArmors: any, loadWeapons: any, loadUnrestrictedMagic: any,
     isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any,
     pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any, loadSpellPickAvailability: any,
-    loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any
+    loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any, addSpellAvailabilityByName: any
 }> {
 
     render() {
@@ -54,7 +54,7 @@ export class AppPathAdditionalApply extends Component<{
                         loadUnrestrictedMagic={(magicNumber: number) => { this.props.loadUnrestrictedMagic(magicNumber) }} />
                 }
                 {this.props.pathItem.addMagicalAbilities &&
-                    <AppAddMagicToNonMagic character={this.props.character} pathType={this.props.pathItem.addMagicalAbilities}
+                    <AppAddMagicToNonMagic path={this.props.pathChosenObj} character={this.props.character} pathType={this.props.pathItem.addMagicalAbilities}
                         loadMagicalAbilities={(character: CharacterModel) => { this.props.loadCharacter(character) }} />
                 }
                 {this.props.pathItem.maneuvers &&
@@ -118,7 +118,7 @@ export class AppPathAdditionalApply extends Component<{
                 }
                 {this.props.pathItem.addSpellAvailability &&
                     <AppPathAddSpellPickAvailability character={this.props.character} path={this.props.pathChosen}
-                        spellList={this.props.pathItem.addSpellAvailability} loadSpells={(val: any) => { this.props.loadSpellPickAvailability(val) }} />
+                        spellList={this.props.pathItem.addSpellAvailability} loadSpells={(val: any) => { this.props.addSpellAvailabilityByName(val) }} />
                 }
                 {this.props.pathItem.pickSpecificSpellWithChoices &&
                     <AppPickSpecificSpellWithChoices character={this.props.character} spell={this.props.pathItem.pickSpecificSpellWithChoices}

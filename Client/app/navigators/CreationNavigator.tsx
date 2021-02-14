@@ -17,6 +17,12 @@ import { CustomRaceBaseArmorProf } from '../screens/RaceCreation/CustomRaceBaseA
 import { CustomRaceFinishScreen } from '../screens/RaceCreation/CustomRaceFinishScreen';
 import { CustomRaceBackImage } from '../screens/RaceCreation/CustomRaceBackImage';
 import { CustomRaceBonusAC } from '../screens/RaceCreation/CustomRaceBonusAC';
+import { CreationScreen } from '../screens/CreationScreen';
+import { CreateSubClass } from '../screens/SubClassCreation/CreateSubClass';
+import { LevelChartSetUp } from '../screens/SubClassCreation/LevelChartSetUp';
+import { AddLevelFeature } from '../screens/SubClassCreation/AddLevelFeature';
+import { EditSubClassFeature } from '../screens/SubClassCreation/EditSubClassFeature';
+import { CustomSubClassStart } from '../screens/SubClassCreation/CustomSubClassStart';
 
 
 const Stack = createStackNavigator();
@@ -31,6 +37,7 @@ const CreationNavigator = () => {
         cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
         headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
     }}>
+        <Stack.Screen options={{ title: "" }} name="CreationScreen" component={CreationScreen} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceStartScreen" component={CustomRaceStartScreen} />
         <Stack.Screen options={{ title: "" }} name="BasicRaceInfo" component={BasicRaceInfo} />
         <Stack.Screen options={{ title: "" }} name="RaceAttributeBonus" component={RaceAttributeBonus} />
@@ -46,6 +53,13 @@ const CreationNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="CustomRaceFinishScreen" component={CustomRaceFinishScreen} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceBackImage" component={CustomRaceBackImage} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceBonusAC" component={CustomRaceBonusAC} />
+
+
+        <Stack.Screen options={{ title: "" }} name="CreateSubClass" component={CreateSubClass} />
+        <Stack.Screen options={{ title: "" }} name="CustomSubClassStart" component={CustomSubClassStart} />
+        <Stack.Screen options={{ title: "" }} name="LevelChartSetUp" component={LevelChartSetUp} />
+        <Stack.Screen options={{ title: "" }} name="AddLevelFeature" component={AddLevelFeature} />
+        <Stack.Screen options={{ headerShown: false }} name="EditSubClassFeature" component={EditSubClassFeature} />
     </Stack.Navigator>
 }
 

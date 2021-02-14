@@ -1,6 +1,7 @@
 import { AdventureModel } from "../models/AdventureModel";
 import { CharacterModel } from "../models/characterModel";
 import { RaceModel } from "../models/raceModel";
+import { SubClassModal } from "../models/SubClassModal";
 import { UserModel } from "../models/userModel";
 
 export class AppState {
@@ -15,6 +16,7 @@ export class AppState {
     public firstLoginAd: boolean
     public colorScheme: boolean
     public customRace: RaceModel
+    public customSubClass: SubClassModal
     public constructor() {
         this.colorScheme = false,
             this.nonUser = false;
@@ -27,5 +29,6 @@ export class AppState {
         this.participatingAdv = []
         this.leadingAdv = []
         this.customRace = new RaceModel()
+        this.customSubClass = new SubClassModal()
     }
 }

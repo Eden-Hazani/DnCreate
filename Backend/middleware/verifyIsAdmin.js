@@ -15,6 +15,7 @@ function verifyIsAdmin(request, response, next) {
         response.status(401).send("You are not logged in")
     }
     jwt.verify(token, config.jwt.secretKey, (err, payload) => {
+        console.log(payload)
         if (err) {
             if (err.message === 'jwt expired') {
                 response.status(403).send("Your Logging session has expired")

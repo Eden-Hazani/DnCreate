@@ -278,13 +278,31 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                     index++
                 }
             }
+            if (character.addSpellAvailabilityByName && character.addSpellAvailabilityByName.length > 0 && character.addSpellAvailabilityByName.includes(this.state.pickedSpell.name) && !this.state.pickedSpell.classes.includes(character.characterClass.toLowerCase())) {
+                const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
+                if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
+                    alert('You already possess this spell');
+                    return;
+                }
+                if (character.spells) {
+                    character.spells[spellLevel].push({ spell: this.state.pickedSpell, removable: true });
+                    this.setState({ character, confirmed: true }, () => {
+                        setTimeout(() => {
+                            this.setState({ pickSpellModal: false, pickedSpell: null, confirmed: false })
+                        }, 1200);
+                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                    })
+                    return;
+                }
+            }
             const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
             if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
                 alert('You already possess this spell');
                 return;
             }
             const checkIfTrue = checkSpellSlots(this.state.character, this.state.pickedSpell)
-            if (!checkHigherWarlockSpells(this.state.character, this.state.pickedSpell)) {
+            if (this.state.character.characterClass === "Warlock" && !checkHigherWarlockSpells(this.state.character, this.state.pickedSpell)) {
                 alert(`As a Warlock your Mystic Arcanum ability only allows one ${this.state.pickedSpell.level}th level spell`);
                 return;
             }
@@ -402,17 +420,20 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                             })
                                         }} />
                                         <AppText>Use the slider to filter the highest spell level you want.</AppText>
-                                        {this.state.sliderLevelVal > 0 && <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
+                                        {this.state.sliderLevelVal === 0 ? <AppText>Spell Level cantrip</AppText> : <AppText>Spell Level {this.state.sliderLevelVal}</AppText>}
                                         <Slider
                                             disabled={!this.state.sliderLevelFilter}
                                             style={{ width: 200, height: 40 }}
-                                            minimumValue={1}
+                                            minimumValue={0}
                                             step={1}
                                             maximumValue={9}
                                             thumbTintColor={Colors.bitterSweetRed}
                                             minimumTrackTintColor={Colors.bitterSweetRed}
                                             maximumTrackTintColor={Colors.berries}
-                                            onValueChange={(val) => {
+                                            onValueChange={(val: any) => {
+                                                if (val == 0) {
+                                                    val = 'cantrip'
+                                                }
                                                 this.setState({ sliderLevelVal: val })
                                             }}
                                             onSlidingComplete={() => {
@@ -463,13 +484,13 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         </View>
                         <Modal visible={this.state.pickSpellModal} >
                             {this.state.pickSpellModal &&
-                                <View>
+                                <View style={{ flex: 1 }}>
                                     {this.state.confirmed ?
                                         <AppConfirmation visible={this.state.confirmed} />
                                         :
-                                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                        <ScrollView style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
                                             {this.state.character.magic ?
-                                                <View style={{ backgroundColor: Colors.pageBackground }}>
+                                                <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
                                                     <View style={{ padding: 10, backgroundColor: Colors.pageBackground }}>
                                                         <AppText fontSize={25} padding={15} color={Colors.berries} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
                                                         <AppText fontSize={17} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description.replace(/\. /g, '.\n\n')}</AppText>
@@ -510,10 +531,10 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                                                                     <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>This Spell is out of your level, you will be able to pick this spell once you reach {spellLevelReadingChanger(this.state.pickedSpell.level)}</AppText>
                                                                 </View>
                                                             : null}
-                                                    </View>
-                                                    <View style={{ margin: 15, backgroundColor: Colors.pageBackground }}>
-                                                        <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                                            title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
+                                                        <View style={{ margin: 15, backgroundColor: Colors.pageBackground }}>
+                                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                                                title={'Close'} onPress={() => this.setState({ pickSpellModal: false })} />
+                                                        </View>
                                                     </View>
                                                 </View>
                                                 :

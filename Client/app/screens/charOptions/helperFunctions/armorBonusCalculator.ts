@@ -60,6 +60,9 @@ export function armorBonusCalculator(character: CharacterModel, armorAc: number,
     if (character.race === "Lizardfolk" && armorBonusesCalculationType === "none" && character.characterClass !== "Monk" && character.characterClass !== "Barbarian") {
         newArmorAc = 13 + +dex;
     }
+    if (character.equippedShield && character.equippedShield.ac && character.equippedShield.ac !== 0) {
+        newArmorAc = newArmorAc + character.equippedShield.ac
+    }
     return newArmorAc
 }
 

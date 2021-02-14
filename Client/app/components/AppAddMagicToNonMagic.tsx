@@ -7,11 +7,12 @@ import { store } from '../redux/store';
 import { addMagicToChar } from '../screens/charOptions/helperFunctions/AddMagicToChar';
 import { AppText } from './AppText';
 
-export class AppAddMagicToNonMagic extends Component<{ character: CharacterModel, loadMagicalAbilities: any, pathType: string }>{
+export class AppAddMagicToNonMagic extends Component<{ path: any, character: CharacterModel, loadMagicalAbilities: any, pathType: string }>{
     componentDidMount() {
         try {
-            this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType))
+            this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType, this.props.path))
         } catch (err) {
+            // console.log(err)
             logger.log(new Error(err))
         }
     }
@@ -32,6 +33,11 @@ export class AppAddMagicToNonMagic extends Component<{ character: CharacterModel
                         <AppText textAlign={'center'} fontSize={18}>{this.props.pathType}s use magical techniques similar to those practiced by wizards. and so your spellcasting ability is Intelligence.</AppText>
                         <AppText textAlign={'center'} fontSize={18}>You learn two cantrips of your choice from the wizard spell list and the cantrip Mage Hand is automatically added to your known cantrips.</AppText>
                         <AppText textAlign={'center'} fontSize={18}>At this level you have 2 spell slots for 1st level spell casting (this will increase as you level up) and a total of 3 known spells.</AppText>
+                    </View>
+                }{
+                    this.props.pathType === 'Custom' &&
+                    <View>
+                        <AppText textAlign={'center'} fontSize={18}>This path provides you with magical techniques similar to those practiced by {this.props.path.levelUpChart[this.props.character.level as any][1].spellCastingClass}s.</AppText>
                     </View>
                 }
             </View>

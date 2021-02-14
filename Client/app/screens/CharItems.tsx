@@ -253,10 +253,10 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                     value={this.state.search}
                 />
                 {this.state.character.items.length > 0 && this.state.searchedItems.length === 0 ?
-                    <View style={{ marginBottom: Dimensions.get('screen').height / 1.5 }}>
+                    <View style={{ paddingBottom: Dimensions.get('screen').height / 1.3 }}>
                         <FlatList
                             data={this.state.character.items}
-                            keyExtractor={stats => stats.toString()}
+                            keyExtractor={(status, index) => index.toString()}
                             renderItem={({ item }) => <ListItem
                                 title={`Item - ${item[0]}`}
                                 subTitle={`Amount -  ${item[1]}`}
@@ -281,7 +281,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                     </View>
                     : null}
                 {this.state.character.items.length > 0 && this.state.searchedItems.length > 0 ?
-                    <View style={{ marginBottom: Dimensions.get('screen').height / 1.5 }}>
+                    <View >
                         <FlatList
                             data={this.state.searchedItems}
                             keyExtractor={(stats, index) => index.toString()}

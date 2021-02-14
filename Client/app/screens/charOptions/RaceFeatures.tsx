@@ -61,8 +61,11 @@ export class RaceFeatures extends Component<{ route: any }, RaceFeaturesState> {
                                     <AppText fontSize={22}>{item.name}</AppText>
                                     <AppText fontSize={17}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                                 </View>)
-
                         }
+                        {this.state.character.addedRaceFeatures?.map((item, index) => <View key={index} style={styles.featureItem}>
+                            <AppText fontSize={22}>{item.name}</AppText>
+                            <AppText fontSize={17}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
+                        </View>)}
                     </View>
                 }
             </ScrollView>

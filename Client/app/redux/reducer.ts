@@ -134,6 +134,10 @@ export function reduce(currentState: AppState | undefined = initialState, action
             break;
         case ActionType.cleanCustomRace:
             newState.customRace = new RaceModel()
+            break;
+        case ActionType.UpdateSubclass:
+            newState.customSubClass = action.payload
+            break;
         default: break;
     }
 

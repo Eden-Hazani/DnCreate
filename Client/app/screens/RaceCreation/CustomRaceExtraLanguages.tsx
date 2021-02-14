@@ -133,7 +133,7 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <AppText textAlign={'center'}>Extra Languages amount</AppText>
-                                    <NumberScroll
+                                    <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem}
                                         max={50} getValue={(amount: number) => {
                                             const customRace = { ...this.state.customRace };

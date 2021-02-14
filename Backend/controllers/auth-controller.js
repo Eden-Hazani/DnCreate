@@ -136,7 +136,13 @@ router.get('/activate/:token', async (request, response) => {
                     }
                     return response.status(400).json({ error: err.message })
                 }
-                const verify = await authLogic.validateRegister(decodedToken.userInfo.username);
+                let verify;
+                if (typeof (decodedToken.userInfo) !== 'string') {
+                    verify = await authLogic.validateRegister(decodedToken.userInfo.username);
+                }
+                if (typeof (decodedToken.userInfo) === 'string') {
+                    verify = await authLogic.validateRegister(JSON.parse(decodedToken.userInfo).username);
+                }
                 if (verify.activated) {
                     return response.status(403).send('User has already been activated')
                 }

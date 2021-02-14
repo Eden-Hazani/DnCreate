@@ -41,6 +41,8 @@ const raceSchema = mongoose.Schema({
     addedSpells: { type: Array },
     addedACPoints: { type: Number },
     baseAddedTools: { type: Array },
+    userPickedFeatures: { type: Array },
+    numberOfFeaturesToPick: { type: Number },
     visibleToEveryone: { type: Boolean },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,

@@ -30,6 +30,8 @@ import { addRacialSpells } from './helperFunctions/addRacialSpells';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
 import { RaceModel } from '../../models/raceModel';
+import subClassesApi from '../../api/subClassesApi';
+import { SubClassList } from './SubClassList';
 
 
 interface LevelUpOptionsState {
@@ -89,7 +91,8 @@ interface LevelUpOptionsState {
     newPathChoice: any
     customPathFeatureList: any[],
     numberOfChoices: number,
-    spellListToLoad: any
+    spellListToLoad: any,
+    addSpellAvailabilityByName: string[]
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
@@ -97,6 +100,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     constructor(props: any) {
         super(props)
         this.state = {
+            addSpellAvailabilityByName: [],
             armorToLoad: null,
             specificSpell: null,
             specificSpellToLoad: false,
@@ -208,12 +212,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
                 const beforeAnyChanges = JSON.parse(JSON.stringify(character))
                 this.setState({ character, beforeAnyChanges }, async () => {
-                    if (this.props.character.level === 1 && this.props.character.race !== undefined) {
-                        addRacialSpells(this.props.character.raceId || new RaceModel()).forEach(item => {
+                    if (this.props.character.race !== undefined) {
+                        addRacialSpells(this.props.character.raceId || new RaceModel(), this.state.character).forEach(item => {
                             const spell = spellsJSON.find(spell => spell.name === item)
                             if (spell && character.spells !== undefined && character.magic !== undefined && this.state.character.magic !== undefined) {
                                 const spellLevel = spellLevelChanger(spell.level)
                                 character.spells[spellLevel].push({ spell: spell, removable: false });
+                                character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
                                 character.magic[spellLevel] = this.state.character.magic[spellLevel] + 1;
                             }
                         })
@@ -224,13 +229,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
                 })
             }
-            if (this.props.character.level === 1 && !(this.props.options.spells || this.props.options.spellsKnown)) {
+            if (!(this.props.options.spells || this.props.options.spellsKnown)) {
                 if (this.props.character.race) {
-                    addRacialSpells(this.props.character.raceId || new RaceModel()).forEach(item => {
+                    addRacialSpells(this.props.character.raceId || new RaceModel(), this.state.character).forEach(item => {
                         const spell = spellsJSON.find(spell => spell.name === item)
                         if (spell && character.spells !== undefined) {
                             const spellLevel = spellLevelChanger(spell.level)
                             character.spells[spellLevel].push({ spell: spell, removable: false });
+                            character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
                         }
                     })
                 }
@@ -1002,6 +1008,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     }
                 }
             }
+            if (this.state.addSpellAvailabilityByName.length > 0) {
+                for (let item of this.state.addSpellAvailabilityByName) {
+                    if (character.addSpellAvailabilityByName) {
+                        character.addSpellAvailabilityByName.push(item)
+                    }
+                }
+            }
             if (this.props.options.monkMartialArts && character.charSpecials) {
                 character.charSpecials.kiPoints = this.props.options.kiPoints
                 character.charSpecials.martialPoints = this.props.options.monkMartialArts
@@ -1085,20 +1098,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
 
     extractCustomPathJson = async (pathName: any) => {
         try {
-            const json = await AsyncStorage.getItem(`${this.props.character.characterClass}-CustomPathFeatures`);
-            if (this.props.options.pathFeature && json) {
-                const strArray = JSON.parse(json);
-                let levelFeatures: any = [];
-                for (let item of strArray) {
-                    if (pathName === Object.keys(JSON.parse(item))[0] && this.state.character.level) {
-                        const currentLevel = JSON.parse(item)[pathName].find((item: any) => item[this.state.character.level ? this.state.character.level : 0])
-                        currentLevel[this.state.character.level].forEach((feature: any, index: number) => levelFeatures.push(feature))
-                    }
-                    // Pathname
-                    // Level
-                }
-                this.setState({ customPathFeatureList: levelFeatures })
-                // return levelFeatures
+            const path: any = await subClassesApi.getSubclass(pathName)
+            if (this.props.options.pathFeature && path.data && this.state.character.level) {
+                this.setState({ customPathFeatureList: Object.values(path.data.levelUpChart[this.state.character.level]) })
             }
         } catch (err) {
             logger.log(new Error(err))
@@ -1143,17 +1145,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                     <AppText fontSize={18} textAlign={'center'}>It is highly recommended to search the many guides online in order to find the path that suites you best.</AppText>
                                     <AppText fontSize={18} textAlign={'center'}>As you level up the path you chose will provide you with spacial bonuses.</AppText>
                                 </View>
-                                <View style={{ flexDirection: "row", flexWrap: 'wrap' }}>
-                                    {this.props.options.pathSelector.map((path: any, index: number) =>
-                                        <TouchableOpacity key={index} onPress={() => this.pickPath(path, index)} style={[styles.item, { backgroundColor: this.state.pathClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
-                                            <AppText color={this.state.pathClicked[index] ? Colors.black : Colors.bitterSweetRed} textAlign={'center'} fontSize={22}>{path.name}</AppText>
-                                            <AppText fontSize={18}>{path.description.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
-                                            {path.restriction && <View>
-                                                <AppText textAlign={'center'} color={this.state.pathClicked[index] ? Colors.black : Colors.danger} fontSize={24}>Restrictions</AppText>
-                                                <AppText textAlign={'center'} color={this.state.pathClicked[index] ? Colors.black : Colors.danger} fontSize={18}>{path.restriction.replace(/\. /g, '.\n\n').replace(/\: /g, ':\n')}</AppText>
-
-                                            </View>}
-                                        </TouchableOpacity>)}
+                                <View style={{ flex: 1 }}>
+                                    <SubClassList pathClicked={this.state.pathClicked} pickPath={(item: any, index: number) => this.pickPath(item, index)}
+                                        baseSubClassList={this.props.options.pathSelector} baseClass={this.state.character.characterClass} />
                                 </View>
                             </View>
                             :
@@ -1252,6 +1246,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                         <AppPathAdditionalApply
                                                             updateSpellList={(val: any) => { this.setState({ spellListToLoad: val }) }}
                                                             loadSpellPickAvailability={(val: any) => { this.setState({ newSpellAvailabilityList: val }) }}
+                                                            addSpellAvailabilityByName={(val: any) => { this.setState({ addSpellAvailabilityByName: val }) }}
                                                             armorToLoad={(val: any) => { this.setState({ armorToLoad: val }) }}
                                                             loadCharacter={(val: CharacterModel) => { this.setState({ character: val }) }}
                                                             languagesToPick={(val: boolean) => { this.setState({ languageToPick: val }) }}

@@ -1,0 +1,16 @@
+{
+    "classList": [
+        "Barbarian",
+        "Bard",
+        "Druid",
+        "Fighter",
+        "Ranger",
+        "Rogue",
+        "Wizard",
+        "Warlock",
+        "Sorcerer",
+        "Monk",
+        "Paladin",
+        "Cleric"
+    ]
+}

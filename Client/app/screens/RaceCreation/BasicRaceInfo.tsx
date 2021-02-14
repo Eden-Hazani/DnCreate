@@ -164,7 +164,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
                                     placeholder={"Languages Description..."} />
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <AppText textAlign={'center'}>Movement speed</AppText>
-                                    <NumberScroll max={50}
+                                    <NumberScroll modelColor={Colors.pageBackground} max={50}
                                         startingVal={speedState}
                                         getValue={(speed: number) => { this.setState({ speed }) }} />
                                 </View>

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -8,6 +8,8 @@ import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import InformationDrawer from '../../components/InformationDrawer';
+import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
@@ -18,7 +20,11 @@ interface CharPersonalityTraitsState {
     characterInfo: CharacterModel
     confirmed: boolean
     updateTraits: boolean
+    openAutoComplete: boolean[]
 }
+
+const fillingList: string[] = ['Nothing can shake my optimistic attitude', "I idolize a particular hero of my faith and constantly refer to that person's deeds and example",
+    "Flattery is my preferred trick for getting what I want", "I pocket anything I see that might have some value", "I blow up at the slightest insult", "My favor, once lost, is lost forever"]
 
 export class CharPersonalityTraits extends Component<{ route: any, navigation: any, updateTraits: boolean }, CharPersonalityTraitsState>{
     private UnsubscribeStore: Unsubscribe;
@@ -26,6 +32,7 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
     constructor(props: any) {
         super(props)
         this.state = {
+            openAutoComplete: [],
             baseState: '',
             updateTraits: this.props.route.params.updateTraits,
             confirmed: false,
@@ -143,6 +150,32 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
         });
     }
 
+    changeAutoCompleteState = (index: number, action: boolean) => {
+        const openAutoComplete = this.state.openAutoComplete;
+        openAutoComplete[index] = action;
+        console.log(openAutoComplete)
+        this.setState({ openAutoComplete })
+    }
+
+    generateJSX = (traits: any) => {
+        let jsxList: any[] = [];
+        for (let i: number = 0; i < 6; i++) {
+            jsxList.push(<View key={i}>
+                <AppTextInput
+                    onBlur={() => this.changeAutoCompleteState(i, false)}
+                    onFocus={() => this.changeAutoCompleteState(i, true)} value={traits ? traits[i] : ''}
+                    onChangeText={(trait: string) => { this.addTrait(trait, i) }} padding={10}
+                    placeholder={fillingList[i]} width={"80%"} />
+                <TextInputDropDown sendText={(val: string) => {
+                    this.changeAutoCompleteState(i, false)
+                    this.addTrait(val, i)
+                }} expendedWidth={Dimensions.get('window').width / 1.2} expendedHeight={450}
+                    information={fillingList} isOpen={this.state.openAutoComplete[i]} />
+            </View>)
+        }
+        return jsxList
+    }
+
     render() {
         const traits = this.state.characterInfo.personalityTraits;
         return (
@@ -153,12 +186,7 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
                             <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={"center"}>Personality Traits</AppText>
                             <AppText fontSize={18} textAlign={"center"}>Here you can write up to six of your characters personality traits, (the recommended number is two) </AppText>
                         </View>
-                        <AppTextInput value={traits ? traits[0] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 0) }} padding={10} placeholder={"I idolize a particular hero of my faith and constantly refer to that person's deeds and example..."} width={"80%"} />
-                        <AppTextInput value={traits ? traits[1] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 1) }} padding={10} placeholder={'Nothing can shake my optimistic attitude....'} width={"80%"} />
-                        <AppTextInput value={traits ? traits[2] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 2) }} padding={10} placeholder={'Flattery is my preferred trick for getting what I want....'} width={"80%"} />
-                        <AppTextInput value={traits ? traits[3] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 3) }} padding={10} placeholder={'I pocket anything I see that might have some value...'} width={"80%"} />
-                        <AppTextInput value={traits ? traits[4] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 4) }} padding={10} placeholder={'I blow up at the slightest insult....'} width={"80%"} />
-                        <AppTextInput value={traits ? traits[5] : ''} onChangeText={(trait: string) => { this.addTrait(trait, 5) }} padding={10} placeholder={'My favor, once lost, is lost forever....'} width={"80%"} />
+                        {this.generateJSX(traits)}
                         <View style={{ paddingBottom: 25 }}>
                             {this.state.updateTraits ?
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
