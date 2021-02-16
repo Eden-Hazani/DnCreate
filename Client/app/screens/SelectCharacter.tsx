@@ -166,6 +166,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows()
+            await AsyncStorage.removeItem('newPlayer')
             if (!await AsyncStorage.getItem('newPlayer')) {
                 Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
                     [{

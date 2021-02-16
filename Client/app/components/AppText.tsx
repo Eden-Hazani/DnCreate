@@ -28,7 +28,7 @@ export class AppText extends Component<any, any> {
                 fontWeight: this.props.fontWeight,
                 width: this.props.width,
                 flex: this.props.flex,
-                fontSize: this.props.fontSize && PixelRatio.get() <= 2.7 ? this.props.fontSize * .8 : this.props.fontSize,
+                fontSize: this.props.fontSize && PixelRatio.get() <= 2.7 ? this.props.fontSize * .95 : this.props.fontSize,
                 padding: this.props.padding,
                 textAlign: this.props.textAlign,
                 fontFamily: "KumbhSans-Light",

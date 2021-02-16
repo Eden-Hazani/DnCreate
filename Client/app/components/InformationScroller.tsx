@@ -8,7 +8,6 @@ import { Colors } from '../config/colors';
 
 
 const { width, height } = Dimensions.get('window')
-// const height = Dimensions.get('window').scale < 3 ? (height - 25) : height;
 const Indicator = ({ scrollY, items }: any) => {
     return (
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: "flex-end", zIndex: 40, width: 30 }}>
@@ -65,7 +64,7 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
 
     return (
         <View style={[styles.itemStyle, {
-            backgroundColor: Colors.pageBackground, flex: 1, width, height: height - 25,
+            backgroundColor: Colors.pageBackground, flex: 1, width, height: height
         }]}>
             <Animated.Text style={[styles.heading,
             { transform: [{ translateY: translateYHeadline }], color: Colors.bitterSweetRed }
@@ -103,8 +102,11 @@ export default function InformationScroller({ PressClose, list }: any) {
                 style={{ zIndex: 10, flex: 1 }}
                 keyExtractor={(item: any, index: any) => index.toString()}
                 data={list}
+                decelerationRate={0.87}
+                snapToAlignment={"start"}
+                pagingEnabled={true}
+                snapToInterval={Dimensions.get('window').height}
                 renderItem={({ item, index }: any) => <Item {...item} index={index} scrollY={scrollY} PressClose={PressClose} />}
-                pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 scrollEnabled={true}
@@ -127,10 +129,8 @@ const styles = StyleSheet.create({
         height
     },
     itemStyle: {
-        justifyContent: "flex-start",
         flex: 1,
-        height,
-        alignItems: "center"
+        alignItems: "center",
     },
     textContainer: {
         alignItems: 'center',

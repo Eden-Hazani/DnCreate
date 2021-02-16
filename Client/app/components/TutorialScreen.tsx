@@ -43,7 +43,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
             <View style={[styles.container, { height: this.percentage(700, this.props.pageHeight) }]}>
                 {this.state.tutorialStage[0] &&
                     <TouchableOpacity onPress={() => this.moveStage(0, { x: 0, y: this.percentage(30, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(5, this.props.pageHeight), left: 10 }}>
+                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(5, this.props.pageHeight), left: 10 }}>
                         <View style={[styles.item, { borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Main attributes.</AppText>
                             <AppText fontSize={15} color={'white'}>Here you have access to your characters main attributes</AppText>
@@ -56,7 +56,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
                 {this.state.tutorialStage[1] &&
                     <TouchableOpacity onPress={() => this.moveStage(1, { x: 0, y: this.percentage(120, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(30, this.props.pageHeight), left: 10 }}>
+                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(30, this.props.pageHeight), left: 10 }}>
                         <View style={[styles.item, { borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Information Circles.</AppText>
                             <AppText fontSize={15} color={'white'}>- Here you have access most of your characters information</AppText>
@@ -73,7 +73,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                 {this.state.tutorialStage[2] &&
                     <TouchableOpacity
                         onPress={() => this.moveStage(2, { x: 0, y: this.percentage(200, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(120, this.props.pageHeight), left: 90 }}>
+                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(120, this.props.pageHeight), left: 90 }}>
                         <View style={{ alignSelf: "center", bottom: 70 }}>
                             <IconGen name={'chevron-left'} size={70} iconColor={"white"} />
                         </View>
@@ -86,7 +86,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
                 {this.state.tutorialStage[3] &&
                     <TouchableOpacity onPress={() => this.moveStage(3, { x: 0, y: this.percentage(300, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(220, this.props.pageHeight), left: 10 }}>
+                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(220, this.props.pageHeight), left: 10 }}>
                         <View style={[styles.item, { borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Saving Throws and dice info</AppText>
                             <AppText fontSize={15} color={'white'}>Here you have access all of your characters proficiency information</AppText>
@@ -100,7 +100,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
 
                 {this.state.tutorialStage[4] &&
                     <TouchableOpacity onPress={() => this.moveStage(4, { x: 0, y: this.percentage(350, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(350, this.props.pageHeight), left: 80 }}>
+                        style={{ width: '100%', height: 150, flexDirection: 'row', top: this.percentage(350, this.props.pageHeight), left: 80 }}>
                         <View style={{ alignSelf: "baseline", bottom: 70 }}>
                             <IconGen name={'chevron-left'} size={70} iconColor={"white"} />
                         </View>
@@ -123,7 +123,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
                 {this.state.tutorialStage[6] &&
                     <TouchableOpacity onPress={() => this.props.end()}
-                        style={{ top: this.percentage(385, this.props.pageHeight) }}>
+                        style={{ width: '100%', height: 150, top: this.percentage(385, this.props.pageHeight) }}>
                         <View style={[styles.item, { width: width * 0.9, borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Magic</AppText>
                             <AppText fontSize={15} color={'white'}>If you have access to spellcasting abilities you can use the magic section of DnCreate's character sheet to manage your spells and spell slots.</AppText>
