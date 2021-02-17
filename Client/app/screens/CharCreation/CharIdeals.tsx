@@ -147,7 +147,6 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
     changeAutoCompleteState = (index: number, action: boolean) => {
         const openAutoComplete = this.state.openAutoComplete;
         openAutoComplete[index] = action;
-        console.log(openAutoComplete)
         this.setState({ openAutoComplete })
     }
 

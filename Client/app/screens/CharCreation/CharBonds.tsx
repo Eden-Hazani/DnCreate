@@ -152,7 +152,6 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
     changeAutoCompleteState = (index: number, action: boolean) => {
         const openAutoComplete = this.state.openAutoComplete;
         openAutoComplete[index] = action;
-        console.log(openAutoComplete)
         this.setState({ openAutoComplete })
     }
 

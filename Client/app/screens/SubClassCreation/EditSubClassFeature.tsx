@@ -102,7 +102,6 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                     }} />
 
                 {/* add magic to nonMagic */}
-                {console.log(customPathLevelList[store.getState().customSubClass.baseClass || ""][0] === this.props.route.params.featureLevel)}
                 {(!charCanSpellCast(store.getState().customSubClass.baseClass || "") && customPathLevelList[store.getState().customSubClass.baseClass || ""][0] === this.props.route.params.featureLevel &&
                     this.props.route.params.featureNumber === 1) &&
                     <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, padding: 15, margin: 10 }}>

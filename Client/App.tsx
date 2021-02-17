@@ -15,7 +15,6 @@ import AppLoading from 'expo-app-loading';
 import { ActionType } from './app/redux/action-type';
 import JwtDecode from 'jwt-decode';
 import TokenHandler from './app/auth/TokenHandler';
-import { AdMobBanner, AdMobInterstitial } from 'expo-ads-admob'
 import { Config } from './config';
 import authApi from './app/api/authApi';
 import errorHandler from './utility/errorHander';

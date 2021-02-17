@@ -31,7 +31,6 @@ export class SkillOrToolPick extends Component<{ skillOrTool: string, isExpertis
 
 
     componentDidMount() {
-        console.log(this.props.skillOrTool)
         const ItemClicked = this.state.ItemClicked;
         for (let item of this.props.itemsAdded) {
             if (this.state.baseList.includes(item)) {

@@ -45,7 +45,6 @@ export class SubClassList extends Component<{ baseClass: string, baseSubClassLis
                 subclassType
             }
             const subClasses: any = await subClassesApi.getSubclassList(searchObj)
-            console.log(subClasses.data)
             const newSubClasses = data.concat(subClasses.data)
             this.setState({ currentLoaded: this.state.currentLoaded + 10, data: newSubClasses })
         } catch (err) {
@@ -122,7 +121,6 @@ export class SubClassList extends Component<{ baseClass: string, baseSubClassLis
                                 <TouchableOpacity
                                     onLayout={(event) => {
                                         const { x, y, width, height } = event.nativeEvent.layout;
-                                        console.log(height)
                                     }}
                                     onPress={() => {
                                         this.setState({ pathChosen: item, pickedIndex: index })

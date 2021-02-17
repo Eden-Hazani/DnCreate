@@ -66,7 +66,6 @@ export class AddFeaturesToRace extends Component<{ navigation: any, route: any }
             }
         }
         this.setState({ characterInfo }, () => {
-            console.log(this.state.characterInfo)
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
             setTimeout(() => {
                 if (this.state.race.changeBaseAttributePoints?.changePoints) {

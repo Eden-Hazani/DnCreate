@@ -40,6 +40,9 @@ import { PersonalInfo } from '../components/PersonalInfo';
 import { RaceModel } from '../models/raceModel';
 import { ChangeMaxHp } from '../components/ChangeMaxHp';
 import { TutorialScreen } from '../components/TutorialScreen';
+import { ExperienceCalculator } from '../components/ExperienceCalculator';
+
+
 /**
  * 
  * @param  image: image url-string || URI
@@ -100,6 +103,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             isDm: this.props.route.params.isDm
         }
         this.UnsubscribeStore = store.subscribe(() => {
+            this.setState({ character: store.getState().character })
         })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
         this.scrollView
@@ -166,7 +170,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows()
-            await AsyncStorage.removeItem('newPlayer')
             if (!await AsyncStorage.getItem('newPlayer')) {
                 Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
                     [{
@@ -304,6 +307,35 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 }
             }, { text: 'No' }])
         }
+    }
+
+    levelUpByExperience = async (level: number) => {
+        let validLevel: number = level;
+        if (level > 20) {
+            validLevel = 20;
+            const character = { ...this.state.character };
+            character.level = validLevel;
+            this.setState({ character })
+            return;
+        }
+        if (level < 0) {
+            validLevel = 1;
+            const character = { ...this.state.character };
+            character.level = validLevel;
+            this.setState({ character })
+            return;
+        }
+        const character = { ...this.state.character };
+        if (!character.path) {
+            character.path = null
+        }
+        await AsyncStorage.setItem(`current${this.state.character._id}level${this.state.character.level}`, JSON.stringify(character));
+        character.level = validLevel;
+        this.setState({ character, currentLevel: validLevel }, () => {
+            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            this.levelUp();
+            this.setState({ currentProficiency: switchProficiency(this.state.currentLevel) })
+        })
     }
 
     skillCheck = (skill: string) => {
@@ -526,6 +558,16 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
+                        <Animated.View style={this.state.startingAnimations[5].getLayout()}>
+                            <View style={{ position: 'relative', marginTop: 10, marginBottom: 10 }}>
+                                <ExperienceCalculator issueLevelUp={() => {
+                                    this.levelUpByExperience((this.state.character.level || 0) + 1)
+                                }}
+                                    character={this.state.character} currentExperience={this.state.character.currentExperience || 0}
+                                    goalLevel={(this.state.character.level || 0) + 1} />
+
+                            </View>
+                        </Animated.View>
                         <View pointerEvents={this.state.tutorialZIndex[1] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[1] ? 10 : 0 }}>
                             <Animated.View style={[this.state.startingAnimations[4].getLayout(), styles.secRowIconContainer]}>
                                 <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>

@@ -151,7 +151,6 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
     changeAutoCompleteState = (index: number, action: boolean) => {
         const openAutoComplete = this.state.openAutoComplete;
         openAutoComplete[index] = action;
-        console.log(openAutoComplete)
         this.setState({ openAutoComplete })
     }
 

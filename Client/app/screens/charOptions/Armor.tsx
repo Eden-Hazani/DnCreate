@@ -235,7 +235,6 @@ export class Armor extends Component<{ navigation: any, route: any }, ArmorState
 
     equipShield = (shield: any) => {
         try {
-            console.log(shield)
             const character = { ...this.state.character };
             character.equippedShield = shield;
             this.setState({ character }, () => {

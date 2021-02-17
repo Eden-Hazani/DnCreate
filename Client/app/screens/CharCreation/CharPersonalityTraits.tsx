@@ -153,7 +153,6 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
     changeAutoCompleteState = (index: number, action: boolean) => {
         const openAutoComplete = this.state.openAutoComplete;
         openAutoComplete[index] = action;
-        console.log(openAutoComplete)
         this.setState({ openAutoComplete })
     }
 

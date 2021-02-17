@@ -51,7 +51,6 @@ const Item = ({ scrollY, index, headline, leftTextBlock, rightTextBlock, ImgUrl,
         inputRange,
         outputRange: [-width, 0, -width]
     })
-    console.log(translateXRTB)
     const translateXLTB = scrollY.interpolate({
         inputRange,
         outputRange: [width, 0, +width]

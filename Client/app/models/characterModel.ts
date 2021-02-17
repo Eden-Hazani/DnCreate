@@ -69,6 +69,7 @@ export class CharacterModel {
         public currentWeapon?: WeaponModal,
         public equipment?: EquipmentModal[],
         public addSpellAvailabilityByName?: string[],
+        public currentExperience?: number,
         public addedRaceFeatures?: any[]
     ) {
         if (!modifiers) {

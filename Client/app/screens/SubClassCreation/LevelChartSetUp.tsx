@@ -52,7 +52,6 @@ export class LevelChartSetUp extends Component<{ navigation: any }, LevelChartSe
                 let index: number = 0;
                 for (let item of featureObj) {
                     if (!item.name || !item.description || item.name === "" || item.description === "") {
-                        console.log(preCheckSubClass.levelUpChart[level])
                         delete preCheckSubClass.levelUpChart[level][index + 1]
                     }
                     index++

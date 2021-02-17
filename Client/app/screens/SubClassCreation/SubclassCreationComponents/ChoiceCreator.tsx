@@ -24,7 +24,6 @@ export class ChoiceCreator extends Component<{ closeModal: any, existingChoices:
         }
     }
     approveChoices = () => {
-        console.log(this.state.amountToPick)
         this.props.loadChoices({ choices: this.state.choices, amount: this.state.amountToPick })
     }
 
@@ -54,7 +53,7 @@ export class ChoiceCreator extends Component<{ closeModal: any, existingChoices:
                         onChangeText={(name: string) => {
                             const choices = this.state.choices
                             choices[index].name = name
-                            this.setState({ choices }, () => console.log(this.state.choices))
+                            this.setState({ choices })
                         }}
                         placeholder={"Choice Name"}
                         defaultValue={this.state.choices[index].name}
@@ -63,7 +62,7 @@ export class ChoiceCreator extends Component<{ closeModal: any, existingChoices:
                         onChangeText={(description: string) => {
                             const choices = this.state.choices
                             choices[index].description = description
-                            this.setState({ choices }, () => console.log(this.state.choices))
+                            this.setState({ choices })
                         }}
                         placeholder={"Choice Description"}
                         defaultValue={this.state.choices[index].description}
@@ -77,7 +76,7 @@ export class ChoiceCreator extends Component<{ closeModal: any, existingChoices:
                         <AppText textAlign={'center'}>Choice Amount</AppText>
                         <NumberScroll modelColor={Colors.pageBackground} max={this.state.choices.length !== 0 ? this.state.choices.length : 1}
                             startingVal={this.props.amountToPick}
-                            getValue={(amountToPick: number) => { this.setState({ amountToPick }, () => console.log(amountToPick)) }} />
+                            getValue={(amountToPick: number) => { this.setState({ amountToPick }) }} />
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: "space-evenly", paddingBottom: 15 }}>

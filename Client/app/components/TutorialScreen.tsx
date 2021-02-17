@@ -28,7 +28,6 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
         tutorialStage[index + 1] = true
         this.props.zIndex(index + 1)
         this.props.changeScrollPosition({ x: XY.x, y: XY.y })
-        console.log(this.percentage(150, this.props.pageHeight))
         this.setState({ tutorialStage: tutorialStage })
     }
     percentage = (num: number, per: number) => {
@@ -45,10 +44,11 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     <TouchableOpacity onPress={() => this.moveStage(0, { x: 0, y: this.percentage(30, this.props.pageHeight) })}
                         style={{ width: '100%', flexDirection: 'row', top: this.percentage(5, this.props.pageHeight), left: 10 }}>
                         <View style={[styles.item, { borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
-                            <AppText fontSize={22} color={'white'}>Main attributes.</AppText>
+                            <AppText fontSize={22} color={'white'}>Main attributes and experience bar.</AppText>
                             <AppText fontSize={15} color={'white'}>Here you have access to your characters main attributes</AppText>
                             <AppText fontSize={15} color={'white'}>You can level up or down by short pressing or long pressing on the level circle respectively</AppText>
                             <AppText fontSize={15} color={'white'}>DnCreate auto rolls your max health points for you but if you wish to input for yourself just tap the max hp circle</AppText>
+                            <AppText fontSize={15} color={'white'}>Below is the XP button to extend your experience bar, if you wish to level up by experience points just enter your current points in the field below the bar and hit update xp</AppText>
                         </View>
                         <View style={{ alignSelf: "center", bottom: 70 }}>
                             <IconGen name={'chevron-right'} size={70} iconColor={"white"} />

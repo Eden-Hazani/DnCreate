@@ -9,7 +9,6 @@ export function addSpell(spellLevel: string, character: CharacterModel) {
         for (let i = 1; i <= warSlotLevel; i++) {
             slots.push(i);
         }
-        console.log(warSlotLevel)
         let result: boolean = false
         switch (true) {
             case character.magic && character.magic.cantrips && spellLevel.includes('cantrip'):

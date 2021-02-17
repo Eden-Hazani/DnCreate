@@ -126,7 +126,6 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
                         }
                     }}
                         style={[styles.square, { margin: 10, alignSelf: "center", borderColor: Colors.whiteInDarkMode }]}>
-                        {console.log(this.state.currentShield)}
                         {this.state.currentShield.name && this.state.currentShield.name !== null && this.state.currentShield.name !== "No Shield Equipped" ?
                             <View>
                                 <View style={{

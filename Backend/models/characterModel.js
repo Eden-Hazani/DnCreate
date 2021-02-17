@@ -179,6 +179,9 @@ const CharacterSchema = mongoose.Schema({
     addedArmorProf: {
         type: Array
     },
+    currentExperience: {
+        type: Number
+    },
     feats: {
         type: Array
     },

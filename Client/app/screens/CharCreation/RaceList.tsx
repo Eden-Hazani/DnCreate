@@ -177,7 +177,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
         })
         setTimeout(() => {
-            console.log(race.userPickedFeatures)
             if (race.userPickedFeatures && race.userPickedFeatures.length > 0) {
                 this.props.navigation.navigate("AddFeaturesToRace", { race: race });
                 return;

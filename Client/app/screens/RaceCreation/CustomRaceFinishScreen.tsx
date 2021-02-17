@@ -9,17 +9,25 @@ import { Colors } from '../../config/colors';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import LottieView from 'lottie-react-native';
+import { AdMobRewarded } from 'expo-ads-admob'
+import { AppActivityIndicator } from '../../components/AppActivityIndicator';
+import { Config } from '../../../config';
 
 interface CustomRaceFinishScreenState {
     racePublic: boolean
     finished: boolean
+    requestingAdConfirm: boolean
+    spamGuard: boolean
 }
 export class CustomRaceFinishScreen extends Component<{ navigation: any }, CustomRaceFinishScreenState>{
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
+            requestingAdConfirm: false,
             finished: false,
-            racePublic: false
+            racePublic: false,
+            spamGuard: false
         }
     }
 
@@ -32,7 +40,46 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         return color;
     }
 
-    sendRaceToServer = () => {
+    componentDidMount() {
+        if (!this.context.user.premium) {
+            AdMobRewarded.setAdUnitID(Config.adAndroidRewarded);
+            AdMobRewarded.requestAdAsync()
+        }
+    }
+
+
+    sendRaceToServerWithAds = () => {
+        this.setState({ requestingAdConfirm: true })
+        AdMobRewarded.getIsReadyAsync().then(async (isReady) => {
+            if (isReady) {
+                await AdMobRewarded.showAdAsync()
+            }
+            if (!isReady) {
+                AdMobRewarded.requestAdAsync().then(async () => {
+                    await AdMobRewarded.showAdAsync()
+                })
+            }
+        })
+        AdMobRewarded.addEventListener("rewardedVideoDidRewardUser", () => {
+            if (!this.state.spamGuard)
+                this.setState({ requestingAdConfirm: false, spamGuard: true }, () => {
+                    const customRace = { ...store.getState().customRace };
+                    const user: any = store.getState().user._id
+                    customRace.visibleToEveryone = this.state.racePublic;
+                    customRace.user_id = user
+                    const color = this.getRandomColor()
+                    customRace.raceColors = color
+                    racesApi.addRace(customRace).then(() => {
+                        this.setState({ finished: true })
+                    }).catch((err) => {
+                        alert('There seems to be a problem with our servers, please try again later.')
+                        return;
+                    })
+                })
+        })
+    }
+
+    sendRaceToServerWithoutAds = () => {
         const customRace = { ...store.getState().customRace };
         const user: any = store.getState().user._id
         customRace.visibleToEveryone = this.state.racePublic;
@@ -50,6 +97,10 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
     finish = () => {
         this.props.navigation.navigate('CustomRaceStartScreen');
         store.dispatch({ type: ActionType.cleanCustomRace })
+    }
+
+    componentWillUnmount() {
+        AdMobRewarded.removeAllListeners()
     }
 
     render() {
@@ -77,8 +128,26 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                             }
                             this.setState({ racePublic: true })
                         }} />
-                        <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
-                            borderRadius={25} title={'Finish'} onPress={() => { this.sendRaceToServer() }} />
+                        {!this.context.user.premium ?
+                            <View>
+                                <AppText fontSize={18} padding={10} textAlign={'center'}>DnCreate uses server space to store your races,
+                                as such you will be served an ad to complete the race creation setup and store your new race for free!</AppText>
+                                <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish to disable ads on DnCreate consider donating on Patreon.</AppText>
+                                <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
+                                    borderRadius={25} title={'Finish'} onPress={() => { this.sendRaceToServerWithAds() }} />
+                                {this.state.requestingAdConfirm &&
+                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                        <AppText fontSize={18} padding={10} textAlign={'center'}>Awaiting ad approval.</AppText>
+                                        <View style={{ height: 70, width: 70 }}>
+                                            <AppActivityIndicator visible={this.state.requestingAdConfirm} />
+                                        </View>
+                                    </View>
+                                }
+                            </View>
+                            :
+                            <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
+                                borderRadius={25} title={'Finish'} onPress={() => { this.sendRaceToServerWithoutAds() }} />
+                        }
                     </View>
                 }
 
