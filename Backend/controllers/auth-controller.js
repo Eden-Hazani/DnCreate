@@ -341,6 +341,7 @@ router.post("/databaseLoginAdmin", cors(), async (request, response) => {
 
 router.post("/databaseFindPersonAdmin", cors(), verifyIsAdmin, async (request, response) => {
     try {
+        console.log(request.body.username)
         const user = await authLogic.findUserAsAdmin(request.body.username);
         response.json({ user });
     } catch (err) {
