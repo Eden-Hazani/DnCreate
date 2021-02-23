@@ -82,9 +82,9 @@ export class CreateSubClass extends Component<{ navigation: any }, CreateSubClas
             <ScrollView style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View>
-                        <View>
-                            <AppText>In this section you need to insert the name and description of your subclass</AppText>
-                            <AppText>Take your time thinking of a fitting description and name for your subclass</AppText>
+                        <View style={{ padding: 20 }}>
+                            <AppText fontSize={18} textAlign={'center'}>In this section you need to insert the name and description of your subclass</AppText>
+                            <AppText fontSize={17} textAlign={'center'}>Take your time thinking of a fitting description and name for your subclass</AppText>
                         </View>
                         <AppForm
                             initialValues={{ name: '', description: '' }}

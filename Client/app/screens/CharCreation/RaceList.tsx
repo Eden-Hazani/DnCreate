@@ -130,7 +130,8 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             if (raceType === null) {
                 raceType = 'false'
             }
-            const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, this.context.user._id, raceType);
+            const user_id = store.getState().nonUser === true ? 'noUserId' : this.context.user._id
+            const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, user_id, raceType);
             if (!result.ok) {
                 this.setState({ error: true, loading: false })
                 return
@@ -149,15 +150,22 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     }
 
     updateSearch = async (search: string) => {
-        this.setState({ search })
-        const raceType = await AsyncStorage.getItem('showPublicRaces');
-        if (search.trim() === "") {
-            this.setState({ currentLoadedRaces: 20, races: [] }, () => this.getPrimeRaces())
-            return;
+        try {
+            this.setState({ search })
+            let raceType = await AsyncStorage.getItem('showPublicRaces');
+            if (raceType === null) {
+                raceType = 'false'
+            }
+            if (search.trim() === "") {
+                this.setState({ currentLoadedRaces: 20, races: [] }, () => this.getPrimeRaces())
+                return;
+            }
+            const user_id = store.getState().nonUser === true ? 'noUserId' : this.context.user._id
+            const searchedRaces = await racesApi.SearchRaceList(search, raceType, user_id);
+            this.setState({ races: searchedRaces.data })
+        } catch (err) {
+            console.log(err)
         }
-        const searchedRaces = await racesApi.SearchRaceList(search, raceType, this.context.user._id);
-        this.setState({ races: searchedRaces.data })
-
     }
 
     pickRace = (race: RaceModel) => {

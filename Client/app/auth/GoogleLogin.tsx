@@ -18,7 +18,7 @@ interface GoogleLoginState {
     loading: boolean
 }
 
-export class GoogleLogin extends Component<{}, GoogleLoginState>{
+export class GoogleLogin extends Component<{ isTutorial: any, turnOffTutorialModel: any }, GoogleLoginState>{
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
@@ -51,6 +51,10 @@ export class GoogleLogin extends Component<{}, GoogleLoginState>{
             reduxToken.setToken(userInfo).then(validToken => {
                 const { user, setUser } = this.context
                 setUser(validToken);
+                if (this.props.isTutorial) {
+                    this.props.turnOffTutorialModel(false);
+                    store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.props.isTutorial })
+                }
                 store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
                 this.setState({ loading: false })
             })
@@ -86,6 +90,11 @@ export class GoogleLogin extends Component<{}, GoogleLoginState>{
             const userInfo: any = answer.data.token;
             reduxToken.setToken(userInfo).then(validToken => {
                 const { user, setUser } = this.context
+                if (this.props.isTutorial) {
+                    this.props.turnOffTutorialModel(false);
+                    alert('This user is already registered, try logging in')
+                    return
+                }
                 setUser(validToken);
                 store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
                 this.setState({ loading: false })

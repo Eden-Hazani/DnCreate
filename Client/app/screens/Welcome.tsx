@@ -18,6 +18,7 @@ import Modal from 'react-native-modal';
 import InformationScroller from '../components/InformationScroller';
 import WelcomeInfo from '../../jsonDump/welcomeInformation.json'
 import { Config } from '../../config';
+import { CharacterModel } from '../models/characterModel';
 
 
 Modal
@@ -33,6 +34,7 @@ interface WelcomeState {
 
 export class Welcome extends Component<{ navigation: any }, WelcomeState> {
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -59,6 +61,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                 },
             ]
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
     _renderItem({ item, index }: any) {
@@ -85,6 +88,12 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
 
     clearStorageJunk = async () => {
         await AsyncStorage.removeItem(`AttributeStage`);
+        await AsyncStorage.removeItem(`DicePool`);
+        store.dispatch({ type: ActionType.CleanCreator })
+    }
+
+    onFocus = () => {
+        this.clearStorageJunk()
     }
 
     async componentDidMount() {

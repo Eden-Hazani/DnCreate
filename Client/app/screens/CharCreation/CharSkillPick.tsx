@@ -288,14 +288,16 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                             </View>}
                     </View>}
                 <Modal visible={this.state.nonUserPauseModel}>
-                    <ScrollView keyboardShouldPersistTaps="always" style={{ backgroundColor: Colors.pageBackground, padding: 15, paddingTop: 20, paddingBottom: 30 }}>
+                    <ScrollView keyboardShouldPersistTaps="always" style={{ backgroundColor: Colors.pageBackground, padding: 15, paddingTop: 20, paddingBottom: 40 }}>
                         <AppText textAlign={'center'} fontSize={35} color={Colors.berries}>Hi!</AppText>
                         <AppText textAlign={'center'} fontSize={20}>wasn't that fun?!</AppText>
                         <AppText textAlign={'center'} fontSize={20}>Told you it would be easy.</AppText>
                         <AppText textAlign={'center'} fontSize={20}>Now the last step is a FREE registration and you will be able to open and maintain an UNLIMITED number of characters!</AppText>
                         <AppText textAlign={'center'} fontSize={20}>Plus use DnCreate's adventure mode with your fellow party members!</AppText>
                         <AppText textAlign={'center'} fontSize={20}>Exciting right?, lets do this!</AppText>
-                        <Register navigation route isTutorial={this.state.characterInfo} turnOffTutorialModel={(val: boolean) => { this.setState({ nonUserPauseModel: val }) }} />
+                        <Register showCancelButt={true}
+                            fireOnCancel={() => { this.props.navigation.navigate("Welcome") }}
+                            navigation route isTutorial={this.state.characterInfo} turnOffTutorialModel={(val: boolean) => { this.setState({ nonUserPauseModel: val }) }} />
                     </ScrollView>
                 </Modal>
             </View>

@@ -2,6 +2,11 @@ const Race = require("../models/raceModel");
 const mongoose = require('mongoose');
 
 function getAllRaces(start, end, _id, raceType) {
+    if (_id === 'noUserId') {
+        return Race.find({
+            user_id: { $exists: false },
+        }).skip(parseInt(start)).limit(parseInt(end)).exec();
+    }
     if (raceType === 'true') {
         return Race.find({
             $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { visibleToEveryone: true }, { visibleToEveryone: { $exists: false } }],
@@ -13,10 +18,15 @@ function getAllRaces(start, end, _id, raceType) {
             $or: [{ user_id: { $eq: mongoose.Types.ObjectId(_id) } }, { user_id: { $exists: false } }],
         }).skip(parseInt(start)).limit(parseInt(end)).exec();
     }
-    // return Race.find().skip(parseInt(start)).limit(parseInt(end)).exec()
 }
 
 function searchRaces(text, raceType, _id) {
+    if (_id === 'noUserId') {
+        return Race.find({
+            user_id: { $exists: false },
+            name: { $regex: text, $options: "i" }
+        }).exec();
+    }
     if (raceType === 'true') {
         return Race.find({
             $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { visibleToEveryone: true }, { visibleToEveryone: { $exists: false } }],

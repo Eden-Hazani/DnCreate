@@ -28,7 +28,7 @@ export class ExperienceCalculator extends Component<{ issueLevelUp: any, charact
         super(props)
         this.state = {
             visible: false,
-            animatedPosition: new Animated.ValueXY({ x: -215, y: 0 }),
+            animatedPosition: new Animated.ValueXY({ x: xpChart[this.props.goalLevel] >= 100000 ? -235 : -215, y: 0 }),
             error: false,
             xpTextVal: '',
             character: this.props.character
@@ -41,7 +41,7 @@ export class ExperienceCalculator extends Component<{ issueLevelUp: any, charact
 
     moveAnimation = () => {
         Animated.timing(this.state.animatedPosition, {
-            toValue: { x: this.state.visible ? 10 : -215, y: 0 },
+            toValue: { x: this.state.visible ? 10 : xpChart[this.props.goalLevel] >= 100000 ? -235 : -215, y: 0 },
             duration: 100,
             useNativeDriver: false
         }).start()

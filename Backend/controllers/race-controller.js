@@ -48,6 +48,7 @@ router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => 
         const raceType = request.params.raceType;
         const user_id = request.params.user_id;
         const items = await raceLogic.searchRaces(request.params.text, raceType, user_id);
+        console.log(items)
         response.json(items);
     } catch (err) {
         response.status(500).send(err.message);

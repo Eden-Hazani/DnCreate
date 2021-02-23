@@ -204,8 +204,9 @@ export default function ClassPick({ route, placeholder }: any) {
                                     }}
                                 />
                                 <Modal
+                                    propagateSwipe={true}
                                     isVisible={pickedClass._id ? true : false}
-                                    swipeDirection={["up", "down"]}
+                                    swipeDirection={"down"}
                                     swipeThreshold={5}
                                     onSwipeComplete={(e) => {
                                         setPickedClass(new ClassModel())
@@ -214,37 +215,42 @@ export default function ClassPick({ route, placeholder }: any) {
                                         backgroundColor: Colors.pageBackground,
                                         margin: 0,
                                         flex: 1,
-                                        marginTop: 40,
+                                        marginTop: 140,
                                         alignItems: undefined,
                                         justifyContent: undefined,
                                     }}>
-                                    <View style={{ flex: 1 }}>
+                                    <ScrollView style={{ flex: 1 }}>
                                         <View style={{ justifyContent: "center", alignItems: "center" }}>
                                             <Image style={{ width: 150, height: 150 }} uri={dragonClasses[pickedClass.name || '']} />
                                         </View>
-                                        <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {pickedClass.name}</AppText>
-                                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
-                                            <View style={{ width: "50%", marginTop: 10 }}>
-                                                <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
-                                                <AppText textAlign={"center"} fontSize={13}>{pickedClass.recommendation}</AppText>
+                                        <TouchableOpacity activeOpacity={1}>
+                                            <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {pickedClass.name}</AppText>
+                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+                                                <View style={{ width: "50%", marginTop: 10 }}>
+                                                    <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Recommended Attributes</AppText>
+                                                    <AppText textAlign={"center"} fontSize={13}>{pickedClass.recommendation}</AppText>
+                                                </View>
+                                                <View style={{ width: "50%" }}>
+                                                    <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Saving Throws</AppText>
+                                                    {pickedClass.savingThrows && pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={13}>{item}</AppText>)}
+                                                </View>
                                             </View>
-                                            <View style={{ width: "50%" }}>
-                                                <AppText textAlign={"center"} fontSize={15} color={Colors.bitterSweetRed}>Saving Throws</AppText>
-                                                {pickedClass.savingThrows && pickedClass.savingThrows.map((item) => <AppText key={item} textAlign={"center"} fontSize={13}>{item}</AppText>)}
+                                            <View style={{ padding: 15, width: '100%', flex: 1 }}>
+                                                <AppText fontSize={17} textAlign={"center"}>{pickedClass.description &&
+                                                    pickedClass.description.replace(/\. /g, '.\n')}</AppText>
                                             </View>
-                                        </View>
-                                        <AppText fontSize={17} textAlign={"center"}>{pickedClass.description && pickedClass.description.replace(/\. /g, '.\n')}</AppText>
-                                        <View style={{ alignItems: "center", padding: 15 }}>
-                                            <InformationDrawer expendedHeight={500} expendedWidth={width} information={pickedClass.brifInfo} />
-                                        </View>
-                                        <View>
-                                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
-                                                height={100} title={"Continue"} onPress={() => {
-                                                    insertInfoAndContinue()
-                                                    setPickedClass(new ClassModel())
-                                                }} />
-                                        </View>
-                                    </View>
+                                            <View style={{ alignItems: "center", padding: 15 }}>
+                                                <InformationDrawer expendedHeight={500} expendedWidth={width} information={pickedClass.brifInfo} />
+                                            </View>
+                                            <View>
+                                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                                                    height={100} title={"Continue"} onPress={() => {
+                                                        insertInfoAndContinue()
+                                                        setPickedClass(new ClassModel())
+                                                    }} />
+                                            </View>
+                                        </TouchableOpacity>
+                                    </ScrollView>
                                 </Modal>
                             </View>
                     }

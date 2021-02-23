@@ -13,6 +13,7 @@ import { CharSkillPick } from '../screens/CharCreation/CharSkillPick';
 import { AttributePicking } from '../screens/CharCreation/AttributePicking';
 import { CharBackground } from '../screens/CharCreation/CharBackground';
 import { SpacialRaceBonuses } from '../screens/CharCreation/SpacialRaceBonuses';
+import { AddFeaturesToRace } from '../screens/CharCreation/AddFeaturesToRace';
 
 const Stack = createStackNavigator();
 
@@ -22,7 +23,7 @@ const AuthNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="Login" component={Login} />
         <Stack.Screen options={{ title: "" }} name="ResetPassword" component={ResetPassword} />
         <Stack.Screen options={{ title: "" }} name="Register" component={Register} />
-        <Stack.Screen options={{ title: "Race List", headerTransparent: false }} name="RaceList" component={RaceList} />
+        <Stack.Screen options={{ title: "" }} name="RaceList" component={RaceList} />
         <Stack.Screen options={{ title: "" }} name="SpacialProficiencyRaces" component={SpacialProficiencyRaces} />
         <Stack.Screen options={{ title: "" }} name="NewCharInfo" component={NewCharInfo} />
         <Stack.Screen options={{ title: "" }} name="ClassPick" component={ClassPick as any} />
@@ -30,6 +31,7 @@ const AuthNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="AttributePicking" component={AttributePicking} />
         <Stack.Screen options={{ title: "" }} name="CharBackground" component={CharBackground} />
         <Stack.Screen options={{ title: "" }} name="SpacialRaceBonuses" component={SpacialRaceBonuses} />
+        <Stack.Screen options={{ title: "", headerTintColor: Colors.black }} name="AddFeaturesToRace" component={AddFeaturesToRace} />
     </Stack.Navigator>
 }
 

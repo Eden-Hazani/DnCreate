@@ -130,7 +130,7 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                             </View>
                             {!__DEV__ &&
                                 <View>
-                                    <GoogleLogin />
+                                    <GoogleLogin isTutorial={false} turnOffTutorialModel={() => { }} />
                                 </View>
                             }
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>

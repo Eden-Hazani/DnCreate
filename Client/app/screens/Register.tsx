@@ -20,6 +20,9 @@ import { AppButton } from '../components/AppButton';
 import { AppText } from '../components/AppText';
 import reduxToken from '../auth/reduxToken';
 import { ActionType } from '../redux/action-type';
+import { GoogleLogin } from '../auth/GoogleLogin';
+import AsyncStorage from '@react-native-community/async-storage';
+import { CharacterModel } from '../models/characterModel';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -37,7 +40,7 @@ interface RegisterState {
     confirmPassOk: boolean
 }
 
-export class Register extends Component<{ navigation: any, route: any, isTutorial: any, turnOffTutorialModel: any }, RegisterState>{
+export class Register extends Component<{ fireOnCancel: any, showCancelButt: any, navigation: any, route: any, isTutorial: any, turnOffTutorialModel: any }, RegisterState>{
     static contextType = AuthContext;
     private UnsubscribeStore: Unsubscribe
     constructor(props: any) {
@@ -149,8 +152,29 @@ export class Register extends Component<{ navigation: any, route: any, isTutoria
                                             placeholder={"repeat Password..."} />
 
                                     </View>
-                                    <SubmitButton title={"Register"} />
+                                    <View style={{
+                                        flexDirection: "row", alignItems: 'center',
+                                        justifyContent: this.props.showCancelButt ? "space-evenly" : "center"
+                                    }}>
+                                        {this.props.showCancelButt &&
+                                            <AppButton marginBottom={35} fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                                                height={100} title={"Cancel"} onPress={async () => {
+                                                    await AsyncStorage.removeItem(`DicePool`)
+                                                    await AsyncStorage.removeItem(`AttributeStage`)
+                                                    store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
+                                                    store.dispatch({ type: ActionType.SetInfoToChar, payload: new CharacterModel() })
+                                                    this.props.fireOnCancel()
+                                                }} />
+                                        }
+                                        <SubmitButton title={"Register"} />
+                                    </View>
                                 </AppForm>
+                                {!__DEV__ &&
+                                    <View style={{ paddingBottom: 20 }}>
+                                        <AppText fontSize={20} textAlign={'center'}>You can use google sign in and skip the email confirmation process</AppText>
+                                        <GoogleLogin isTutorial={this.props.isTutorial} turnOffTutorialModel={(val: boolean) => this.props.turnOffTutorialModel(val)} />
+                                    </View>
+                                }
                                 <Modal visible={this.state.questionModal} animationType={'slide'}>
                                     <View style={{ flex: 1, paddingTop: 100, padding: 15, backgroundColor: Colors.pageBackground }}>
                                         <AppText textAlign={'center'} color={Colors.berries} fontSize={25}>Why my Email address?</AppText>
