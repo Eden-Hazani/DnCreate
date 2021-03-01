@@ -99,7 +99,7 @@ export class ParticipatingAdventureList extends Component<{ navigation: any }, P
                             <AppText textAlign={'center'} fontSize={22}>You are not participating in any adventures.</AppText>
                         </View>
                         :
-                        <AdventureLists adventures={this.state.participatingAdventures} openAdventure={(adventure: AdventureModel) => {
+                        <AdventureLists adventures={store.getState().participatingAdv} openAdventure={(adventure: AdventureModel) => {
                             this.props.navigation.navigate("SelectedParticipationAdv", { adventure: adventure })
                         }} />
                 }

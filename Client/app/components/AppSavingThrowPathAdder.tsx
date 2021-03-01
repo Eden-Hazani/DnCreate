@@ -22,6 +22,7 @@ interface AppSavingThrowPathAdderState {
 }
 
 export class AppSavingThrowPathAdder extends Component<{
+    returnSavingThrows: any
     character: CharacterModel, withConditions: boolean, extraSavingThrowsTotal: any, pathChosen: any
     amount: number, itemList: any, setAdditionalSaveThrowPicks: any
 }, AppSavingThrowPathAdderState> {
@@ -40,14 +41,15 @@ export class AppSavingThrowPathAdder extends Component<{
 
     componentDidMount() {
         const alreadyPickedSavingThrows = this.state.alreadyPickedSavingThrows;
-        if (this.props.withConditions) {
-            for (let item of this.state.character.characterClassId.savingThrows) {
+        if (this.props.withConditions && this.state.character.savingThrows) {
+            for (let item of this.state.character.savingThrows) {
                 if (this.props.itemList.includes(item)) {
                     const alreadyPickedSavingThrows = this.state.alreadyPickedSavingThrows;
                     alreadyPickedSavingThrows[this.props.itemList.indexOf(item)] = true;
                 }
             }
             this.setState({ alreadyPickedSavingThrows }, () => {
+                console.log(this.props.extraSavingThrowsTotal)
                 const { extraSavingThrowsToPick, pickedSkillFromStart } = generateSavingThrowsPathConditions(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSavingThrowsTotal)
                 if (pickedSkillFromStart !== "") {
                     let savingThrowsWasPickedByPath = this.state.savingThrowsWasPickedByPath
@@ -70,10 +72,12 @@ export class AppSavingThrowPathAdder extends Component<{
             this.props.setAdditionalSaveThrowPicks(this.state.amountToPick)
             return
         }
-        for (let item of this.state.character.characterClassId.savingThrows) {
-            if (this.props.itemList.includes(item)) {
-                const alreadyPickedSavingThrows = this.state.alreadyPickedSavingThrows;
-                alreadyPickedSavingThrows[this.props.itemList.indexOf(item)] = true;
+        if (this.state.character.savingThrows) {
+            for (let item of this.state.character.savingThrows) {
+                if (this.props.itemList.includes(item)) {
+                    const alreadyPickedSavingThrows = this.state.alreadyPickedSavingThrows;
+                    alreadyPickedSavingThrows[this.props.itemList.indexOf(item)] = true;
+                }
             }
         }
         this.props.setAdditionalSaveThrowPicks(this.state.amountToPick)
@@ -90,6 +94,7 @@ export class AppSavingThrowPathAdder extends Component<{
     }
 
     saveSavingThrow = async () => {
+        this.props.returnSavingThrows(this.state.savingThrows)
         await AsyncStorage.setItem(`${this.state.character._id}SavingThrows`, JSON.stringify(this.state.savingThrows));
     }
 
@@ -104,7 +109,6 @@ export class AppSavingThrowPathAdder extends Component<{
             }
             const savingThrowsClicked = this.state.savingThrowsClicked;
             savingThrowsClicked[index] = true;
-            savingThrowsClicked.push(saveThrow)
             savingThrows.push(saveThrow)
             this.setState({ savingThrows, savingThrowsClicked })
         }

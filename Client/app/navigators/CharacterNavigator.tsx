@@ -37,6 +37,8 @@ import { PeopleNotes } from '../screens/charOptions/personalNoteTypes/PeopleNote
 import { OtherNotes } from '../screens/charOptions/personalNoteTypes/OtherNotes';
 import ClassPick from '../screens/CharCreation/ClassPick';
 import { AddFeaturesToRace } from '../screens/CharCreation/AddFeaturesToRace';
+import { CharacterAppearance } from '../screens/CharCreation/CharacterAppearance';
+import { CharacterAlignment } from '../screens/CharCreation/CharacterAlignment';
 
 const Stack = createStackNavigator();
 
@@ -74,6 +76,9 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "Bonds", headerShown: false }} name="CharBonds" component={CharBonds} />
         <Stack.Screen options={{ title: "Congratulations", headerShown: false }} name="SaveCharacter" component={SaveCharacter} />
         <Stack.Screen options={{ title: "" }} name="CharBackstory" component={CharBackstory} />
+        <Stack.Screen options={{ title: "" }} name="CharacterAppearance" component={CharacterAppearance} />
+        <Stack.Screen options={{ title: "" }} name="CharacterAlignment" component={CharacterAlignment} />
+
         <Stack.Screen options={{ title: "" }} name="CharacterHall" component={CharacterHall} />
         <Stack.Screen options={{ title: "" }} name="SelectCharacter" component={SelectCharacter} />
         <Stack.Screen options={{ title: "" }} name="CharItems" component={CharItems} />

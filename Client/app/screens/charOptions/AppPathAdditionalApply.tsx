@@ -31,7 +31,7 @@ export class AppPathAdditionalApply extends Component<{
     loadSkills: any, resetExpertiseSkills: any, loadArmors: any, loadWeapons: any, loadUnrestrictedMagic: any,
     isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any,
     pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any, loadSpellPickAvailability: any,
-    loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any, addSpellAvailabilityByName: any
+    loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any, addSpellAvailabilityByName: any, returnSavingThrows: any
 }> {
 
     render() {
@@ -129,7 +129,7 @@ export class AppPathAdditionalApply extends Component<{
                         updateSpellList={(spellList: any) => { this.props.updateSpellList(spellList) }} />
                 }
                 {this.props.pathItem.savingThrowList &&
-                    <AppSavingThrowPathAdder character={this.props.character} pathChosen={this.props.pathChosen} itemList={this.props.pathItem.savingThrowList} amount={this.props.pathItem.saveThrowPickNumber}
+                    <AppSavingThrowPathAdder returnSavingThrows={(val: string[]) => this.props.returnSavingThrows(val)} character={this.props.character} pathChosen={this.props.pathChosen} itemList={this.props.pathItem.savingThrowList} amount={this.props.pathItem.saveThrowPickNumber}
                         withConditions={this.props.pathItem.withConditions} setAdditionalSaveThrowPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} extraSavingThrowsTotal={this.props.pathItem.extraSavingThrowsTotal} />
                 }
                 {this.props.pathItem.addExactSkillProficiency &&

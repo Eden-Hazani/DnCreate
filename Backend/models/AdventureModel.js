@@ -23,6 +23,9 @@ const AdventureSchema = mongoose.Schema({
     },
     quests: {
         type: Array
+    },
+    uploadedPhotoArray: {
+        type: Array
     }
 
 

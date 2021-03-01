@@ -107,29 +107,33 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         return (
             <ScrollView style={styles.container}>
                 {this.state.finished ?
-                    <View>
-                        <View>
-                            <LottieView style={{ zIndex: 1, width: "100%" }} autoPlay source={require('../../../assets/lottieAnimations/confeetiAnimation.json')} />
+                    <View style={{ flex: 1 }}>
+                        <View style={{ flex: .2, justifyContent: "center", alignItems: "center" }}>
+                            <LottieView style={{ zIndex: 1, width: "100%", height: 250 }} autoPlay source={require('../../../assets/lottieAnimations/confeetiAnimation.json')} />
                         </View>
-                        <AppText fontSize={30} padding={5} textAlign={'center'}>Done!</AppText>
-                        <AppText fontSize={18} padding={5} textAlign={'center'}>Your new race will be available for you on the race screen!</AppText>
-                        <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
-                            borderRadius={25} title={'Done'} onPress={() => { this.finish() }} />
+                        <View style={{ flex: .8 }}>
+                            <AppText fontSize={30} padding={5} textAlign={'center'}>Done!</AppText>
+                            <AppText fontSize={18} padding={5} textAlign={'center'}>Your new race will be available for you on the race screen!</AppText>
+                            <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
+                                borderRadius={25} title={'Done'} onPress={() => { this.finish() }} />
+                        </View>
                     </View>
                     :
-                    <View style={{ justifyContent: 'center', alignItems: "center" }}>
+                    <ScrollView>
                         <AppText fontSize={25} padding={5} textAlign={'center'}>Almost Done!</AppText>
                         <AppText fontSize={18} padding={15} textAlign={'center'}>Would you like to share your creation with everyone on DnCreate?</AppText>
                         <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish for this race to become public and visible everyone toggle the option below</AppText>
-                        <Switch value={this.state.racePublic} onValueChange={() => {
-                            if (this.state.racePublic) {
-                                this.setState({ racePublic: false })
-                                return;
-                            }
-                            this.setState({ racePublic: true })
-                        }} />
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                            <Switch value={this.state.racePublic} onValueChange={() => {
+                                if (this.state.racePublic) {
+                                    this.setState({ racePublic: false })
+                                    return;
+                                }
+                                this.setState({ racePublic: true })
+                            }} />
+                        </View>
                         {!this.context.user.premium ?
-                            <View>
+                            <View style={{ paddingBottom: 70 }}>
                                 <AppText fontSize={18} padding={10} textAlign={'center'}>DnCreate uses server space to store your races,
                                 as such you will be served an ad to complete the race creation setup and store your new race for free!</AppText>
                                 <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish to disable ads on DnCreate consider donating on Patreon.</AppText>
@@ -148,7 +152,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                             <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                                 borderRadius={25} title={'Finish'} onPress={() => { this.sendRaceToServerWithoutAds() }} />
                         }
-                    </View>
+                    </ScrollView>
                 }
 
             </ScrollView>
@@ -159,6 +163,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 100,
+        flex: 1,
+        paddingTop: 50,
     }
 });

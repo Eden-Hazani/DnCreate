@@ -30,7 +30,7 @@ export function ImageInput({ imageUri, onChangeImage, idDisabled }: any) {
         }
         if (!imageUri) selectImg();
         else {
-            Alert.alert("Delete", "Remove profile image?", [{ text: 'Yes', onPress: () => onChangeImage(null) }, { text: 'No' }])
+            Alert.alert("Replace", "Remove currently picked image?", [{ text: 'Yes', onPress: () => onChangeImage(null) }, { text: 'No' }])
         }
     }
 

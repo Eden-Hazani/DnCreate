@@ -53,12 +53,8 @@ export class CustomRaceBackImage extends Component<{ navigation: any }, CustomRa
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <View style={{ paddingBottom: 15 }}>
                                     <AppText padding={20} textAlign={'center'} fontSize={18}>Optional - Upload a Portrait image for your race!</AppText>
-                                    <AppText padding={20} textAlign={'center'} fontSize={18}>This option is currently disabled, once DnCreate reaches it's goal on Patreon I will be able to enable race image uploads.</AppText>
-                                    <AppText padding={20} textAlign={'center'} fontSize={18}>If you wish to contribute please press the link below, Thank you for helping DnCreate!</AppText>
-                                    <TouchableOpacity style={{ padding: 2, justifyContent: "center", alignItems: "center" }} onPress={() => { Linking.openURL('https://www.patreon.com/Edenhazani?fan_landing=true') }}>
-                                        <Image uri={`${Config.serverUrl}/assets/logos/patreon.png`} style={{ height: 100, width: 100 }} />
-                                    </TouchableOpacity>
-                                    <FormImagePicker name="image" idDisabled={true} />
+
+                                    <FormImagePicker name="image" />
                                 </View>
                             </View>
                             <SubmitButton width={250} title={"Continue"} />

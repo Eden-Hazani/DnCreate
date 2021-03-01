@@ -44,8 +44,14 @@ export class CharacterModel {
         public maxHp?: number,
         public items?: any,
         public path?: any,
+        public savingThrows?: string[],
         public pathFeatures?: any[],
         public spellsKnown?: any,
+        public characterAppearance?: string,
+        public characterAlignment?: {
+            alignment: string,
+            alignmentDescription: string
+        },
         public unrestrictedKnownSpells?: number,
         public differentClassSpellsToPick?: any[],
         public currency?: {
@@ -72,6 +78,9 @@ export class CharacterModel {
         public currentExperience?: number,
         public addedRaceFeatures?: any[]
     ) {
+        if (!characterAlignment) {
+            this.characterAlignment = { alignment: '', alignmentDescription: "" }
+        }
         if (!modifiers) {
             this.modifiers = new ModifiersModel();
         }

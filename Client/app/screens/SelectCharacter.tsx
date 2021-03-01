@@ -41,6 +41,7 @@ import { RaceModel } from '../models/raceModel';
 import { ChangeMaxHp } from '../components/ChangeMaxHp';
 import { TutorialScreen } from '../components/TutorialScreen';
 import { ExperienceCalculator } from '../components/ExperienceCalculator';
+import { killToolArrayDuplicates } from '../../utility/killToolArrayDuplicates';
 
 
 /**
@@ -64,7 +65,6 @@ interface SelectCharacterState {
     isDm: boolean
     setCurrentHpModal: boolean
     completeSkillModel: boolean
-    cashedSavingThrows: any[]
     startingAnimations: Animated.ValueXY[]
     personalInfoModal: boolean
     maxHpChangeModal: boolean
@@ -86,7 +86,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             maxHpChangeModal: false,
             personalInfoModal: false,
             startingAnimations: [],
-            cashedSavingThrows: [],
             completeSkillModel: false,
             attackRollTutorialModal: false,
             setCurrentHpModal: false,
@@ -120,6 +119,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             this.setState({ loading: true })
             if (await AsyncStorage.getItem('isOffline')) {
                 const stringChars = await AsyncStorage.getItem('offLineCharacterList');
+                this.loadCashedSavingThrows()
                 if (stringChars) {
                     const characters = JSON.parse(stringChars);
                     const character = characters.find((char: CharacterModel) => char._id === this.state.character._id)
@@ -135,6 +135,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                 return;
             }
             const character = response.data;
+            this.loadCashedSavingThrows()
             if (character) {
                 this.setState({ character }, () => {
                     this.setState({ loading: false })
@@ -155,6 +156,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
 
     componentDidMount() {
+        this.props.navigation.addListener('beforeRemove', (e: any) => {
+            if (this.props.route.params.isDm) {
+                this.setState({ loading: true })
+                setTimeout(() => {
+                    this.props.navigation.navigate("Adventures")
+                }, 400);
+                return
+            }
+            e.preventDefault()
+            this.setState({ loading: true }, () => this.props.navigation.dispatch(e.data.action))
+        })
         let startingAnimations: Animated.ValueXY[] = []
         for (let i = 0; i < 7; i++) {
             startingAnimations.push(new Animated.ValueXY({ x: 0, y: -900 }));
@@ -167,31 +179,31 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         if (!this.state.isDm) {
             startCharInfo = store.getState().character;
         }
-
+        startCharInfo.tools = killToolArrayDuplicates(startCharInfo.tools || [])
         this.setState({ character: startCharInfo }, async () => {
-            this.loadCashedSavingThrows()
-            if (!await AsyncStorage.getItem('newPlayer')) {
-                Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
-                    [{
-                        text: 'Yes', onPress: () => {
-                            this.setState({ tutorialOn: true })
-                        }
-                    }, { text: 'No', onPress: async () => await AsyncStorage.setItem('newPlayer', "true") }])
-            }
-            if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
-                const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
-                this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
-            }
-            this.maxHpCheck();
-            if (this.state.character.level) {
-                this.setState({ currentLevel: this.state.character.level })
-                this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
-            }
-
-            this.setState({ loading: false }, () => {
-                setTimeout(() => {
-                    this.startAnimations()
-                }, 150);
+            this.loadCashedSavingThrows().then(async () => {
+                if (!await AsyncStorage.getItem('newPlayer')) {
+                    Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
+                        [{
+                            text: 'Yes', onPress: () => {
+                                this.setState({ tutorialOn: true })
+                            }
+                        }, { text: 'No', onPress: async () => await AsyncStorage.setItem('newPlayer', "true") }])
+                }
+                if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
+                    const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
+                    this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
+                }
+                this.maxHpCheck();
+                if (this.state.character.level) {
+                    this.setState({ currentLevel: this.state.character.level })
+                    this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
+                }
+                this.setState({ loading: false }, () => {
+                    setTimeout(() => {
+                        this.startAnimations()
+                    }, 150);
+                })
             })
         })
     }
@@ -209,9 +221,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     loadCashedSavingThrows = async () => {
-        const cashedSavingThrows = await AsyncStorage.getItem(`${this.state.character._id}SavingThrows`);
-        const savingThrows: any = cashedSavingThrows !== null ? getSpecialSaveThrows(this.state.character).concat(JSON.parse(cashedSavingThrows)) : getSpecialSaveThrows(this.state.character)
-        this.setState({ cashedSavingThrows: savingThrows })
+        if (!this.state.character.savingThrows || this.state.character.savingThrows.length === 0) {
+            const character = { ...this.state.character };
+            const cashedSavingThrows = await AsyncStorage.getItem(`${this.state.character._id}SavingThrows`);
+            const savingThrows: any = cashedSavingThrows !== null ? getSpecialSaveThrows(this.state.character).concat(JSON.parse(cashedSavingThrows)) : getSpecialSaveThrows(this.state.character)
+            character.savingThrows = savingThrows;
+            this.setState({ character }, () => userCharApi.updateChar(this.state.character))
+        }
     }
 
 
@@ -414,11 +430,13 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         try {
             let midRes = '';
             const list = modifierNameList.list.map((modifierName, index) => {
-                if (this.state.cashedSavingThrows.includes(modifierName) && this.state.character.modifiers) {
-                    midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
-                }
-                if ((!this.state.cashedSavingThrows.includes(modifierName)) && this.state.character.modifiers) {
-                    midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
+                if (this.state.character.savingThrows) {
+                    if (this.state.character.savingThrows.includes(modifierName) && this.state.character.modifiers) {
+                        midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
+                    }
+                    if ((!this.state.character.savingThrows.includes(modifierName)) && this.state.character.modifiers) {
+                        midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
+                    }
                 }
                 return <View key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
                     <AppText textAlign={'center'} fontSize={18}>{midRes} </AppText>
@@ -732,7 +750,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <View style={{ borderWidth: 1, borderRadius: 15, borderColor: Colors.bitterSweetRed, margin: 20, padding: 15 }}>
                                     <AppText fontSize={18} padding={5} textAlign={'center'}>Proficient Saving Throws</AppText>
                                     <View style={{ flexDirection: 'row', justifyContent: "space-evenly", alignItems: 'center', flexWrap: 'wrap' }}>
-                                        {this.state.cashedSavingThrows.map((sThrow, index) => <View key={index}>
+                                        {this.state.character.savingThrows && this.state.character.savingThrows.map((sThrow, index) => <View key={index} style={{ padding: 5 }}>
                                             <AppText>{sThrow}</AppText>
                                         </View>)}
                                     </View>
@@ -829,7 +847,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         <View pointerEvents={this.state.tutorialZIndex[5] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[5] ? 10 : 0 }}>
                             <View style={styles.personality}>
                                 <View style={{ width: '30%', paddingLeft: 18 }}>
-                                    <AppText textAlign={'center'}>To change a personality feature press and hold on its title.</AppText>
+                                    <AppText textAlign={'center'}>To change any your personality traits, alignment, or appearance long press on the text you wish to change.</AppText>
                                 </View>
                                 <View style={styles.list}>
                                     <TouchableOpacity disabled={isDm} onLongPress={() => { this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: true, character: this.state.character }) }}>
@@ -856,6 +874,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     </TouchableOpacity>
                                 </View>
                             </View>
+                            <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAlignment", { updateAlignment: true, character: this.state.character })}
+                                style={{ alignItems: "center", marginBottom: 20 }}>
+                                <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Alignment</AppText>
+                                {this.state.character.characterAlignment?.alignment && <AppText fontSize={20}>{this.state.character.characterAlignment?.alignment}</AppText>}
+                                {this.state.character.characterAlignment?.alignmentDescription && <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>}
+                            </TouchableOpacity>
+                            <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAppearance", { updateAppearance: true, character: this.state.character })}
+                                style={{ alignItems: "center", marginBottom: 20 }}>
+                                <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Appearance</AppText>
+                                {this.state.character.characterAppearance && <AppText fontSize={15}>{this.state.character.characterAppearance}</AppText>}
+                            </TouchableOpacity>
                         </View>
                         <View pointerEvents={this.state.tutorialZIndex[6] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[6] ? 10 : 0 }}>
                             <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={30}>Magic</AppText>

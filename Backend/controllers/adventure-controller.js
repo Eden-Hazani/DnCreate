@@ -24,7 +24,24 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + uuid.v4() + ext)
     }
 })
+
+const galleryStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = JSON.parse(req.body.adventure)._id
+        if (!fs.existsSync('public/uploads/adventure-galleries/' + dir)) {
+            fs.mkdirSync('public/uploads/adventure-galleries/' + dir);
+        }
+        cb(null, 'public/uploads/adventure-galleries/' + dir)
+    },
+    filename: function (req, file, cb) {
+        const name = JSON.parse(req.body.imageObj).photoUri
+        const ext = name.substr(name.lastIndexOf('.'));
+        cb(null, Date.now() + uuid.v4() + ext)
+    }
+})
+
 var upload = multer({ storage: storage })
+var uploadToGallery = multer({ storage: galleryStorage })
 
 router.post("/createAdventure", verifyLogged, upload.single('backgroundImage'), async (request, response) => {
     try {
@@ -35,6 +52,44 @@ router.post("/createAdventure", verifyLogged, upload.single('backgroundImage'), 
         adventure.adventureIdentifier = Math.floor((Math.random() * 1000000) + 1);
         const savedAdventure = await adventureLogic.createAdventure(adventure);
         response.json(savedAdventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.post("/addImgToGallery", verifyLogged, uploadToGallery.single("newImage"), async (request, response) => {
+    try {
+        const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const imageObj = JSON.parse(request.body.imageObj)
+        if (adventure.uploadedPhotoArray.length === 0) {
+            adventure.uploadedPhotoArray = [];
+        }
+        const galleryObj = {
+            description: imageObj.description,
+            photoUri: request.file.filename,
+        }
+        adventure.uploadedPhotoArray.push(galleryObj)
+        const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
+        response.json(updatedAdventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/removeImgFromGallery/:imageUrl/:adventure_id", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        console.log(request.body)
+        const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const adventure_id = request.params.adventure_id;
+        const imageUrl = request.params.imageUrl;
+        fs.unlink(`public/uploads/adventure-galleries/${adventure_id}/${imageUrl}`, function (err) {
+            if (err) return console.log(err);
+            console.log('file deleted successfully');
+        });
+        const updatedAdventure = await adventureLogic.updateAdventure(adventure);
+        global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
+        response.json(updatedAdventure);
     } catch (err) {
         response.status(500).send(err.message);
     }
@@ -62,6 +117,16 @@ router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, re
         }
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
+        response.json(updatedAdventure);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/editAdventure", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const adventure = new Adventure(JSON.parse(request.body.adventure))
+        const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         response.json(updatedAdventure);
     } catch (err) {
         response.status(500).send(err.message);
@@ -150,6 +215,9 @@ router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, 
                 console.log('file deleted successfully');
             });
         }
+        console.log(adventure[0]._id.toString())
+        fs.rmdirSync('public/uploads/adventure-galleries/' + adventure[0]._id.toString(), { recursive: true });
+
         await adventureLogic.removeAdventure(adventureIdentifier);
         global.socketServer.emit(`adventure-removedChange`, adventureIdentifier);
         response.sendStatus(204);

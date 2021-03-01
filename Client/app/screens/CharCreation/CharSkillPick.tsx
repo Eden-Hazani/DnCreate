@@ -20,6 +20,7 @@ import reduxToken from '../../auth/reduxToken';
 import AuthContext from '../../auth/context';
 import { UserModel } from '../../models/userModel';
 import { SpellsModel } from '../../models/spellsModel';
+import { killToolArrayDuplicates } from '../../../utility/killToolArrayDuplicates';
 
 interface CharSkillPickState {
     characterInfo: CharacterModel
@@ -133,6 +134,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                     characterInfo.charSpecials.dragonBornAncestry = storeChar.dragonBornAncestry
             }
         })
+        characterInfo.tools = killToolArrayDuplicates(characterInfo.tools || [])
         if (store.getState().nonUser) {
             if (this.context.user && this.context.user.username) {
                 this.sendInfo(characterInfo)

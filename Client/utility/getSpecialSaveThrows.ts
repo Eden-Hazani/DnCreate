@@ -2,8 +2,13 @@ import { CharacterModel } from "../app/models/characterModel";
 
 
 export function getSpecialSaveThrows(character: CharacterModel) {
+    let saveThrows: any = []
     if (character.characterClassId) {
-        let saveThrows = character.characterClassId.savingThrows;
+        if (!character.savingThrows || character.savingThrows.length === 0) {
+            saveThrows = character.characterClassId.savingThrows;
+        } else {
+            saveThrows = character.savingThrows;
+        }
         if (saveThrows) {
             switch (true) {
                 case character.characterClass === 'Rogue' && character.level === 15:

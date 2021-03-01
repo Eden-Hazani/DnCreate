@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Colors } from '../config/colors';
 import { store } from '../redux/store';
 import { ActiveQuestList } from '../screens/Adventures/adventureComponents/ActiveQuestList';
+import { AdventurePictureGallery } from '../screens/Adventures/adventureComponents/AdventurePictureGallery';
 import { CompletedQuestList } from '../screens/Adventures/adventureComponents/CompletedQuestList';
 import { Adventures } from '../screens/Adventures/Adventures';
 import { JoinAdventure } from '../screens/Adventures/JoinAdventure';
@@ -31,6 +32,7 @@ const AdventuresNavigator = () => {
         <Stack.Screen options={{ title: "", }} name="CompletedQuestList" component={CompletedQuestList} />
         <Stack.Screen options={{ title: "", }} name="ParticipatingAdventureList" component={ParticipatingAdventureList} />
         <Stack.Screen options={{ title: "", }} name="LeadingAdventureList" component={LeadingAdventureList} />
+        <Stack.Screen options={{ title: "", }} name="AdventurePictureGallery" component={AdventurePictureGallery} />
     </Stack.Navigator>
 }
 

@@ -57,6 +57,7 @@ export class ListItem extends Component<any, ListItemState>{
                         </View>
                         <View style={{ paddingLeft: this.props.textDistanceFromImg }}>
                             <AppText textAlign={this.props.headTextAlign} fontSize={this.props.headerFontSize} color={this.props.headColor ? this.props.headColor : Colors.whiteInDarkMode}>{this.props.title}</AppText>
+                            {this.props.secSubTitle && <AppText textAlign={this.props.secSubTextAlign} fontSize={this.props.secSubFontSize} color={this.props.secSubColor ? this.props.secSubColor : Colors.whiteInDarkMode}>{this.props.secSubTitle}</AppText>}
                             <AppText textAlign={this.props.subTextAlign} fontSize={this.props.subFontSize} color={this.props.subColor ? this.props.subColor : Colors.whiteInDarkMode}>{this.props.subTitle}</AppText>
                         </View>
                     </View>

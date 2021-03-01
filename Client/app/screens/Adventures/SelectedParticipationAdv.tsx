@@ -10,6 +10,7 @@ import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
 import { Colors } from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
+import { store } from '../../redux/store';
 
 interface SelectedParticipationAdvState {
     adventure: AdventureModel
@@ -18,6 +19,7 @@ interface SelectedParticipationAdvState {
 }
 
 export class SelectedParticipationAdv extends Component<{ navigation: any, route: any }, SelectedParticipationAdvState> {
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -25,6 +27,8 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             profilePicList: [],
             adventure: this.props.route.params.adventure
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+
     }
     async componentDidMount() {
         try {
@@ -49,8 +53,14 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             logger.log(new Error(err))
         }
     }
+
+    onFocus = () => {
+        const adventure = store.getState().participatingAdv.find((item, index) => item._id === this.state.adventure._id);
+        if (adventure)
+            this.setState({ adventure })
+    }
     render() {
-        const adventure = this.props.route.params.adventure;
+        const adventure = this.state.adventure;
         return (
             <View style={styles.container}>
                 {this.state.loading ?
@@ -84,8 +94,13 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                     justifyContent={"flex-start"} textDistanceFromImg={10} />}
                                 ItemSeparatorComponent={ListItemSeparator} />
                         </View>
-                        <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
+                        <AppButton padding={15} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
                             fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
+                        <View>
+                            <AppButton backgroundColor={Colors.bitterSweetRed}
+                                onPress={() => { this.props.navigation.navigate("AdventurePictureGallery", { adventure: this.state.adventure }) }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Image Gallery"} />
+                        </View>
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
                             <AppButton padding={20} backgroundColor={Colors.pinkishSilver}
                                 onPress={() => { this.props.navigation.navigate("ActiveQuestList", { adventure: adventure, isDmLevel: false }) }}

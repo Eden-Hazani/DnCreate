@@ -107,10 +107,19 @@ const CharacterSchema = mongoose.Schema({
     spellsKnown: {
         type: String
     },
+    characterAppearance: {
+        type: String
+    },
+    characterAlignment: {
+        type: Object
+    },
     unrestrictedKnownSpells: {
         type: Number
     },
     differentClassSpellsToPick: {
+        type: Array
+    },
+    savingThrows: {
         type: Array
     },
     addSpellAvailabilityByName: {

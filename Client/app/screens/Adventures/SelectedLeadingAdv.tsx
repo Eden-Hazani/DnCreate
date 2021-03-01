@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, Alert, Modal } from 'react-native';
+import { View, StyleSheet, FlatList, Alert, Modal, ScrollView } from 'react-native';
 import { Config } from '../../../config';
 import adventureApi from '../../api/adventureApi';
 import { AppButton } from '../../components/AppButton';
@@ -206,7 +206,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 <AppText textAlign={'center'} fontSize={15}>Share the adventure identifier with your friends to let them join.</AppText>
                             </View>
                             :
-                            <View style={{ flex: .8 }}>
+                            <View style={{ paddingBottom: 50 }}>
                                 {this.state.innerLoading ? <AppActivityIndicator visible={this.state.innerLoading} /> :
                                     <FlatList
                                         data={adventure.participants_id}
@@ -237,36 +237,43 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 }
                             </View>
                         }
-                        <View style={{ flex: .5, alignItems: "center", flexDirection: "row", justifyContent: "center" }}>
-                            <AppText fontSize={18}>Adventure identifier:</AppText>
-                            <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
-                        </View>
-                        <View style={{ justifyContent: "center", alignItems: "center" }}>
-                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ questCreationModal: true }) }}
-                                fontSize={18} borderRadius={25} width={120} height={65} title={"Quest Creator"} />
-                            <View style={{ flexDirection: "row" }}>
-                                <AppButton padding={20} backgroundColor={Colors.pinkishSilver}
-                                    onPress={() => { this.props.navigation.navigate("ActiveQuestList", { adventure: adventure, isDmLevel: true }) }}
-                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Active Quests"} />
-                                <AppButton padding={20} backgroundColor={Colors.metallicBlue}
-                                    onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: true }) }}
-                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
+                        <ScrollView>
+                            <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", paddingBottom: 50 }}>
+                                <AppText fontSize={18}>Adventure identifier:</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                             </View>
-                            <Modal visible={this.state.questCreationModal} animationType="slide">
-                                <CreateQuest edit={{ true: false }} adventure={this.state.adventure} close={(val: boolean) => {
-                                    this.setState({ questCreationModal: val })
-                                    this.reloadAdventureAfterQuest();
-                                }} />
-                            </Modal>
-                        </View>
-                        <View style={{ flex: .2, flexDirection: "row", justifyContent: "space-evenly" }}>
-                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.back() }}
-                                fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
-                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
-                                Alert.alert("Delete", "Are you sure you want to delete this adventure?", [{ text: 'Yes', onPress: () => this.deleteAdventure() }, { text: 'No' }])
-                            }}
-                                fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
-                        </View>
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ questCreationModal: true }) }}
+                                        fontSize={18} borderRadius={25} width={120} height={65} title={"Quest Creator"} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed}
+                                        onPress={() => { this.props.navigation.navigate("AdventurePictureGallery", { adventure: this.state.adventure }) }}
+                                        fontSize={18} borderRadius={25} width={120} height={65} title={"Image Gallery"} />
+                                </View>
+                                <View style={{ flexDirection: "row" }}>
+                                    <AppButton padding={20} backgroundColor={Colors.pinkishSilver}
+                                        onPress={() => { this.props.navigation.navigate("ActiveQuestList", { adventure: adventure, isDmLevel: true }) }}
+                                        fontSize={18} borderRadius={25} width={120} height={65} title={"Active Quests"} />
+                                    <AppButton padding={20} backgroundColor={Colors.metallicBlue}
+                                        onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: true }) }}
+                                        fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
+                                </View>
+                                <Modal visible={this.state.questCreationModal} animationType="slide">
+                                    <CreateQuest edit={{ true: false }} adventure={this.state.adventure} close={(val: boolean) => {
+                                        this.setState({ questCreationModal: val })
+                                        this.reloadAdventureAfterQuest();
+                                    }} />
+                                </Modal>
+                            </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                                <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.back() }}
+                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
+                                <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => {
+                                    Alert.alert("Delete", "Are you sure you want to delete this adventure?", [{ text: 'Yes', onPress: () => this.deleteAdventure() }, { text: 'No' }])
+                                }}
+                                    fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
+                            </View>
+                        </ScrollView>
                     </View>
                 }
             </View>
@@ -282,7 +289,7 @@ const styles = StyleSheet.create({
 
     },
     main: {
-        flex: .2,
+        padding: 20,
         justifyContent: "center",
         alignItems: "center"
     }

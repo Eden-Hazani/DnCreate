@@ -6,11 +6,25 @@ import { AppTextInput } from '../../components/forms/AppTextInput';
 import { IconGen } from '../../components/IconGen';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
+import skillList from '../../../jsonDump/skillList.json'
+import toolList from '../../../jsonDump/toolList.json'
+import abilityScores from '../../../jsonDump/abilityScores.json'
+import { AppMultipleItemPicker } from '../../components/AppMultipleItemPicker';
+import AsyncStorage from '@react-native-community/async-storage';
+import { getSpecialSaveThrows } from '../../../utility/getSpecialSaveThrows';
 
 interface FeatOptionsState {
+    cashedSavingThrows: string[]
+    alreadyPickedSavingThrows: boolean[]
+    alreadyPickedSkills: boolean[]
+    alreadyPickedTools: boolean[]
     weaponsProfWindow: boolean
     armorProfWindow: boolean
+    savingThrowsWindow: boolean
+    skillProfWindow: boolean
+    toolProfWindow: boolean
     abilityPointsImprove: boolean
+    resetClicked: string,
     character: CharacterModel
     weaponProfArray: any[]
     armorProfArray: any[]
@@ -25,10 +39,18 @@ interface FeatOptionsState {
 }
 
 
-export class FeatOptions extends Component<{ featName: any, featDescription: any, resetAbilityScore: any, resetList: any, weaponsProfChange: any, armorProfChange: any, attributePointsChange: any, character: CharacterModel }, FeatOptionsState> {
+export class FeatOptions extends Component<{ savingThrowListChange: any, toolListChange: any, skillListChange: any, featName: any, featDescription: any, resetAbilityScore: any, resetList: any, weaponsProfChange: any, armorProfChange: any, attributePointsChange: any, character: CharacterModel }, FeatOptionsState> {
     constructor(props: any) {
         super(props)
         this.state = {
+            savingThrowsWindow: false,
+            cashedSavingThrows: [],
+            toolProfWindow: false,
+            alreadyPickedSavingThrows: [],
+            alreadyPickedSkills: [],
+            alreadyPickedTools: [],
+            resetClicked: '',
+            skillProfWindow: false,
             abilityClicked: [0, 0, 0, 0, 0, 0],
             armorProfArray: [],
             weaponProfArray: [],
@@ -95,6 +117,46 @@ export class FeatOptions extends Component<{ featName: any, featDescription: any
         })
     }
 
+    loadCashedSavingThrows = async () => {
+        if (!this.state.character.savingThrows || this.state.character.savingThrows.length === 0) {
+            const character = { ...this.state.character };
+            const cashedSavingThrows = await AsyncStorage.getItem(`${this.state.character._id}SavingThrows`);
+            const savingThrows: any = cashedSavingThrows !== null ? getSpecialSaveThrows(this.state.character).concat(JSON.parse(cashedSavingThrows)) : getSpecialSaveThrows(this.state.character)
+            this.setState({ cashedSavingThrows: savingThrows })
+            return
+        }
+        this.setState({ cashedSavingThrows: this.state.character.savingThrows })
+    }
+
+    async componentDidMount() {
+        await this.loadCashedSavingThrows()
+        if (this.state.character.skills) {
+            for (let item of this.state.character.skills) {
+                if (skillList.skillList.includes(item[0])) {
+                    const alreadyPickedSkills = this.state.alreadyPickedSkills;
+                    alreadyPickedSkills[skillList.skillList.indexOf(item[0])] = true;
+                    this.setState({ alreadyPickedSkills })
+                }
+            }
+        }
+        if (this.state.character.tools) {
+            for (let item of this.state.character.tools) {
+                if (toolList.tools.includes(item[0])) {
+                    const alreadyPickedTools = this.state.alreadyPickedTools;
+                    alreadyPickedTools[toolList.tools.indexOf(item[0])] = true;
+                    this.setState({ alreadyPickedTools })
+                }
+            }
+        }
+        for (let item of this.state.cashedSavingThrows) {
+            if (abilityScores.abilityScores.includes(item)) {
+                const alreadyPickedSavingThrows = this.state.alreadyPickedSavingThrows;
+                alreadyPickedSavingThrows[abilityScores.abilityScores.indexOf(item)] = true;
+                this.setState({ alreadyPickedSavingThrows })
+            }
+        }
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -140,6 +202,90 @@ export class FeatOptions extends Component<{ featName: any, featDescription: any
                         <AppTextInput placeholder={"name"} iconName={"text"} onChangeText={(text: string) => { this.setArmorProf(text) }} />
                     </View>
                 }
+
+                <View style={[styles.switchBox, { flexDirection: 'row', width: '50%', paddingLeft: 20 }]}>
+                    <AppText fontSize={18} textAlign={'center'}>Does this feat add Skill proficiencies?</AppText>
+                    <Switch value={this.state.skillProfWindow} onValueChange={() => {
+                        if (this.state.skillProfWindow) {
+                            this.setState({ resetClicked: 'skillList' }, () => {
+                                this.props.resetList('featSkillList')
+                                this.setState({ skillProfWindow: false }, () => {
+                                    setTimeout(() => {
+                                        this.setState({ resetClicked: "" })
+                                    }, 500);
+                                })
+                            })
+                            return;
+                        }
+                        this.setState({ skillProfWindow: true })
+                    }} />
+                </View>
+                {this.state.skillProfWindow &&
+                    <View>
+                        <AppText textAlign={'center'} fontSize={17} padding={8}>You can add any skill you like here, if you are going by an official feat read what skills are provided with it and pick accordingly</AppText>
+                        <AppMultipleItemPicker addAsProficiency={true} resetList={this.state.resetClicked === "skillList" ? true : false} list={skillList.skillList} alreadyPickedItems={this.state.alreadyPickedSkills} listChange={(val: any[]) => { this.props.skillListChange(val) }} />
+                    </View>
+                }
+                <View style={[styles.switchBox, { flexDirection: 'row', width: '50%', paddingLeft: 20 }]}>
+                    <AppText fontSize={18} textAlign={'center'}>Does this feat add Tool proficiencies?</AppText>
+                    <Switch value={this.state.toolProfWindow} onValueChange={() => {
+                        if (this.state.toolProfWindow) {
+                            this.setState({ resetClicked: 'toolList' }, () => {
+                                this.props.resetList('featToolList')
+                                this.setState({ toolProfWindow: false }, () => {
+                                    setTimeout(() => {
+                                        this.setState({ resetClicked: "" })
+                                    }, 500);
+                                })
+                            })
+                            return;
+                        }
+                        this.setState({ toolProfWindow: true })
+                    }} />
+                </View>
+                {this.state.toolProfWindow &&
+                    <View>
+                        <AppText textAlign={'center'} fontSize={17} padding={8}>You can add any Tools you like here, if you are going by an official feat read what tools are provided with it and pick accordingly</AppText>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                            <AppMultipleItemPicker addAsProficiency={true} resetList={this.state.resetClicked === "toolList" ? true : false}
+                                list={toolList.tools} alreadyPickedItems={this.state.alreadyPickedSkills} listChange={(val: any[]) => { this.props.toolListChange(val) }} />
+                        </View>
+                    </View>
+                }
+
+
+
+                <View style={[styles.switchBox, { flexDirection: 'row', width: '50%', paddingLeft: 20 }]}>
+                    <AppText fontSize={18} textAlign={'center'}>Does this feat add Saving Throw proficiencies?</AppText>
+                    <Switch value={this.state.savingThrowsWindow} onValueChange={() => {
+                        if (this.state.savingThrowsWindow) {
+                            this.setState({ resetClicked: 'saveThrows' }, () => {
+                                this.props.resetList('featToolList')
+                                this.setState({ savingThrowsWindow: false }, () => {
+                                    setTimeout(() => {
+                                        this.setState({ resetClicked: "" })
+                                    }, 500);
+                                })
+                            })
+                            return;
+                        }
+                        this.setState({ savingThrowsWindow: true })
+                    }} />
+                </View>
+                {this.state.savingThrowsWindow &&
+                    <View>
+                        <AppText textAlign={'center'} fontSize={17} padding={8}>You can add any Saving Throws you like here, if you are going by an official feat read what saving throws are provided with it and pick accordingly</AppText>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                            <AppMultipleItemPicker addAsProficiency={false} resetList={this.state.resetClicked === "saveThrows" ? true : false}
+                                list={abilityScores.abilityScores} alreadyPickedItems={this.state.alreadyPickedSavingThrows}
+                                listChange={(val: any[]) => { this.props.savingThrowListChange(val) }} />
+                        </View>
+                    </View>
+                }
+
+
+
+
                 <View style={[styles.switchBox, { flexDirection: 'row', width: '50%', paddingLeft: 20 }]}>
                     <AppText fontSize={18} textAlign={'center'}>Does this feat add any Ability Scores?</AppText>
                     <Switch value={this.state.abilityPointsImprove} onValueChange={() => {
@@ -190,5 +336,15 @@ const styles = StyleSheet.create({
     },
     switchBox: {
         paddingBottom: 25
+    },
+    item: {
+        width: 150,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 15,
+        margin: 15,
+        borderWidth: 1,
+        borderColor: Colors.black,
+        borderRadius: 25
     }
 });

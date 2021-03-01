@@ -1,4 +1,5 @@
 import { AdventureModel } from '../models/AdventureModel';
+import { AdventurePhotoArrayModal } from '../models/AdventurePhotoArrayModal';
 import { CharacterModel } from '../models/characterModel';
 import client from './client';
 
@@ -18,10 +19,36 @@ const saveAdventure = (adventure: AdventureModel) => {
     return client.post(`${endpoint}/createAdventure`, formData);
 };
 
+const addImageToAdventure = (adventure: AdventureModel, imageObj: AdventurePhotoArrayModal) => {
+    let formData = new FormData();
+    formData.append("adventure", JSON.stringify(adventure));
+    formData.append("imageObj", JSON.stringify(imageObj));
+    if (imageObj.photoUri) {
+        formData.append('newImage', {
+            uri: imageObj.photoUri,
+            type: 'image/jpeg',
+            name: `image`
+        });
+    }
+    return client.post(`${endpoint}/addImgToGallery`, formData);
+};
+
+const removeImageFromGallery = (adventure: AdventureModel, imageUri: string) => {
+    let formData = new FormData();
+    formData.append("adventure", JSON.stringify(adventure));
+    return client.patch(`${endpoint}/removeImgFromGallery/${imageUri}/${adventure._id}`, formData);
+};
+
 const updateAdventure = (adventure: AdventureModel) => {
     let formData = new FormData();
     formData.append("adventure", JSON.stringify(adventure));
     return client.patch(`${endpoint}/updateAdventure`, formData);
+};
+
+const editAdventure = (adventure: AdventureModel) => {
+    let formData = new FormData();
+    formData.append("adventure", JSON.stringify(adventure));
+    return client.patch(`${endpoint}/editAdventure`, formData);
 };
 
 const addAdventureParticipant = (adventure: AdventureModel) => {
@@ -71,5 +98,8 @@ export default {
     userInAdv,
     getSingleLeadingAdventure,
     getUserProfileImages,
-    addAdventureParticipant
+    editAdventure,
+    addImageToAdventure,
+    addAdventureParticipant,
+    removeImageFromGallery
 }

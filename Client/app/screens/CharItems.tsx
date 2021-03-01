@@ -23,7 +23,10 @@ interface CharItemsState {
     character: CharacterModel
     addItemModal: boolean
     changeCurrencyModal: boolean
-    newItem: string
+    newItem: {
+        name: string,
+        description: string
+    },
     newAmount: number
     newGold: number
     newSilver: number
@@ -45,7 +48,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
             newCopper: 0,
             changeCurrencyModal: false,
             newAmount: 0,
-            newItem: '',
+            newItem: { name: "", description: "" },
             addItemModal: false,
             character: this.props.route.params.isDm ? this.props.route.params.isDm : store.getState().character,
             search: '',
@@ -87,7 +90,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
 
 
     addItem = () => {
-        if (!this.state.newItem || this.state.newAmount === 0) {
+        if (this.state.newItem.name.length === 0 || this.state.newAmount === 0) {
             alert("Cannot Leave Name Or amount Empty!");
             return;
         }
@@ -97,7 +100,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
         this.setState({ character }, () => {
             store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
             this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
-            this.setState({ addItemModal: false })
+            this.setState({ addItemModal: false, newItem: { description: "", name: "" }, newAmount: 0 })
         })
 
     }
@@ -227,7 +230,18 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                     <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                         <View style={{ flex: .8, justifyContent: "center", alignItems: "center" }}>
                             <AppText color={Colors.bitterSweetRed} fontSize={25}>Add Item</AppText>
-                            <AppTextInput placeholder={'Item Name'} onChangeText={(item: string) => { this.setState({ newItem: item }) }} />
+                            <AppTextInput placeholder={'Item Name'} onChangeText={(item: string) => {
+                                const newItem = { ...this.state.newItem };
+                                newItem.name = item;
+                                this.setState({ newItem })
+                            }} />
+                            <AppTextInput
+                                numberOfLines={7} multiline={true} textAlignVertical={"top"}
+                                placeholder={'Item Description (optional)...'} onChangeText={(description: string) => {
+                                    const newItem = { ...this.state.newItem };
+                                    newItem.description = description;
+                                    this.setState({ newItem })
+                                }} />
                             <AppTextInput keyboardType={"numeric"} placeholder={'Amount'} onChangeText={(amount: number) => { this.setState({ newAmount: amount }) }} />
                         </View>
                         <View style={{ flex: .4, flexDirection: "row" }}>
@@ -258,7 +272,7 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                             data={this.state.character.items}
                             keyExtractor={(status, index) => index.toString()}
                             renderItem={({ item }) => <ListItem
-                                title={`Item - ${item[0]}`}
+                                title={item[0].name ? `Item - ${item[0].name}` : `Item - ${item[0]}`}
                                 subTitle={`Amount -  ${item[1]}`}
                                 direction={'row'}
                                 subColor={Colors.bitterSweetRed}
@@ -266,6 +280,8 @@ export class CharItems extends Component<{ navigation: any, route: any }, CharIt
                                 padding={20} width={60} height={60}
                                 headTextAlign={"left"}
                                 subTextAlign={"left"}
+                                secSubTextAlign={"left"}
+                                secSubTitle={item[0].description ? item[0].description : null}
                                 justifyContent={"flex-start"} textDistanceFromImg={10}
                                 renderLeftActions={() =>
                                     <ListItemDecreaseIncrease

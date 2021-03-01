@@ -78,7 +78,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 adventure.quests.push(quest);
                 this.setState({ adventure, completed: true }, () => {
                     store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
-                    adventureApi.updateAdventure(this.state.adventure).then(() => {
+                    adventureApi.editAdventure(this.state.adventure).then(() => {
                         setTimeout(() => {
                             this.props.close(false)
                         }, 1200);
@@ -108,6 +108,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                     alert(adventureObj.ok);
                     return;
                 }
+                console.log(adventureObj.data)
                 const adventure = adventureObj.data ? adventureObj.data[0] : new AdventureModel();
                 const newQuestList = adventure.quests.map((quest: QuestModal) => {
                     if (quest._id === _id) {
@@ -118,7 +119,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                 adventure.quests = newQuestList
                 this.setState({ adventure, completed: true }, () => {
                     store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: this.state.adventure });
-                    adventureApi.updateAdventure(this.state.adventure).then(() => {
+                    adventureApi.editAdventure(this.state.adventure).then(() => {
                         setTimeout(() => {
                             this.props.close({ isDone: false, info: this.state.adventure })
                         }, 1200);
@@ -229,7 +230,7 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                                 </View>
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-                                <SubmitButton textAlign={'center'} title={"Create Quest"} marginBottom={1} />
+                                <SubmitButton textAlign={'center'} title={this.props.edit.true ? "Ok" : "Create Quest"} marginBottom={1} />
                                 <AppButton padding={20} backgroundColor={Colors.pinkishSilver} onPress={() => { this.props.close({ isDone: false, info: this.state.adventure }) }}
                                     fontSize={18} borderRadius={25} width={120} height={65} title={"Exit and Cancel"} />
                             </View>

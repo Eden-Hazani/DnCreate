@@ -144,7 +144,7 @@ export default function AnimatedCenterHorizontalList(data: any) {
         });
         newAdventure.quests = newQuestList;
         setAdventure(newAdventure)
-        adventureApi.updateAdventure(newAdventure);
+        adventureApi.editAdventure(newAdventure);
         store.dispatch({ type: ActionType.UpdateSingleAdventure, payload: newAdventure });
         const activeQuests = adventure.quests.filter((quest: QuestModal) => quest.active)
         setQuests(activeQuests)

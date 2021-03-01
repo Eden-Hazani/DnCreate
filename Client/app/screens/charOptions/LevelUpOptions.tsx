@@ -32,6 +32,7 @@ import logger from '../../../utility/logger';
 import { RaceModel } from '../../models/raceModel';
 import subClassesApi from '../../api/subClassesApi';
 import { SubClassList } from './SubClassList';
+import { getSpecialSaveThrows } from '../../../utility/getSpecialSaveThrows';
 
 
 interface LevelUpOptionsState {
@@ -93,6 +94,9 @@ interface LevelUpOptionsState {
     numberOfChoices: number,
     spellListToLoad: any,
     addSpellAvailabilityByName: string[]
+    featSkillList: any[]
+    featToolList: any[]
+    featSavingThrowList: string[]
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
@@ -157,7 +161,10 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             newPathChoice: null,
             customPathFeatureList: [],
             numberOfChoices: 0,
-            spellListToLoad: null
+            spellListToLoad: null,
+            featSkillList: [],
+            featToolList: [],
+            featSavingThrowList: []
         }
     }
 
@@ -909,6 +916,19 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     alert('You must provide a name and description for your feat.');
                     return;
                 }
+                if (this.state.featSkillList.length > 0) {
+                    this.state.featSkillList.forEach((item) => character.skills?.push(item))
+                }
+                if (this.state.featToolList.length > 0) {
+                    this.state.featToolList.forEach((item) => character.tools?.push(item))
+                }
+                if (this.state.featSavingThrowList.length > 0) {
+                    const savingThrows: any = getSpecialSaveThrows(this.state.character)
+                    if (savingThrows) {
+                        this.state.featSavingThrowList.forEach((item) => savingThrows.push(item));
+                        character.savingThrows = savingThrows
+                    }
+                }
                 this.state.weaponProfArray.forEach(item => {
                     if (character.addedWeaponProf !== undefined) {
                         character.addedWeaponProf.push(item)
@@ -1210,10 +1230,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                             }}
                                             armorProfChange={(e: any) => {
                                                 let armorProfArray = this.state.armorProfArray;
-                                                armorProfArray = e.split(',').filter((i: any) => i);;
+                                                armorProfArray = e.split(',').filter((i: any) => i);
                                                 this.setState({ armorProfArray }, () => {
                                                 })
                                             }}
+                                            skillListChange={(featSkillList: any[]) => { this.setState({ featSkillList }) }}
+                                            savingThrowListChange={(featSavingThrowList: any[]) => { this.setState({ featSavingThrowList }) }}
+                                            toolListChange={(featToolList: any[]) => { this.setState({ featToolList }) }}
                                             attributePointsChange={(abilityName: string, ability: number) => { this.setState({ [abilityName]: ability } as any) }}
                                             resetList={(listName: string) => { this.setState({ [listName]: [] } as any) }}
                                             resetAbilityScore={() => { this.resetAbilityScoresToCurrentLevel() }} />
@@ -1259,6 +1282,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                             elementsToPick={(val: any) => { this.setState({ ElementsToPick: val }) }}
                                                             loadElements={(val: any) => { this.setState({ elements: val }) }}
                                                             loadManeuvers={(val: any) => { this.setState({ maneuvers: val }) }}
+                                                            returnSavingThrows={(val: any) => {
+                                                                const character = { ...this.state.character };
+                                                                if (character.savingThrows) {
+                                                                    character.savingThrows.push(val)
+                                                                    this.setState({ character })
+                                                                }
+                                                            }}
                                                             loadUnrestrictedMagic={(magicNumber: number) => {
                                                                 const character = { ...this.state.character };
                                                                 character.unrestrictedKnownSpells = (character.unrestrictedKnownSpells ? character.unrestrictedKnownSpells : 0) + magicNumber;
