@@ -23,7 +23,7 @@ export class AppText extends Component<any, any> {
 
     render() {
         return (
-            <Text numberOfLines={this.props.numberOfLines} style={{
+            <Text numberOfLines={this.props.numberOfLines} adjustsFontSizeToFit style={{
                 paddingBottom: this.props.paddingBottom,
                 fontWeight: this.props.fontWeight,
                 width: this.props.width,

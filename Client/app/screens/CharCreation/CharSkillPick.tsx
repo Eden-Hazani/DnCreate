@@ -124,6 +124,8 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             if (characterInfo.charSpecials) {
                 characterInfo.charSpecials[v] = false
                 characterInfo.charSpecials.sorcererMetamagic = []
+                characterInfo.charSpecials.artificerInfusions = []
+                characterInfo.charSpecials.currentInfusedItems = []
                 characterInfo.charSpecials.eldritchInvocations = []
                 characterInfo.charSpecials.battleMasterManeuvers = []
                 characterInfo.charSpecials.fightingStyle = []

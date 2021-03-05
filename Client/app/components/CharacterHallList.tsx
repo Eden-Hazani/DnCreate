@@ -21,6 +21,7 @@ const classesBackgrounds = {
     Sorcerer: `${Config.serverUrl}/assets/classBackGrounds/SorcererFinal.png`,
     Warlock: `${Config.serverUrl}/assets/classBackGrounds/WarlockFinal.png`,
     Wizard: `${Config.serverUrl}/assets/classBackGrounds/WizardFinal.jpg`,
+    Artificer: `${Config.serverUrl}/assets/classBackGrounds/ArtificerFinal.png`,
 }
 
 
@@ -80,7 +81,8 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                     <IconGen name={'trash-can-outline'} size={70}
                                         borderWidth={2}
                                         borderColor={Colors.whiteInDarkMode}
-                                        backgroundColor={Colors.burgundy} />
+                                        iconColor={Colors.bitterSweetRed}
+                                        backgroundColor={Colors.softPageBackground} />
                                 </TouchableOpacity>
                             </Animated.View>
                             <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
@@ -92,13 +94,14 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                     <Image uri={`${Config.serverUrl}/assets/races/${item.image}`}
                                         style={{ width: 150, height: 150 }} />
                                     <View style={{
-                                        backgroundColor: Colors.burgundy, padding: 15, justifyContent: "center",
+                                        backgroundColor: Colors.softPageBackground, padding: 15, justifyContent: "center",
                                         borderColor: Colors.whiteInDarkMode,
                                         borderWidth: 2, width: width * 0.7, alignItems: "center", borderRadius: 25
                                     }}>
-                                        <AppText fontSize={25} color={Colors.deepGold}>{item.name}</AppText>
-                                        <AppText fontSize={22} color={Colors.deepGold}>{item.race} {item.characterClass}</AppText>
-                                        <AppText fontSize={22} color={Colors.deepGold}>Level {item.level}</AppText>
+                                        <AppText textAlign={'center'} fontSize={25} color={Colors.bitterSweetRed}>{item.name}</AppText>
+                                        <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>{item.race}</AppText>
+                                        <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>{item.characterClass}</AppText>
+                                        <AppText textAlign={'center'} fontSize={22} color={Colors.bitterSweetRed}>Level {item.level}</AppText>
                                     </View>
                                 </TouchableOpacity>
 

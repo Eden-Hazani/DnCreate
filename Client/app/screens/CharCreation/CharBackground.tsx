@@ -414,8 +414,8 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                 </AppForm>
                             </View>}
                         {this.state.officialWindow &&
-                            <View>
-                                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                            <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
                                     {Object.values(backgroundsJson).map((item: any, index: number) =>
                                         <TouchableOpacity style={[styles.skill, { backgroundColor: this.state.officialClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]} key={index}
                                             onPress={() => {

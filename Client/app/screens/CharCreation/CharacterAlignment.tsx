@@ -43,8 +43,14 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
         }
     }
     componentDidMount() {
-        if (this.props.updateAlignment) {
-            this.setState({ characterInfo: this.props.route.params.character })
+        if (this.state.updateAlignment) {
+            this.setState({ characterInfo: this.props.route.params.character }, () => {
+                if (!this.state.characterInfo.characterAlignment) {
+                    const characterInfo = { ...this.state.characterInfo };
+                    characterInfo.characterAlignment = { alignment: '', alignmentDescription: '' }
+                    this.setState({ characterInfo })
+                }
+            })
         }
     }
 
@@ -108,6 +114,7 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
                 characterInfo.characterAlignment.alignment = alignmentItem
                 this.setState({ characterInfo, clickedAlignment: index })
                 console.log(characterInfo.characterAlignment)
+                return
             }
         }
     }

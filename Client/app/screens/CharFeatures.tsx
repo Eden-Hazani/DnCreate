@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { CharacterModel } from '../models/characterModel';
 import * as features from '../classFeatures/features';
 import { cos } from 'react-native-reanimated';
@@ -8,12 +8,16 @@ import { Colors } from '../config/colors';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { AppText } from '../components/AppText';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
+import { Image } from 'react-native-expo-image-cache';
+import { classesDragonsBackgrounds } from '../../utility/charClassesBackgrounds';
 
 interface CharFeaturesState {
     charFeatures: any
     character: CharacterModel
     loading: boolean
 }
+
+
 
 export class CharFeatures extends Component<{ route: any }, CharFeaturesState> {
     constructor(props: any) {
@@ -36,12 +40,13 @@ export class CharFeatures extends Component<{ route: any }, CharFeaturesState> {
                 {this.state.loading ?
                     <AppActivityIndicator visible={this.state.loading} />
                     :
-                    <View>
+                    <View style={{ flex: 1 }}>
                         <View style={{ justifyContent: "center", alignItems: "center" }}>
                             <AppText fontSize={20}>Level {this.state.character.level} {this.state.character.characterClass} Features</AppText>
                         </View>
+                        <Image uri={classesDragonsBackgrounds[this.state.character.characterClass || '']} style={{ width: 120, height: 120, alignSelf: "center" }} />
                         <FlatList
-                            style={{ marginBottom: 50 }}
+                            contentContainerStyle={{ paddingBottom: 20 }}
                             data={this.state.charFeatures.features}
                             keyExtractor={(features, index) => index.toString()}
                             renderItem={({ item }) => <ListItem
@@ -69,6 +74,6 @@ export class CharFeatures extends Component<{ route: any }, CharFeaturesState> {
 
 const styles = StyleSheet.create({
     container: {
-
+        flex: 1
     }
 });

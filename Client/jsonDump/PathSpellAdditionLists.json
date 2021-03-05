@@ -309,6 +309,136 @@
             }
         }
     },
+    "Artificer": {
+        "Alchemist": {
+            "3": {
+                "spellList": [
+                    "Healing Word",
+                    "Ray of Sickness"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Flaming Sphere",
+                    "Melf's Acid Arrow"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Gaseous Form",
+                    "Mass Healing Word"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Blight",
+                    "Death Ward"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Cloudkill",
+                    "Raise Dead"
+                ]
+            }
+        },
+        "Battle Smith": {
+            "3": {
+                "spellList": [
+                    "Heroism",
+                    "Shield"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Branding Smite",
+                    "Warding Bond"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Aura of Vitality",
+                    "Conjure Barrage"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Aura of Purity",
+                    "Fire Shield"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Banishing Smite",
+                    "Mass Cure Wounds"
+                ]
+            }
+        },
+        "Artillerist": {
+            "3": {
+                "spellList": [
+                    "Shield",
+                    "Thunderwave"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Scorching Ray",
+                    "Shatter"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Fireball",
+                    "Wind Wall"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Ice Storm",
+                    "Wall of Fire"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Cone of Cold",
+                    "Wall of Force"
+                ]
+            }
+        },
+        "Armorer": {
+            "3": {
+                "spellList": [
+                    "Magic Missile",
+                    "Thunderwave"
+                ]
+            },
+            "5": {
+                "spellList": [
+                    "Mirror Image",
+                    "Shatter"
+                ]
+            },
+            "9": {
+                "spellList": [
+                    "Hypnotic Pattern",
+                    "Lightning Bolt"
+                ]
+            },
+            "13": {
+                "spellList": [
+                    "Fire Shield",
+                    "Greater Invisibility"
+                ]
+            },
+            "17": {
+                "spellList": [
+                    "Passwall",
+                    "Wall of Force"
+                ]
+            }
+        }
+    },
     "Cleric": {
         "Arcana Domain": {
             "1": {

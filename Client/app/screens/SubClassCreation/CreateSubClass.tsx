@@ -104,13 +104,13 @@ export class CreateSubClass extends Component<{ navigation: any }, CreateSubClas
                                     placeholder={"Subclass Description..."} />
                             </View>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                <AppText padding={5} textAlign={'center'}>The classes Cleric, Druid, and Paladin are locked for now, they will be released at a later date</AppText>
+                                <AppText padding={5} textAlign={'center'}>The classes Cleric, Druid, Artificer, and Paladin are locked for now, they will be released at a later date</AppText>
                                 <AppText padding={5} textAlign={'center'}>If you would like to help with the development speed please consider donating to us on Patreon</AppText>
                             </View>
                             <View>
                                 <View style={{ flexDirection: 'row', flexWrap: "wrap" }}>
                                     {classList.classList.map((item: any, index: any) => <TouchableOpacity
-                                        disabled={item === "Druid" || item === "Cleric" || item === "Paladin"}
+                                        disabled={item === "Druid" || item === "Cleric" || item === "Paladin" || item === "Artificer"}
                                         key={index} onPress={() => this.pickClass(item, index)}
                                         style={[styles.item, {
                                             backgroundColor:

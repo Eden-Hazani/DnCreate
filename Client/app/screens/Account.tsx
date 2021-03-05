@@ -105,7 +105,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
         const user = await authApi.updateProfilePic(values, this.state.userInfo);
         this.setState({ userInfo: user.data.user }, () => {
             store.dispatch({ type: ActionType.SetUserInfo, payload: this.state.userInfo })
-            this.setState({ changeProfileModal: false })
+            this.setState({ changeProfileModal: false, currentImgUri: `${Config.serverUrl}/uploads/profile-imgs/${this.state.userInfo.profileImg}` || "" })
         })
     }
 

@@ -25,6 +25,9 @@ export function charCanSpellCast(spellClass: string) {
         case spellClass === "Wizard":
             canSpellCast = true
             break;
+        case spellClass === "Artificer":
+            canSpellCast = true
+            break;
 
     }
 

@@ -140,7 +140,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                         }
                     </View>
                     {(this.props.character.characterClass === 'Wizard' || this.props.character.characterClass === 'Cleric'
-                        || this.props.character.characterClass === 'Paladin' || this.props.character.characterClass === 'Druid') ?
+                        || this.props.character.characterClass === 'Paladin' || this.props.character.characterClass === 'Druid' || this.props.character.characterClass === 'Artificer') ?
                         <View>
                             <AppText textAlign={'center'} fontSize={18}>Remember that as a {this.props.character.characterClass} your known spells are the spells you have prepared for the day and can be replaced every long rest.</AppText>
                         </View>

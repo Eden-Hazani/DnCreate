@@ -104,7 +104,8 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             }
             return newSpells
         } catch (err) {
-            logger.log(new Error(err))
+            console.log(err)
+            // logger.log(new Error(err))
         }
     }
     loadSpells = (shownSpells: any[]) => {

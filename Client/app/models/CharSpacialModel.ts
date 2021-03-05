@@ -23,6 +23,9 @@ export class CharSpacialModel {
         public companion?: CompanionModel[],
         public warlockSpellSlotLevel?: string,
         public warlockSpellSlots?: number,
-        public dragonBornAncestry?: any
+        public dragonBornAncestry?: any,
+        public alwaysOnToolExpertise?: boolean,
+        public currentInfusedItems?: any[],
+        public artificerInfusions?: any[]
     ) { }
 }

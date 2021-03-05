@@ -23,6 +23,7 @@ export class PathFeatures extends Component<{ route: any }, PathFeaturesState> {
         }
     }
     componentDidMount() {
+        console.log(this.props.route.params.char.pathFeatures)
         setTimeout(() => {
             this.setState({ loading: false })
         }, 800);
@@ -37,10 +38,10 @@ export class PathFeatures extends Component<{ route: any }, PathFeaturesState> {
                         <View style={{ justifyContent: "center", alignItems: "center" }}>
                             <AppText fontSize={20}>Level {this.state.character.level} {this.state.character.characterClass} Path Features</AppText>
                         </View>
-                        {this.state.pathFeatures.map((feature: any) =>
-                            <View key={feature.name} style={styles.item}>
+                        {this.state.pathFeatures.map((feature: any) => {
+                            return feature.name && <View key={feature.name} style={styles.item}>
                                 <AppText fontSize={28} color={Colors.berries}>{feature.name}</AppText>
-                                <AppText fontSize={20}>{feature.description.replace(/\. /g, '.\n\n')}</AppText>
+                                {feature.description && <AppText fontSize={20}>{feature.description.replace(/\. /g, '.\n\n')}</AppText>}
                                 {feature.choice ?
                                     <View style={{ marginTop: 15 }}>
                                         {feature.choice.map((choice: any) =>
@@ -51,7 +52,8 @@ export class PathFeatures extends Component<{ route: any }, PathFeaturesState> {
                                         )}
                                     </View>
                                     : null}
-                            </View>)}
+                            </View>
+                        })}
                     </View>
                 }
             </ScrollView>

@@ -18,8 +18,11 @@ export class AppButton extends Component<any>{
                 <View style=
                     {[styles.button,
                     {
+                        flexShrink: 1,
                         marginBottom: this.props.marginBottom,
-                        backgroundColor: this.props.disabled ? Colors.lightGray : this.props.backgroundColor, width: this.props.width, height: this.props.height,
+                        backgroundColor: this.props.disabled ? Colors.lightGray : this.props.backgroundColor,
+                        width: this.props.width,
+                        height: this.props.height,
                         borderRadius: this.props.borderRadius, display: this.props.display
                     }]}>
                     {this.props.highlightText ?

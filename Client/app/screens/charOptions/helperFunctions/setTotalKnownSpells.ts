@@ -27,6 +27,9 @@ export function setTotalKnownSpells(character: CharacterModel) {
         case charClass === "Wizard":
             knownSpells = int + level;
             break;
+        case charClass === "Artificer":
+            knownSpells = int + (Math.floor(level / 2));
+            break;
         case charClass === "Druid":
             knownSpells = wiz + level;
             break;

@@ -42,6 +42,7 @@ import { ChangeMaxHp } from '../components/ChangeMaxHp';
 import { TutorialScreen } from '../components/TutorialScreen';
 import { ExperienceCalculator } from '../components/ExperienceCalculator';
 import { killToolArrayDuplicates } from '../../utility/killToolArrayDuplicates';
+import { Image as CashImage } from 'react-native-expo-image-cache'
 
 
 /**
@@ -596,6 +597,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </TouchableOpacity>
                                 <Modal visible={this.state.backGroundStoryVisible} animationType="slide">
                                     <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                        <CashImage uri={`${Config.serverUrl}/assets/specificDragons/backstoryDragon.png`} style={{ width: 150, height: 150, alignSelf: "center" }} />
                                         <View style={{ flex: .8, padding: 25 }}>
                                             <AppText textAlign={"left"} fontSize={35} color={Colors.bitterSweetRed}>{`${this.state.character.name}'s Story`}</AppText>
                                             <AppText textAlign={"left"} fontSize={20}>{this.state.character.backStory}</AppText>
@@ -877,8 +879,12 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAlignment", { updateAlignment: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>
                                 <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Alignment</AppText>
-                                {this.state.character.characterAlignment?.alignment && <AppText fontSize={20}>{this.state.character.characterAlignment?.alignment}</AppText>}
-                                {this.state.character.characterAlignment?.alignmentDescription && <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>}
+                                {this.state.character.characterAlignment &&
+                                    <View>
+                                        {this.state.character.characterAlignment.alignment.length > 0 && <AppText fontSize={20}>{this.state.character.characterAlignment?.alignment}</AppText>}
+                                        {this.state.character.characterAlignment?.alignmentDescription.length > 0 && this.state.character.characterAlignment.alignmentDescription.length > 0 && <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>}
+                                    </View>
+                                }
                             </TouchableOpacity>
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAppearance", { updateAppearance: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>

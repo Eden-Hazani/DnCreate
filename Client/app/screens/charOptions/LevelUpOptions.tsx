@@ -33,6 +33,7 @@ import { RaceModel } from '../../models/raceModel';
 import subClassesApi from '../../api/subClassesApi';
 import { SubClassList } from './SubClassList';
 import { getSpecialSaveThrows } from '../../../utility/getSpecialSaveThrows';
+import { AppArtificerInfusionPicker } from '../../components/AppArtificerInfusionPicker';
 
 
 interface LevelUpOptionsState {
@@ -97,6 +98,8 @@ interface LevelUpOptionsState {
     featSkillList: any[]
     featToolList: any[]
     featSavingThrowList: string[]
+    infusions: any
+    infusionsToPick: any
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
@@ -104,6 +107,8 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     constructor(props: any) {
         super(props)
         this.state = {
+            infusions: this.props.character.charSpecials && this.props.character.charSpecials.artificerInfusions,
+            infusionsToPick: false,
             addSpellAvailabilityByName: [],
             armorToLoad: null,
             specificSpell: null,
@@ -884,6 +889,13 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
 
             }
+            if (this.state.infusionsToPick) {
+                alert('You have additional infusions to pick from')
+                return;
+            }
+            if (character.charSpecials) {
+                character.charSpecials.artificerInfusions = this.state.infusions
+            }
             if (this.props.options.extraSpells) {
                 for (let item of this.props.options.extraSpells) {
                     const spell = spellsJSON.find(spell => spell.name === item)
@@ -1028,6 +1040,9 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     }
                 }
             }
+            if (this.props.options.alwaysOnToolExpertise && character.charSpecials) {
+                character.charSpecials.alwaysOnToolExpertise = true
+            }
             if (this.state.addSpellAvailabilityByName.length > 0) {
                 for (let item of this.state.addSpellAvailabilityByName) {
                     if (character.addSpellAvailabilityByName) {
@@ -1060,6 +1075,11 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
                 if (character.charSpecials) {
                     character.charSpecials.warlockPactBoon = this.state.pact;
+                }
+            }
+            if (character.charSpecials?.alwaysOnToolExpertise && character.tools) {
+                for (let item of character.tools) {
+                    item[1] = 2
                 }
             }
             this.setState({ character }, async () => {
@@ -1171,6 +1191,17 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 </View>
                             </View>
                             :
+                            null}
+                        {this.props.options.alwaysOnToolExpertise ?
+                            <View style={{ padding: 15 }}>
+                                <AppText fontSize={18} textAlign={'center'}>You have expertise with all your proficient tools, doubling your proficiency score for them</AppText>
+                            </View>
+                            : null}
+                        {this.props.options.totalInfusions ?
+                            <View>
+                                <AppArtificerInfusionPicker character={this.state.character} totalInfusions={this.props.options.totalInfusions}
+                                    loadInfusions={(val: any) => this.setState({ infusions: val })} infusionsToPick={(val: boolean) => this.setState({ infusionsToPick: val })} />
+                            </View> :
                             null}
                         {this.props.options.rageAmount ?
                             <View>

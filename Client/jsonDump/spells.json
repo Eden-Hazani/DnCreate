@@ -3,7 +3,8 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -21,7 +22,8 @@
         "tags": [
             "sorcerer",
             "wizard",
-            "cantrip"
+            "cantrip",
+            "artificer"
         ],
         "type": "Conjuration cantrip"
     },
@@ -29,6 +31,7 @@
         "casting_time": "1 action",
         "classes": [
             "ranger",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -49,10 +52,70 @@
         "school": "abjuration",
         "tags": [
             "ranger",
+            "artificer",
             "wizard",
             "level1"
         ],
         "type": "1st-level abjuration (ritual)"
+    },
+    {
+        "casting_time": "1 bonus action",
+        "classes": [
+            "artificer"
+        ],
+        "components": {
+            "material": false,
+            "materials_needed": [],
+            "raw": "V, S",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You channel arcane energy into one simple or martial weapon you’re holding, and choose one damage type: acid, cold, fire, lightning, poison, or thunder. Until the spell ends, you deal an extra 1d6 damage of the chosen type to any target you hit with the weapon. If the weapon isn’t magical, it becomes a magic weapon for the spell’s duration. As a bonus action, you can change the damage type, choosing from the options above.",
+        "duration": "Concentration, up to 1 hour",
+        "level": "1",
+        "name": "Arcane Weapon",
+        "range": "Self",
+        "ritual": false,
+        "school": "transmutation",
+        "tags": [
+            "artificer",
+            "level1"
+        ],
+        "type": "1st-level transmutation"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "artificer",
+            "wizard",
+            "sorcerer",
+            "warlock"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a melee weapon worth at least 1 sp"
+            ],
+            "raw": "S, M (a melee weapon worth at least 1 sp)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You brandish the weapon used in the spell’s casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack’s normal effects and then becomes sheathed in booming energy until the start of your next turn. If the target willingly moves 5 feet or more before then, the target takes 1d8 thunder damage, and the spell ends.",
+        "duration": "1 round",
+        "level": "cantrip",
+        "name": "Booming Blade",
+        "range": "Self (5-foot radius)",
+        "ritual": false,
+        "school": "abjuration",
+        "higher_levels": "At 5th level, the melee attack deals an extra 1d8 thunder damage to the target on a hit, and the damage the target takes for moving increases to 2d8. Both damage rolls increase by 1d8 at 11th level (2d8 and 3d8) and again at 17th level (3d8 and 4d8).",
+        "tags": [
+            "artificer",
+            "wizard",
+            "warlock",
+            "sorcerer",
+            "cantrip"
+        ],
+        "type": "Evocation cantrip"
     },
     {
         "casting_time": "1 action",
@@ -446,6 +509,7 @@
             "cleric",
             "druid",
             "paladin",
+            "artificer",
             "ranger"
         ],
         "components": {
@@ -465,6 +529,7 @@
         "tags": [
             "bard",
             "cleric",
+            "artificer",
             "druid",
             "paladin",
             "ranger",
@@ -477,7 +542,8 @@
         "classes": [
             "bard",
             "sorcerer",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -499,6 +565,7 @@
             "bard",
             "sorcerer",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Evocation cantrip"
@@ -537,6 +604,7 @@
             "druid",
             "paladin",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -556,6 +624,7 @@
         "tags": [
             "bard",
             "cleric",
+            "artificer",
             "druid",
             "paladin",
             "ranger",
@@ -603,6 +672,7 @@
         "classes": [
             "bard",
             "cleric",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -621,6 +691,7 @@
         "school": "illusion",
         "tags": [
             "bard",
+            "artificer",
             "cleric (trickery)",
             "sorcerer",
             "wizard",
@@ -778,7 +849,8 @@
         "casting_time": "1 action",
         "classes": [
             "bard",
-            "druid"
+            "druid",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -796,6 +868,7 @@
         "tags": [
             "bard",
             "druid",
+            "artificer",
             "level1"
         ],
         "type": "1st-level evocation"
@@ -805,6 +878,7 @@
         "classes": [
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -823,6 +897,7 @@
         "tags": [
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard",
             "level1"
         ],
@@ -832,6 +907,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -854,6 +930,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "level1"
         ],
         "type": "1st-level necromancy"
@@ -863,6 +940,7 @@
         "classes": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -885,6 +963,7 @@
             "bard",
             "sorcerer",
             "wizard",
+            "artificer",
             "level1"
         ],
         "type": "1st-level transmutation"
@@ -919,8 +998,43 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "artificer",
+            "wizard",
             "sorcerer",
-            "wizard"
+            "warlock"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a melee weapon worth at least 1 sp"
+            ],
+            "raw": "S, M (a melee weapon worth at least 1 sp)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You brandish the weapon used in the spell’s casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack’s normal effects, and you can cause green fire to leap from the target to a different creature of your choice that you can see within 5 feet of it. The second creature takes fire damage equal to your spellcasting ability modifier.",
+        "duration": "1 round",
+        "level": "cantrip",
+        "name": "Green-Flame Blade",
+        "range": "Self (5-foot radius)",
+        "ritual": false,
+        "school": "abjuration",
+        "higher_levels": "At 5th level, the melee attack deals an extra 1d8 fire damage to the target on a hit, and the fire damage to the second creature increases to 1d8 + your spellcasting ability modifier. Both damage rolls increase by 1d8 at 11th level (2d8 and 2d8) and 17th level (3d8 and 3d8).",
+        "tags": [
+            "artificer",
+            "wizard",
+            "warlock",
+            "sorcerer",
+            "cantrip"
+        ],
+        "type": "Evocation cantrip"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "sorcerer",
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -938,7 +1052,8 @@
         "tags": [
             "sorcerer",
             "wizard",
-            "cantrip"
+            "cantrip",
+            "artificer"
         ],
         "type": "Evocation cantrip"
     },
@@ -1038,7 +1153,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -1058,6 +1174,7 @@
         "school": "conjuration",
         "tags": [
             "wizard",
+            "artificer",
             "level1"
         ],
         "type": "1st-level conjuration"
@@ -1066,7 +1183,8 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
-            "druid"
+            "druid",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -1084,7 +1202,8 @@
         "tags": [
             "cleric",
             "druid",
-            "cantrip"
+            "cantrip",
+            "artificer"
         ],
         "type": "Divination cantrip"
     },
@@ -1275,6 +1394,7 @@
         "casting_time": "1 minute",
         "classes": [
             "bard",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -1296,6 +1416,7 @@
         "tags": [
             "bard",
             "wizard",
+            "artificer",
             "level1"
         ],
         "type": "1st-level divination (Ritual)"
@@ -1423,6 +1544,7 @@
         "classes": [
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -1446,6 +1568,7 @@
             "druid",
             "ranger",
             "sorcerer",
+            "artificer",
             "wizard",
             "level1"
         ],
@@ -1457,6 +1580,7 @@
             "bard",
             "cleric",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -1478,6 +1602,41 @@
         "tags": [
             "bard",
             "cleric",
+            "artificer",
+            "sorcerer",
+            "wizard",
+            "cantrip"
+        ],
+        "type": "Evocation cantrip"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "bard",
+            "cleric",
+            "sorcerer",
+            "artificer",
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "materials_needed": [],
+            "raw": "V",
+            "somatic": false,
+            "verbal": true
+        },
+        "description": "You create a lash of lightning energy that strikes at one creature of your choice that you can see within 15 feet of you. The target must succeed on a Strength saving throw or be pulled up to 10 feet in a straight line toward you and then take 1d8 lightning damage if it is within 5 feet of you.",
+        "duration": "Instantaneous",
+        "level": "cantrip",
+        "name": "Lightning Lure",
+        "higher_levels": "This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+        "range": "Self (15-foot radius)",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "bard",
+            "cleric",
+            "artificer",
             "sorcerer",
             "wizard",
             "cantrip"
@@ -1490,6 +1649,7 @@
             "bard",
             "druid",
             "ranger",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -1512,6 +1672,7 @@
         "tags": [
             "bard",
             "druid",
+            "artificer",
             "ranger",
             "wizard",
             "level1"
@@ -1550,6 +1711,7 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "artificer",
             "bard",
             "sorcerer",
             "warlock",
@@ -1571,6 +1733,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "warlock",
             "wizard",
             "cantrip"
@@ -1610,6 +1773,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -1634,6 +1798,7 @@
             "cleric",
             "druid",
             "sorcerer",
+            "artificer",
             "wizard",
             "cantrip"
         ],
@@ -1643,6 +1808,7 @@
         "casting_time": "1 action",
         "classes": [
             "bard",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -1665,6 +1831,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard",
             "cantrip"
         ],
@@ -1709,6 +1876,7 @@
             "druid",
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -1729,6 +1897,7 @@
             "sorcerer",
             "warlock",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Conjuration cantrip"
@@ -1739,7 +1908,8 @@
             "bard",
             "sorcerer",
             "warlock",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -1757,6 +1927,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "warlock",
             "wizard",
             "cantrip"
@@ -1825,6 +1996,7 @@
         "classes": [
             "cleric",
             "druid",
+            "artificer",
             "paladin"
         ],
         "components": {
@@ -1843,6 +2015,7 @@
         "tags": [
             "cleric",
             "druid",
+            "artificer",
             "paladin",
             "level1"
         ],
@@ -1852,7 +2025,8 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -1870,6 +2044,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Evocation cantrip"
@@ -2005,6 +2180,7 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
+            "artificer",
             "druid"
         ],
         "components": {
@@ -2026,6 +2202,7 @@
         "tags": [
             "cleric",
             "druid",
+            "artificer",
             "cantrip"
         ],
         "type": "Abjuration cantrip"
@@ -2057,6 +2234,7 @@
     {
         "casting_time": "1 bonus action",
         "classes": [
+            "artificer",
             "cleric"
         ],
         "components": {
@@ -2077,9 +2255,76 @@
         "school": "abjuration",
         "tags": [
             "cleric",
+            "artificer",
             "level1"
         ],
         "type": "1st-level abjuration"
+    },
+    {
+        "casting_time": "1 bonus action",
+        "classes": [
+            "artificer",
+            "druid",
+            "ranger",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "30 feet of cord or rope, which is consumed by the spell"
+            ],
+            "raw": "V, S, M (30 feet of cord or rope, which is consumed by the spell)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "While you cast this spell, you use the cord or rope to create a circle with a 5-foot radius on a flat surface within your reach. When you finish casting, the cord or rope disappears to become a magical trap. The trap is nearly invisible and requires a successful Intelligence (Investigation) check against your spell save DC to be found. The trap triggers when a Small creature or larger moves into the area protected by the spell. The triggering creature must succeed on a Dexterity saving throw or fall prone and be hoisted into the air until it hangs upside down 3 feet above the protected surface, where it is restrained. The restrained creature can make a Dexterity saving throw with disadvantage at the end of each of its turns and ends the restrained effect on a success. Alternatively, another creature that can reach the restrained creature can use an action to make an Intelligence (Arcana) check against your spell save DC. On a success, the restrained effect also ends.",
+        "duration": "Until dispelled or triggered",
+        "level": "1",
+        "name": "Snare",
+        "range": "Touch",
+        "ritual": false,
+        "school": "abjuration",
+        "tags": [
+            "artificer",
+            "druid",
+            "ranger",
+            "wizard",
+            "level1"
+        ],
+        "type": "1st-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "artificer",
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a bit of rotten food"
+            ],
+            "raw": "V, S, M (a bit of rotten food)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "A stream of acid emanates from you in a line 30 feet long and 5 feet wide in a direction you choose. Each creature in the line must succeed on a Dexterity saving throw or be covered in acid for the spell’s duration or until a creature uses its action to scrape or wash the acid off itself or another creature. A creature covered in the acid takes 2d4 acid damage at start of each of its turns.",
+        "duration": "Concentration, up to 1 minute",
+        "level": "1",
+        "name": "Tasha's Caustic Brew",
+        "range": "Self (30-foot line)",
+        "ritual": false,
+        "school": "evocation",
+        "higher_levels": "When you cast this spell using a spell slot 2nd level or higher, the damage increases by 2d4 for each slot level above 1st.",
+        "tags": [
+            "artificer",
+            "druid",
+            "ranger",
+            "wizard",
+            "level1"
+        ],
+        "type": "1st-level evocation"
     },
     {
         "casting_time": "1 bonus action",
@@ -2192,7 +2437,8 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -2210,6 +2456,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Evocation cantrip"
@@ -2280,7 +2527,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "cleric"
+            "cleric",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -2297,9 +2545,41 @@
         "school": "necromancy",
         "tags": [
             "cleric",
+            "artificer",
             "cantrip"
         ],
         "type": "Necromancy cantrip"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "sorcerer",
+            "warlock",
+            "wizard",
+            "artificer"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V",
+            "somatic": false,
+            "verbal": true
+        },
+        "description": "You create a momentary circle of spectral blades that sweep around you. All other creatures within 5 feet of you must succeed on a Dexterity saving throw or take 1d6 force damage.",
+        "duration": "Instantaneous",
+        "level": "cantrip",
+        "name": "Sword Burst",
+        "range": "Self (5-foot radius)",
+        "ritual": false,
+        "school": "conjuration",
+        "higher_levels": "This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).",
+        "tags": [
+            "sorcerer",
+            "warlock",
+            "wizard",
+            "artificer",
+            "cantrip"
+        ],
+        "type": "Conjuration cantrip"
     },
     {
         "casting_time": "1 action",
@@ -2356,7 +2636,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "druid"
+            "druid",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -2376,6 +2657,7 @@
         "school": "transmutation",
         "tags": [
             "druid",
+            "artificer",
             "cantrip"
         ],
         "type": "Transmutation cantrip"
@@ -2580,6 +2862,7 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
+            "artificer",
             "paladin"
         ],
         "components": {
@@ -2601,6 +2884,7 @@
         "school": "abjuration",
         "tags": [
             "cleric",
+            "artificer",
             "paladin",
             "level2"
         ],
@@ -2766,6 +3050,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "paladin",
             "ranger"
         ],
@@ -2787,6 +3072,7 @@
             "cleric",
             "druid",
             "paladin",
+            "artificer",
             "ranger",
             "level2"
         ],
@@ -2929,7 +3215,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -2949,6 +3236,7 @@
         "school": "divination",
         "tags": [
             "wizard",
+            "artificer",
             "level4"
         ],
         "type": "4th-level divination"
@@ -2956,7 +3244,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -2976,9 +3265,98 @@
         "school": "conjuration",
         "tags": [
             "wizard",
+            "artificer",
             "level4"
         ],
         "type": "4th-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard",
+            "artificer"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a tiny silver whistle, a piece of bone, and a thread"
+            ],
+            "raw": "V, S, M (a tiny silver whistle, a piece of bone, and a thread)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You conjure a phantom watchdog in an unoccupied space that you can see within range, where it remains for the duration, until you dismiss it as an action, or until you move more than 100 feet away from it. The hound is invisible to all creatures except you and can’t be harmed. When a Small or larger creature comes within 30 feet of it without first speaking the password that you specify when you cast this spell, the hound starts barking loudly. The hound sees invisible creatures and can see into the Ethereal Plane. It ignores illusions. At the start of each of your turns, the hound attempts to bite one creature within 5 feet of it that is hostile to you. The hound’s attack bonus is equal to your spellcasting ability modifier + your proficiency bonus. On a hit, it deals 4d8 piercing damage.",
+        "duration": "8 hours",
+        "level": "4",
+        "name": "Mordenkainen's Faithful Hound",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "conjuration",
+        "tags": [
+            "wizard",
+            "artificer",
+            "level4"
+        ],
+        "type": "4th-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard",
+            "artificer"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a thin sheet of lead, a piece of opaque glass, a wad of cotton or cloth, and powdered chrysolite"
+            ],
+            "raw": "V, S, M (a thin sheet of lead, a piece of opaque glass, a wad of cotton or cloth, and powdered chrysolite)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You make an area within range magically secure. The area is a cube that can be as small as 5 feet to as large as 100 feet on each side. The spell lasts for the duration or until you use an action to dismiss it. When you cast the spell, you decide what sort of security the spell provides, choosing any or all of the following properties: 1. Sound can’t pass through the barrier at the edge of the warded area. 2. The barrier of the warded area appears dark and foggy, preventing vision (including darkvision) through it. 3. Sensors created by divination spells can’t appear inside the protected area or pass through the barrier at its perimeter. 4. Creatures in the area can’t be targeted by divination spells. 5. Nothing can teleport into or out of the warded area. 6. Planar travel is blocked within the warded area. Casting this spell on the same spot every day for a year makes this effect permanent.",
+        "duration": "24 hours",
+        "level": "4",
+        "name": "Mordenkainen's Private Sanctum",
+        "range": "120 feet",
+        "ritual": false,
+        "school": "conjuration",
+        "higher_levels": "When you cast this spell using a spell slot of 5th level or higher, you can increase the size of the cube by 100 feet for each slot level beyond 4th. Thus you could protect a cube that can be up to 200 feet on one side by using a spell slot of 5th level.",
+        "tags": [
+            "wizard",
+            "artificer",
+            "level4"
+        ],
+        "type": "4th-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard",
+            "artificer"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a hemispherical piece of clear crystal and a matching hemispherical piece of gum arabic)"
+            ],
+            "raw": "V, S, M (a hemispherical piece of clear crystal and a matching hemispherical piece of gum arabic)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "A sphere of shimmering force encloses a creature or object of Large size or smaller within range. An unwilling creature must make a Dexterity saving throw. On a failed save, the creature is enclosed for the duration. Nothing – not physical objects, energy, or other spell effects – can pass through the barrier, in or out, though a creature in the sphere can breathe there. The sphere is immune to all damage, and a creature or object inside can’t be damaged by attacks or effects originating from outside, nor can a creature inside the sphere damage anything outside it. The sphere is weightless and just large enough to contain the creature or object inside. An enclosed creature can use its action to push against the sphere’s walls and thus roll the sphere at up to half the creature’s speed. Similarly, the globe can be picked up and moved by other creatures. A Disintegrate spell targeting the globe destroys it without harming anything inside it.",
+        "duration": "Concentration, up to 1 minute",
+        "level": "4",
+        "name": "Otiluke's Resilient Sphere",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "wizard",
+            "artificer",
+            "level4"
+        ],
+        "type": "4th-level evocation"
     },
     {
         "casting_time": "1 action",
@@ -3227,6 +3605,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -3245,9 +3624,43 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "level3"
         ],
         "type": "3rd-level transmutation"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "bard",
+            "sorcerer",
+            "artificer",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "a pinch of sand"
+            ],
+            "raw": "S, M (a pinch of sand)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You make a calming gesture, and up to three willing creatures of your choice that you can see within range fall unconscious for the spell’s duration. The spell ends on a target early if it takes damage or someone uses an action to shake or slap it awake. If a target remains unconscious for the full duration, that target gains the benefit of a short rest, and it can’t be affected by this spell again until it finishes a long rest.",
+        "duration": "10 minutes",
+        "level": "3",
+        "name": "Catnap",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "enchantment",
+        "tags": [
+            "bard",
+            "sorcerer",
+            "artificer",
+            "wizard",
+            "level3"
+        ],
+        "type": "3rd-level enchantment"
     },
     {
         "casting_time": "1 action",
@@ -3452,6 +3865,7 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
+            "artificer",
             "paladin"
         ],
         "components": {
@@ -3469,6 +3883,7 @@
         "school": "conjuration",
         "tags": [
             "cleric",
+            "artificer",
             "paladin",
             "level3"
         ],
@@ -3534,6 +3949,7 @@
         "classes": [
             "bard",
             "cleric",
+            "artificer",
             "druid",
             "paladin",
             "sorcerer",
@@ -3558,6 +3974,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "paladin",
             "sorcerer",
             "warlock",
@@ -3569,7 +3986,8 @@
     {
         "casting_time": "1 action",
         "classes": [
-            "paladin"
+            "paladin",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -3587,6 +4005,7 @@
         "school": "transmutation",
         "tags": [
             "paladin",
+            "artificer",
             "level3"
         ],
         "type": "3rd-level transmutation"
@@ -3692,6 +4111,7 @@
         "classes": [
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -3714,6 +4134,7 @@
         "tags": [
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard",
             "level3"
         ],
@@ -3752,6 +4173,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -3772,10 +4194,44 @@
         "school": "transmutation",
         "tags": [
             "sorcerer",
+            "artificer",
             "wizard",
             "level3"
         ],
         "type": "3rd-level transmutation"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "sorcerer",
+            "artificer",
+            "wizard",
+            "bard",
+            "warlock"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V",
+            "somatic": false,
+            "verbal": true
+        },
+        "description": "For the duration, you or one willing creature you can see within range has resistance to psychic damage, as well as advantage on Intelligence, Wisdom, and Charisma saving throws.",
+        "duration": "Concentration, up to 1 hour",
+        "level": "3",
+        "name": "Intellect Fortress",
+        "range": "30 feet",
+        "ritual": false,
+        "school": "abjuration",
+        "higher_levels": "When you cast this spell using a spell slot of 4th level or higher, you can target one additional creature for each slot level above 3rd. The creatures must be within 30 feet of each other when you target them.",
+        "tags": [
+            "sorcerer",
+            "artificer",
+            "wizard",
+            "bard",
+            "warlock",
+            "level3"
+        ],
+        "type": "3rd-level abjuration"
     },
     {
         "casting_time": "1 action",
@@ -3932,6 +4388,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -3950,6 +4407,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-Level Transmutation"
@@ -3957,6 +4415,7 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -3977,6 +4436,7 @@
         "school": "abjuration",
         "tags": [
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-Level abjuration"
@@ -4126,6 +4586,7 @@
             "druid",
             "ranger",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -4144,6 +4605,7 @@
         "tags": [
             "cleric",
             "druid",
+            "artificer",
             "ranger",
             "sorcerer",
             "wizard",
@@ -4184,6 +4646,7 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
+            "artificer",
             "paladin"
         ],
         "components": {
@@ -4204,10 +4667,38 @@
         "school": "conjuration",
         "tags": [
             "cleric",
+            "artificer",
             "paladin",
             "level3"
         ],
         "type": "3rd-level conjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard",
+            "artificer"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V, S",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You touch one Tiny, nonmagical object that isn’t attached to another object or a surface and isn’t being carried by another creature. The target animates and sprouts little arms and legs, becoming a creature under your control until the spell ends or the creature drops to 0 hit points. See the stat block for its statistics. As a bonus action, you can mentally command the creature if it is within 120 feet of you. (If you control multiple creatures with this spell, you can command any or all of them at the same time, issuing the same command to each one.) You decide what action the creature will take and where it will move during its next turn, or you can issue a simple, general command, such as to fetch a key, stand watch, or stack some books. If you issue no commands, the servant does nothing other than defend itself against hostile creatures. Once given an order, the servant continues to follow that order until its task is complete. When the creature drops to 0 hit points, it reverts to its original form, and any remaining damage carries over to that form.",
+        "duration": "8 hours",
+        "level": "3",
+        "name": "Tiny Servant",
+        "range": "Touch",
+        "ritual": false,
+        "higher_levels": "When you cast this spell using a spell slot of 4th level or higher, you can animate two additional objects for each slot level above 3rd.",
+        "school": "transmutation",
+        "tags": [
+            "wizard",
+            "artificer",
+            "level3"
+        ],
+        "type": "3rd-level transmutation"
     },
     {
         "casting_time": "1 action",
@@ -4629,6 +5120,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -4646,6 +5138,7 @@
         "school": "illusion",
         "tags": [
             "sorcerer",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -4770,6 +5263,7 @@
         "classes": [
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -4793,6 +5287,7 @@
             "druid",
             "ranger",
             "sorcerer",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -6362,6 +6857,7 @@
             "bard",
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -6384,6 +6880,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "warlock",
             "wizard",
             "level2"
@@ -6395,6 +6892,7 @@
         "classes": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -6414,6 +6912,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard",
             "level5"
         ],
@@ -6442,6 +6941,38 @@
             "level5"
         ],
         "type": "5th-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "artificer",
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "an eggshell and a snakeskin glove"
+            ],
+            "raw": "V, S, M (an eggshell and a snakeskin glove)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You create a Large hand of shimmering, translucent force in an unoccupied space that you can see within range. The hand lasts for the spell’s duration, and it moves at your command, mimicking the movements of your own hand. The hand is an object that has AC 20 and hit points equal to your hit point maximum. If it drops to 0 hit points, the spell ends. It has a Strength of 26 (+8) and a Dexterity of 10 (+0). The hand doesn’t fill its space. When you cast the spell and as a bonus action on your subsequent turns, you can move the hand up to 60 feet and then cause one of the following effects with it. \n Clenched Fist. The hand strikes one creature or object within 5 feet of it. Make a melee spell attack for the hand using your game statistics. On a hit, the target takes 4d8 force damage. \n Forceful Hand. The hand attempts to push a creature within 5 feet of it in a direction you choose. Make a check with the hand’s Strength contested by the Strength (Athletics) check of the target. If the target is Medium or smaller, you have advantage on the check. If you succeed, the hand pushes the target up to 5 feet plus a number of feet equal to five times your spellcasting ability modifier. The hand moves with the target to remain within 5 feet of it. \n Grasping Hand. The hand attempts to grapple a Huge or smaller creature within 5 feet of it. You use the hand’s Strength score to resolve the grapple. If the target is Medium or smaller, you have advantage on the check. While the hand is grappling the target, you can use a bonus action to have the hand crush it. When you do so, the target takes bludgeoning damage equal to 2d6 + your spellcasting ability modifier. \n Interposing Hand. The hand interposes itself between you and a creature you choose until you give the hand a different command. The hand moves to stay between you and the target, providing you with half cover against the target. The target can’t move through the hand’s space if its Strength score is less than or equal to the hand’s Strength score. If its Strength score is higher than the hand’s Strength score, the target can move toward you through the hand’s space, but that space is difficult terrain for the target.",
+        "duration": "Concentration, up to 1 minute",
+        "level": "5",
+        "higher_levels": "When you cast this spell using a spell slot of 6th level or higher, the damage from the clenched fist option increases by 2d8 and the damage from the grasping hand increases by 2d6 for each slot level above 5th.",
+        "name": "Bigby's Hand",
+        "range": "120 feet",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "artificer",
+            "sorcerer",
+            "wizard",
+            "level5"
+        ],
+        "type": "5th-level evocation"
     },
     {
         "casting_time": "1 action",
@@ -6943,6 +7474,7 @@
         "casting_time": "1 action",
         "classes": [
             "cleric",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -6963,6 +7495,7 @@
         "school": "evocation",
         "tags": [
             "cleric",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -6972,7 +7505,8 @@
         "casting_time": "1 minute",
         "classes": [
             "sorcerer",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": true,
@@ -6994,6 +7528,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "level5"
         ],
         "type": "5th-level illusion"
@@ -7201,6 +7736,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "sorcerer"
         ],
         "components": {
@@ -7224,6 +7760,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "sorcerer",
             "level2"
         ],
@@ -7233,6 +7770,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -7254,6 +7792,7 @@
         "tags": [
             "sorcerer",
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-level transmutation"
@@ -7287,7 +7826,8 @@
     {
         "casting_time": "10 minutes",
         "classes": [
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -7304,6 +7844,7 @@
         "school": "transmutation",
         "tags": [
             "wizard",
+            "artificer",
             "level4"
         ],
         "type": "4th-level transmutation"
@@ -7596,6 +8137,7 @@
             "bard",
             "cleric",
             "druid",
+            "artificer",
             "ranger"
         ],
         "components": {
@@ -7616,6 +8158,7 @@
         "school": "abjuration",
         "tags": [
             "bard",
+            "artificer",
             "cleric",
             "druid",
             "ranger",
@@ -7744,6 +8287,7 @@
         "classes": [
             "cleric",
             "wizard",
+            "artificer",
             "bard"
         ],
         "components": {
@@ -7766,6 +8310,7 @@
         "tags": [
             "cleric",
             "wizard",
+            "artificer",
             "bard",
             "level3"
         ],
@@ -7830,6 +8375,7 @@
         "classes": [
             "cleric",
             "druid",
+            "artificer",
             "bard"
         ],
         "components": {
@@ -7851,10 +8397,41 @@
         "tags": [
             "cleric",
             "druid",
+            "artificer",
             "bard",
             "level5"
         ],
         "type": "5th-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "bard",
+            "sorcerer",
+            "artificer",
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V, S",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "Your magic deepens a creature’s understanding of its own talent. You touch one willing creature and give it expertise in one skill of your choice; until the spell ends, the creature doubles its proficiency bonus for ability checks it makes that use the chosen skill. You must choose a skill in which the target is proficient and that isn’t already benefiting from an effect, such as Expertise, that doubles its proficiency bonus.",
+        "duration": "Concentration, up to 1 hour",
+        "level": "5",
+        "name": "Skill Empowerment",
+        "range": "Touch",
+        "ritual": false,
+        "school": "transmutation",
+        "tags": [
+            "bard",
+            "sorcerer",
+            "artificer",
+            "wizard",
+            "level5"
+        ],
+        "type": "5th-level transmutation"
     },
     {
         "casting_time": "1 action",
@@ -8028,6 +8605,7 @@
         "casting_time": "1 action",
         "classes": [
             "druid",
+            "artificer",
             "bard"
         ],
         "components": {
@@ -8050,6 +8628,7 @@
         "tags": [
             "druid",
             "bard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-level transmutation"
@@ -8271,6 +8850,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -8291,6 +8871,7 @@
         "school": "transmutation",
         "tags": [
             "sorcerer",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -8462,6 +9043,7 @@
         "casting_time": "1 bonus action",
         "classes": [
             "paladin",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -8480,6 +9062,7 @@
         "school": "transmutation",
         "tags": [
             "paladin",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -8489,6 +9072,7 @@
         "casting_time": "1 minute",
         "classes": [
             "bard",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -8510,6 +9094,7 @@
         "tags": [
             "bard",
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-level illusion (ritual)"
@@ -9014,6 +9599,7 @@
             "cleric",
             "ranger",
             "paladin",
+            "artificer",
             "druid"
         ],
         "components": {
@@ -9032,6 +9618,7 @@
         "tags": [
             "cleric",
             "ranger",
+            "artificer",
             "paladin",
             "druid",
             "level2"
@@ -9094,6 +9681,7 @@
     {
         "casting_time": "1 action",
         "classes": [
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9114,6 +9702,7 @@
         "school": "transmutation",
         "tags": [
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-level transmutation"
@@ -9213,6 +9802,7 @@
         "classes": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9233,6 +9823,7 @@
         "school": "divination",
         "tags": [
             "bard",
+            "artificer",
             "sorcerer",
             "wizard",
             "level2"
@@ -9276,6 +9867,7 @@
         "classes": [
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9296,6 +9888,7 @@
         "school": "transmutation",
         "tags": [
             "sorcerer",
+            "artificer",
             "warlock",
             "wizard",
             "level2"
@@ -9360,6 +9953,7 @@
         "classes": [
             "cleric",
             "druid",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9381,6 +9975,7 @@
         "tags": [
             "cleric",
             "druid",
+            "artificer",
             "wizard",
             "level4"
         ],
@@ -9423,6 +10018,7 @@
             "druid",
             "sorcerer",
             "ranger",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9443,12 +10039,42 @@
         "school": "abjuration",
         "tags": [
             "druid",
+            "artificer",
             "sorcerer",
             "ranger",
             "wizard",
             "level4"
         ],
         "type": "4th-level abjuration"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "artificer",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "an ornate stone and metal lockbox worth at least 400 gp"
+            ],
+            "raw": "V, S, M (an ornate stone and metal lockbox worth at least 400 gp)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You call forth the spirit of a construct. It manifests in an unoccupied space that you can see within range. This corporeal form uses the Construct Spirit stat block. When you cast the spell, choose a material: Clay, Metal, or Stone. The creature resembles a golem or a modron (your choice) made of the chosen material, which determines certain traits in its stat block. The creature disappears when it drops to 0 hit points or when the spell ends. The creature is an ally to you and your companions. In combat, the creature shares your initiative count, but it takes its turn immediately after yours. It obeys your verbal commands (no action required by you). If you don’t issue any, it takes the Dodge action and uses its move to avoid danger. Costruct stats:\n Armor class: 13 + the level of the spell (natural armor) \n hit points: 40 + 15 for each spell level above 4th \n speed: 30 \n STR:18 DEX:10 CON:18 INT:14 WIZ:11 CHA:5 \n Damage Resistances: poison \n Condition Immunities: charmed, exhaustion, frightened, incapacitated, paralyzed, petrified, poisoned \n Senses: darkvision 60 ft., passive Perception 10 \n Languages: understands the languages you speak \n Proficiency Bonus: equals your bonus \n Heated Body (Metal Only). A creature that touches the construct or hits it with a melee attack while within 5 feet of it takes 1d10 fire damage. \n Stony Lethargy (Stone Only). When a creature the construct can see starts its turn within 10 feet of the construct, the construct can force it to make a Wisdom saving throw against your spell save DC. On a failed save, the target can’t use reactions and its speed is halved until the start of its next turn. \n Multiattack. The construct makes a number of attacks equal to half this spell’s level (rounded down). \n Slam. Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target. Hit: 1d8 + 4 + the spell’s level bludgeoning damage. \n Berserk Lashing (Clay Only). When the construct takes damage, it makes a slam attack against a random creature within 5 feet of it. If no creature is within reach, the construct moves up to half its speed toward an enemy it can see, without provoking opportunity attacks.",
+        "duration": "Concentration, up to 1 hour",
+        "level": "4",
+        "name": "Summon Construct",
+        "range": "90 feet",
+        "ritual": false,
+        "school": "conjuration",
+        "tags": [
+            "wizard",
+            "artificer",
+            "level4"
+        ],
+        "type": "4th-level conjuration"
     },
     {
         "casting_time": "1 bonus action",
@@ -9737,6 +10363,7 @@
         "classes": [
             "druid",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9759,9 +10386,65 @@
             "druid",
             "sorcerer",
             "wizard",
+            "artificer",
             "level5"
         ],
         "type": "5th-level evocation"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "bard",
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V, S",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You or a creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person.",
+        "duration": "Concentration, Up to 1 minute",
+        "level": "4",
+        "name": "Greater Invisibility",
+        "range": "Touch",
+        "ritual": false,
+        "school": "illusion",
+        "tags": [
+            "sorcerer",
+            "bard",
+            "wizard",
+            "level5"
+        ],
+        "type": "4th-level illusion"
+    },
+    {
+        "casting_time": "1 action",
+        "classes": [
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "powdered rhubarb leaf and an adder’s stomach"
+            ],
+            "raw": ", S, M (powdered rhubarb leaf and an adder’s stomach)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "A shimmering green arrow streaks toward a target within range and bursts in a spray of acid. Make a ranged spell attack against the target. On a hit, the target takes 4d4 acid damage immediately and 2d4 acid damage at the end of its next turn. On a miss, the arrow splashes the target with acid for half as much of the initial damage and no damage at the end of its next turn.",
+        "duration": "Instantaneous",
+        "level": "2",
+        "name": "Melf's Acid Arrow",
+        "range": "90 feet",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "wizard",
+            "level2"
+        ],
+        "type": "2nd-level evocation"
     },
     {
         "casting_time": "1 action",
@@ -9796,6 +10479,7 @@
         "classes": [
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard"
         ],
@@ -9818,6 +10502,7 @@
         "tags": [
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard",
             "level3"
@@ -9830,6 +10515,7 @@
             "cleric",
             "druid",
             "ranger",
+            "artificer",
             "sorcerer"
         ],
         "components": {
@@ -9852,6 +10538,7 @@
             "cleric",
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "level2"
         ],
@@ -9861,6 +10548,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -9881,6 +10569,7 @@
         "school": "conjuration",
         "tags": [
             "sorcerer",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -10030,6 +10719,7 @@
         "classes": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10048,6 +10738,7 @@
         "tags": [
             "bard",
             "sorcerer",
+            "artificer",
             "wizard",
             "level2"
         ],
@@ -10058,6 +10749,7 @@
         "classes": [
             "bard",
             "druid",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10077,6 +10769,7 @@
             "bard",
             "druid",
             "wizard",
+            "artificer",
             "level2"
         ],
         "type": "2nd-level transmutation (ritual)"
@@ -10086,6 +10779,7 @@
         "classes": [
             "bard",
             "druid",
+            "artificer",
             "sorcerer",
             "warlock",
             "wizard"
@@ -10106,6 +10800,7 @@
         "tags": [
             "bard",
             "druid",
+            "artificer",
             "sorcerer",
             "warlock",
             "wizard",
@@ -10175,7 +10870,8 @@
             "druid",
             "sorcerer",
             "warlock",
-            "wizard"
+            "wizard",
+            "artificer"
         ],
         "components": {
             "material": false,
@@ -10195,6 +10891,7 @@
             "sorcerer",
             "warlock",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Conjuration cantrip"
@@ -10205,6 +10902,7 @@
             "druid",
             "sorcerer",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10225,6 +10923,7 @@
             "sorcerer",
             "warlock",
             "wizard",
+            "artificer",
             "cantrip"
         ],
         "type": "Evocation cantrip"
@@ -10253,7 +10952,8 @@
             "druid",
             "sorcerer",
             "wizard",
-            "cantrip"
+            "cantrip",
+            "artificer"
         ],
         "type": "Transmutation cantrip"
     },
@@ -10278,6 +10978,7 @@
         "school": "transmutation",
         "tags": [
             "druid",
+            "artificer",
             "warlock",
             "cantrip"
         ],
@@ -10344,6 +11045,7 @@
         "classes": [
             "druid",
             "ranger",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10363,6 +11065,7 @@
         "tags": [
             "druid",
             "ranger",
+            "artificer",
             "wizard",
             "level1"
         ],
@@ -10495,6 +11198,7 @@
         "casting_time": "1 action",
         "classes": [
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10513,6 +11217,7 @@
         "school": "transmutation",
         "tags": [
             "sorcerer",
+            "artificer",
             "wizard",
             "level1"
         ],
@@ -10608,6 +11313,7 @@
         "classes": [
             "druid",
             "warlock",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10626,6 +11332,7 @@
         "school": "transmutation",
         "tags": [
             "druid",
+            "artificer",
             "warlock",
             "wizard",
             "level4"
@@ -10663,6 +11370,7 @@
             "druid",
             "ranger",
             "sorcerer",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10682,6 +11390,7 @@
         "tags": [
             "druid",
             "ranger",
+            "artificer",
             "sorcerer",
             "wizard",
             "level3"
@@ -10892,6 +11601,7 @@
         "casting_time": "1 action",
         "classes": [
             "druid",
+            "artificer",
             "wizard"
         ],
         "components": {
@@ -10913,6 +11623,7 @@
         "tags": [
             "druid",
             "wizard",
+            "artificer",
             "level5"
         ],
         "type": "5th-level transmutation"

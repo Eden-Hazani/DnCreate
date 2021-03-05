@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { boolean } from "yup";
 import subClassesApi from "../api/subClassesApi";
 import { CharacterModel } from "../models/characterModel";
+import { artificerPathSpells } from "./artificerPathSpells";
 import { clericDomainSpellsPicker } from "./clericDomainSpellsPicker";
 import { druidCircleSpellsPicker } from "./druidCircleSpellsPicker";
 import { druidPathSpellPicker } from "./druidPathSpellPicker";
@@ -1769,7 +1770,6 @@ const Wizard = async (level: number, character: CharacterModel) => {
         { name: "School of Illusion", description: "You focus your studies on magic that dazzles the senses, befuddles the mind, and tricks even the wisest folk. Your magic is subtle, but the illusions crafted by your keen mind make the impossible seem real. Some illusionists – including many gnome wizards – are benign tricksters who use their spells to entertain. Others are more sinister masters of deception, using their illusions to frighten and fool others for their personal gain." },
         { name: "School of Necromancy", description: "The School of Necromancy explores the cosmic forces of life, death, and undeath. As you focus your studies in this tradition, you learn to manipulate the energy that animates all living things. As you progress, you learn to sap the life force from a creature as your magic destroys its body, transforming that vital energy into magical power you can manipulate. Most people see necromancers as menacing, or even villainous, due to the close association with death. Not all necromancers are evil, but the forces they manipulate are considered taboo by many societies." },
         { name: "School of Transmutation", description: "You are a student of spells that modify energy and matter. To you, the world is not a fixed thing, but eminently mutable, and you delight in being an agent of change. You wield the raw stuff of creation and learn to alter both physical forms and mental qualities. Your magic gives you the tools to become a smith on reality's forge. Some transmuters are tinkerers and pranksters, turning people into toads and transforming copper into silver for fun and occasional profit. Others pursue their magical studies with deadly seriousness, seeking the power of the gods to make and destroy worlds." }]
-
     let LevelUpFunction: any;
     switch (true) {
         case (level === 1):
@@ -1878,4 +1878,115 @@ const Wizard = async (level: number, character: CharacterModel) => {
     return LevelUpFunction;
 }
 
-export { Barbarian, Bard, Fighter, Druid, Cleric, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard };
+const Artificer = async (level: number, character: CharacterModel) => {
+    let paths: any[] = [
+        { name: "Alchemist", description: "An Alchemist is an expert at combining reagents to produce mystical effects. Alchemists use their creations to give life and to leech it away. Alchemy is the oldest of artificer traditions, and its versatility has long been valued during times of war and peace." },
+        { name: "Armorer", description: "An artificer who specializes as an Armorer modifies armor to function almost like a second skin. The armor is enhanced to hone the artificer's magic, unleash potent attacks, and generate a formidable defense. The artificer bonds with this armor, becoming one with it even as they experiment with it and refine its magical capabilities." },
+        { name: "Artillerist", description: "An Artillerist specializes in using magic to hurl energy, projectiles, and explosions on a battlefield. This destructive power is valued by armies in the wars on many different worlds. And when war passes, some members of this specialization seek to build a more peaceful world by using their powers to fight the resurgence of strife. The world-hopping gnome artificer Vi has been especially vocal about making things right: 'It's about time we fixed things instead of blowing them all to hell.'" },
+        { name: "Battle Smith", description: "Armies require protection, and someone has to put things back together if defenses fail. A combination of protector and medic, a Battle Smith is an expert at defending others and repairing both materiel and personnel. To aid in their work, Battle Smiths are accompanied by a steel defender, a protective companion of their own creation. Many soldiers tell stories of nearly dying before being saved by a Battle Smith and a steel defender." }]
+    let LevelUpFunction: any;
+    switch (true) {
+        case (level === 1):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [2, 0, 0, 0, 0, 0, 0, 0, 0] }
+            }
+            break;
+        case (level === 2):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [2, 0, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 4 }
+            }
+            break;
+        case (level === 3):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 4, pathSelector: paths, pathFeature: true }
+            }
+            break;
+        case (level === 4):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [3, 0, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 4, abilityPointIncrease: true }
+            }
+            break;
+        case (level === 5):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 4, pathFeature: true, extraSpells: artificerPathSpells(character.level ? character.level : 0, character.path.name, character), notCountAgainstKnown: true }
+            }
+            break;
+        case (level === 6):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [4, 2, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 6, alwaysOnToolExpertise: true }
+            }
+            break;
+        case (level === 7):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 6 }
+            }
+            break;
+        case (level === 8):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [4, 3, 0, 0, 0, 0, 0, 0, 0], totalInfusions: 6, abilityPointIncrease: true }
+            }
+            break;
+        case (level === 9):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 2, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], totalInfusions: 6, pathFeature: true, notCountAgainstKnown: true, extraSpells: artificerPathSpells(character.level ? character.level : 0, character.path.name, character), }
+            }
+            break;
+        case (level === 10):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 3, spells: [4, 3, 2, 0, 0, 0, 0, 0, 0], totalInfusions: 8 }
+            }
+            break;
+        case (level === 11):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 3, spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], totalInfusions: 8 }
+            }
+            break;
+        case (level === 12):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 3, spells: [4, 3, 3, 0, 0, 0, 0, 0, 0], totalInfusions: 8, abilityPointIncrease: true }
+            }
+            break;
+        case (level === 13):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 3, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], totalInfusions: 8, extraSpells: artificerPathSpells(character.level ? character.level : 0, character.path.name, character), notCountAgainstKnown: true }
+            }
+            break;
+        case (level === 14):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 1, 0, 0, 0, 0, 0], totalInfusions: 10 }
+            }
+            break;
+        case (level === 15):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], totalInfusions: 10, pathFeature: true }
+            }
+            break;
+        case (level === 16):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 2, 0, 0, 0, 0, 0], totalInfusions: 10, abilityPointIncrease: true }
+            }
+            break;
+        case (level === 17):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], totalInfusions: 10, extraSpells: artificerPathSpells(character.level ? character.level : 0, character.path.name, character), notCountAgainstKnown: true }
+            }
+            break;
+        case (level === 18):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 3, 1, 0, 0, 0, 0], totalInfusions: 12 }
+            }
+            break;
+        case (level === 19):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 3, 2, 0, 0, 0, 0], totalInfusions: 12, abilityPointIncrease: true }
+            }
+        case (level === 20):
+            LevelUpFunction = {
+                operation: true, action: { cantrips: 4, spells: [4, 3, 3, 3, 2, 0, 0, 0, 0], totalInfusions: 12 }
+            }
+            break;
+    }
+    return LevelUpFunction;
+}
+
+export { Barbarian, Bard, Fighter, Druid, Cleric, Monk, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard, Artificer };

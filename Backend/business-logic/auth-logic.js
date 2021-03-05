@@ -18,6 +18,10 @@ function validateInSystem(_id) {
     return User.findOne({ _id: { $eq: _id } });
 }
 
+async function getProfileImagesAsAdmin(start, end) {
+    return User.find().select('profileImg').skip(parseInt(start)).limit(parseInt(end)).exec();
+}
+
 function resetLinkValidator(resetLink) {
     return User.findOne({ resetLink: { $eq: resetLink } });
 }
@@ -68,5 +72,6 @@ module.exports = {
     updateUserWithPassword,
     deleteAccount,
     validateInSystem,
-    findUserAsAdmin
+    findUserAsAdmin,
+    getProfileImagesAsAdmin
 }

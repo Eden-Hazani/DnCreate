@@ -34,7 +34,7 @@ interface CustomSpellCreatorState {
     schoolClicked: boolean[]
 }
 
-const classes = ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "warlock", "wizard"];
+const classes = ["bard", "cleric", "druid", "paladin", "ranger", "sorcerer", "warlock", "wizard", "artificer"];
 const levels = ["cantrip", "1st-level", "2nd-level", "3rd-level", "4th-level", "5th-level", "6th-level", "7th-level", "8th-level", "9th-level"];
 const magicSchools = ["Conjuration", "Necromancy", "Evocation", "Abjuration", "Transmutation", "Divination", "Enchantment", "Illusion"]
 export class CustomSpellCreator extends Component<{ route: any, navigation: any }, CustomSpellCreatorState> {

@@ -54,6 +54,10 @@ const skillSwitch = (charClass: string) => {
             skills.skillList = ['Arcana', 'History', 'Insight', 'Investigation', 'Religion', 'Medicine'];
             skills.amount = 2;
             break;
+        case charClass === 'Artificer':
+            skills.skillList = ['Arcana', 'History', 'Investigation', 'Nature', 'Perception', 'Medicine', 'Sleight of Hand'];
+            skills.amount = 2;
+            break;
     }
 
     return skills;

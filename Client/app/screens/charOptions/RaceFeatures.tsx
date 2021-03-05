@@ -49,10 +49,10 @@ export class RaceFeatures extends Component<{ route: any }, RaceFeaturesState> {
                         {this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry &&
                             <View style={styles.featureItem}>
                                 <AppText fontSize={22} padding={10} color={Colors.black} textAlign={'center'}>Your Dragon ancestry feature</AppText>
-                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry.color} dragon ancestry</AppText>
-                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry.damageType} damage type</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry[0].color} dragon ancestry</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry[0].damageType} damage type</AppText>
                                 <AppText fontSize={20} padding={5} color={Colors.black} textAlign={'center'}>Attack style</AppText>
-                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry.breath}</AppText>
+                                <AppText fontSize={18} padding={5} color={Colors.berries} textAlign={'center'}>{this.state.character.charSpecials && this.state.character.charSpecials.dragonBornAncestry[0].breath}</AppText>
                             </View>
                         }
                         {this.state.character.raceId && this.state.character.raceId.raceAbilities?.uniqueAbilities &&

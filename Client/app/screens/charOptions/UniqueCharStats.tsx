@@ -17,6 +17,7 @@ import pathCreatedCompanion from '../../../jsonDump/pathCreatedCompanion.json'
 import { MonkKiPointCounter } from '../../components/uniqueCharComponents/MonkKiPointCounter';
 import { RoguePhantomSkillPicks } from '../../components/uniqueCharComponents/RoguePhantomSkillPicks';
 import logger from '../../../utility/logger';
+import { ArtificerCurrentInfusedItems } from '../../components/uniqueCharComponents/ArtificerCurrentInfusedItems';
 
 interface UniqueCharStatsState {
     talesFromTheBeyondModal: boolean
@@ -80,7 +81,9 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                     <UniqueRollLists modalContacts={wildSurge.wildMagic} title={"Wild Magic"} />
                 }
                 {(this.props.character.path?.name === "College of Creation" && this.props.character.level && this.props.character.level >= 6 ||
-                    this.props.character.path?.name === "Circle of Wildfire" && this.props.character.level && this.props.character.level >= 2)
+                    this.props.character.path?.name === "Circle of Wildfire" && this.props.character.level && this.props.character.level >= 2 ||
+                    this.props.character.path?.name === "Battle Smith" && this.props.character.level && this.props.character.level >= 3
+                )
                     ?
                     <View>
                         <AppButton padding={10} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50} borderRadius={25} title={pathCreatedCompanion[this.props.character.path?.name].name}
@@ -98,6 +101,9 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </Modal>
                     </View>
                     : null}
+                {this.props.character.characterClass === "Artificer" && this.props.character.level && this.props.character.level >= 2 &&
+                    <ArtificerCurrentInfusedItems character={this.props.character} />
+                }
                 {this.props.character.path?.name === "Path of Wild Magic" &&
                     <UniqueRollLists modalContacts={wildBarbarianMagic.magicRolls} title={"Wild Magic"} />
                 }
@@ -137,6 +143,20 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                                 <AppText fontSize={20} color={Colors.bitterSweetRed}>{maneuver.name}</AppText>
                                 <View style={{ paddingRight: 10 }}>
                                     <AppText>{maneuver.description.substring(0, 80)}...</AppText>
+                                </View>
+                            </TouchableOpacity>)}
+                    </View>
+                    : null
+                }
+                {this.props.character.charSpecials && this.props.character.charSpecials.artificerInfusions && this.props.character.charSpecials.artificerInfusions.length > 0 ?
+                    <View style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode, marginTop: 15 }]}>
+                        <AppText textAlign={'left'} color={Colors.bitterSweetRed} fontSize={22}>Infusions:</AppText>
+                        {this.props.character.charSpecials.artificerInfusions.map(infusion =>
+                            <TouchableOpacity key={infusion.name} style={{ backgroundColor: Colors.pinkishSilver, borderColor: Colors.berries, borderWidth: 1, borderRadius: 15, padding: 10, margin: 5 }}
+                                onPress={() => { this.setState({ maneuversModal: true, pickedManeuver: infusion }) }}>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed}>{infusion.name}</AppText>
+                                <View style={{ paddingRight: 10 }}>
+                                    <AppText>{infusion.description.substring(0, 80)}...</AppText>
                                 </View>
                             </TouchableOpacity>)}
                     </View>

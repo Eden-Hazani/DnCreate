@@ -341,7 +341,6 @@ router.post("/databaseLoginAdmin", cors(), async (request, response) => {
 
 router.post("/databaseFindPersonAdmin", cors(), verifyIsAdmin, async (request, response) => {
     try {
-        console.log(request.body.username)
         const user = await authLogic.findUserAsAdmin(request.body.username);
         response.json({ user });
     } catch (err) {
@@ -367,6 +366,33 @@ router.post("/changePremiumStatusAdmin", cors(), verifyIsAdmin, async (request, 
         const userToUpdate = new User(request.body);
         const user = await authLogic.updateUser(userToUpdate)
         response.json({ user });
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.post("/getProfileImagesAdmin", cors(), verifyIsAdmin, async (request, response) => {
+    try {
+        const reqParams = request.body.reqParams
+        const images = await authLogic.getProfileImagesAsAdmin(reqParams.start, reqParams.end)
+        console.log(images)
+        response.json({ images });
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/removeProfileImagesAsAdmin", cors(), verifyIsAdmin, async (request, response) => {
+    try {
+        const user = new User(request.body)
+        console.log(request.body)
+        fs.unlink(`./public/uploads/profile-imgs/${user.profileImg}`, function (err) {
+            if (err) return console.log(err);
+            console.log('file deleted successfully');
+        });
+        user.profileImg = '';
+        const updatedUser = await authLogic.updateUser(user);
+        response.json({ updatedUser })
     } catch (err) {
         response.status(500).send(err.message);
     }

@@ -79,5 +79,50 @@
         ],
         "proficiency": "equals your bonus",
         "abilities": []
+    },
+    "Battle Smith": {
+        "name": "Steel Defender",
+        "armorClass": "Armor Class: 15 (natural armor)",
+        "hitPoints": "Hit Points: 2 + your Intelligence modifier + 5 times your artificer level (the defender has a number of Hit Dice [d8s] equal to your artificer level)",
+        "speed": "Speed: 40 ft.",
+        "actions": [
+            {
+                "name": "Force-Empowered Rend",
+                "description": "Melee Weapon Attack: your spell attack modifier to hit, reach 5 ft., one target you can see. Hit: 1d8 + PB force damage."
+            },
+            {
+                "name": "Repair (3/Day)",
+                "description": "The magical mechanisms inside the defender restore 2d8 + PB hit points to itself or to one construct or object within 5 feet of it."
+            },
+            {
+                "name": "Deflect Attack",
+                "description": "The defender imposes disadvantage on the attack roll of one creature it can see that is within 5 feet of it, provided the attack roll is against a creature other than the defender."
+            }
+        ],
+        "str": "STR - 14 (+2)",
+        "dex": "DEX - 12 (+1)",
+        "con": "CON - 14 (+2)",
+        "int": "INT - 4 (−3)",
+        "wiz": "WIZ - 10 (+0)",
+        "cha": "CHA - 6 (−2)",
+        "damageImmune": [
+            "poison"
+        ],
+        "conditionImmune": [
+            "charmed",
+            "exhaustion",
+            "poisoned"
+        ],
+        "senses": "darkvision 60 ft., passive Perception 10 + (PB x 2)",
+        "languages": [
+            "understands the languages you speak"
+        ],
+        "proficiency": "equals your bonus",
+        "abilities": [
+            {
+                "name": "Vigilant",
+                "description": "The defender can't be surprised."
+            }
+        ]
     }
 }

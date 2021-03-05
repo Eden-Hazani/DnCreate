@@ -105,7 +105,10 @@ export class AppPathAdditionalApply extends Component<{
                     <AppPathAddSpellsList path={this.props.pathChosen} character={this.props.character} spellList={this.props.pathItem.spellsToBeAdded} loadSpells={(val: CharacterModel) => { this.props.loadCharacter(val) }} />
                 }
                 {this.props.pathItem.toolsToBeAdded &&
-                    <AppAddSpecificTools character={this.props.character} path={this.props.pathChosen}
+                    <AppAddSpecificTools withReplacementConditions={this.props.pathItem.withReplacementConditions}
+                        character={this.props.character} path={this.props.pathChosen} setAdditionalToolPicks={(val: any) => { this.props.isAdditionalToolChoice(val) }}
+                        optionalTools={this.props.pathItem.optionalTools}
+                        sendToolsBack={(val: any) => { this.props.loadCharacter(val) }}
                         tools={this.props.pathItem.toolsToBeAdded} loadTools={(val: CharacterModel) => { this.props.loadCharacter(val) }} />
                 }
                 {this.props.pathItem.addArmor &&

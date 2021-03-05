@@ -22,24 +22,10 @@ import { IconGen } from '../../components/IconGen';
 import Modal from 'react-native-modal';
 import { useNavigation } from '@react-navigation/native';
 import InformationDrawer from '../../components/InformationDrawer';
+import { classesDragonsBackgrounds } from '../../../utility/charClassesBackgrounds'
 
 const { width, height } = Dimensions.get('window');
 
-const dragonClasses = {
-    Starting: `${Config.serverUrl}/assets/classDragons/pickDragon.png`,
-    Barbarian: `${Config.serverUrl}/assets/classDragons/barbarianDragon.png`,
-    Bard: `${Config.serverUrl}/assets/classDragons/bardDragon.png`,
-    Fighter: `${Config.serverUrl}/assets/classDragons/fighterDragon.png`,
-    Druid: `${Config.serverUrl}/assets/classDragons/druidDragon.png`,
-    Cleric: `${Config.serverUrl}/assets/classDragons/clericDragon.png`,
-    Monk: `${Config.serverUrl}/assets/classDragons/monkDragon.png`,
-    Paladin: `${Config.serverUrl}/assets/classDragons/paladinDragon.png`,
-    Ranger: `${Config.serverUrl}/assets/classDragons/rangerDragon.png`,
-    Rogue: `${Config.serverUrl}/assets/classDragons/rogueDragon.png`,
-    Sorcerer: `${Config.serverUrl}/assets/classDragons/sorcererDragon.png`,
-    Warlock: `${Config.serverUrl}/assets/classDragons/warlockDragon.png`,
-    Wizard: `${Config.serverUrl}/assets/classDragons/wizardDragon.png`,
-}
 const classesBackgrounds = {
     Starting: `${Config.serverUrl}/assets/classBackGrounds/Starting.png`,
     Barbarian: `${Config.serverUrl}/assets/classBackGrounds/BarbarianFinal.png`,
@@ -54,6 +40,7 @@ const classesBackgrounds = {
     Sorcerer: `${Config.serverUrl}/assets/classBackGrounds/SorcererFinal.png`,
     Warlock: `${Config.serverUrl}/assets/classBackGrounds/WarlockFinal.png`,
     Wizard: `${Config.serverUrl}/assets/classBackGrounds/WizardFinal.jpg`,
+    Artificer: `${Config.serverUrl}/assets/classBackGrounds/ArtificerFinal.png`,
 }
 
 const starterImg = [
@@ -177,7 +164,7 @@ export default function ClassPick({ route, placeholder }: any) {
                                         return <View key={index} style={{ width, justifyContent: "center", alignItems: "center" }}>
                                             {index === 0 ?
                                                 <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
-                                                    <Image uri={dragonClasses[item.name || '']}
+                                                    <Image uri={classesDragonsBackgrounds[item.name || '']}
                                                         style={{ width: 250, height: 250 }} />
                                                     <View style={{ width: width * 0.9 }}>
                                                         <View style={{ padding: 20, backgroundColor: Colors.burgundy, borderRadius: 25 }}>
@@ -193,7 +180,7 @@ export default function ClassPick({ route, placeholder }: any) {
                                                     }}
                                                 >
                                                     <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
-                                                        <Image uri={dragonClasses[item.name || '']}
+                                                        <Image uri={classesDragonsBackgrounds[item.name || '']}
                                                             style={{ width: 250, height: 250 }} />
                                                         <AppText fontSize={30} color={Colors.deepGold}>{item.name}</AppText>
                                                         <IconGen iconColor={Colors.deepGold} name={item.icon} size={120} />
@@ -221,7 +208,7 @@ export default function ClassPick({ route, placeholder }: any) {
                                     }}>
                                     <ScrollView style={{ flex: 1 }}>
                                         <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                            <Image style={{ width: 150, height: 150 }} uri={dragonClasses[pickedClass.name || '']} />
+                                            <Image style={{ width: 150, height: 150 }} uri={classesDragonsBackgrounds[pickedClass.name || '']} />
                                         </View>
                                         <TouchableOpacity activeOpacity={1}>
                                             <AppText fontSize={30} textAlign={"center"} color={Colors.bitterSweetRed}>Class {pickedClass.name}</AppText>

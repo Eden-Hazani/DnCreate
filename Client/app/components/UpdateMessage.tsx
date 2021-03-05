@@ -11,7 +11,7 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.4</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.41</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
@@ -20,8 +20,12 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={25} color={Colors.deepGold}>BigK_Games</AppText>
                     <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>For donating and contributing to the future of DnCreate</AppText>
                 </View>
+                <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Say hello to the Artificer!</AppText>
+                    <Image uri={`${Config.serverUrl}/assets/classDragons/artificerDragon.png`} style={{ height: 150, width: 150 }} />
+                    <AppText textAlign={'center'} fontSize={20}>The Artificer class has joined DnCreate!</AppText>
+                </View>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.berries}>DnCreate has reached it's first Patreon goal!</AppText>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure mode now features the Image Gallery!</AppText>
                     <AppText textAlign={'center'} fontSize={20}>You as the DM or as a participating member can upload any images you want into your adventure for your fellow adventurers to see!</AppText>
                     <AppText textAlign={'center'} fontSize={20}>share maps, monsters, stats, landscapes, or just memes with your entire party</AppText>

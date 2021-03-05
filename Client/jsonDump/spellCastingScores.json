@@ -39,6 +39,11 @@
         "baseSpellSaveDc": "8+proficiency+intelligence",
         "spellAttackModifier": "proficiency+intelligence"
     },
+    "Artificer": {
+        "spellcastingAbility": "intelligence",
+        "baseSpellSaveDc": "8+proficiency+intelligence",
+        "spellAttackModifier": "proficiency+intelligence"
+    },
     "Eldritch Knight": {
         "spellcastingAbility": "intelligence",
         "baseSpellSaveDc": "8+proficiency+intelligence",
