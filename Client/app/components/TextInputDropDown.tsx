@@ -43,16 +43,15 @@ export default function TextInputDropDown({ sendText, isOpen, expendedWidth, exp
             easing: Easing.linear as any
         }).start()
     }
-
     return (
-        <View style={[styles.container, { display: isOpen ? 'flex' : 'none' }]}>
+        <View style={[styles.container, { display: isOpen ? 'flex' : 'none', flex: 1 }]}>
             <View style={[styles.box, drawerStatus ? expendedStyle() : undefined, { backgroundColor: Colors.burgundy }]}>
                 <Animated.View style={[animationStatus.getLayout(), { padding: 25 }]}>
                     {information.map((item: any, index: number) => {
                         return <View key={index}>
                             <TouchableOpacity onPress={() => sendText(item)}
-                                style={{ borderColor: Colors.black, borderWidth: 1, borderRadius: 25, padding: 10, margin: 1 }}>
-                                <AppText>{item}</AppText>
+                                style={{ borderColor: Colors.totalWhite, borderWidth: 1, borderRadius: 25, padding: 10, margin: 1 }}>
+                                <AppText color={Colors.totalWhite}>{item}</AppText>
                             </TouchableOpacity>
                             <ListItemSeparator />
                         </View>

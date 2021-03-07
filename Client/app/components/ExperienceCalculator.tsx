@@ -68,7 +68,8 @@ export class ExperienceCalculator extends Component<{ issueLevelUp: any, charact
                             <Progress.Bar color={Colors.bitterSweetRed} progress={experienceCalculator(this.props.currentExperience, this.props.goalLevel)} width={200} />
                             <View style={{ flexDirection: 'row' }}>
                                 <View style={{ alignSelf: "baseline", top: 5 }}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} height={30} width={70} fontSize={14} borderRadius={50} title={"Update XP"}
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} height={30} width={70}
+                                        fontSize={50} borderRadius={50} title={"Update XP"}
                                         onPress={() => {
                                             Keyboard.dismiss()
                                             const character = { ...this.state.character };

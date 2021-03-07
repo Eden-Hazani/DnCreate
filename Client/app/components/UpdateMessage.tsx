@@ -11,7 +11,7 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.41</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.42</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
@@ -24,6 +24,10 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Say hello to the Artificer!</AppText>
                     <Image uri={`${Config.serverUrl}/assets/classDragons/artificerDragon.png`} style={{ height: 150, width: 150 }} />
                     <AppText textAlign={'center'} fontSize={20}>The Artificer class has joined DnCreate!</AppText>
+                </View>
+                <View style={{ padding: 15 }}>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Change tools skills and languages manually!</AppText>
+                    <AppText textAlign={'center'} fontSize={20}>Due to user requests the feature for manually edition skills languages and tools have been added to the character sheet!</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure mode now features the Image Gallery!</AppText>

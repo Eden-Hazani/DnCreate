@@ -249,7 +249,8 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                                         style={{ flex: .5 }}
                                     />
                                     <AppText textAlign={'center'}>Pick Color</AppText>
-                                    <AppButton backgroundColor={this.state[this.state.colorPickOrder] ? this.state[this.state.colorPickOrder] : Colors.lightGray} width={150} height={80} borderRadius={25}
+                                    <AppButton backgroundColor={this.state[this.state.colorPickOrder] ? this.state[this.state.colorPickOrder] : Colors.lightGray}
+                                        width={150} height={80} borderRadius={25}
                                         title={'Pick Color'} onPress={() => { this.setState({ colorPickWindow: false }) }} />
                                 </View>
                             </Modal>

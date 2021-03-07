@@ -84,7 +84,6 @@ export class AdventurePictureGallery extends Component<{ navigation: any, route:
     componentDidMount() {
         socket.on(`adventure-${this.state.adventure._id}-change`, (adventure: AdventureModel) => {
             this.setState({ adventure }, () => store.dispatch({ type: ActionType.ReplaceParticipateAdventure, payload: this.state.adventure }))
-            console.log(store.getState().participatingAdv)
         });
     }
 

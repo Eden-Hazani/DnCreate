@@ -20,7 +20,7 @@ export class CompleteSkillList extends Component<{ character: CharacterModel }, 
     }
     componentDidMount() {
         try {
-            const baseSkillList = skillsJson.skillList;
+            const baseSkillList = [...skillsJson.skillList];
             if (this.props.character.skills && this.props.character.modifiers) {
                 for (let item of this.props.character.skills) {
                     if (baseSkillList.includes(item[0])) {

@@ -23,7 +23,6 @@ export class PathFeatures extends Component<{ route: any }, PathFeaturesState> {
         }
     }
     componentDidMount() {
-        console.log(this.props.route.params.char.pathFeatures)
         setTimeout(() => {
             this.setState({ loading: false })
         }, 800);

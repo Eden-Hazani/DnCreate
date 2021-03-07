@@ -216,11 +216,6 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     <CashImage uri={`${Config.serverUrl}/assets/logos/patreon.png`} style={{ height: 100, width: 100 }} />
                                 </TouchableOpacity>
                             </View>
-                            <View style={{ flex: .3 }}>
-                                <AppText textAlign={'center'}>Custom path maker beta will release in the next update!</AppText>
-                                <AppButton disabled={true} borderRadius={15} width={150} height={50} backgroundColor={Colors.bitterSweetRed} title={"Create Custom Path"}
-                                    textAlign={"center"} fontSize={15} onPress={() => { this.props.navigation.navigate("CreateNewPath") }} />
-                            </View>
 
                             <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flex: .4, paddingTop: 30, paddingBottom: 30 }}>
                                 <View style={{ flex: .5 }}>
@@ -273,13 +268,13 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
                                         <AppText fontSize={20}>Privacy Policy</AppText>
                                         <AppButton borderRadius={15} width={100} height={50} backgroundColor={Colors.bitterSweetRed}
-                                            title={"Policy"} textAlign={"center"} fontSize={20} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
+                                            title={"Policy"} textAlign={"center"} fontSize={30} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
                                     </View>
                                     <ListItemSeparator thick={true} />
                                     <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
                                         <AppText fontSize={20}>Delete Account</AppText>
                                         <AppButton onPress={() => { this.deleteAccount() }} width={100} height={50} borderRadius={15}
-                                            fontSize={20} color={Colors.black} backgroundColor={Colors.danger} title={"Delete"} />
+                                            fontSize={30} color={Colors.black} backgroundColor={Colors.danger} title={"Delete"} />
                                     </View>
                                     <ListItemSeparator thick={true} />
                                     <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
@@ -287,7 +282,7 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                         <AppButton onPress={() => {
                                             this.checkForUpdates()
                                         }} width={100} height={50} borderRadius={15}
-                                            fontSize={20} color={Colors.black} backgroundColor={Colors.pastelPink} title={"Check"} />
+                                            fontSize={30} color={Colors.black} backgroundColor={Colors.pastelPink} title={"Check"} />
                                     </View>
                                     <ListItemSeparator thick={true} />
                                     <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5, width: Dimensions.get('window').width - 100 }}>

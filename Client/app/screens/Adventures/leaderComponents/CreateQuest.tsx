@@ -108,7 +108,6 @@ export class CreateQuest extends Component<{ adventure: AdventureModel, close: a
                     alert(adventureObj.ok);
                     return;
                 }
-                console.log(adventureObj.data)
                 const adventure = adventureObj.data ? adventureObj.data[0] : new AdventureModel();
                 const newQuestList = adventure.quests.map((quest: QuestModal) => {
                     if (quest._id === _id) {

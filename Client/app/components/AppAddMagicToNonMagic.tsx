@@ -12,7 +12,6 @@ export class AppAddMagicToNonMagic extends Component<{ path: any, character: Cha
         try {
             this.props.loadMagicalAbilities(addMagicToChar(this.props.character, this.props.pathType, this.props.path))
         } catch (err) {
-            // console.log(err)
             logger.log(new Error(err))
         }
     }

@@ -113,7 +113,6 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
             if (characterInfo.characterAlignment) {
                 characterInfo.characterAlignment.alignment = alignmentItem
                 this.setState({ characterInfo, clickedAlignment: index })
-                console.log(characterInfo.characterAlignment)
                 return
             }
         }

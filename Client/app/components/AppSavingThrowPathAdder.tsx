@@ -49,7 +49,6 @@ export class AppSavingThrowPathAdder extends Component<{
                 }
             }
             this.setState({ alreadyPickedSavingThrows }, () => {
-                console.log(this.props.extraSavingThrowsTotal)
                 const { extraSavingThrowsToPick, pickedSkillFromStart } = generateSavingThrowsPathConditions(this.state.character, this.props.itemList, this.props.pathChosen, this.props.extraSavingThrowsTotal)
                 if (pickedSkillFromStart !== "") {
                     let savingThrowsWasPickedByPath = this.state.savingThrowsWasPickedByPath

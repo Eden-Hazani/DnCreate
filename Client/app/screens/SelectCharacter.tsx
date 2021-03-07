@@ -764,7 +764,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <View style={styles.infoContainer}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={[styles.list, { width: '40%' }]}>
-                                        <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={18} width={100} height={50} borderRadius={25} title={'complete skill list'}
+                                        <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={30} width={100} height={50} borderRadius={25} title={'complete skill list'}
                                             onPress={() => { this.setState({ completeSkillModel: true }) }} />
                                         <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
                                         {this.state.character.skills && this.state.character.skills.map((skill: any) =>
@@ -774,6 +774,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                     textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
                                             </View>
                                         )}
+                                        <View style={{ paddingTop: 15 }}>
+                                            <AppButton backgroundColor={Colors.earthYellow} fontSize={20}
+                                                width={110} height={60} borderRadius={25} title={'Replace skill proficiencies'}
+                                                onPress={() => { this.props.navigation.navigate("ReplaceProficiencies", { char: this.state.character, profType: "skills" }) }} />
+                                        </View>
                                         <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
                                             <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                                                 <CompleteSkillList character={this.state.character} />
@@ -817,7 +822,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 <AppText textAlign={'center'} fontSize={16}>Includes {this.state.character.addedWeaponProf.map((v, index) => <AppText key={index}>{`\n`} - {v} - </AppText>)}</AppText>
                                             </View>}
                                         <View>
-                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={200} height={50} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
+                                            <AppButton backgroundColor={Colors.bitterSweetRed} width={120} height={60} borderRadius={25} title={'Issues with bonuses?'} onPress={() => { this.setState({ attackRollTutorialModal: true }) }} />
                                             <Modal visible={this.state.attackRollTutorialModal} animationType={'slide'}>
                                                 <AttackRollTutorial closeWindow={(boolean: boolean) => { this.setState({ attackRollTutorialModal: boolean }) }} />
                                             </Modal>
@@ -827,14 +832,21 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             </View>
                         </View>
                         <View pointerEvents={this.state.tutorialZIndex[4] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[4] ? 10 : 0 }}>
+                            <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
                             {this.state.character.languages &&
-                                <View style={[styles.list, { width: '100%' }]}>
-                                    <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
-                                    {this.state.character.languages.map((lang, index) =>
-                                        <View key={index} style={[styles.tools, { borderColor: Colors.bitterSweetRed }]}>
-                                            <AppText>{lang}</AppText>
-                                        </View>
-                                    )}
+                                <View style={[styles.list, { width: '100%', flexDirection: 'row', justifyContent: "space-evenly" }]}>
+                                    <View>
+                                        {this.state.character.languages.map((lang, index) =>
+                                            <View key={index} style={[styles.tools, { borderColor: Colors.bitterSweetRed, maxHeight: 30 }]}>
+                                                <AppText>{lang}</AppText>
+                                            </View>
+                                        )}
+                                    </View>
+                                    <View style={{ paddingLeft: 15 }}>
+                                        <AppButton backgroundColor={Colors.earthYellow} fontSize={20}
+                                            width={110} height={60} borderRadius={25} title={'Change Languages'}
+                                            onPress={() => { this.props.navigation.navigate("ReplaceLanguages", { char: this.state.character }) }} />
+                                    </View>
                                 </View>
                             }
                             <View style={[styles.list, { width: '100%' }]}>
@@ -844,6 +856,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         <AppText>{`${tool[0]} +${(this.state.currentProficiency) + skillExpertiseCheck(tool[1], this.state.currentProficiency)}`}</AppText>
                                     </View>
                                 )}
+                            </View>
+                            <View style={{ paddingTop: 5, alignSelf: "flex-start", paddingBottom: 10, paddingLeft: 25 }}>
+                                <AppButton backgroundColor={Colors.earthYellow} fontSize={20}
+                                    width={110} height={60} borderRadius={25} title={'Replace tool proficiencies'}
+                                    onPress={() => { this.props.navigation.navigate("ReplaceProficiencies", { char: this.state.character, profType: "tools" }) }} />
                             </View>
                         </View>
                         <View pointerEvents={this.state.tutorialZIndex[5] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[5] ? 10 : 0 }}>
@@ -879,12 +896,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAlignment", { updateAlignment: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>
                                 <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Alignment</AppText>
-                                {this.state.character.characterAlignment &&
+                                {this.state.character.characterAlignment ?
                                     <View>
-                                        {this.state.character.characterAlignment.alignment.length > 0 && <AppText fontSize={20}>{this.state.character.characterAlignment?.alignment}</AppText>}
-                                        {this.state.character.characterAlignment?.alignmentDescription.length > 0 && this.state.character.characterAlignment.alignmentDescription.length > 0 && <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>}
+                                        {this.state.character.characterAlignment.alignment && this.state.character.characterAlignment.alignment.length > 0 ?
+                                            <AppText fontSize={20}>{this.state.character.characterAlignment.alignment}</AppText>
+                                            :
+                                            null}
+                                        {this.state.character.characterAlignment.alignmentDescription && this.state.character.characterAlignment.alignmentDescription.length > 0 ?
+                                            <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>
+                                            :
+                                            null}
                                     </View>
-                                }
+                                    : null}
                             </TouchableOpacity>
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAppearance", { updateAppearance: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>

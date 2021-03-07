@@ -81,7 +81,7 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
                 this.componentStartLoadWithoutAds();
             }
         } catch (err) {
-            console.log(err)
+            this.setState({ loadingAd: false, loading: false })
         }
     }
 

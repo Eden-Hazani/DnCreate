@@ -71,7 +71,8 @@ export class BarbarianRageCounter extends Component<{ character: CharacterModel 
                             this.decrease()
                         }} style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                         <View style={{ paddingBottom: 15 }}>
-                            <AppText fontSize={20}>Rage</AppText>
+                            <AppText textAlign={'center'} fontSize={20}>Rage</AppText>
+                            <AppText textAlign={'center'} fontSize={14}>Press and hold to use 1 rage point, tap to restore 1 rage point</AppText>
                         </View>
                         <AppText fontSize={18}>Total:</AppText>
                         <AppText fontSize={18} color={Colors.bitterSweetRed}>{this.state.rageTotal}</AppText>

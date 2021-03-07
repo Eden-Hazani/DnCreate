@@ -83,7 +83,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '1.9.41') {
+        if (!newsFlag || newsFlag !== '1.9.42') {
             this.setState({ updateNews: true })
         }
     }
@@ -224,8 +224,9 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                             return;
                                         }
                                         this.props.navigation.navigate("RaceList")
-                                    }} fontSize={18} borderRadius={100} width={120} height={120} title={"New Character"} />
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")} fontSize={18} borderRadius={100} width={120} height={120} title={"Character Hall"} />
+                                    }} fontSize={15} borderRadius={100} width={120} height={120} title={"New Character"} />
+                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")}
+                                        fontSize={15} borderRadius={100} width={120} height={120} title={"Character Hall"} />
                                 </View>
                                 <Modal visible={this.state.homeMessageModal} animationType="slide">
                                     <FeedBack close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
@@ -233,7 +234,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '1.9.41')
+                                            AsyncStorage.setItem('newsFlag', '1.9.42')
                                         })
                                     }} />
                                 </Modal>

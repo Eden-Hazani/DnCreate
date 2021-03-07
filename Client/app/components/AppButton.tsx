@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import { AppText } from './AppText';
 import { Colors } from '../config/colors';
+import { AppButtonInnerText } from './AppButtonInnerText';
 
 
 /**
@@ -18,7 +19,6 @@ export class AppButton extends Component<any>{
                 <View style=
                     {[styles.button,
                     {
-                        flexShrink: 1,
                         marginBottom: this.props.marginBottom,
                         backgroundColor: this.props.disabled ? Colors.lightGray : this.props.backgroundColor,
                         width: this.props.width,
@@ -27,12 +27,12 @@ export class AppButton extends Component<any>{
                     }]}>
                     {this.props.highlightText ?
                         <View style={{ backgroundColor: this.props.highLightColor ? this.props.highLightColor : Colors.totalWhite, borderRadius: this.props.width / 2, padding: 5 }}>
-                            <AppText color={this.props.color} fontSize={this.props.fontSize}
-                                textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppText>
+                            <AppButtonInnerText buttonHeightSize={this.props.height} buttonWidthSize={this.props.width} color={this.props.color} fontSize={this.props.fontSize}
+                                textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppButtonInnerText>
                         </View>
                         :
-                        <AppText color={this.props.color} fontSize={this.props.fontSize}
-                            textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppText>
+                        <AppButtonInnerText buttonHeightSize={this.props.height} buttonWidthSize={this.props.width} color={this.props.color} fontSize={this.props.fontSize}
+                            textAlign={"center"} padding={5}>{this.props.title ? this.props.title.replace(" ", '\n') : " "}</AppButtonInnerText>
                     }
                 </View>
             </TouchableOpacity>

@@ -39,6 +39,8 @@ import ClassPick from '../screens/CharCreation/ClassPick';
 import { AddFeaturesToRace } from '../screens/CharCreation/AddFeaturesToRace';
 import { CharacterAppearance } from '../screens/CharCreation/CharacterAppearance';
 import { CharacterAlignment } from '../screens/CharCreation/CharacterAlignment';
+import { ReplaceProficiencies } from '../screens/charOptions/ReplaceProficiencies';
+import { ReplaceLanguages } from '../screens/charOptions/ReplaceLanguages';
 
 const Stack = createStackNavigator();
 
@@ -100,6 +102,8 @@ const CharNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="CustomSpellList" component={CustomSpellList} />
         <Stack.Screen options={{ title: "" }} name="CharWeapons" component={CharWeapons} />
         <Stack.Screen options={{ title: "" }} name="CharEquipment" component={CharEquipment} />
+        <Stack.Screen options={{ title: "" }} name="ReplaceProficiencies" component={ReplaceProficiencies} />
+        <Stack.Screen options={{ title: "" }} name="ReplaceLanguages" component={ReplaceLanguages} />
 
     </Stack.Navigator>
 }

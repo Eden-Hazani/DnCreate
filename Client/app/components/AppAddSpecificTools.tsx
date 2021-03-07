@@ -37,7 +37,6 @@ export class AppAddSpecificTools extends Component<{ optionalTools: [], sendTool
                         }
                     }
                 }
-                console.log(this.props.optionalTools)
                 if (conditionalToolsToPickNumber > 0) {
                     this.props.setAdditionalToolPicks(true)
                     this.setState({ conditionalToolsToPickNumber })

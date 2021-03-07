@@ -62,7 +62,8 @@ export class BardInspirationCounter extends Component<{ character: CharacterMode
                         this.decrease()
                     }} style={[styles.statContainer, { borderColor: Colors.whiteInDarkMode }]}>
                     <View style={{ paddingBottom: 15 }}>
-                        <AppText fontSize={20}>Inspiration Dice</AppText>
+                        <AppText textAlign={'center'} fontSize={20}>Inspiration Dice</AppText>
+                        <AppText textAlign={'center'} fontSize={14}>Press and hold to use 1 inspiration point, tap to restore 1 inspiration point</AppText>
                     </View>
                     <AppText fontSize={18}>Total:</AppText>
                     <AppText fontSize={18} color={Colors.bitterSweetRed}>{this.state.inspectionTotal}</AppText>

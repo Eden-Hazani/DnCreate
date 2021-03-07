@@ -64,10 +64,10 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                         </View>
                         <View style={styles.buttons}>
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("ParticipatingAdventureList") }} fontSize={18}
+                                onPress={() => { this.props.navigation.navigate("ParticipatingAdventureList") }} fontSize={14}
                                 borderRadius={25} width={125} height={100} title={"Participating Adventures"} />
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("LeadingAdventureList") }} fontSize={18} borderRadius={25}
+                                onPress={() => { this.props.navigation.navigate("LeadingAdventureList") }} fontSize={14} borderRadius={25}
                                 width={125} height={100} title={"Leading Adventures"} />
                         </View>
                     </View>
@@ -77,10 +77,10 @@ export class Adventures extends Component<{ props: any, navigation: any }, Adven
                         </View>
                         <View style={styles.buttons}>
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("StartAdventure") }} fontSize={18} borderRadius={25}
+                                onPress={() => { this.props.navigation.navigate("StartAdventure") }} fontSize={14} borderRadius={25}
                                 width={125} height={100} title={"Start Adventure"} />
                             <AppButton backgroundColor={Colors.bitterSweetRed}
-                                onPress={() => { this.props.navigation.navigate("JoinAdventure") }} fontSize={18} borderRadius={25}
+                                onPress={() => { this.props.navigation.navigate("JoinAdventure") }} fontSize={14} borderRadius={25}
                                 width={125} height={100} title={"Join Adventure"} />
                         </View>
                     </View>

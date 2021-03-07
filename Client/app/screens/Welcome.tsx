@@ -183,7 +183,8 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                             }} borderRadius={25} width={150} height={70} title={"Register"} />
                                         </View>
                                         <View style={{ paddingTop: 50 }}>
-                                            <AppButton fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.berries} onPress={() => this.setState({ newUserModal: false })} borderRadius={25} width={250} height={70} title={"Wait! I'm already a user"} />
+                                            <AppButton fontSize={15} color={Colors.totalWhite} backgroundColor={Colors.berries} onPress={() => this.setState({ newUserModal: false })}
+                                                borderRadius={25} width={250} height={70} title={"Wait! I'm already a user"} />
                                         </View>
                                     </ScrollView>
                                 </Modal>
