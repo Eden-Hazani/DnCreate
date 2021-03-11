@@ -217,6 +217,8 @@ const CharacterSchema = mongoose.Schema({
         dice: { type: String },
         diceAmount: { type: Number },
         name: { type: String },
+        modifier: { type: String },
+        isProficient: { type: Boolean },
         description: { type: String },
         specialAbilities: { type: String },
         removable: { type: Boolean }

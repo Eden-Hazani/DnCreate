@@ -30,6 +30,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
         this.props.changeScrollPosition({ x: XY.x, y: XY.y })
         this.setState({ tutorialStage: tutorialStage })
     }
+
     percentage = (num: number, per: number) => {
         const POV = Dimensions.get('window').scale
         if (POV >= 2.7 && this.state.tutorialStage.length > 4) {
@@ -37,6 +38,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
         }
         return (num / 100) * per;
     }
+
     render() {
         return (
             <View style={[styles.container, { height: this.percentage(700, this.props.pageHeight) }]}>
@@ -73,7 +75,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                 {this.state.tutorialStage[2] &&
                     <TouchableOpacity
                         onPress={() => this.moveStage(2, { x: 0, y: this.percentage(200, this.props.pageHeight) })}
-                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(120, this.props.pageHeight), left: 90 }}>
+                        style={{ width: '100%', flexDirection: 'row', top: this.percentage(170, this.props.pageHeight), left: 90 }}>
                         <View style={{ alignSelf: "center", bottom: 70 }}>
                             <IconGen name={'chevron-left'} size={70} iconColor={"white"} />
                         </View>
@@ -90,6 +92,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                         <View style={[styles.item, { borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Saving Throws and dice info</AppText>
                             <AppText fontSize={15} color={'white'}>Here you have access all of your characters proficiency information</AppText>
+                            <AppText fontSize={15} color={'white'}>Press on any skill and DnCreate will roll a d20 + skill related bonuses for you!</AppText>
                             <AppText fontSize={15} color={'white'}>Your main hit die is positioned to the right of the screen together with all the information required for combat</AppText>
                             <AppText fontSize={15} color={'white'}>If you have a hard time understanding the mechanics of hit/damage dice press the "issues with bonuses" button</AppText>
                         </View>
@@ -99,8 +102,8 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
 
                 {this.state.tutorialStage[4] &&
-                    <TouchableOpacity onPress={() => this.moveStage(4, { x: 0, y: this.percentage(350, this.props.pageHeight) })}
-                        style={{ width: '100%', height: 150, flexDirection: 'row', top: this.percentage(350, this.props.pageHeight), left: 80 }}>
+                    <TouchableOpacity onPress={() => this.moveStage(4, { x: 0, y: this.percentage(400, this.props.pageHeight) })}
+                        style={{ width: '100%', height: 150, flexDirection: 'row', top: this.percentage(400, this.props.pageHeight), left: 80 }}>
                         <View style={{ alignSelf: "baseline", bottom: 70 }}>
                             <IconGen name={'chevron-left'} size={70} iconColor={"white"} />
                         </View>
@@ -111,8 +114,8 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
 
                 {this.state.tutorialStage[5] &&
-                    <TouchableOpacity onPress={() => this.moveStage(5, { x: 0, y: this.percentage(355, this.props.pageHeight) })}
-                        style={{ flexDirection: 'row', top: this.percentage(400, this.props.pageHeight), left: 80 }}>
+                    <TouchableOpacity onPress={() => this.moveStage(5, { x: 0, y: this.percentage(430, this.props.pageHeight) })}
+                        style={{ flexDirection: 'row', top: this.percentage(450, this.props.pageHeight), left: 80 }}>
                         <View style={{ alignSelf: "baseline", bottom: 70 }}>
                             <IconGen name={'chevron-left'} size={70} iconColor={"white"} />
                         </View>
@@ -123,7 +126,7 @@ export class TutorialScreen extends Component<{ zIndex: any, pageHeight: any, ch
                     </TouchableOpacity>}
                 {this.state.tutorialStage[6] &&
                     <TouchableOpacity onPress={() => this.props.end()}
-                        style={{ width: '100%', height: 150, top: this.percentage(385, this.props.pageHeight) }}>
+                        style={{ width: '100%', height: 150, top: this.percentage(490, this.props.pageHeight) }}>
                         <View style={[styles.item, { width: width * 0.9, borderColor: Colors.whiteInDarkMode, backgroundColor: Colors.burgundy }]}>
                             <AppText fontSize={22} color={'white'}>Magic</AppText>
                             <AppText fontSize={15} color={'white'}>If you have access to spellcasting abilities you can use the magic section of DnCreate's character sheet to manage your spells and spell slots.</AppText>

@@ -29,6 +29,7 @@ export class Colors {
     public static earthYellow: string;
     public static deepGold: string;
     public static softPageBackground: string
+    public static softWhiteInDarkMode: string
     public static async InitializeAsync() {
         await AsyncStorage.getItem('colorScheme').then(scheme => {
             if (scheme === "firstUse") {
@@ -58,6 +59,7 @@ export class Colors {
                 Colors.earthYellow = "#E0A458"
                 Colors.deepGold = "#D1B000"
                 Colors.softPageBackground = "rgba(255, 255, 255, 0.7)"
+                Colors.softWhiteInDarkMode = "rgba(0, 0, 0, 0.7)"
             }
             if (scheme === "light") {
                 Colors.primary = '#F2A65A'
@@ -86,6 +88,7 @@ export class Colors {
                 Colors.earthYellow = "#E0A458"
                 Colors.deepGold = "#D1B000"
                 Colors.softPageBackground = "rgba(255, 255, 255, 0.7)"
+                Colors.softWhiteInDarkMode = "rgba(0, 0, 0, 0.7)"
 
             }
             if (scheme === "dark") {
@@ -115,6 +118,7 @@ export class Colors {
                 Colors.earthYellow = "#E0A458"
                 Colors.deepGold = "#D1B000"
                 Colors.softPageBackground = "rgba(0, 0, 0, 0.7)"
+                Colors.softWhiteInDarkMode = "rgba(255, 255, 255, 0.7)"
             }
         })
     }

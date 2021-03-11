@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert, Vibration, Animated } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Modal, FlatList, ScrollView, Alert, Vibration, Animated, Dimensions } from 'react-native';
 import { IconGen } from '../components/IconGen';
 import { Colors } from '../config/colors';
 import { AppText } from '../components/AppText';
@@ -43,7 +43,9 @@ import { TutorialScreen } from '../components/TutorialScreen';
 import { ExperienceCalculator } from '../components/ExperienceCalculator';
 import { killToolArrayDuplicates } from '../../utility/killToolArrayDuplicates';
 import { Image as CashImage } from 'react-native-expo-image-cache'
-
+import { ProficientSkillList } from './charOptions/ProficiantSkillList';
+import { DiceRolling } from '../animations/DiceRolling';
+const { height, width } = Dimensions.get('window');
 
 /**
  * 
@@ -71,6 +73,11 @@ interface SelectCharacterState {
     maxHpChangeModal: boolean
     tutorialOn: boolean
     containerHeight: number
+    diceRolling: boolean
+    scrollHandle: number
+    currentDiceRollValue: number
+    diceType: number
+    diceAmount: number
 }
 
 export class SelectCharacter extends Component<{ route: any, navigation: any }, SelectCharacterState>{
@@ -81,6 +88,10 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            diceAmount: 0,
+            diceType: 0,
+            currentDiceRollValue: 0,
+            diceRolling: false,
             tutorialZIndex: [],
             containerHeight: 0,
             tutorialOn: false,
@@ -100,7 +111,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             statsVisible: false,
             character: new CharacterModel(),
             resetHpModal: false,
-            isDm: this.props.route.params.isDm
+            isDm: this.props.route.params.isDm,
+            scrollHandle: 0
         }
         this.UnsubscribeStore = store.subscribe(() => {
             this.setState({ character: store.getState().character })
@@ -429,8 +441,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
     setSavingThrows = () => {
         try {
-            let midRes = '';
             const list = modifierNameList.list.map((modifierName, index) => {
+                let midRes = '';
                 if (this.state.character.savingThrows) {
                     if (this.state.character.savingThrows.includes(modifierName) && this.state.character.modifiers) {
                         midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) + this.state.currentProficiency}`
@@ -439,9 +451,15 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         midRes = `${modifierName} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()]) > 0 ? '+' : ""} ${parseInt(this.state.character.modifiers[modifierName.toLowerCase()])}`
                     }
                 }
-                return <View key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
-                    <AppText textAlign={'center'} fontSize={18}>{midRes} </AppText>
-                </View>
+                return <TouchableOpacity onPress={() => {
+                    let number = midRes.match(/\d/g);
+                    if (number) {
+                        this.setState({ diceRolling: true, diceAmount: 1, diceType: 20, currentDiceRollValue: parseInt(number.join("")) })
+                    }
+                }}
+                    key={index} style={{ borderColor: Colors.bitterSweetRed, borderWidth: 1, borderRadius: 15, padding: 5, margin: 5, width: 150 }} >
+                    <AppText textAlign={'center'} fontSize={18}>{midRes}</AppText>
+                </TouchableOpacity>
             })
             return list
         } catch (err) {
@@ -455,10 +473,41 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         this.setState({ tutorialOn: false })
     }
 
+    rollDamageWithWeapon = () => {
+        if (!this.state.character.currentWeapon?.modifier) {
+            alert('Using DnCreate to roll for damage is only available if your weapon has an assigned modifier, go to the weapons circle and edit your weapon with the modifier you want then try again :)')
+            return;
+        }
+        if (this.state.character.modifiers && this.state.character.currentWeapon.dice) {
+            this.setState({
+                diceAmount: this.state.character.currentWeapon.diceAmount || 1, diceType: parseInt(this.state.character.currentWeapon.dice.split('D')[1] || '0'), diceRolling: true,
+                currentDiceRollValue: this.state.character.modifiers[this.state.character.currentWeapon.modifier.toLowerCase()]
+            })
+        }
+    }
+
+    rollHitWithWeapon = () => {
+        if (this.state.character.modifiers && this.state.character.currentWeapon?.isProficient && this.state.character.currentWeapon.modifier) {
+            this.setState({
+                diceAmount: 1, diceType: 20, diceRolling: true,
+                currentDiceRollValue: this.state.character.modifiers[this.state.character.currentWeapon.modifier.toLowerCase()] + this.state.currentProficiency
+            })
+        } else {
+            this.setState({
+                diceAmount: 1, diceType: 20, diceRolling: true,
+                currentDiceRollValue: this.state.currentProficiency
+            })
+        }
+    }
+
     render() {
         const isDm = this.state.isDm;
         return (
             <ScrollView
+                scrollEnabled={!this.state.diceRolling}
+                onScroll={(event) => {
+                    this.setState({ scrollHandle: event.nativeEvent.contentOffset.y })
+                }}
                 onLayout={(evt) => {
                     const { height } = evt.nativeEvent.layout;
                     const { containerHeight } = this.state;
@@ -478,9 +527,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         tutorialZIndex[val] = true
                                         this.setState({ tutorialZIndex })
                                     }}
-                                    pageHeight={this.state.containerHeight} end={() => this.endTutorial()} changeScrollPosition={(val: any) => this.scrollView.scrollTo({ x: val.x, y: val.y, animated: true })} />
+                                    pageHeight={this.state.containerHeight} end={() => this.endTutorial()}
+                                    changeScrollPosition={(val: any) => this.scrollView.scrollTo({ x: val.x, y: val.y, animated: true })} />
                             </>}
-                        {this.state.tutorialOn && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
+
+                        {this.state.tutorialOn || this.state.diceRolling && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
+                        {this.state.diceRolling && <View style={[{
+                            zIndex: 10, position: 'absolute', top: this.state.scrollHandle + (this.state.diceAmount > 2 ? 50 : height / 3),
+                            left: 0, right: 0, bottom: 0
+                        }]}>
+                            <DiceRolling diceAmount={this.state.diceAmount} diceType={this.state.diceType} rollValue={this.state.currentDiceRollValue} close={() => this.setState({ diceRolling: false, currentDiceRollValue: 0, diceType: 0, diceAmount: 0 })} />
+                        </View>}
                         <Modal visible={this.state.levelUpFunctionActive} animationType="slide">
                             <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
@@ -761,19 +818,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     {this.setSavingThrows()}
                                 </View>
                             </View>
+                            <View>
+                                <AppText textAlign={'center'} fontSize={18} padding={15}>DnCreate can roll for you, just hit the skill, tool, save throw, or hit dice and let the dice roll!</AppText>
+                            </View>
                             <View style={styles.infoContainer}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={[styles.list, { width: '40%' }]}>
                                         <AppButton backgroundColor={Colors.bitterSweetRed} fontSize={30} width={100} height={50} borderRadius={25} title={'complete skill list'}
                                             onPress={() => { this.setState({ completeSkillModel: true }) }} />
-                                        <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Proficient skills:</AppText>
-                                        {this.state.character.skills && this.state.character.skills.map((skill: any) =>
-                                            <View key={skill} style={[styles.skill, { borderColor: Colors.bitterSweetRed }]}>
-                                                <AppText textAlign={'center'}>{`${skill[0]}`}</AppText>
-                                                <AppText fontSize={20} color={Colors.bitterSweetRed}
-                                                    textAlign={'center'}>{`${((this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency) <= 0 ? "" : "+")} ${(this.skillCheck(skill) + this.state.currentProficiency) + skillExpertiseCheck(skill[1], this.state.currentProficiency)}`}</AppText>
-                                            </View>
-                                        )}
+                                        <ProficientSkillList isDm={this.state.isDm}
+                                            diceRolling={(val: any) => this.setState({ diceAmount: 1, diceRolling: val.diceRolling, currentDiceRollValue: val.rollValue, diceType: 20 })}
+                                            character={this.state.character} currentProficiency={this.state.currentProficiency} />
                                         <View style={{ paddingTop: 15 }}>
                                             <AppButton backgroundColor={Colors.earthYellow} fontSize={20}
                                                 width={110} height={60} borderRadius={25} title={'Replace skill proficiencies'}
@@ -781,17 +836,23 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         </View>
                                         <Modal visible={this.state.completeSkillModel} animationType={'slide'}>
                                             <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
-                                                <CompleteSkillList character={this.state.character} />
-                                                <View>
-                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
-                                                        onPress={() => { this.setState({ completeSkillModel: false }) }} />
-                                                </View>
+                                                <CompleteSkillList close={(val: boolean) => this.setState({ completeSkillModel: val })} onPress={(val: number) => this.setState({ diceAmount: 1, diceRolling: true, diceType: 20, currentDiceRollValue: val })} character={this.state.character} />
                                             </ScrollView>
                                         </Modal>
                                     </View>
                                     <View style={{ justifyContent: "center", alignItems: "center", width: "55%" }}>
                                         {this.state.character.currentWeapon && this.state.character.currentWeapon.name ?
                                             <View style={{ borderColor: Colors.whiteInDarkMode, borderRadius: 15, borderWidth: 1 }}>
+                                                <View style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
+                                                    <TouchableOpacity style={{ backgroundColor: Colors.bitterSweetRed, width: '40%', borderRadius: 10, margin: 2 }}
+                                                        disabled={this.state.isDm} onPress={() => this.rollDamageWithWeapon()}>
+                                                        <AppText textAlign={'center'}>Roll{`\n`}Damage</AppText>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={{ backgroundColor: Colors.bitterSweetRed, width: '40%', borderRadius: 10, margin: 2 }}
+                                                        disabled={this.state.isDm} onPress={() => this.rollHitWithWeapon()}>
+                                                        <AppText textAlign={'center'}>Roll{`\n`}Hit Chance</AppText>
+                                                    </TouchableOpacity>
+                                                </View>
                                                 <AppText fontSize={25} textAlign={'center'}>Weapon Hit Dice</AppText>
                                                 <AppText fontSize={15} textAlign={'center'}>Your currently equipped weapon does the following damage</AppText>
                                                 <AppText fontSize={25} textAlign={'center'} color={Colors.bitterSweetRed}>{this.state.character.currentWeapon.diceAmount}-{this.state.character.currentWeapon.dice}</AppText>

@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import skillModifier from '../../utility/skillModifier';
 import { CharacterModel } from '../models/characterModel';
 import skillsJson from '../../jsonDump/skillList.json';
 import { AppText } from './AppText';
 import { Colors } from '../config/colors';
 import logger from '../../utility/logger';
+import { AppButton } from './AppButton';
 
 interface CompleteSkillListState {
     skillList: any[]
 }
 
-export class CompleteSkillList extends Component<{ character: CharacterModel }, CompleteSkillListState>{
+export class CompleteSkillList extends Component<{ onPress: any, character: CharacterModel, close: any }, CompleteSkillListState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -55,13 +56,21 @@ export class CompleteSkillList extends Component<{ character: CharacterModel }, 
                     justifyContent: "center",
                     alignItems: "center"
                 }}>
-                    {this.state.skillList.map((skill: any, index: number) => <View key={index} style={{
-                        margin: 10, borderWidth: 1, borderColor: Colors.bitterSweetRed, borderRadius: 15, padding: 10,
-                        width: 150, height: 80, justifyContent: "center"
-                    }}>
+                    {this.state.skillList.map((skill: any, index: number) => <TouchableOpacity key={index} onPress={() => {
+                        this.props.onPress(skill[1])
+                        this.props.close(false)
+                    }}
+                        style={{
+                            margin: 10, borderWidth: 1, borderColor: Colors.bitterSweetRed, borderRadius: 15, padding: 10,
+                            width: 150, height: 80, justifyContent: "center"
+                        }}>
                         <AppText textAlign={'center'} fontSize={18}>{skill[0]}</AppText>
                         <AppText textAlign={'center'} fontSize={20}>{skill[1]}</AppText>
-                    </View>)}
+                    </TouchableOpacity>)}
+                </View>
+                <View>
+                    <AppButton backgroundColor={Colors.bitterSweetRed} width={150} height={50} borderRadius={25} title={'close'}
+                        onPress={() => this.props.close(false)} />
                 </View>
             </View>
         )

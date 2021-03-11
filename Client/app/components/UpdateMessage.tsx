@@ -11,7 +11,7 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.42</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.43</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
@@ -19,6 +19,12 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={25} color={Colors.deepGold}>JoinedForSteampunk</AppText>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.deepGold}>BigK_Games</AppText>
                     <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>For donating and contributing to the future of DnCreate</AppText>
+                </View>
+                <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>The Dice Roller Is Here!!</AppText>
+                    <Image uri={`${Config.serverUrl}/assets/misc/diceRollsD20/diceRollAni.gif`} style={{ height: 150, width: 150 }} />
+                    <AppText textAlign={'center'} fontSize={25} >Just tap one of your skills tools or your hit dice and let DnCreate roll for you!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >The rolls automatically add all relevant bonuses to your roll</AppText>
                 </View>
                 <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Say hello to the Artificer!</AppText>
@@ -33,22 +39,6 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure mode now features the Image Gallery!</AppText>
                     <AppText textAlign={'center'} fontSize={20}>You as the DM or as a participating member can upload any images you want into your adventure for your fellow adventurers to see!</AppText>
                     <AppText textAlign={'center'} fontSize={20}>share maps, monsters, stats, landscapes, or just memes with your entire party</AppText>
-                </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.berries}>Improved feats!</AppText>
-                    <AppText textAlign={'center'} fontSize={22}>The ability to add skill, tool, and saving throw proficiencies has now been added on acquiring a new feat</AppText>
-                </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.berries}>Character Appearance</AppText>
-                    <AppText textAlign={'center'} fontSize={22}>You can now add the appearance of your character in the character creation process (you can always change your current appearance from the character sheet)</AppText>
-                </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.berries}>Character Alignment</AppText>
-                    <AppText textAlign={'center'} fontSize={22}>You can now add the alignment of your character in the character creation process (you can always change your current alignment from the character sheet)</AppText>
-                </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.berries}>Item Description</AppText>
-                    <AppText textAlign={'center'} fontSize={22}>You can now add description to your items to provide more depth.</AppText>
                 </View>
 
                 <View style={{ padding: 15 }}>

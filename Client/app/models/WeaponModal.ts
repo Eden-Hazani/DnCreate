@@ -1,3 +1,5 @@
+import { string } from "yup";
+
 export class WeaponModal {
     public constructor(
         public _id?: string,
@@ -6,6 +8,8 @@ export class WeaponModal {
         public name?: string,
         public description?: string,
         public specialAbilities?: string,
+        public modifier?: string,
+        public isProficient?: boolean,
         public removable?: boolean
     ) { }
 }

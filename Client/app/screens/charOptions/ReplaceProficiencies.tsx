@@ -32,7 +32,6 @@ export class ReplaceProficiencies extends Component<{ navigation: any, route: an
         }
     }
     componentDidMount() {
-        console.log(this.state.baseItemList)
         const pickedItems = [...this.state.pickedItems];
         const clickedItems = [...this.state.clickedItems];
         const expertiseItems = [...this.state.expertiseItems];
@@ -63,7 +62,6 @@ export class ReplaceProficiencies extends Component<{ navigation: any, route: an
             const clickedItems = [...this.state.clickedItems];
             clickedItems[index] = false;
             const pickedItems = oldPickedItems.filter(currentItem => currentItem[0] !== item);
-            console.log(pickedItems)
             this.setState({ clickedItems, pickedItems });
         }
         else if (!this.state.clickedItems[index]) {
@@ -85,7 +83,6 @@ export class ReplaceProficiencies extends Component<{ navigation: any, route: an
             const expertiseItems = [...this.state.expertiseItems];
             expertiseItems[index] = false;
             const pickedItems = oldPickedItems.filter(currentItem => currentItem[0] !== item);
-            console.log(pickedItems)
             this.setState({ expertiseItems, pickedItems });
         }
         else if (!this.state.expertiseItems[index]) {

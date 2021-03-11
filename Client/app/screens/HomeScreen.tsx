@@ -24,6 +24,7 @@ import { FeedBack } from '../components/FeedBack';
 import { UpdateMessage } from '../components/UpdateMessage';
 import { Config } from '../../config';
 import { IconGen } from '../components/IconGen';
+import { serverDice } from '../../utility/getDiceFromServer';
 
 interface HomeState {
     loading: boolean
@@ -83,24 +84,15 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '1.9.42') {
+        if (!newsFlag || newsFlag !== '1.9.43') {
             this.setState({ updateNews: true })
         }
     }
 
+
     async componentDidMount() {
         try {
-            const date = new Date().toISOString().slice(0, 10)
-            const clearCashOnceADay = await AsyncStorage.getItem('clearCashOnceADay');
-            if (!clearCashOnceADay) {
-                await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
-            }
-            if (clearCashOnceADay) {
-                if (clearCashOnceADay !== date) {
-                    await CacheManager.clearCache();
-                    await AsyncStorage.setItem('clearCashOnceADay', `${date}`);
-                }
-            }
+            serverDice()
             this.checkForNews();
             if (store.getState().nonUser) {
                 this.setState({ loading: true }, () => {
@@ -234,7 +226,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '1.9.42')
+                                            AsyncStorage.setItem('newsFlag', '1.9.43')
                                         })
                                     }} />
                                 </Modal>

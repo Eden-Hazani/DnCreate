@@ -179,6 +179,8 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
                             <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 100 }}>
                                 <AppText color={Colors.berries} fontSize={22} textAlign={'center'}>{this.state.currentWeapon.name}</AppText>
                                 <AppText fontSize={17} textAlign={'center'}>{this.state.currentWeapon.description}</AppText>
+                                <AppText fontSize={17} textAlign={'center'}>Modifier: {this.state.currentWeapon.modifier && this.state.currentWeapon.modifier}</AppText>
+                                <AppText fontSize={17} textAlign={'center'}>Proficient: {this.state.currentWeapon.isProficient && this.state.currentWeapon.isProficient.toString()}</AppText>
                                 <AppText fontSize={17} textAlign={'center'}>`Damage Dice - {this.state.currentWeapon.diceAmount}{this.state.currentWeapon.dice}`</AppText>
                             </View>
                             {this.state.currentWeapon.specialAbilities &&
