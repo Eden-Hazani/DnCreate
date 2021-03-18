@@ -138,6 +138,9 @@ export function reduce(currentState: AppState | undefined = initialState, action
         case ActionType.UpdateSubclass:
             newState.customSubClass = action.payload
             break;
+        case ActionType.CustomRaceEditing:
+            newState.customRaceEditing = action.payload
+            break;
         default: break;
     }
 

@@ -13,7 +13,7 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 
 const ValidationSchema = Yup.object().shape({
-    image: Yup.string().label("Image"),
+    image: Yup.mixed().label("Image"),
 })
 
 interface CustomRaceBackImageState {
@@ -30,6 +30,7 @@ export class CustomRaceBackImage extends Component<{ navigation: any }, CustomRa
     }
 
     addImageAndContinue = (values: any) => {
+        console.log(values)
         const storeItem = { ...store.getState().customRace };
         storeItem.image = values.image;
         this.setState({ confirmed: true })
@@ -47,7 +48,7 @@ export class CustomRaceBackImage extends Component<{ navigation: any }, CustomRa
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <View style={{ paddingTop: 20 }}>
                         <AppForm
-                            initialValues={{ image: store.getState().customRace.image }}
+                            initialValues={{ image: store.getState().customRace.image || null }}
                             onSubmit={(values: any) => this.addImageAndContinue(values)}
                             validationSchema={ValidationSchema}>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>

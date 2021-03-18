@@ -95,6 +95,16 @@ export class CustomRaceBaseTools extends Component<{ navigation: any }, CustomRa
         }, 1100);
     }
 
+    removeFeatureSwitch = () => {
+        this.setState({ clickedTools: [], pickedTools: [] }, () => {
+            const customRace = { ...this.state.customRace };
+            if (customRace.baseAddedTools) {
+                customRace.baseAddedTools = this.state.pickedTools
+            }
+            this.setState({ customRace })
+        })
+    }
+
     render() {
         return (
             <ScrollView style={styles.container}>
@@ -106,6 +116,16 @@ export class CustomRaceBaseTools extends Component<{ navigation: any }, CustomRa
                             <AppText fontSize={20} padding={5} textAlign={'center'}>These tools are applied instantly on character creation</AppText>
                             <Switch value={this.state.activatedInterface} onValueChange={() => {
                                 if (this.state.activatedInterface) {
+                                    if (store.getState().customRaceEditing) {
+                                        Alert.alert("Remove", "This will remove all selected items", [{
+                                            text: 'Yes', onPress: () => {
+                                                this.setState({ activatedInterface: false }, () => {
+                                                    this.removeFeatureSwitch()
+                                                })
+                                            }
+                                        }, { text: 'No' }])
+                                        return
+                                    }
                                     this.setState({ activatedInterface: false })
                                     return;
                                 }

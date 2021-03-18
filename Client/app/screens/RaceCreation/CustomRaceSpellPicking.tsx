@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { Switch } from 'react-native-gesture-handler';
 import spellList from '../../../jsonDump/spells.json'
@@ -107,6 +107,12 @@ export class CustomRaceSpellPicking extends Component<{ navigation: any }, Custo
         }, 1100);
     }
 
+    removeFeatureSwitch = () => {
+        const customRace = { ...this.state.customRace };
+        customRace.addedSpells = [];
+        this.setState({ customRace, shownSpells: [] })
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -118,8 +124,18 @@ export class CustomRaceSpellPicking extends Component<{ navigation: any }, Custo
                             <AppText textAlign={'center'} fontSize={18}>Here you can choose any spell from the spell book, the spells you choose will be available to this race at level 1</AppText>
                             <Switch value={this.state.activatedInterface} onValueChange={() => {
                                 if (this.state.activatedInterface) {
-                                    this.setState({ activatedInterface: false })
-                                    return;
+                                    if (store.getState().customRaceEditing) {
+                                        Alert.alert("Remove", "This will remove all selected items", [{
+                                            text: 'Yes', onPress: () => {
+                                                this.setState({ activatedInterface: false }, () => {
+                                                    this.removeFeatureSwitch()
+                                                })
+                                            }
+                                        }, { text: 'No' }])
+                                        return
+                                    }
+                                    this.setState({ activatedInterface: false });
+                                    return
                                 }
                                 this.setState({ activatedInterface: true })
                             }} />

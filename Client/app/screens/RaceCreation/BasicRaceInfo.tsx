@@ -64,7 +64,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
         super(props)
         this.state = {
             speed: 0,
-            customRace: new RaceModel(),
+            customRace: store.getState().customRaceEditing ? store.getState().customRace : new RaceModel(),
             confirmed: false,
         }
     }
@@ -79,7 +79,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
             languages: values.languages,
             alignment: values.alignment,
             size: values.size,
-            uniqueAbilities: [],
+            uniqueAbilities: store.getState().customRaceEditing ? store.getState().customRace.raceAbilities?.uniqueAbilities : [],
             speed: this.state.speed
         }
         this.setState({ confirmed: true })

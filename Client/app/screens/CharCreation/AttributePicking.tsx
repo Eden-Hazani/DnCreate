@@ -5,6 +5,7 @@ import { Unsubscribe } from 'redux';
 import switchModifier from '../../../utility/abillityModifierSwitch';
 import { attributeColorCodedGuide } from '../../../utility/attributeColorCodedGuide';
 import logger from '../../../utility/logger';
+import { DiceRolling } from '../../animations/DiceRolling';
 import { RollingDiceAnimation } from '../../animations/RollingDiceAnimation';
 import { VibrateAnimation } from '../../animations/vibrateAnimation';
 import userCharApi from '../../api/userCharApi';
@@ -43,6 +44,7 @@ interface AttributePickingState {
     firstPick: boolean
     placedResult: number
     returnScoreToAverageList: number
+    scrollHandle: number
 }
 
 export class AttributePicking extends Component<{ route: any, navigation: any }, AttributePickingState> {
@@ -51,6 +53,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     constructor(props: any) {
         super(props)
         this.state = {
+            scrollHandle: 0,
             returnScoreToAverageList: 0,
             placedResult: -1,
             firstPick: false,
@@ -178,16 +181,16 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         }
         this.setState({ rollingDice: true })
         this.resetRoll();
-        const diceResults = []
-        for (let i = 1; i <= 4; i++) {
-            let number = Math.floor(Math.random() * 6) + 1;
-            diceResults.push(number)
-        }
-        this.setState({ diceResults }, () => {
-            setTimeout(() => {
-                this.setState({ rollingDice: false })
-            }, 800);
-        })
+        // const diceResults = []
+        // for (let i = 1; i <= 4; i++) {
+        //     let number = Math.floor(Math.random() * 6) + 1;
+        //     diceResults.push(number)
+        // }
+        // this.setState({ diceResults }, () => {
+        //     setTimeout(() => {
+        //         this.setState({ rollingDice: false })
+        //     }, 800);
+        // })
     }
     updateStat = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }
@@ -267,23 +270,21 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
 
     render() {
         return (
-            <ScrollView keyboardShouldPersistTaps="always" >
+            <ScrollView keyboardShouldPersistTaps="always"
+                scrollEnabled={!this.state.rollingDice}
+                onScroll={(event) => {
+                    this.setState({ scrollHandle: event.nativeEvent.contentOffset.y })
+                }}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
-                    <View>
-                        <View style={[styles.rollingDice, { backgroundColor: this.state.rollingDice ? Colors.softBlack : Colors.pageBackground }]} pointerEvents={this.state.rollingDice ? "none" : "auto"}>
-                            {this.state.rollingDice && <View style={{
-                                position: 'absolute', top: 0, left: 0,
-                                right: 0,
-                                bottom: Dimensions.get('screen').height / 2,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <View style={[styles.animationContainer, { backgroundColor: Colors.bitterSweetRed }]}>
-                                    <RollingDiceAnimation props />
-                                    <View style={{ width: '100%', marginLeft: 50, transform: [{ rotateX: '15deg' }, { rotateY: '30deg' }] }}>
-                                        <AppText fontSize={50} color={Colors.whiteInDarkMode}>Rolling Dice</AppText>
-                                    </View>
-                                </View>
+                    <View style={[styles.rollingDice, { backgroundColor: this.state.rollingDice ? Colors.softBlack : Colors.pageBackground }]} pointerEvents={this.state.rollingDice ? "none" : "auto"}>
+                        <View>
+                            {this.state.rollingDice && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
+                            {this.state.rollingDice && <View style={[{
+                                zIndex: 10, position: 'absolute', top: this.state.scrollHandle + 50,
+                                left: 0, right: 0, bottom: 0
+                            }]}>
+                                <DiceRolling isClosedTimer={true} showResults={false}
+                                    returnResultArray={(diceResults: number[]) => this.setState({ diceResults })} diceAmount={4} diceType={6} rollValue={0} close={() => this.setState({ rollingDice: false })} />
                             </View>}
                             <View style={styles.container}>
                                 <View style={styles.attributeContainer} >
@@ -415,7 +416,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                             <View >
                                 <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} title={"Roll Dice!"} height={50} borderRadius={25}
-                                        width={Dimensions.get('screen').width / 3.2} fontSize={18} onPress={() => {
+                                        width={Dimensions.get('screen').width / 3.2} fontSize={35} onPress={() => {
                                             this.setState({ firstPick: true })
                                             this.state.finishRolls ? alert("No rolls left!") : this.rollDice()
                                         }} />
@@ -455,7 +456,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                                         <AppButton disabled={this.state.rollDisabled[index] || !this.state.finishRolls || this.state.sumOfDice > 0}
                                                             borderRadius={10} backgroundColor={Colors.bitterSweetRed} title={result.toString()}
                                                             onPress={() => { this.setSumAndDisableRoll(result, index) }}
-                                                            width={50} height={40} fontSize={15} key={result} />
+                                                            width={50} height={40} fontSize={80} key={result} />
                                                     </View>
 
                                                 )}
@@ -535,9 +536,9 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                                     </View>
                                 }
                             </View>
+                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                                height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                         </View>
-                        <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
-                            height={100} title={"Continue"} onPress={() => { this.insertInfoAndContinue() }} />
                     </View>}
             </ScrollView>
 

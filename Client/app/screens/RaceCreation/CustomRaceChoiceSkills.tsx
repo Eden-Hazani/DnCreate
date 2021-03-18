@@ -95,7 +95,6 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
                 storeItem.skillPickChoice.amountToPick = this.state.customRace.skillPickChoice.amountToPick
             }
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: storeItem })
-
         })
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceChoiceTools");
@@ -104,6 +103,18 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
             this.setState({ confirmed: false })
         }, 1100);
     }
+    removeFeatureSwitch = () => {
+        this.setState({ pickedSkills: [], amountToPick: 0 }, () => {
+            const customRace = { ...this.state.customRace };
+            if (customRace.skillPickChoice) {
+                customRace.skillPickChoice.skillList = this.state.pickedSkills
+                customRace.skillPickChoice.amountToPick = this.state.amountToPick
+            }
+            this.setState({ customRace })
+        })
+    }
+
+
     render() {
         const storeItem = store.getState().customRace.skillPickChoice?.amountToPick || 0;
         return (
@@ -116,6 +127,16 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
                             <AppText fontSize={20} padding={5} textAlign={'center'}>These skills will be shown to the player on character pick, and he will be able to pick from them until he reaches the cap you provide below.</AppText>
                             <Switch value={this.state.activatedInterface} onValueChange={() => {
                                 if (this.state.activatedInterface) {
+                                    if (store.getState().customRaceEditing) {
+                                        Alert.alert("Remove", "This will remove all selected items", [{
+                                            text: 'Yes', onPress: () => {
+                                                this.setState({ activatedInterface: false }, () => {
+                                                    this.removeFeatureSwitch()
+                                                })
+                                            }
+                                        }, { text: 'No' }])
+                                        return
+                                    }
                                     this.setState({ activatedInterface: false })
                                     return;
                                 }

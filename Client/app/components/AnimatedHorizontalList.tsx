@@ -99,7 +99,7 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors, loadNext
     const scrollX = React.useRef(new Animated.Value(0)).current;
     return (
         <View>
-            <BackDrop scrollX={scrollX} backDropColors={backDropColors} />
+            {data.length > 1 && <BackDrop scrollX={scrollX} backDropColors={backDropColors} />}
             <Square scrollX={scrollX} />
             <Animated.FlatList
                 onEndReachedThreshold={2}

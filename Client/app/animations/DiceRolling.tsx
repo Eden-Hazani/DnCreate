@@ -40,7 +40,7 @@ const test = (diceAmount: number, diceType: number) => {
     return { currentImages, animatedXYVal }
 }
 
-export class DiceRolling extends Component<{ diceAmount: number, diceType: number, rollValue: number, close: any }, DiceRollingState>{
+export class DiceRolling extends Component<{ showResults: boolean, isClosedTimer: boolean, diceAmount: number, diceType: number, rollValue: number, close: any, returnResultArray: any }, DiceRollingState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -101,6 +101,11 @@ export class DiceRolling extends Component<{ diceAmount: number, diceType: numbe
 
 
     componentDidMount() {
+        if (this.props.isClosedTimer) {
+            setTimeout(() => {
+                this.props.close()
+            }, 2500);
+        }
         setTimeout(() => {
             let currentImages = [...this.state.currentImages];
             currentImages = currentImages.map((item, index) => item = `${Config.serverUrl}/assets/misc/diceRollsD${this.props.diceType}/startingDice.png`)
@@ -127,6 +132,9 @@ export class DiceRolling extends Component<{ diceAmount: number, diceType: numbe
         }
         diceResult.mainDice = result;
         diceResult.result = result + this.props.rollValue;
+        setTimeout(() => {
+            this.props.returnResultArray(diceResultArray)
+        }, 1200);
         this.setState({ diceResult, diceResultArray }, () => {
             let currentImages = [...this.state.currentImages];
             let index: number = 0;
@@ -246,7 +254,7 @@ export class DiceRolling extends Component<{ diceAmount: number, diceType: numbe
                         }
                     })}
                 </Animated.View>
-                {this.state.showResults && <Animated.View style={{
+                {this.state.showResults && this.props.showResults && <Animated.View style={{
                     position: "absolute", top: this.props.diceAmount > 2 ? Dimensions.get('window').height / 3 : Dimensions.get('window').height / 5,
                     alignSelf: "center", transform: [{
                         scale: this.state.animatedPopVal.interpolate({

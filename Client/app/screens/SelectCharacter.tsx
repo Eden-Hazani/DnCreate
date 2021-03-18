@@ -195,14 +195,6 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         startCharInfo.tools = killToolArrayDuplicates(startCharInfo.tools || [])
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows().then(async () => {
-                if (!await AsyncStorage.getItem('newPlayer')) {
-                    Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
-                        [{
-                            text: 'Yes', onPress: () => {
-                                this.setState({ tutorialOn: true })
-                            }
-                        }, { text: 'No', onPress: async () => await AsyncStorage.setItem('newPlayer', "true") }])
-                }
                 if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
                     const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
                     this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
@@ -216,6 +208,17 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                     setTimeout(() => {
                         this.startAnimations()
                     }, 150);
+                    setTimeout(async () => {
+                        if (!await AsyncStorage.getItem('newPlayer')) {
+                            Alert.alert("Tutorial?", "We see you are a new player, would you like a short tutorial of DnCreate's character sheet?",
+                                [{
+                                    text: 'Yes', onPress: () => {
+                                        this.setState({ tutorialOn: true })
+                                    }
+                                }, { text: 'No', onPress: () => { } }])
+                            await AsyncStorage.setItem('newPlayer', "true")
+                        }
+                    }, 1000);
                 })
             })
         })
@@ -531,13 +534,14 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     changeScrollPosition={(val: any) => this.scrollView.scrollTo({ x: val.x, y: val.y, animated: true })} />
                             </>}
 
-                        {this.state.tutorialOn || this.state.diceRolling && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
+                        {this.state.tutorialOn || this.state.diceRolling && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 4 }]}></View>}
                         {this.state.diceRolling && <View style={[{
                             zIndex: 10, position: 'absolute', top: this.state.scrollHandle + (this.state.diceAmount > 2 ? 50 : height / 3),
                             left: 0, right: 0, bottom: 0
                         }]}>
-                            <DiceRolling diceAmount={this.state.diceAmount} diceType={this.state.diceType} rollValue={this.state.currentDiceRollValue} close={() => this.setState({ diceRolling: false, currentDiceRollValue: 0, diceType: 0, diceAmount: 0 })} />
+                            <DiceRolling showResults={true} isClosedTimer={false} returnResultArray={() => { }} diceAmount={this.state.diceAmount} diceType={this.state.diceType} rollValue={this.state.currentDiceRollValue} close={() => this.setState({ diceRolling: false, currentDiceRollValue: 0, diceType: 0, diceAmount: 0 })} />
                         </View>}
+
                         <Modal visible={this.state.levelUpFunctionActive} animationType="slide">
                             <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
                                 <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
@@ -546,6 +550,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                         <Modal visible={this.state.personalInfoModal} animationType="slide">
                             <PersonalInfo character={this.state.character} close={(val: boolean) => { this.setState({ personalInfoModal: val }) }} />
                         </Modal>
+
+
                         <View>
                             <View style={styles.imageContainer}>
                                 <View style={styles.upperContainer}>
@@ -634,6 +640,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
+
+
                         <Animated.View style={this.state.startingAnimations[5].getLayout()}>
                             <View style={{ position: 'relative', marginTop: 10, marginBottom: 10 }}>
                                 <ExperienceCalculator issueLevelUp={() => {
@@ -644,6 +652,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
 
                             </View>
                         </Animated.View>
+
+
                         <View pointerEvents={this.state.tutorialZIndex[1] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[1] ? 10 : 0 }}>
                             <Animated.View style={[this.state.startingAnimations[4].getLayout(), styles.secRowIconContainer]}>
                                 <TouchableOpacity style={{ alignItems: "center" }} onPress={() => this.setState({ backGroundStoryVisible: true })}>
@@ -803,6 +813,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 <UniqueCharStats character={this.state.character} proficiency={this.state.currentProficiency} isDm={this.state.isDm} />
                             </View>
                         </View>
+
+
                         <View pointerEvents={this.state.tutorialZIndex[3] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[3] ? 10 : 0 }}>
                             <View>
                                 <AppText fontSize={20} textAlign={'center'}>Saving Throws</AppText>
@@ -892,6 +904,8 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 </View>
                             </View>
                         </View>
+
+
                         <View pointerEvents={this.state.tutorialZIndex[4] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[4] ? 10 : 0 }}>
                             <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'left'}>Languages:</AppText>
                             {this.state.character.languages &&
@@ -924,7 +938,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     onPress={() => { this.props.navigation.navigate("ReplaceProficiencies", { char: this.state.character, profType: "tools" }) }} />
                             </View>
                         </View>
+
                         <View pointerEvents={this.state.tutorialZIndex[5] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[5] ? 10 : 0 }}>
+
                             <View style={styles.personality}>
                                 <View style={{ width: '30%', paddingLeft: 18 }}>
                                     <AppText textAlign={'center'}>To change any your personality traits, alignment, or appearance long press on the text you wish to change.</AppText>
@@ -954,6 +970,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                     </TouchableOpacity>
                                 </View>
                             </View>
+
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAlignment", { updateAlignment: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>
                                 <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Alignment</AppText>
@@ -973,9 +990,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAppearance", { updateAppearance: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>
                                 <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Appearance</AppText>
-                                {this.state.character.characterAppearance && <AppText fontSize={15}>{this.state.character.characterAppearance}</AppText>}
+                                {this.state.character.characterAppearance || this.state.character.characterAppearance !== '' && <AppText fontSize={15}>{this.state.character.characterAppearance}</AppText>}
                             </TouchableOpacity>
+
                         </View>
+
                         <View pointerEvents={this.state.tutorialZIndex[6] ? "none" : "auto"} style={{ zIndex: this.state.tutorialZIndex[6] ? 10 : 0 }}>
                             <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={30}>Magic</AppText>
                             {charHasMagic(this.state.character) ? <CharMagic isDm={this.state.isDm} reloadChar={() => {

@@ -42,6 +42,38 @@ router.get("/getPrimeRaceList", async (request, response) => {
     }
 });
 
+router.get("/getUserCreatedRaces/:uid", verifyLogged, async (request, response) => {
+    try {
+        const uid = request.params.uid;
+        console.log(uid)
+        const races = await raceLogic.getUserCreatedRaces(uid)
+        response.json(races);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.patch("/editCustomRace", verifyLogged, upload.single('image'), async (request, response) => {
+    try {
+        const race = new Race(JSON.parse(request.body.raceInfo))
+        if (request.file) {
+            const raceSnapShot = await raceLogic.getRace(JSON.parse(request.body.raceInfo)._id);
+            console.log(raceSnapShot)
+            if (raceSnapShot.image) {
+                fs.unlink(`./public/assets/races/${raceSnapShot.image}`, function (err) {
+                    if (err) return console.log(err);
+                    console.log('file deleted successfully');
+                });
+            }
+            race.image = request.file.filename;
+        }
+        const updatedRace = await raceLogic.updateCustomRace(race);
+        response.json(updatedRace);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 
 router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => {
     try {

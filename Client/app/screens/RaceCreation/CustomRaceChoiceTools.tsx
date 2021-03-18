@@ -101,6 +101,19 @@ export class CustomRaceChoiceTools extends Component<{ navigation: any }, Custom
             this.setState({ confirmed: false })
         }, 1100);
     }
+
+    removeFeatureSwitch = () => {
+        this.setState({ pickedTools: [], amountToPick: 0, clickedTools: [] }, () => {
+            const customRace = { ...this.state.customRace };
+            if (customRace.toolProficiencyPick) {
+                customRace.toolProficiencyPick.toolList = this.state.pickedTools
+                customRace.toolProficiencyPick.amountToPick = this.state.amountToPick
+            }
+            this.setState({ customRace })
+        })
+    }
+
+
     render() {
         const storeItem = store.getState().customRace.toolProficiencyPick?.amountToPick || 0;
         return (
@@ -113,6 +126,16 @@ export class CustomRaceChoiceTools extends Component<{ navigation: any }, Custom
                             <AppText fontSize={20} padding={5} textAlign={'center'}>These tools will be shown to the player on character pick, and he will be able to pick from them until he reaches the cap you provide below.</AppText>
                             <Switch value={this.state.activatedInterface} onValueChange={() => {
                                 if (this.state.activatedInterface) {
+                                    if (store.getState().customRaceEditing) {
+                                        Alert.alert("Remove", "This will remove all selected items", [{
+                                            text: 'Yes', onPress: () => {
+                                                this.setState({ activatedInterface: false }, () => {
+                                                    this.removeFeatureSwitch()
+                                                })
+                                            }
+                                        }, { text: 'No' }])
+                                        return
+                                    }
                                     this.setState({ activatedInterface: false })
                                     return;
                                 }

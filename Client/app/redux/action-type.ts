@@ -26,4 +26,5 @@ export enum ActionType {
     UpdateCustomRace,
     cleanCustomRace,
     UpdateSubclass,
+    CustomRaceEditing
 }

@@ -20,6 +20,17 @@ function getAllRaces(start, end, _id, raceType) {
     }
 }
 
+function getUserCreatedRaces(_id) {
+    return Race.find({ user_id: { $eq: mongoose.Types.ObjectId(_id) } }).exec();
+}
+
+async function updateCustomRace(race) {
+    const info = await Race.findOneAndUpdate({ user_id: race.user_id }, race,
+        { new: true, useFindAndModify: false }).exec();
+    return info
+}
+
+
 function searchRaces(text, raceType, _id) {
     if (_id === 'noUserId') {
         return Race.find({
@@ -46,13 +57,20 @@ function createRace(race) {
     return race.save();
 }
 
+function getRace(_id) {
+    return Race.findOne({ _id: { $eq: _id } }).exec()
+}
+
 function getPrimeRaces() {
     return Race.find().skip(0).limit(20).exec();
 }
 
 module.exports = {
+    getRace,
     getAllRaces,
     searchRaces,
     createRace,
-    getPrimeRaces
+    getPrimeRaces,
+    getUserCreatedRaces,
+    updateCustomRace
 }

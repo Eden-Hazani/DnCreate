@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Switch } from 'react-native-gesture-handler';
+import { View, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native';
+import { Switch, TouchableOpacity } from 'react-native-gesture-handler';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import { IconGen } from '../../components/IconGen';
 import NumberScroll from '../../components/NumberScroll';
 import { Colors } from '../../config/colors';
 import { RaceModel } from '../../models/raceModel';
@@ -54,6 +55,14 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
         this.setState({ customRace })
     }
 
+    removeLanguage = (index: number) => {
+        const customRace = { ...this.state.customRace };
+        if (customRace.languages) {
+            customRace.languages.splice(index, 1);
+        }
+        this.setState({ customRace })
+    }
+
     confirmAndContinue = () => {
         const customRace = { ...this.state.customRace };
         if (this.state.customRace.languages)
@@ -80,6 +89,18 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
         }, 1100);
     }
 
+    removeFeatureSwitch = () => {
+        const customRace = { ...this.state.customRace };
+        customRace.languages = []
+        this.setState({ customRace })
+    }
+
+    removeFeatureSwitchExtraLanguages = () => {
+        const customRace = { ...this.state.customRace };
+        customRace.extraLanguages = 0
+        this.setState({ customRace })
+    }
+
     render() {
         const storeItem = store.getState().customRace.extraLanguages || 0;
         return (
@@ -93,8 +114,18 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                                 <AppText textAlign={'center'} fontSize={18}>Important! Common is not set by default, if you wish to add common you need to write it with the rest of the languages below.</AppText>
                                 <Switch value={this.state.activatedInterfaceBaseLanguages} onValueChange={() => {
                                     if (this.state.activatedInterfaceBaseLanguages) {
-                                        this.setState({ activatedInterfaceBaseLanguages: false })
-                                        return;
+                                        if (store.getState().customRaceEditing) {
+                                            Alert.alert("Remove", "This will remove all selected items", [{
+                                                text: 'Yes', onPress: () => {
+                                                    this.setState({ activatedInterfaceBaseLanguages: false }, () => {
+                                                        this.removeFeatureSwitch()
+                                                    })
+                                                }
+                                            }, { text: 'No' }])
+                                            return
+                                        }
+                                        this.setState({ activatedInterfaceBaseLanguages: false });
+                                        return
                                     }
                                     this.setState({ activatedInterfaceBaseLanguages: true })
                                 }} />
@@ -104,8 +135,9 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                                     <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                                         borderRadius={25} title={'Add Language'} onPress={() => { this.addLanguage() }} />
                                     {this.state.customRace.languages?.map((item, index) => {
-                                        return <View key={index}>
+                                        return <View key={index} style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
                                             <AppTextInput
+                                                width={Dimensions.get('window').width - 150}
                                                 defaultValue={this.state.customRace.languages ? this.state.customRace.languages[index] : ''}
                                                 onChangeText={(txt: string) => {
                                                     const customRace = { ...this.state.customRace };
@@ -113,6 +145,9 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                                                         customRace.languages[index] = txt.trim()
                                                     this.setState({ customRace })
                                                 }} placeholder={'Language Name...'} />
+                                            <TouchableOpacity onPress={() => this.removeLanguage(index)}>
+                                                <IconGen size={50} name={'trash-can'} iconColor={Colors.danger} />
+                                            </TouchableOpacity>
                                         </View>
                                     })}
                                 </View>
@@ -123,8 +158,18 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                             <AppText textAlign={'center'} fontSize={18}>If so, how many languages can the player pick?</AppText>
                             <Switch value={this.state.activatedInterfaceExtraLanguages} onValueChange={() => {
                                 if (this.state.activatedInterfaceExtraLanguages) {
-                                    this.setState({ activatedInterfaceExtraLanguages: false })
-                                    return;
+                                    if (store.getState().customRaceEditing) {
+                                        Alert.alert("Remove", "This will remove all selected items", [{
+                                            text: 'Yes', onPress: () => {
+                                                this.setState({ activatedInterfaceExtraLanguages: false }, () => {
+                                                    this.removeFeatureSwitchExtraLanguages()
+                                                })
+                                            }
+                                        }, { text: 'No' }])
+                                        return
+                                    }
+                                    this.setState({ activatedInterfaceExtraLanguages: false });
+                                    return
                                 }
                                 this.setState({ activatedInterfaceExtraLanguages: true })
                             }} />

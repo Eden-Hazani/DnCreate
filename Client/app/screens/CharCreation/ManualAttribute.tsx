@@ -51,7 +51,7 @@ export class ManualAttribute extends Component<{ finishedRollsAndInsertInfo: any
     render() {
         return (
             <View style={styles.container}>
-                <AppButton backgroundColor={Colors.bitterSweetRed} title={"Enter Manually"} height={50} borderRadius={25} width={Dimensions.get('screen').width / 3.2} fontSize={20} onPress={() => this.setState({ visible: true })} />
+                <AppButton backgroundColor={Colors.bitterSweetRed} title={"Enter Manually"} height={50} borderRadius={25} width={Dimensions.get('screen').width / 3.2} fontSize={35} onPress={() => this.setState({ visible: true })} />
                 <Modal visible={this.state.visible} animationType="slide">
                     <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                         <AppText padding={25} color={Colors.berries} fontSize={25} textAlign={'center'}>Manual attribute input</AppText>

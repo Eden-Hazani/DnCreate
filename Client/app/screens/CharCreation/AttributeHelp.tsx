@@ -20,7 +20,7 @@ export class AttributeHelp extends Component<{ mode: boolean }, AttributeHelpSta
     render() {
         return (
             <View style={styles.container}>
-                <AppButton backgroundColor={Colors.bitterSweetRed} title={"Help"} height={50} borderRadius={25} width={Dimensions.get('screen').width / 3.2} fontSize={20} onPress={() => this.setState({ visible: true })} />
+                <AppButton backgroundColor={Colors.bitterSweetRed} title={"Help"} height={50} borderRadius={25} width={Dimensions.get('screen').width / 3.2} fontSize={35} onPress={() => this.setState({ visible: true })} />
                 <Modal visible={this.state.visible} animationType="slide">
                     <View style={[styles.modalContainer, { backgroundColor: Colors.pageBackground }]}>
                         {this.props.mode ?

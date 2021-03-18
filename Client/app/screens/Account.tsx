@@ -216,7 +216,10 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     <CashImage uri={`${Config.serverUrl}/assets/logos/patreon.png`} style={{ height: 100, width: 100 }} />
                                 </TouchableOpacity>
                             </View>
-
+                            <TouchableOpacity style={{ backgroundColor: Colors.bitterSweetRed, borderRadius: 15, padding: 20 }}
+                                onPress={() => this.props.navigation.navigate("MyCreations")}>
+                                <AppText>My Created Races</AppText>
+                            </TouchableOpacity>
                             <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flex: .4, paddingTop: 30, paddingBottom: 30 }}>
                                 <View style={{ flex: .5 }}>
                                     <AppButton onPress={() => { this.logout() }} width={100} height={100} borderRadius={100} fontSize={20} color={Colors.black} backgroundColor={Colors.yellow} title={"Logout"} />

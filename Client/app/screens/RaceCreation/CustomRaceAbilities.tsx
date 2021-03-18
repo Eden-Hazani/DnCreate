@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Modal, ScrollView, Alert } from 'react-native';
-import { Switch } from 'react-native-gesture-handler';
+import { Switch, TouchableOpacity } from 'react-native-gesture-handler';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import { IconGen } from '../../components/IconGen';
 import { Colors } from '../../config/colors';
 import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
@@ -35,6 +36,15 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
             })
         let modalTruthList = this.state.modalTruthList;
         modalTruthList.push(false)
+        this.setState({ customRace, modalTruthList })
+    }
+
+    removeFeature = (index: number) => {
+        const customRace = { ...this.state.customRace };
+        if (customRace.raceAbilities?.uniqueAbilities)
+            customRace.raceAbilities?.uniqueAbilities.splice(index, 1)
+        let modalTruthList = this.state.modalTruthList;
+        modalTruthList.splice(index, 1)
         this.setState({ customRace, modalTruthList })
     }
 
@@ -88,7 +98,10 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
                                         {this.state.customRace.raceAbilities?.uniqueAbilities && this.state.customRace.raceAbilities?.uniqueAbilities[index].description !== '' && <AppText textAlign={'center'}>
                                             {this.state.customRace.raceAbilities?.uniqueAbilities[index].description}</AppText>}
                                     </View>
-                                    <Modal visible={this.state.modalTruthList[index]} animationType='slide'>
+                                    <TouchableOpacity onPress={() => this.removeFeature(index)} style={{ alignItems: "center" }}>
+                                        <IconGen name={'trash-can'} size={50} iconColor={Colors.danger} />
+                                    </TouchableOpacity>
+                                    <Modal visible={this.state.modalTruthList[index] === true} animationType='slide'>
                                         <AppTextInput placeholder={"Feature Name"}
                                             defaultValue={defaultVal[index].name}
                                             onChangeText={(name: string) => {

@@ -15,6 +15,7 @@ export class AppState {
     public leadingAdv: AdventureModel[];
     public firstLoginAd: boolean
     public colorScheme: boolean
+    public customRaceEditing: boolean
     public customRace: RaceModel
     public customSubClass: SubClassModal
     public constructor() {
@@ -28,6 +29,7 @@ export class AppState {
         this.race = new RaceModel();
         this.participatingAdv = []
         this.leadingAdv = []
+        this.customRaceEditing = false
         this.customRace = new RaceModel()
         this.customSubClass = new SubClassModal()
     }
