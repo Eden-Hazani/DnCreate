@@ -18,6 +18,7 @@ import AuthContext from '../../auth/context';
 import { CreateQuest } from './leaderComponents/CreateQuest';
 import logger from '../../../utility/logger';
 import { io } from 'socket.io-client';
+import { AdventureChat } from './AdventureChat';
 const socket = io(Config.serverUrl);
 
 interface SelectedLeadingAdvState {
@@ -87,6 +88,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
 
     async componentDidMount() {
         try {
+            store.dispatch({ type: ActionType.ReplaceLeadAdventure, payload: this.state.adventure })
             await this.getUserProfileImg(this.state.adventure)
             this.props.navigation.addListener('beforeRemove', (e: any) => {
                 e.preventDefault();
@@ -237,13 +239,16 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 }
                             </View>
                         }
-                        <ScrollView>
+                        <ScrollView keyboardShouldPersistTaps="always">
                             <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", paddingBottom: 50 }}>
                                 <AppText fontSize={18}>Adventure identifier:</AppText>
                                 <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                             </View>
+                            <View style={{ paddingBottom: 15 }}>
+                                <AdventureChat participantChar={{ name: "DM", _id: this.context.user._id }} adventureIdentifier={this.state.adventure.adventureIdentifier} adventure_id={this.state.adventure._id} />
+                            </View>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: '100%' }}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => { this.setState({ questCreationModal: true }) }}
                                         fontSize={18} borderRadius={25} width={120} height={65} title={"Quest Creator"} />
                                     <AppButton backgroundColor={Colors.bitterSweetRed}

@@ -9,9 +9,11 @@ const Adventure = require("../models/AdventureModel");
 const sendPushNotification = require("../utilities/pushNotifications");
 const authLogic = require("../business-logic/auth-logic");
 const userLogic = require("../business-logic/user-logic")
+const messageLogic = require("../business-logic/message-logic")
 const { Expo } = require("expo-server-sdk");
 const uuid = require('uuid');
 const fs = require('fs');
+const Message = require("../models/MessageModel");
 
 
 const storage = multer.diskStorage({
@@ -115,6 +117,7 @@ router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, re
         if (Expo.isExpoPushToken(expoPushToken)) {
             await sendPushNotification(expoPushToken, "New adventurer has joined", `${joiningUserCharacter.name} has joined ${adventure.adventureName}`);
         }
+        console.log(adventure)
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
         response.json(updatedAdventure);
@@ -215,7 +218,6 @@ router.delete("/deleteAdventure/:adventureIdentifier/:leader_id", verifyLogged, 
                 console.log('file deleted successfully');
             });
         }
-        console.log(adventure[0]._id.toString())
         fs.rmdirSync('public/uploads/adventure-galleries/' + adventure[0]._id.toString(), { recursive: true });
 
         await adventureLogic.removeAdventure(adventureIdentifier);
@@ -256,6 +258,51 @@ router.get("/userInAdv/:user_id/:adventureIdentifier", async (request, response)
         response.status(500).send(err.message);
     }
 });
+
+router.post("/sendMessage", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const message = new Message(JSON.parse(request.body.message));
+        const targetAdventure = await adventureLogic.findAdventure(message.adventureIdentifier);
+        for (let charId of targetAdventure[0].participants_id) {
+            if (charId.toString() !== message.sender_id) {
+                let char = await userLogic.getChar(charId);
+                let user = await authLogic.validateInSystem(char.user_id.toString())
+                const { expoPushToken } = user;
+                if (Expo.isExpoPushToken(expoPushToken)) {
+                    await sendPushNotification(expoPushToken, `${message.senderName}`, `${message.message}`);
+                }
+            }
+        }
+        console.log(message.sender_id, targetAdventure[0].leader_id)
+        if (message.sender_id !== targetAdventure[0].leader_id) {
+            let user = await authLogic.validateInSystem(targetAdventure[0].leader_id)
+            const { expoPushToken } = user;
+            if (Expo.isExpoPushToken(expoPushToken)) {
+                await sendPushNotification(expoPushToken, `${message.senderName}`, `${message.message}`);
+            }
+        }
+
+        global.socketServer.emit(`adventure${message.adventure_id}-messageUpdate`, message);
+        messageLogic.saveMessage(message)
+        response.sendStatus(200);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/getMessages/:adventure_id/:start/:end", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const adventure_id = request.params.adventure_id;
+        const start = request.params.start;
+        const end = request.params.end;
+        console.log(start, end)
+        const messages = await messageLogic.getMessages(adventure_id, start, end)
+        response.json(messages);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 
 
 module.exports = router;

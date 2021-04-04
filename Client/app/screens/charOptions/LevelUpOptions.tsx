@@ -100,6 +100,7 @@ interface LevelUpOptionsState {
     featSavingThrowList: string[]
     infusions: any
     infusionsToPick: any
+    newFirstLevelMagic: { newSpells: any, spellsKnown: string }
 }
 
 export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
@@ -107,6 +108,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
     constructor(props: any) {
         super(props)
         this.state = {
+            newFirstLevelMagic: { newSpells: null, spellsKnown: '' },
             infusions: this.props.character.charSpecials && this.props.character.charSpecials.artificerInfusions,
             infusionsToPick: false,
             addSpellAvailabilityByName: [],
@@ -234,11 +236,14 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                 character.magic[spellLevel] = this.state.character.magic[spellLevel] + 1;
                             }
                         })
-                        this.setState({ character })
+                        this.setState({ character }, () => {
+                            setTimeout(() => {
+                                this.setAvailableMagicSlots()
+                                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
+                                this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
+                            }, 1000);
+                        })
                     }
-                    this.setAvailableMagicSlots()
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character });
-                    this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.character)
                 })
             }
             if (!(this.props.options.spells || this.props.options.spellsKnown)) {
@@ -881,13 +886,20 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 if (character.charSpecials && character.pathFeatures) {
                     character.charSpecials.battleMasterManeuvers = this.state.maneuvers;
                     character.charSpecials.monkElementsDisciplines = this.state.elements;
-                    const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name] ? Path[this.state.character.characterClass][this.state.character.path.name][this.state.character.level] : this.state.customPathFeatureList
+                    const officialOrCustom = Path[this.state.character.characterClass][this.state.character.path.name || this.state.pathChosen.name] ? Path[this.state.character.characterClass][this.state.character.path.name || this.state.pathChosen.name][this.state.character.level] : this.state.customPathFeatureList
                     const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
                     for (let item of pathResult) {
                         character.pathFeatures.push(item)
                     }
                 }
 
+            }
+            if (this.state.newFirstLevelMagic.newSpells && character.spells) {
+                for (let spell of this.state.newFirstLevelMagic.newSpells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
+                character.spellsKnown = this.state.newFirstLevelMagic.spellsKnown
             }
             if (this.state.infusionsToPick) {
                 alert('You have additional infusions to pick from')
@@ -1302,6 +1314,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                                                             loadSpellPickAvailability={(val: any) => { this.setState({ newSpellAvailabilityList: val }) }}
                                                             addSpellAvailabilityByName={(val: any) => { this.setState({ addSpellAvailabilityByName: val }) }}
                                                             armorToLoad={(val: any) => { this.setState({ armorToLoad: val }) }}
+                                                            loadFirstLevelSpells={(val: any) => this.setState({ newFirstLevelMagic: { newSpells: val.newSpells, spellsKnown: val.spellsKnown } })}
                                                             loadCharacter={(val: CharacterModel) => { this.setState({ character: val }) }}
                                                             languagesToPick={(val: boolean) => { this.setState({ languageToPick: val }) }}
                                                             pickDruidCircle={(val: boolean) => { this.setState({ pathPickDruidCircle: val }) }}

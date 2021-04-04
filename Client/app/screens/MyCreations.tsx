@@ -45,7 +45,7 @@ export class MyCreations extends Component<{ navigation: any }, MyCreationsState
             for (let item of result.data as any) {
                 raceColors.push(item.raceColors)
             }
-            this.setState({ currentRaces: result.data, raceColors, loading: false })
+            this.setState({ currentRaces: result.data ? result.data : [], raceColors, loading: false })
         } catch (err) {
             logger.log(err)
         }

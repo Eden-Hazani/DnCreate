@@ -10,12 +10,15 @@ import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
 import { Colors } from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
+import { CharacterModel } from '../../models/characterModel';
 import { store } from '../../redux/store';
+import { AdventureChat } from './AdventureChat';
 
 interface SelectedParticipationAdvState {
     adventure: AdventureModel
     profilePicList: any[]
     loading: boolean
+    participantChar: CharacterModel
 }
 
 export class SelectedParticipationAdv extends Component<{ navigation: any, route: any }, SelectedParticipationAdvState> {
@@ -23,6 +26,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
     constructor(props: any) {
         super(props)
         this.state = {
+            participantChar: new CharacterModel(),
             loading: true,
             profilePicList: [],
             adventure: this.props.route.params.adventure
@@ -49,6 +53,22 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             this.setState({ profilePicList: picList }, () => {
                 this.setState({ loading: false })
             })
+            if (this.state.adventure.participants_id) {
+                let charIds = [];
+                for (let character of store.getState().characters) {
+                    if (character._id !== undefined) {
+                        charIds.push(character._id)
+                    }
+                }
+                for (let participant of this.state.adventure.participants_id) {
+                    charIds.forEach((_id) => {
+                        if (_id === participant._id) {
+                            this.setState({ participantChar: participant })
+                        }
+                    })
+                }
+            }
+
         } catch (err) {
             logger.log(new Error(err))
         }
@@ -94,9 +114,9 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                     justifyContent={"flex-start"} textDistanceFromImg={10} />}
                                 ItemSeparatorComponent={ListItemSeparator} />
                         </View>
-                        <AppButton padding={15} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
-                            fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
-                        <View>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                            <AppButton padding={15} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
+                                fontSize={18} borderRadius={25} width={120} height={65} title={"Back"} />
                             <AppButton backgroundColor={Colors.bitterSweetRed}
                                 onPress={() => { this.props.navigation.navigate("AdventurePictureGallery", { adventure: this.state.adventure }) }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Image Gallery"} />
@@ -108,6 +128,9 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                             <AppButton padding={20} backgroundColor={Colors.metallicBlue}
                                 onPress={() => { this.props.navigation.navigate("CompletedQuestList", { adventure: adventure, isDmLevel: false }) }}
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
+                        </View>
+                        <View>
+                            <AdventureChat DM_id={this.state.adventure.leader_id} participantChar={this.state.participantChar} adventureIdentifier={this.state.adventure.adventureIdentifier} adventure_id={this.state.adventure._id} />
                         </View>
                     </View>
                 }

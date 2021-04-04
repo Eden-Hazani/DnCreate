@@ -202,7 +202,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                             <AppText textAlign={'center'} fontSize={22} color={Colors.whiteInDarkMode}>Pick your style.</AppText>
                                         </View>
                                         <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={!this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                            <AppButton disabled={!this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
                                                 this.setState({ darkModeOn: false, loading: true }, async () => {
                                                     await AsyncStorage.setItem('colorScheme', "light").then(() => {
                                                         Colors.InitializeAsync().then(() => {
@@ -215,7 +215,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                                 borderRadius={25} width={250} height={100} title={"Let there be LIGHT!"} />
                                         </View>
                                         <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                            <AppButton disabled={this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
                                                 this.setState({ darkModeOn: true, loading: true }, async () => {
                                                     await AsyncStorage.setItem('colorScheme', "dark").then(() => {
                                                         Colors.InitializeAsync().then(() => {

@@ -1,5 +1,5 @@
 const Adventure = require("../models/AdventureModel");
-const Character = require("../models/characterModel");
+const Message = require("../models/MessageModel");
 const User = require("../models/userModel");
 
 
@@ -30,6 +30,7 @@ async function updateAdventure(adventure) {
 }
 
 function removeAdventure(adventureIdentifier) {
+    Message.deleteMany({ adventureIdentifier: { $eq: adventureIdentifier } }).exec()
     return Adventure.deleteOne({ adventureIdentifier: { $eq: adventureIdentifier } }).exec()
 }
 

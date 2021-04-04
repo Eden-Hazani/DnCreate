@@ -29,7 +29,7 @@ import { AppAddExactSkillProf } from '../../components/AppAddExectSkillProf';
 export class AppPathAdditionalApply extends Component<{
     character: CharacterModel, pathItem: any, isAdditionalSkillChoice: any, pathChosen: any, loadManeuvers: any, maneuversToPick: any
     loadSkills: any, resetExpertiseSkills: any, loadArmors: any, loadWeapons: any, loadUnrestrictedMagic: any,
-    isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any,
+    isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any, loadFirstLevelSpells: any,
     pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any, loadSpellPickAvailability: any,
     loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any, addSpellAvailabilityByName: any, returnSavingThrows: any
 }> {
@@ -85,7 +85,7 @@ export class AppPathAdditionalApply extends Component<{
                 }
                 {this.props.pathItem.levelOneSpells &&
                     <AppPathFirstLevelSpellsAddition character={this.props.character} path={this.props.pathChosen} noCountAgainstKnown={this.props.pathItem.noCountAgainstKnown}
-                        returnMagic={(val: any) => { this.props.loadCharacter(val) }} />
+                        returnMagic={(val: any) => { this.props.loadFirstLevelSpells(val) }} />
                 }
                 {this.props.pathItem.specificCantrip &&
                     <AppPathAddSpecificSpell path={this.props.pathChosen} character={this.props.character} notCountAgainstKnownCantrips={this.props.pathItem.notCountAgainstKnownCantrips}

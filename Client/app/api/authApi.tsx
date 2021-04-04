@@ -67,6 +67,8 @@ const isUserLogged = () => client.get(`${endpoint}/isUserLogged`);
 
 const isActivated = () => client.get(`${endpoint}/isActivated`);
 
+const isPremium = (_id: string) => client.get(`${endpoint}/isPremium/${_id}`);
+
 const registerNotificationToken = ((user: UserModel, token: string) => {
     user.expoPushToken = token;
     let formData: FormData = new FormData();
@@ -85,5 +87,6 @@ export default {
     isUserLogged,
     resendActivationEmail,
     isActivated,
+    isPremium,
     googleRegister
 }

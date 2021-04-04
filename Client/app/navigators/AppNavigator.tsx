@@ -14,15 +14,22 @@ import logger from '../../utility/logger';
 import authApi from '../api/authApi';
 import navigation from './rootNavigation';
 import CreationNavigator from './CreationNavigator';
+import { AppState } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
     useEffect(() => {
         askNotificationPermissions();
+        Notifications.addNotificationReceivedListener(response => {
+            if (AppState.currentState === 'active') {
+                Notifications.dismissAllNotificationsAsync()
+            }
+        });
         Notifications.addNotificationResponseReceivedListener(notification => {
             navigation.navigate('Adventures', null)
         })
     }, [])
+
     const askNotificationPermissions = async () => {
         try {
             const permissions = await Permissions.getAsync(Permissions.NOTIFICATIONS);

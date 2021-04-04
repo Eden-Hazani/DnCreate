@@ -84,7 +84,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '1.9.43') {
+        if (!newsFlag || newsFlag !== '1.9.44') {
             this.setState({ updateNews: true })
         }
     }
@@ -211,7 +211,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <View style={styles.buttonsView}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
                                         const isActive = await authApi.isActivated();
-                                        if (!isActive.data && this.state.characters.length >= 1) {
+                                        if (isActive.data === 'false' && this.state.characters.length >= 1) {
                                             this.setState({ errorModal: true })
                                             return;
                                         }
@@ -226,7 +226,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '1.9.43')
+                                            AsyncStorage.setItem('newsFlag', '1.9.44')
                                         })
                                     }} />
                                 </Modal>
@@ -258,7 +258,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                             <AppText textAlign={'center'} fontSize={22} color={Colors.whiteInDarkMode}>Pick your style.</AppText>
                                         </View>
                                         <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={!this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                            <AppButton disabled={!this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
                                                 this.setState({ darkModeOn: false, loading: true }, async () => {
                                                     await AsyncStorage.setItem('colorScheme', "light").then(() => {
                                                         Colors.InitializeAsync().then(() => {
@@ -271,7 +271,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                                 borderRadius={25} width={250} height={100} title={"Let there be LIGHT!"} />
                                         </View>
                                         <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={this.state.darkModeOn} fontSize={25} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                            <AppButton disabled={this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
                                                 this.setState({ darkModeOn: true, loading: true }, async () => {
                                                     await AsyncStorage.setItem('colorScheme', "dark").then(() => {
                                                         Colors.InitializeAsync().then(() => {

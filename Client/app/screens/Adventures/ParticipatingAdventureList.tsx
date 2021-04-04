@@ -65,8 +65,9 @@ export class ParticipatingAdventureList extends Component<{ navigation: any }, P
                 for (let adventure of adventures.data) {
                     participatingAdventures.push(adventure[0])
                 }
+                console.log(adventures.data.length)
                 this.setState({ participatingAdventures }, () => {
-                    store.dispatch({ type: ActionType.SetParticipatingAdv, payload: this.state.participatingAdventures })
+                    store.dispatch({ type: ActionType.ClearParticipatingAdv, payload: this.state.participatingAdventures })
                 })
             }
         } catch (err) {

@@ -11,29 +11,19 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.43</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.44</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
                     <AppText textAlign={'center'} fontSize={25} >Starting the update with a huge thanks to:</AppText>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.deepGold}>JoinedForSteampunk</AppText>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.deepGold}>BigK_Games</AppText>
                     <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>For donating and contributing to the future of DnCreate</AppText>
                 </View>
                 <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>The Dice Roller Is Here!!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure chat!</AppText>
                     <Image uri={`${Config.serverUrl}/assets/misc/diceRollsD20/diceRollAni.gif`} style={{ height: 150, width: 150 }} />
-                    <AppText textAlign={'center'} fontSize={25} >Just tap one of your skills tools or your hit dice and let DnCreate roll for you!</AppText>
-                    <AppText textAlign={'center'} fontSize={25} >The rolls automatically add all relevant bonuses to your roll</AppText>
-                </View>
-                <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Say hello to the Artificer!</AppText>
-                    <Image uri={`${Config.serverUrl}/assets/classDragons/artificerDragon.png`} style={{ height: 150, width: 150 }} />
-                    <AppText textAlign={'center'} fontSize={20}>The Artificer class has joined DnCreate!</AppText>
-                </View>
-                <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Change tools skills and languages manually!</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>Due to user requests the feature for manually edition skills languages and tools have been added to the character sheet!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >You can now chat in app with your entire adventure party!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >This feature is reserved for donating members of DnCreate (Only the adventure DM is required to be a donating member)</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure mode now features the Image Gallery!</AppText>

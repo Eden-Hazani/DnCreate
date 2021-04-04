@@ -28,6 +28,7 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstK
         try {
             const character = { ...this.state.character }
             const domainMagic = spellLists[this.props.character.characterClass][this.props.path][this.props.character.level].spellList;
+            let spells: any[] = [];
             for (let item of domainMagic) {
                 const spell = spellsJSON.find(spell => spell.name === item)
                 if (spell && character.spells) {
@@ -37,13 +38,14 @@ export class AppPathFirstLevelSpellsAddition extends Component<{ noCountAgainstK
                             const spellsKnown = setTotalKnownSpells(this.props.character);
                             character.spellsKnown = spellsKnown;
                         }
+                        console.log(character.spellsKnown)
                         character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
                     }
-                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                    spells.push(spell)
                 }
             }
             this.setState({ character, domainMagic }, () => {
-                this.props.returnMagic(this.state.character)
+                this.props.returnMagic({ newSpells: spells, spellsKnown: this.state.character.spellsKnown })
             })
         } catch (err) {
             logger.log(new Error(err))

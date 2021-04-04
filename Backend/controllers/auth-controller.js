@@ -310,11 +310,27 @@ router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
 router.get("/isActivated", verifyLoggedIn, async (request, response) => {
     try {
         const user = await authLogic.validateInSystem(response.locals.user._id);
-        if (user.activated) {
-            response.json(true);
-        }
         if (!user.activated) {
-            response.json(false);
+            response.json('false');
+        }
+        else {
+            response.json('true');
+        }
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/isPremium/:user_id", verifyLoggedIn, async (request, response) => {
+    try {
+        const user = await authLogic.validateInSystem(request.params.user_id);
+        console.log(user.premium)
+        if (!user.premium) {
+            console.log('dfg')
+            response.json('false');
+        }
+        else {
+            response.json('true');
         }
     } catch (err) {
         response.status(500).send(err.message);

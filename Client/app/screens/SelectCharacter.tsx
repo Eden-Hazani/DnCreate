@@ -977,11 +977,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                 {this.state.character.characterAlignment ?
                                     <View>
                                         {this.state.character.characterAlignment.alignment && this.state.character.characterAlignment.alignment.length > 0 ?
-                                            <AppText fontSize={20}>{this.state.character.characterAlignment.alignment}</AppText>
+                                            <AppText fontSize={20} textAlign={'center'}>{this.state.character.characterAlignment.alignment}</AppText>
                                             :
                                             null}
                                         {this.state.character.characterAlignment.alignmentDescription && this.state.character.characterAlignment.alignmentDescription.length > 0 ?
-                                            <AppText fontSize={16}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>
+                                            <AppText fontSize={16} textAlign={'center'}>{this.state.character.characterAlignment?.alignmentDescription}</AppText>
                                             :
                                             null}
                                     </View>
@@ -990,7 +990,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             <TouchableOpacity disabled={isDm} onLongPress={() => this.props.navigation.navigate("CharacterAppearance", { updateAppearance: true, character: this.state.character })}
                                 style={{ alignItems: "center", marginBottom: 20 }}>
                                 <AppText fontSize={26} color={Colors.bitterSweetRed} textAlign={"center"}>Appearance</AppText>
-                                {this.state.character.characterAppearance || this.state.character.characterAppearance !== '' && <AppText fontSize={15}>{this.state.character.characterAppearance}</AppText>}
+                                {(this.state.character.characterAppearance || this.state.character.characterAppearance !== '') && <AppText fontSize={15}>{this.state.character.characterAppearance}</AppText>}
                             </TouchableOpacity>
 
                         </View>

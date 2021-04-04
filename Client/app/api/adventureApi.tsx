@@ -1,6 +1,7 @@
 import { AdventureModel } from '../models/AdventureModel';
 import { AdventurePhotoArrayModal } from '../models/AdventurePhotoArrayModal';
 import { CharacterModel } from '../models/characterModel';
+import { MessageModal } from '../models/MessageModal';
 import client from './client';
 
 const endpoint = '/adventures'
@@ -87,6 +88,14 @@ const getUserProfileImages = (userList: string[]) => {
     return client.post(`${endpoint}/getUsersProfilePic`, formData);
 }
 
+const sendMessage = (message: MessageModal) => {
+    let formData = new FormData();
+    formData.append("message", JSON.stringify(message));
+    return client.post(`${endpoint}/sendMessage`, formData);
+}
+
+const getMessages = (adventure_id: string, start: number, end: number) => client.get(`${endpoint}/getMessages/${adventure_id}/${start}/${end}`)
+
 export default {
     saveAdventure,
     getLeadingAdventures,
@@ -101,5 +110,7 @@ export default {
     editAdventure,
     addImageToAdventure,
     addAdventureParticipant,
-    removeImageFromGallery
+    removeImageFromGallery,
+    sendMessage,
+    getMessages
 }

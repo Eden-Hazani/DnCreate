@@ -1,5 +1,6 @@
 import { AdventurePhotoArrayModal } from "./AdventurePhotoArrayModal";
 import { CharacterModel } from "./characterModel";
+import { MessageModal } from "./MessageModal";
 import { QuestModal } from "./questModel";
 
 export class AdventureModel {
@@ -12,6 +13,7 @@ export class AdventureModel {
         public adventureIdentifier?: string,
         public backgroundImage?: string,
         public quests?: QuestModal[],
+        public messageArray?: MessageModal[],
         public uploadedPhotoArray?: AdventurePhotoArrayModal[]
     ) {
         if (!this.uploadedPhotoArray) {
