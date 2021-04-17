@@ -1,37 +1,23 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Image, Modal, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View } from 'react-native';
 import 'react-native-gesture-handler';
-import * as Font from 'expo-font'
-import { NavigationContainer } from '@react-navigation/native'
-import navigationTheme from './app/navigators/navigationTheme';
-import AppNavigator from './app/navigators/AppNavigator';
-import AuthNavigator from './app/navigators/AuthNavigation';
 import { Unsubscribe } from 'redux';
 import { store } from './app/redux/store';
 import { UserModel } from './app/models/userModel';
-import AuthContext from './app/auth/context';
-import storage from './app/auth/storage';
+import AuthContext, { AuthProvider } from './app/auth/context';
 import AppLoading from 'expo-app-loading';
-import { ActionType } from './app/redux/action-type';
-import JwtDecode from 'jwt-decode';
-import TokenHandler from './app/auth/TokenHandler';
 import { Config } from './config';
-import authApi from './app/api/authApi';
-import errorHandler from './utility/errorHander';
-import AsyncStorage from '@react-native-community/async-storage';
 import { Colors } from './app/config/colors';
 import { I18nManager } from "react-native";
 import { StartAnimation } from './app/animations/StartAnimation';
-import OfflineNavigator from './app/navigators/OfflineNavigator';
-import * as Updates from 'expo-updates';
 import logger from './utility/logger';
 import * as Facebook from 'expo-facebook';
-import MainAds from './app/Ads/MainAds';
-import { AppText } from './app/components/AppText';
 import { CheckForUpdates } from './app/components/CheckForUpdates';
 import * as Notifications from 'expo-notifications';
-import { navigationRef } from './app/navigators/rootNavigation';
-import { CacheManager } from 'react-native-expo-image-cache'
+import startUp from './utility/core/appStartUp'
+import updateCheck from './utility/core/checkForUpdates';
+import { AuthenticationGate } from './AuthenticationGate';
+import { Provider } from 'react-redux';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -49,11 +35,8 @@ Facebook.initializeAsync({ appId: "118004343480971", appName: "DnCreate" });
 interface AppState {
   fontsLoaded: boolean
   user: UserModel
-  isReady: boolean
   AppMainLoadAnimation: boolean
   colorScheme: boolean
-  offLineMode: boolean
-  bannerCallTime: boolean
   lookingForUpdates: boolean
 }
 
@@ -63,18 +46,17 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   navigationSubscription: any;
   static contextType = AuthContext;
   private UnsubscribeStore: Unsubscribe;
+
   constructor(props: any) {
     super(props)
     this.state = {
-      bannerCallTime: false,
-      offLineMode: false,
       AppMainLoadAnimation: false,
-      isReady: false,
       user: new UserModel(),
       fontsLoaded: false,
       colorScheme: false,
       lookingForUpdates: false
     }
+
     this.UnsubscribeStore = store.subscribe(() => {
       this.setState({ user: store.getState().user, colorScheme: store.getState().colorScheme })
     })
@@ -82,137 +64,38 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     this.facebookBannerAd = Config.facebookBannerAd
   }
 
-  checkForUpdates = () => {
-    try {
-      this.setState({ lookingForUpdates: true }, async () => {
-        const updates = await Updates.checkForUpdateAsync();
-        if (updates.isAvailable) {
-          Alert.alert("New Update", "DnCreate has a new update, would you like to download it?",
-            [{
-              text: 'Yes', onPress: async () => {
-                Updates.fetchUpdateAsync().then(({ isNew }) => {
-                  if (isNew) {
-                    setTimeout(() => {
-                      Updates.reloadAsync();
-                    }, 2000);
-                  }
-                }).catch(() => {
-                  this.setState({ lookingForUpdates: false })
-                  this.loadApp()
-                })
-              }
-            }, {
-              text: 'No', onPress: () => {
-                this.setState({ lookingForUpdates: false })
-                this.loadApp()
-              }
-            }])
-        } else if (!updates.isAvailable) {
-          this.setState({ lookingForUpdates: false })
-          this.loadApp()
-        }
-      })
-    } catch (err) {
-      logger.log(new Error('Error in updates'))
-      logger.log(new Error(err))
-      this.setState({ lookingForUpdates: false })
-      this.loadApp()
-    }
-  }
-
-
   loadApp = async () => {
     try {
-      this.loadColors().then(async () => {
-        store.dispatch({ type: ActionType.CleanCreator })
-        await TokenHandler().then(async (user) => {
-          if (user !== null && user._id !== "Offline") {
-            this.setState({ user }, async () => {
-              const result = await authApi.isUserLogged();
-              if (!result.ok) {
-                errorHandler(result);
-                return;
-              }
-            })
-          }
-          if (user === null) {
-            const isOffline = await AsyncStorage.getItem("isOffline");
-            const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined, premium: false }
-            if (isOffline) {
-              if (JSON.parse(isOffline)) {
-                store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
-                this.setState({ user: offlineUser })
-              }
-            }
-          }
-          Font.loadAsync({
-            'KumbhSans-Light': require('./assets/fonts/KumbhSans-Light.ttf')
-          }).then(() => this.setState({ fontsLoaded: true, AppMainLoadAnimation: true }, () => {
-            setTimeout(() => {
-              this.setState({ AppMainLoadAnimation: false, bannerCallTime: true })
-            }, 2300);
-          }))
-        })
+      const { AppMainLoadAnimation, fontsLoaded } = await startUp();
+      this.setState({ AppMainLoadAnimation, fontsLoaded }, () => {
+        setTimeout(() => {
+          this.setState({ AppMainLoadAnimation: false })
+        }, 2300);
       })
     } catch (err) {
       console.log(err.message)
     }
   }
 
-
   async componentDidMount() {
     logger.start();
     try {
       if (!__DEV__) {
-        this.checkForUpdates()
+        this.setState({ lookingForUpdates: true })
+        await updateCheck((resolve: boolean) => {
+          this.setState({ lookingForUpdates: resolve }, () => this.loadApp());
+        });
         return;
       }
-      this.loadApp()
+      this.loadApp();
     } catch (err) {
       logger.log(new Error(err))
     }
   }
 
-  loadColors = async () => {
-    let colorScheme = await AsyncStorage.getItem('colorScheme');
-    if (colorScheme === null || colorScheme === "firstUse") {
-      await AsyncStorage.setItem("colorScheme", "firstUse")
-      colorScheme = "firstUse"
-      Colors.InitializeAsync()
-      store.dispatch({ type: ActionType.colorScheme, payload: false })
-      return
-    }
-    store.dispatch({ type: ActionType.colorScheme, payload: colorScheme === "light" ? false : true })
-  }
 
   componentWillUnmount() {
     this.UnsubscribeStore()
-  }
-
-  setUser = (user: UserModel) => {
-    this.setState((prevState) => ({ user }))
-  }
-
-
-  isUserLogged = async () => {
-    const isOffline = await AsyncStorage.getItem('isOffline');
-    if (isOffline) {
-      if (JSON.parse(isOffline)) {
-        return;
-      }
-    }
-    const result = await authApi.isUserLogged();
-    if (result.status === 403) {
-      errorHandler(result);
-      return;
-    }
-  }
-
-
-  pickBannerAd = () => {
-    if (this.state.user && this.state.user._id && this.state.user.premium) {
-      return <View></View>
-    }
   }
 
   componentDidCatch(error: any, info: any) {
@@ -222,8 +105,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   }
 
   render() {
-    const user = this.state.user
-    const { setUser } = this
+
     return (
       <View style={{ flex: 1 }}>
         {this.state.lookingForUpdates ?
@@ -231,22 +113,16 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
           :
           <SafeAreaView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
             <View style={{ flex: 1 }}>
-              {!this.state.isReady ? <AppLoading onError={(error) => { logger.log(error) }} startAsync={TokenHandler} onFinish={() => this.setState({ isReady: true })} /> :
-                <AuthContext.Provider value={{ user, setUser }}>
+              <AuthProvider >
+                <Provider store={store}>
                   {this.state.AppMainLoadAnimation ?
                     <StartAnimation />
                     :
                     !this.state.fontsLoaded ? <AppLoading /> :
-                      <NavigationContainer ref={navigationRef} onStateChange={() => this.isUserLogged()} theme={navigationTheme}>
-                        {(user && user._id === "Offline" && <OfflineNavigator />) || (user && user.username ? <AppNavigator /> : <AuthNavigator />)}
-                      </NavigationContainer>
+                      <AuthenticationGate />
                   }
-                </AuthContext.Provider>}
-              {this.state.bannerCallTime && <View>{
-                this.state.user && this.state.user._id && this.state.user.premium ? <View></View>
-                  :
-                  <MainAds adMobBannerId={this.bannerAd} faceBookBannerId={this.facebookBannerAd} />
-              }</View>}
+                </Provider>
+              </AuthProvider>
             </View>
           </SafeAreaView>
         }

@@ -81,7 +81,9 @@ export class PickSingleItem extends Component<{ isObject: boolean, amountToPick:
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center"
     },
     item: {
         width: 150,

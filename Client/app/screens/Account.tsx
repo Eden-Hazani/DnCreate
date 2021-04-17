@@ -88,17 +88,13 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
 
     logout = () => {
         AsyncStorage.multiRemove(['classList', 'raceList']);
-        store.dispatch({ type: ActionType.Logout })
-        const { user, setUser } = this.context
-        setUser(null);
+        this.context.logout()
     }
 
     exitOffline = () => {
         AsyncStorage.multiRemove(['classList', 'raceList']);
         AsyncStorage.removeItem('isOffline');
-        store.dispatch({ type: ActionType.Logout })
-        const { user, setUser } = this.context
-        setUser(null);
+        this.context.logout()
     }
 
     updateImg = async (values: any) => {

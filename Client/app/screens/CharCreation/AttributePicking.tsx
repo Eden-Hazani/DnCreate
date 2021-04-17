@@ -181,16 +181,6 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         }
         this.setState({ rollingDice: true })
         this.resetRoll();
-        // const diceResults = []
-        // for (let i = 1; i <= 4; i++) {
-        //     let number = Math.floor(Math.random() * 6) + 1;
-        //     diceResults.push(number)
-        // }
-        // this.setState({ diceResults }, () => {
-        //     setTimeout(() => {
-        //         this.setState({ rollingDice: false })
-        //     }, 800);
-        // })
     }
     updateStat = (attribute: any) => {
         const characterInfo = { ...this.state.characterInfo }

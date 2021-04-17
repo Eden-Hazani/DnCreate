@@ -5,7 +5,7 @@ import { RaceList } from '../screens/CharCreation/RaceList';
 import { NewCharInfo } from '../screens/CharCreation/NewCharInfo';
 import { AttributePicking } from '../screens/CharCreation/AttributePicking';
 import { CharBackstory } from '../screens/CharCreation/CharBackstory';
-import { CharacterHall } from '../screens/CharacterHall';
+import CharacterHall from '../screens/CharacterHall';
 import { SelectCharacter } from '../screens/SelectCharacter';
 import { CharPersonalityTraits } from '../screens/CharCreation/CharPersonalityTraits';
 import { CharIdeals } from '../screens/CharCreation/CharIdeals';

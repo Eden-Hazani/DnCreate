@@ -76,6 +76,7 @@ export class CharacterModel {
         public equipment?: EquipmentModal[],
         public addSpellAvailabilityByName?: string[],
         public currentExperience?: number,
+        public marketStatus?: { isInMarket: boolean, market_id: string, creator_id: string },
         public addedRaceFeatures?: any[]
     ) {
         if (!characterAlignment) {

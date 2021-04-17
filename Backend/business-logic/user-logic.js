@@ -5,6 +5,7 @@ const Character = require("../models/characterModel");
 function addCharacter(character) {
     return character.save();
 }
+
 async function getCharacters(user_id) {
     return Character.find({ user_id: { $eq: user_id } }).populate('characterClassId').populate('raceId').exec();
 }

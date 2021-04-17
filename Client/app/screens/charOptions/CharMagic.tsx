@@ -209,7 +209,7 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                                     <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Tap a spell slot to use it.</AppText>
                                     <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Long tap a spell slot to restore it.</AppText>
                                     <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>press reset to reset all your used spells</AppText>
-                                    <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed}
+                                    <AppButton fontSize={45} backgroundColor={Colors.bitterSweetRed}
                                         borderRadius={100} width={60} height={60} title={"reset"} onPress={async () => {
                                             const totalMagic = Object.values(this.props.character.magic !== undefined && this.props.character.magic);
                                             const newAvailableMagic = []

@@ -21,6 +21,7 @@ import { Image, CacheManager } from 'react-native-expo-image-cache'
 import { Config } from '../../../config';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
+import NumberScroll from '../../components/NumberScroll';
 
 
 const ValidationSchema = Yup.object().shape({
@@ -35,6 +36,8 @@ interface CharEquipmentState {
     pickedImg: string
     pickedEquipment: EquipmentModal
     equipmentInfoModal: boolean
+    addedAc: number
+    addedDam: number
 }
 
 export class CharEquipment extends Component<{ route: any }, CharEquipmentState>{
@@ -42,6 +45,8 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
     constructor(props: any) {
         super(props)
         this.state = {
+            addedDam: 0,
+            addedAc: 0,
             equipmentInfoModal: false,
             pickedEquipment: new EquipmentModal(),
             pickedImg: '',
@@ -56,6 +61,8 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
             const equipment: EquipmentModal = {
                 _id: values.name + Math.floor((Math.random() * 1000000) + 1),
                 name: values.name,
+                addedAc: this.state.addedAc,
+                addedDam: this.state.addedDam,
                 description: values.description,
                 equipmentType: values.equipmentType,
                 image: this.state.pickedImg ? this.state.pickedImg : undefined,
@@ -179,6 +186,24 @@ export class CharEquipment extends Component<{ route: any }, CharEquipmentState>
                                     fieldName={"equipmentType"}
                                     iconName={"text-short"}
                                     placeholder={"Equipment type..."} />
+
+                                <AppText textAlign={'center'} padding={10} fontSize={18}>Does this equipment add additional AC?</AppText>
+                                <NumberScroll modelColor={Colors.pageBackground} max={50}
+                                    startFromZero={true}
+                                    startingVal={0}
+                                    getValue={(val: any) => {
+                                        this.setState({ addedAc: val })
+                                    }} />
+
+                                <AppText textAlign={'center'} padding={10} fontSize={18}>Does this equipment add additional Damage on hit?</AppText>
+                                <NumberScroll modelColor={Colors.pageBackground} max={50}
+                                    startFromZero={true}
+                                    startingVal={0}
+                                    getValue={(val: any) => {
+                                        this.setState({ addedDam: val })
+                                    }} />
+
+
                                 <View style={{ padding: 5, marginTop: 15, justifyContent: 'center', alignItems: "center" }}>
                                     <AppText textAlign={'center'}>If you wish, you can add an image to better visualize your item</AppText>
                                 </View>

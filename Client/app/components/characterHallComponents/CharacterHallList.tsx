@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
-import { Config } from '../../config';
-import { Colors } from '../config/colors';
-import { CharacterModel } from '../models/characterModel';
-import { AppText } from './AppText';
-import { IconGen } from './IconGen';
+import { Config } from '../../../config';
+import { Colors } from '../../config/colors';
+import { CharacterModel } from '../../models/characterModel';
+import { AppText } from '../AppText';
+import { IconGen } from '../IconGen';
+import { CharacterMarketInfo } from './CharacterMarketInfo';
 const { width, height } = Dimensions.get('window')
 
 const classesBackgrounds = {
@@ -26,6 +27,7 @@ const classesBackgrounds = {
 
 
 export default function CharacterHallList({ characters, openCharacter, deleteChar }: any) {
+
     const scrollX = React.useRef(new Animated.Value(0)).current;
     return (
         <View style={{ height }}>
@@ -74,7 +76,7 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                     zIndex: 1,
                                     transform: [{ scale }],
                                     alignSelf: 'flex-end',
-                                    position: 'absolute', left: -30, bottom: -60, elevation: 10, width: 70, height: 70
+                                    position: 'absolute', left: -30, bottom: -65, elevation: 10, width: 70, height: 70
                                 }}>
                                 <TouchableOpacity
                                     onPress={() => { Alert.alert("Delete", "Are you sure you want to delete this character? (this action is irreversible)", [{ text: 'Yes', onPress: () => deleteChar(item) }, { text: 'No' }]) }}>
@@ -88,7 +90,7 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                             <Animated.View style={{ justifyContent: "center", alignItems: "center", transform: [{ scale }] }}>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        openCharacter(item)
+                                        openCharacter(item, index)
                                     }}
                                     style={{ alignItems: "center" }}>
                                     <Image uri={`${Config.serverUrl}/assets/races/${item.image}`}
@@ -106,8 +108,18 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                 </TouchableOpacity>
 
                             </Animated.View>
-                        </View>
+                            <Animated.View
+                                style={{
+                                    flex: 1,
+                                    zIndex: 1,
+                                    transform: [{ scale }],
+                                    alignSelf: 'flex-end',
+                                    position: 'absolute', right: -30, bottom: -65, width: 70, height: 70
+                                }}>
 
+                                <CharacterMarketInfo index={index} character={item} />
+                            </Animated.View>
+                        </View>
                     </View>
                 }}
             />

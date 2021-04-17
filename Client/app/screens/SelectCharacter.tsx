@@ -45,6 +45,8 @@ import { killToolArrayDuplicates } from '../../utility/killToolArrayDuplicates';
 import { Image as CashImage } from 'react-native-expo-image-cache'
 import { ProficientSkillList } from './charOptions/ProficiantSkillList';
 import { DiceRolling } from '../animations/DiceRolling';
+import { CurrentHpSetting } from './charOptions/CurrentHpSetting';
+import rollForDamageCalc from './charOptions/helperFunctions/rollForDamageCalc'
 const { height, width } = Dimensions.get('window');
 
 /**
@@ -195,11 +197,11 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         startCharInfo.tools = killToolArrayDuplicates(startCharInfo.tools || [])
         this.setState({ character: startCharInfo }, async () => {
             this.loadCashedSavingThrows().then(async () => {
+                this.maxHpCheck();
                 if (await AsyncStorage.getItem(`${this.state.character._id}FirstTimeOpened`) !== null && levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)) {
                     const { operation, action } = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character);
                     this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
                 }
-                this.maxHpCheck();
                 if (this.state.character.level) {
                     this.setState({ currentLevel: this.state.character.level })
                     this.setState({ currentProficiency: switchProficiency(this.state.character.level) })
@@ -300,6 +302,7 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                             }
                             userCharApi.updateChar(this.state.character).then(() => {
                                 this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" });
+                                store.dispatch({ type: ActionType.ReplaceExistingChar, payload: { charIndex: this.props.route.params.index, character: JSON.parse(character) } });
                                 this.refreshData();
                             })
                         })
@@ -398,14 +401,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         character.maxHp = maxHp;
         this.setState({ character }, async () => {
             this.context.user._id === "Offline" ? this.updateOfflineChar(this.state.character) : userCharApi.updateChar(this.state.character);
+            this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" }, async () => {
+                await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
+            });
             const levelUpTreeFunc = await levelUpTree[this.state.character.characterClass](this.state.character.level, this.state.character)
             if (levelUpTreeFunc) {
                 const { operation, action } = levelUpTreeFunc;
                 this.setState({ levelUpFunctionActive: operation, levelUpFunction: action });
             }
-            this.setState({ currentHp: this.state.character.maxHp ? this.state.character.maxHp.toString() : "0" }, async () => {
-                await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
-            });
+            else if (!levelUpTreeFunc) {
+                store.dispatch({ type: ActionType.ReplaceExistingChar, payload: { charIndex: this.props.route.params.index, character: character } });
+                this.refreshData()
+            }
         })
     }
 
@@ -436,8 +443,18 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
         this.setState({ levelUpFunctionActive: closed })
     }
 
-    setCurrentHp = async () => {
-        await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp);
+    setCurrentHp = (newHPVal: number) => {
+        let newHP: number = newHPVal + parseInt(this.state.currentHp);
+        console.log(newHP)
+        if (this.state.character.maxHp) {
+            if (newHP > this.state.character.maxHp) {
+                newHP = this.state.character.maxHp;
+            }
+            if (newHP < 0) {
+                newHP = 0;
+            }
+        }
+        this.setState({ currentHp: newHP.toString() }, async () => await AsyncStorage.setItem(`${this.state.character._id}currentHp`, this.state.currentHp))
         this.setState({ setCurrentHpModal: false })
     }
 
@@ -477,16 +494,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
     }
 
     rollDamageWithWeapon = () => {
-        if (!this.state.character.currentWeapon?.modifier) {
-            alert('Using DnCreate to roll for damage is only available if your weapon has an assigned modifier, go to the weapons circle and edit your weapon with the modifier you want then try again :)')
-            return;
-        }
-        if (this.state.character.modifiers && this.state.character.currentWeapon.dice) {
-            this.setState({
-                diceAmount: this.state.character.currentWeapon.diceAmount || 1, diceType: parseInt(this.state.character.currentWeapon.dice.split('D')[1] || '0'), diceRolling: true,
-                currentDiceRollValue: this.state.character.modifiers[this.state.character.currentWeapon.modifier.toLowerCase()]
-            })
-        }
+        const { diceType, currentDiceRollValue, diceAmount, diceRolling } = rollForDamageCalc(this.state.character)
+        this.setState({ diceType, currentDiceRollValue, diceAmount, diceRolling })
+
     }
 
     rollHitWithWeapon = () => {
@@ -530,21 +540,23 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                         tutorialZIndex[val] = true
                                         this.setState({ tutorialZIndex })
                                     }}
+                                    characterClass={this.state.character}
                                     pageHeight={this.state.containerHeight} end={() => this.endTutorial()}
                                     changeScrollPosition={(val: any) => this.scrollView.scrollTo({ x: val.x, y: val.y, animated: true })} />
                             </>}
 
-                        {this.state.tutorialOn || this.state.diceRolling && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 4 }]}></View>}
+                        {(this.state.tutorialOn || this.state.diceRolling) && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 4 }]}></View>}
                         {this.state.diceRolling && <View style={[{
                             zIndex: 10, position: 'absolute', top: this.state.scrollHandle + (this.state.diceAmount > 2 ? 50 : height / 3),
                             left: 0, right: 0, bottom: 0
                         }]}>
-                            <DiceRolling showResults={true} isClosedTimer={false} returnResultArray={() => { }} diceAmount={this.state.diceAmount} diceType={this.state.diceType} rollValue={this.state.currentDiceRollValue} close={() => this.setState({ diceRolling: false, currentDiceRollValue: 0, diceType: 0, diceAmount: 0 })} />
+                            <DiceRolling showResults={true} isClosedTimer={false} returnResultArray={() => { }} diceAmount={this.state.diceAmount} diceType={this.state.diceType}
+                                rollValue={this.state.currentDiceRollValue} close={() => this.setState({ diceRolling: false, currentDiceRollValue: 0, diceType: 0, diceAmount: 0 })} />
                         </View>}
 
                         <Modal visible={this.state.levelUpFunctionActive} animationType="slide">
                             <ScrollView style={{ backgroundColor: Colors.pageBackground }} keyboardShouldPersistTaps="always">
-                                <LevelUpOptions options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
+                                <LevelUpOptions index={this.props.route.params.index} options={this.state.levelUpFunction} character={this.state.character} close={this.handleLevelUpFunctionActiveCloser} refresh={this.refreshData} />
                             </ScrollView>
                         </Modal>
                         <Modal visible={this.state.personalInfoModal} animationType="slide">
@@ -628,13 +640,10 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
                                                 </TouchableOpacity>
                                                 <AppText>Current Hp</AppText>
                                             </View>
-                                            <Modal visible={this.state.setCurrentHpModal}>
-                                                <View style={{ flex: 1, alignItems: "center", backgroundColor: Colors.pageBackground }}>
-                                                    <AppText color={Colors.bitterSweetRed} fontSize={35}>Insert Current Hp</AppText>
-                                                    <AppTextInput keyboardType={'numeric'} iconName={'plus'} onChangeText={(hp: string) => { this.setState({ currentHp: hp }) }} />
-                                                    <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25} title={'Ok'} onPress={() => { this.setCurrentHp() }} />
-                                                </View>
-                                            </Modal>
+                                            <CurrentHpSetting
+                                                closeModal={(newHPVal: number) => this.setCurrentHp(newHPVal)}
+                                                currentHp={this.state.currentHp}
+                                                openModal={this.state.setCurrentHpModal} />
                                         </Animated.View>
                                     </View>
                                 </View>

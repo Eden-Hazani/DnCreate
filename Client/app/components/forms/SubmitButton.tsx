@@ -17,7 +17,7 @@ export function SubmitButton({ ...props }: any) {
     return (
         <TouchableOpacity activeOpacity={.8} style={styles.container} onPress={() => handleSubmit()}>
             <View style={[styles.button, {
-                ...props, backgroundColor: Colors.bitterSweetRed,
+                ...props, backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.bitterSweetRed,
                 width: props.width ?
                     props.width : 100, marginBottom: props.marginBottom ? props.marginBottom : 35
             }]}>

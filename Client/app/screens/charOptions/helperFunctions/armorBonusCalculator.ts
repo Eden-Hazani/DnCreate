@@ -63,6 +63,13 @@ export function armorBonusCalculator(character: CharacterModel, armorAc: number,
     if (character.equippedShield && character.equippedShield.ac && character.equippedShield.ac !== 0) {
         newArmorAc = newArmorAc + character.equippedShield.ac
     }
+    if (character.equipment) {
+        for (let item of character.equipment) {
+            if (item.addedAc && item.isEquipped)
+                newArmorAc = newArmorAc + item.addedAc
+        }
+    }
+
     return newArmorAc
 }
 

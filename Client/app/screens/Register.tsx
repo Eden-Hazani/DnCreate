@@ -56,55 +56,14 @@ export class Register extends Component<{ fireOnCancel: any, showCancelButt: any
         this.UnsubscribeStore = store.subscribe(() => { })
     }
 
-    register = async (values: any) => {
-        this.setState({ loading: true })
-        const validValues = {
-            username: values.username.toLowerCase().trim(),
-            password: values.password,
-            passwordConfirmation: values.passwordConfirmation
-        }
-        const loginValues = {
-            username: values.username.toLowerCase().trim(),
-            password: values.password
-        }
-        await authApi.register(validValues).then(result => {
-            const userInfo: any = result.data;
-            this.setState({ loading: false }, () => {
-                alert(userInfo.message)
-                this.login(loginValues)
-            });
-        }).catch(err => {
-            this.setState({ loading: false })
-            errorHandler(err.request)
-        });
-    }
     componentWillUnmount() {
         this.UnsubscribeStore()
     }
 
-    login = async (values: any) => {
-        const newValues = {
-            username: values.username.toLowerCase(),
-            password: values.password
-        }
+    register = async (values: any) => {
         this.setState({ loading: true })
-        await authApi.login(newValues, false).then(result => {
-            const userInfo: any = result.data.token;
-            reduxToken.setToken(userInfo).then(validToken => {
-                const { user, setUser } = this.context
-                setUser(validToken);
-                if (this.props.isTutorial) {
-                    this.props.turnOffTutorialModel(false);
-                    store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.props.isTutorial })
-                }
-                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
-                this.setState({ loading: false })
-            })
-        }).catch(err => {
-            this.setState({ loading: false })
-            errorHandler(err.request)
-        })
-
+        const result = await this.context.register(values);
+        this.setState({ loading: result })
     }
 
     render() {

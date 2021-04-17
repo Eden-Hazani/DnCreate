@@ -69,6 +69,7 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
         } else {
             const characterInfo = { ...this.state.characterInfo };
             characterInfo.characterAlignment = this.state.alignment;
+            console.log(characterInfo)
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })

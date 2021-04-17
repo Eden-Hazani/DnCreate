@@ -1,0 +1,29 @@
+{
+    "list": [
+        {
+            "headline": "Market Place!",
+            "leftTextBlock": "Welcome To The Market, here you can browse all kinds of characters other members of the community created!",
+            "rightTextBlock": "Heres how this works",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/marketPlaceDragon1.png"
+        },
+        {
+            "headline": "Find Characters",
+            "leftTextBlock": "Feel free to browse the market, find anything you fancy?",
+            "rightTextBlock": "Just hit the add button and the character will be added to your character hall!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/marketPlaceDragon2.png"
+        },
+        {
+            "headline": "Upload Your Creations",
+            "leftTextBlock": "Did you make a character you want to share with the world?",
+            "rightTextBlock": "Just hit the marketplace button in your character hall and add your character to the market!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/marketPlaceDragon3.png"
+        },
+        {
+            "headline": "More Things are coming",
+            "leftTextBlock": "I am working hard to get you new cool features",
+            "rightTextBlock": "More additions to the marketplace are coming",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/sharingDragon.png",
+            "finishButton": true
+        }
+    ]
+}

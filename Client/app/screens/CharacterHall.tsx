@@ -1,13 +1,7 @@
-import React, { Component } from 'react';
-import { View, FlatList, Platform, Alert } from 'react-native';
-import { ListItem } from '../components/ListItem';
-import { ListItemSeparator } from '../components/ListItemSeparator';
-import ListItemDelete from '../components/ListItemDelete';
-import { SelectCharacter } from './SelectCharacter';
+import React, { useEffect, useState } from 'react';
+import { View, Platform } from 'react-native';
 import { CharacterModel } from '../models/characterModel';
 import userCharApi from '../api/userCharApi';
-import { UserModel } from '../models/userModel';
-import AuthContext from '../auth/context';
 import { AppText } from '../components/AppText';
 import { Colors } from '../config/colors';
 import { Config } from '../../config';
@@ -20,149 +14,123 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { AdMobInterstitial } from 'expo-ads-admob'
 import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../components/AppNoInternet';
-import * as FacebookAds from 'expo-ads-facebook';
-import logger from '../../utility/logger';
-import CharacterHallList from '../components/CharacterHallList';
+import CharacterHallList from '../components/characterHallComponents/CharacterHallList';
+import { useSelector } from 'react-redux'
+import { RootState } from '../redux/reducer'
+import useAuthContext from '../hooks/useAuthContext';
 
-interface CharacterHallState {
-    characters: CharacterModel[]
-    userInfo: UserModel
-    loading: boolean
-    error: boolean
-    showAds: boolean
-    isInternet: boolean
-    loadingAd: boolean
+interface Props {
+    navigation: any
 }
 
+const interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial;
 
-export class CharacterHall extends Component<{ props: any, navigation: any }, CharacterHallState> {
-    navigationSubscription: any;
-    public interstitialAd: string;
-    public interstitialFacebookAd: string;
-    static contextType = AuthContext;
-    private NetUnSub: any;
-    constructor(props: any) {
-        super(props)
-        this.state = {
-            isInternet: true,
-            loadingAd: false,
-            showAds: store.getState().user.premium ? false : store.getState().firstLoginAd,
-            error: false,
-            loading: true,
-            userInfo: this.context,
-            characters: [],
+
+export default function CharacterHall({ navigation }: Props) {
+
+    const [showAds, setShowAds] = useState<boolean>(store.getState().user.premium ? false : store.getState().firstLoginAd);
+    const [loadingAd, setLoadingAd] = useState<boolean>(false);
+    const [isInternet, setIsInternet] = useState<boolean>(true);
+    const [error, setError] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [isMounted, setIsMounted] = useState<boolean>(true);
+
+    const characters = useSelector((state: RootState) => {
+        if (isMounted) return state.characters
+    }) || [];
+
+    const userContext = useAuthContext();
+
+    const NetUnSub = NetInfo.addEventListener(netInfo => {
+        if (netInfo.isInternetReachable && netInfo.isInternetReachable !== isInternet) {
+            setIsInternet(netInfo.isInternetReachable)
         }
-        setTimeout(() => {
-            this.NetUnSub = NetInfo.addEventListener(netInfo => {
-                if (netInfo.isInternetReachable) {
-                    this.setState({ isInternet: netInfo.isInternetReachable })
-                }
-            })
-        }, 500);
-        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
-        this.interstitialAd = Platform.OS === 'ios' ? Config.adIosInterstitial : Config.adAndroidInterstitial
-        this.interstitialFacebookAd = Config.facebookFullScreenAd
-    }
+    })
 
-
-
-    async componentDidMount() {
+    const navigationSubscription = navigation.addListener('focus', async () => {
         try {
-            if (this.state.showAds) {
-                setTimeout(() => {
-                    this.setState({ loadingAd: true }, () => {
-                        this.requestAd().then(() => {
-                            this.componentStartLoadWithAds()
-                            store.dispatch({ type: ActionType.firstLoginAd });
-                        })
-                    })
-                }, 250);
-            } else {
-                this.componentStartLoadWithoutAds();
-            }
-        } catch (err) {
-            this.setState({ loadingAd: false, loading: false })
-        }
-    }
-
-    requestAd = async () => {
-        AdMobInterstitial.setAdUnitID(this.interstitialAd);
-        await AdMobInterstitial.requestAdAsync().then(async () => {
-            await AdMobInterstitial.showAdAsync().then(() => {
-                this.setState({ loading: false, loadingAd: false })
-            }).catch(() => {
-                this.setState({ loadingAd: false, loading: false })
-            })
-        }).catch(() => {
-            this.setState({ loadingAd: false, loading: false })
-        })
-    }
-
-    loadFacebookAd = () => {
-        FacebookAds.InterstitialAdManager.showAd(this.interstitialFacebookAd).then(() => {
-            setTimeout(() => {
-                this.setState({ loadingAd: false, loading: false })
-            }, 1300);
-        }).catch((error: any) => {
-            logger.log(new Error(JSON.stringify(error.nativeEvent)));
-            this.setState({ loadingAd: false, loading: false })
-        })
-    }
-
-    componentStartLoadWithoutAds = async () => {
-        if (this.context.user._id === "Offline") {
-            this.loadOfflineChars().then(() => {
-                this.setState({ loading: false })
-            })
-        }
-        if (this.context.user._id !== "Offline") {
-            const response = await userCharApi.getChars(this.context.user._id);
-            if (response.data) {
-                const characters = response.data;
-                this.setState({ characters, error: errorHandler(response), loading: false });
-            }
-        }
-    }
-
-    componentStartLoadWithAds = async () => {
-        if (this.context.user._id === "Offline") {
-            this.loadOfflineChars()
-        }
-        if (this.context.user._id !== "Offline") {
-            const response = await userCharApi.getChars(this.context.user._id);
-            if (response.data) {
-                const characters = response.data;
-                this.setState({ characters, error: errorHandler(response) });
-            }
-        }
-    }
-
-    loadOfflineChars = async () => {
-        const characters = await AsyncStorage.getItem('offLineCharacterList');
-        if (!characters) {
-            this.setState({ characters: [] });
-            return
-        }
-        this.setState({ characters: JSON.parse(characters) });
-    }
-
-    onFocus = async () => {
-        try {
-            if (!this.state.showAds) {
-                this.componentStartLoadWithoutAds()
+            if (!showAds) {
+                componentStartLoadWithoutAds()
             }
         } catch (err) {
             errorHandler(err)
         }
+    });
+
+    useEffect(() => {
+        try {
+            if (showAds) {
+                setTimeout(() => {
+                    setLoading(true)
+                    requestAd().then(() => {
+                        componentStartLoadWithAds();
+                        store.dispatch({ type: ActionType.firstLoginAd });
+                    })
+                }, 250);
+            } else {
+                componentStartLoadWithoutAds();
+            }
+            return () => {
+                setIsMounted(false)
+                console.log(isMounted)
+                navigationSubscription();
+                NetUnSub()
+            };
+        } catch (err) {
+            setLoading(false)
+            setLoadingAd(false)
+        }
+    }, [])
+
+    const requestAd = async () => {
+        AdMobInterstitial.setAdUnitID(interstitialAd);
+        await AdMobInterstitial.requestAdAsync().then(async () => {
+            await AdMobInterstitial.showAdAsync().then(() => {
+                setLoading(false)
+                setLoadingAd(false)
+            }).catch(() => {
+                setLoading(false)
+                setLoadingAd(false)
+            })
+        }).catch(() => {
+            setLoading(false)
+            setLoadingAd(false)
+        })
     }
 
+    const componentStartLoadWithoutAds = async () => {
+        if (userContext.user?._id === "Offline") {
+            loadOfflineChars().then(() => {
+                setLoading(false)
+            })
+        }
+        if (userContext.user?._id !== "Offline") {
+            setTimeout(() => {
+                setLoading(false)
+            }, 500);
+        }
+    }
 
-    handleDelete = async (character: CharacterModel) => {
-        if (this.context.user._id === "Offline") {
-            for (let item of this.state.characters) {
+    const componentStartLoadWithAds = async () => {
+        if (userContext.user?._id === "Offline") {
+            loadOfflineChars()
+        }
+    }
+
+    const loadOfflineChars = async () => {
+        const characters = await AsyncStorage.getItem('offLineCharacterList');
+        if (!characters) {
+            return;
+        }
+        store.dispatch({ type: ActionType.SetCharacters, payload: JSON.parse(characters) });
+    }
+
+    const handleDelete = async (character: CharacterModel) => {
+        if (userContext.user?._id === "Offline") {
+            for (let item of characters) {
                 if (item._id === character._id) {
-                    const characters = this.state.characters.filter(m => m._id !== item._id)
-                    this.setState({ characters })
+                    const filteredCharacters = characters.filter(m => m._id !== item._id)
+                    store.dispatch({ type: ActionType.SetCharacters, payload: filteredCharacters })
                 }
             }
             const stringifiedChars = await AsyncStorage.getItem('offLineCharacterList');
@@ -178,10 +146,10 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
             }
             return;
         }
-        for (let item of this.state.characters) {
+        for (let item of characters) {
             if (item._id === character._id) {
-                const characters = this.state.characters.filter(m => m._id !== item._id)
-                this.setState({ characters })
+                const filteredCharacters = characters.filter(m => m._id !== item._id)
+                store.dispatch({ type: ActionType.SetCharacters, payload: filteredCharacters })
             }
         }
         for (let level = 1; level < 20; level++) {
@@ -194,46 +162,39 @@ export class CharacterHall extends Component<{ props: any, navigation: any }, Ch
 
     }
 
-    characterWindow = (character: CharacterModel) => {
+    const characterWindow = (character: CharacterModel, index: number) => {
         store.dispatch({ type: ActionType.SetInfoToChar, payload: character })
-        this.props.navigation.navigate("SelectCharacter", { character: character, isDm: false })
-    }
-    componentWillUnmount() {
-        this.NetUnSub()
+        navigation.navigate("SelectCharacter", { character: character, isDm: false, index: index })
     }
 
-
-
-    render() {
-        return (
-            <View>
-                {!this.state.isInternet ? <AppNoInternet />
+    return (
+        <View>
+            {!isInternet ? <AppNoInternet />
+                :
+                loading ?
+                    <View>
+                        <AppActivityIndicator visible={loading} />
+                        {loadingAd &&
+                            <View>
+                                <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Characters are loading</AppText>
+                                <AppText textAlign={'center'} color={Colors.whiteInDarkMode} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
+                            </View>
+                        }
+                    </View>
                     :
-                    this.state.loading ?
-                        <View>
-                            <AppActivityIndicator visible={this.state.loading} />
-                            {this.state.loadingAd &&
-                                <View>
-                                    <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Characters are loading</AppText>
-                                    <AppText textAlign={'center'} color={Colors.whiteInDarkMode} fontSize={18}>Thank you for using DnCreate 🖤</AppText>
-                                </View>
-                            }
-                        </View>
-                        :
-                        <View>
-                            {this.state.error ? <AppError /> :
-                                <View>
-                                    {this.state.characters.length === 0 ?
-                                        <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                            <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
-                                        </View> :
-                                        <CharacterHallList characters={this.state.characters}
-                                            deleteChar={(val: CharacterModel) => { this.handleDelete(val) }}
-                                            openCharacter={(val: CharacterModel) => { this.characterWindow(val) }} />
-                                    }
-                                </View>}
-                        </View>}
-            </View>
-        )
-    }
+                    <View>
+                        {error ? <AppError /> :
+                            <View>
+                                {characters.length === 0 ?
+                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                        <AppText color={Colors.bitterSweetRed} fontSize={20}>No Characters</AppText>
+                                    </View> :
+                                    <CharacterHallList characters={characters}
+                                        deleteChar={(val: CharacterModel) => { handleDelete(val) }}
+                                        openCharacter={(val: CharacterModel, index: number) => { characterWindow(val, index) }} />
+                                }
+                            </View>}
+                    </View>}
+        </View>
+    )
 }

@@ -8,6 +8,8 @@ export class EquipmentModal {
         public description?: string,
         public image?: string,
         public equipmentType?: string,
-        public isEquipped?: boolean
+        public isEquipped?: boolean,
+        public addedAc?: number,
+        public addedDam?: number
     ) { }
 }

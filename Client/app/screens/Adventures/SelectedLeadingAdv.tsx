@@ -90,6 +90,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
         try {
             store.dispatch({ type: ActionType.ReplaceLeadAdventure, payload: this.state.adventure })
             await this.getUserProfileImg(this.state.adventure)
+
             this.props.navigation.addListener('beforeRemove', (e: any) => {
                 e.preventDefault();
             })
@@ -189,7 +190,6 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
             logger.log(new Error(err))
         }
     }
-
     render() {
         const adventure = this.state.adventure;
         return (
@@ -245,7 +245,16 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
                             </View>
                             <View style={{ paddingBottom: 15 }}>
-                                <AdventureChat participantChar={{ name: "DM", _id: this.context.user._id }} adventureIdentifier={this.state.adventure.adventureIdentifier} adventure_id={this.state.adventure._id} />
+                                <AppButton
+                                    borderRadius={15} width={150} height={70} title={"Adventure Chat"} backgroundColor={Colors.bitterSweetRed}
+                                    onPress={() => this.props.navigation.navigate('AdventureChat',
+                                        {
+                                            participantChar: { name: "DM", _id: this.context.user._id },
+                                            adventureIdentifier: this.state.adventure.adventureIdentifier,
+                                            adventure_id: this.state.adventure._id,
+                                            premiumStatus: this.context.user.premium ? "OK" : "DM_ERROR"
+                                        }
+                                    )} />
                             </View>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: '100%' }}>

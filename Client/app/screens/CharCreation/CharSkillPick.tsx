@@ -204,7 +204,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 }
                 this.setState({ confirmed: true, loading: false })
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                store.dispatch({ type: ActionType.SetCharacters, payload: [this.state.characterInfo] })
+                store.dispatch({ type: ActionType.addNewCharacter, payload: this.state.characterInfo })
                 await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
                 setTimeout(() => {
                     this.props.navigation.navigate("CharBackstory", { updateStory: false });
@@ -229,7 +229,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 this.setState({ confirmed: true })
                 this.setState({ characterInfo }, async () => {
                     store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    store.dispatch({ type: ActionType.SetCharacters, payload: [this.state.characterInfo] })
+                    store.dispatch({ type: ActionType.addNewCharacter, payload: this.state.characterInfo })
                     await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
                     setTimeout(() => {
                         this.props.navigation.navigate("CharBackstory", { updateStory: false });

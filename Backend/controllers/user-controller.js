@@ -75,6 +75,21 @@ router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, re
     }
 })
 
+router.patch("/updateCharacterAndReturnInfo", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const cleanChar = removeEmptySpecificObj(JSON.parse(request.body.charInfo))
+        const char = new Character(cleanChar);
+        const error = await char.validate();
+        if (error) {
+            response.status(400).send(error.message)
+        }
+        const updatedChar = await userLogic.updateCharacter(char);
+        response.json(updatedChar);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+})
+
 
 
 router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
@@ -97,6 +112,21 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
         char.currency.gold = 0;
         char.currency.silver = 0;
         char.currency.copper = 0;
+        const error = await char.validate();
+        if (error) {
+            response.status(400).send(error.message)
+        }
+        const addedChar = await userLogic.addCharacter(char);
+        response.json(addedChar);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.post("/addCharFromMarket", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
+    try {
+        const char = new Character(JSON.parse(request.body.charInfo));
+        console.log(char)
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)

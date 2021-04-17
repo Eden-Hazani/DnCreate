@@ -7,14 +7,12 @@ import { Colors } from '../config/colors';
 import { IconGen } from '../components/IconGen';
 import AccNavigator from './AccountNavigator';
 import AdventuresNavigator from './AdventuresNavigator';
-import { store } from '../redux/store';
-import * as Permissions from 'expo-permissions'
 import * as Notifications from 'expo-notifications';
-import logger from '../../utility/logger';
-import authApi from '../api/authApi';
 import navigation from './rootNavigation';
 import CreationNavigator from './CreationNavigator';
 import { AppState } from 'react-native';
+import askNotificationPermissions from '../api/notifications';
+import MarketPlaceNavigator from './MarketPlaceNavigator';
 
 const Tab = createBottomTabNavigator();
 const AppNavigator = () => {
@@ -30,22 +28,6 @@ const AppNavigator = () => {
         })
     }, [])
 
-    const askNotificationPermissions = async () => {
-        try {
-            const permissions = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-            if (!permissions.granted) return;
-            Notifications.setNotificationChannelAsync('default', {
-                name: 'default',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-            });
-            const token = await Notifications.getExpoPushTokenAsync();
-            authApi.registerNotificationToken(store.getState().user, token.data)
-        } catch (err) {
-            logger.log(err)
-        }
-    };
 
     return <Tab.Navigator tabBarOptions={{
         activeBackgroundColor: Colors.bitterSweetRed,
@@ -58,6 +40,7 @@ const AppNavigator = () => {
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"account"} iconColor={color} /> }} name="Account" component={AccNavigator} />
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"map-outline"} iconColor={color} /> }} name="Adventures" component={AdventuresNavigator} />
         <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"creation"} iconColor={color} /> }} name="Creation" component={CreationNavigator} />
+        <Tab.Screen options={{ tabBarIcon: ({ color }) => <IconGen size={50} name={"shopping-outline"} iconColor={color} /> }} name="Marketplace" component={MarketPlaceNavigator} />
     </Tab.Navigator>
 }
 

@@ -17,17 +17,23 @@ export function reduce(currentState: AppState | undefined = initialState, action
         case ActionType.colorScheme:
             newState.colorScheme = action.payload;
             break;
+
         case ActionType.SetInfoBeforeRegisterChar:
             newState.beforeRegisterChar = action.payload
             break;
+
         case ActionType.ClearInfoBeforeRegisterChar:
             newState.beforeRegisterChar = new CharacterModel()
+            break;
+
         case ActionType.StartAsNonUser:
             newState.nonUser = action.payload;
             break;
+
         case ActionType.SetInfoToChar:
             newState.character = action.payload;
             break;
+
         case ActionType.ResetCharSkillsToLowerLevel:
             const char = { ...newState.character };
             if (char.skills)
@@ -39,12 +45,25 @@ export function reduce(currentState: AppState | undefined = initialState, action
                 }
             newState.character = char;
             break;
+
         case ActionType.firstLoginAd:
             newState.firstLoginAd = false;
             break;
+
         case ActionType.SetCharacters:
             newState.characters = action.payload
             break;
+
+        case ActionType.addNewCharacter:
+            newState.characters = [...newState.characters, action.payload]
+            break;
+
+        case ActionType.ReplaceExistingChar:
+            const { charIndex, character } = action.payload;
+            console.log(character.maxHp)
+            newState.characters[charIndex] = character;
+            break;
+
         case ActionType.SetUserInfo:
             const user = new UserModel(action.payload._id, action.payload.username, action.payload.password, action.payload.profileImg, action.payload.activated, action.payload.premium)
             newState.user = user;
@@ -147,3 +166,4 @@ export function reduce(currentState: AppState | undefined = initialState, action
     return newState;
 }
 
+export type RootState = ReturnType<typeof reduce>

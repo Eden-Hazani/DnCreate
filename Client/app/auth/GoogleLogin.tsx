@@ -32,7 +32,6 @@ export class GoogleLogin extends Component<{ isTutorial: any, turnOffTutorialMod
 
     initAsync = async () => {
         await GoogleSignIn.initAsync();
-        // this._syncUserWithStateAsync();
     };
 
 
@@ -41,27 +40,13 @@ export class GoogleLogin extends Component<{ isTutorial: any, turnOffTutorialMod
     };
 
     login = async (values: any) => {
-        const newValues = {
-            username: values.username,
-            password: values.password
-        }
         this.setState({ loading: true })
-        await authApi.login(newValues, false).then(result => {
-            const userInfo: any = result.data.token;
-            reduxToken.setToken(userInfo).then(validToken => {
-                const { user, setUser } = this.context
-                setUser(validToken);
-                if (this.props.isTutorial) {
-                    this.props.turnOffTutorialModel(false);
-                    store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.props.isTutorial })
-                }
-                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
-                this.setState({ loading: false })
-            })
-        }).catch(err => {
-            this.setState({ loading: false })
-            errorHandler(err.request)
-        })
+        if (this.props.isTutorial) {
+            this.props.turnOffTutorialModel(false);
+            store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: this.props.isTutorial })
+        }
+        const result = await this.context.login(false, values, false);
+        this.setState({ loading: result })
     }
 
     signOutAsync = async () => {
@@ -86,22 +71,15 @@ export class GoogleLogin extends Component<{ isTutorial: any, turnOffTutorialMod
     };
 
     findIfRegistered = async (values: any, photoURL: any) => {
-        authApi.login(values, false).then(answer => {
-            const userInfo: any = answer.data.token;
-            reduxToken.setToken(userInfo).then(validToken => {
-                const { user, setUser } = this.context
-                if (this.props.isTutorial) {
-                    this.props.turnOffTutorialModel(false);
-                    alert('This user is already registered, try logging in')
-                    return
-                }
-                setUser(validToken);
-                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
-                this.setState({ loading: false })
-            })
-        }).catch(async () => {
+        if (this.props.isTutorial) {
+            this.props.turnOffTutorialModel(false);
+            alert('This user is already registered, try logging in')
+            return
+        }
+        const result = await this.context.login(false, values, true);
+        if (result === 'noUserExists') {
             this.registerWithGoogle(values, photoURL)
-        });
+        }
     }
 
     registerWithGoogle = async (values: any, photoURL: any) => {
@@ -145,9 +123,6 @@ export class GoogleLogin extends Component<{ isTutorial: any, turnOffTutorialMod
                             <AppText>Google Sign in</AppText>
                         </TouchableOpacity>
                     </View>
-                    // <AppButton onPress={() => { this.signInAsync() }} width={100} height={100}
-                    //     borderRadius={100} fontSize={18} marginBottom={1}
-                    //     color={Colors.black} backgroundColor={Colors.bitterSweetRed} title={"test"} />
                 }
             </View>
         )

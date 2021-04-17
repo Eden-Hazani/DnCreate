@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, View, Animated, Image, TouchableOpacity, Modal } from 'react-native';
+import { Dimensions, FlatList, View, Animated, TouchableOpacity, Modal, Switch } from 'react-native';
 import { ListItem } from '../../components/ListItem';
 import { SearchBar } from 'react-native-elements';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
@@ -24,6 +24,8 @@ import { AppNoInternet } from '../../components/AppNoInternet';
 import { AppButton } from '../../components/AppButton';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
+import { Image } from 'react-native-expo-image-cache';
+import { RaceListHomeBrew } from './components/RaceListHomeBrew';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -44,6 +46,7 @@ interface RaceListState {
     isUserOffline: boolean
     disclaimerModal: boolean
     currentLoadedRaces: number
+    afterDisclaimerModal: boolean
 }
 
 
@@ -54,6 +57,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     constructor(props: any) {
         super(props)
         this.state = {
+            afterDisclaimerModal: false,
             disclaimerModal: false,
             isUserOffline: false,
             isInternet: true,
@@ -246,12 +250,16 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                         <AppText textAlign={'center'} fontSize={17}>Before using DnCreate or considering donating to us we extremely
                                                 recommend purchasing the players handbook from Wizards Of The Coast.</AppText>
                                         <AppButton padding={20} backgroundColor={Colors.metallicBlue} onPress={() => {
-                                            this.setState({ disclaimerModal: false }, async () => {
-                                                await AsyncStorage.setItem('shownDisclaimer', "true")
-                                            })
+                                            this.setState({ disclaimerModal: false, afterDisclaimerModal: true })
                                         }}
                                             fontSize={18} borderRadius={25} width={120} height={65} title={"I Understand"} />
                                     </View>
+                                </Modal>
+                                <Modal visible={this.state.afterDisclaimerModal} animationType="slide">
+                                    <RaceListHomeBrew close={async () => {
+                                        this.setState({ afterDisclaimerModal: false })
+                                        await AsyncStorage.setItem('shownDisclaimer', "true")
+                                    }} />
                                 </Modal>
                             </View>}
             </View>

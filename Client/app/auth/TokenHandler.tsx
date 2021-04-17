@@ -6,12 +6,13 @@ import storage from './storage';
 
 
 
-const handleToken = async (): Promise<any> => {
+const handleToken = async (): Promise<UserModel | null> => {
     const token = await storage.getToken()
     if (!token) return null;
     const validToken: any = jwtDecode(token)
-    store.dispatch({ type: ActionType.SetUserInfo, payload: validToken.user })
-    return validToken.user;
+    const user: UserModel = validToken.user
+    store.dispatch({ type: ActionType.SetUserInfo, payload: user })
+    return user;
 }
 
 export default handleToken;

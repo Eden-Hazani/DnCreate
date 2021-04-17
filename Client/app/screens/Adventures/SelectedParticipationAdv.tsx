@@ -12,13 +12,14 @@ import { Colors } from '../../config/colors';
 import { AdventureModel } from '../../models/AdventureModel';
 import { CharacterModel } from '../../models/characterModel';
 import { store } from '../../redux/store';
-import { AdventureChat } from './AdventureChat';
+import validatePremium from './functions/validatePremium'
 
 interface SelectedParticipationAdvState {
     adventure: AdventureModel
     profilePicList: any[]
     loading: boolean
-    participantChar: CharacterModel
+    participantChar: CharacterModel;
+    DMPremium: string
 }
 
 export class SelectedParticipationAdv extends Component<{ navigation: any, route: any }, SelectedParticipationAdvState> {
@@ -28,6 +29,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
         this.state = {
             participantChar: new CharacterModel(),
             loading: true,
+            DMPremium: 'MEMBER_ERROR',
             profilePicList: [],
             adventure: this.props.route.params.adventure
         }
@@ -50,6 +52,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
             }
             const userPicList: any = await adventureApi.getUserProfileImages(userArray)
             const picList = userArray.map((item, index) => [item, userPicList?.data.list[index]])
+            this.isLeaderPremium();
             this.setState({ profilePicList: picList }, () => {
                 this.setState({ loading: false })
             })
@@ -72,6 +75,11 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
         } catch (err) {
             logger.log(new Error(err))
         }
+    }
+
+    isLeaderPremium = async () => {
+        const LeaderPremium = await validatePremium(this.state.adventure.leader_id || "");
+        this.setState({ DMPremium: LeaderPremium });
     }
 
     onFocus = () => {
@@ -130,7 +138,17 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                 fontSize={18} borderRadius={25} width={120} height={65} title={"Completed Quests"} />
                         </View>
                         <View>
-                            <AdventureChat DM_id={this.state.adventure.leader_id} participantChar={this.state.participantChar} adventureIdentifier={this.state.adventure.adventureIdentifier} adventure_id={this.state.adventure._id} />
+                            <AppButton
+                                borderRadius={15} width={150} height={70} title={"Adventure Chat"} backgroundColor={Colors.bitterSweetRed}
+                                onPress={() => this.props.navigation.navigate('AdventureChat',
+                                    {
+                                        participantChar: { name: "DM", _id: this.context.user._id },
+                                        adventureIdentifier: this.state.adventure.adventureIdentifier,
+                                        adventure_id: this.state.adventure._id,
+                                        DM_id: this.state.adventure.leader_id,
+                                        premiumStatus: this.state.DMPremium
+                                    }
+                                )} />
                         </View>
                     </View>
                 }

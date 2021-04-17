@@ -111,13 +111,6 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
         this.props.navigation.navigate("RaceList")
     }
 
-    useAppOffline = async () => {
-        const offlineUser: any = { username: 'Offline', activated: true, _id: 'Offline', password: undefined, profileImg: undefined }
-        const { user, setUser } = this.context
-        store.dispatch({ type: ActionType.SetUserInfo, payload: offlineUser })
-        setUser(offlineUser);
-        await AsyncStorage.setItem('isOffline', JSON.stringify(true));
-    }
 
     render() {
         return (
@@ -147,7 +140,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                     <AppText fontSize={18} textAlign={'center'}>If you only wish to create characters for yourself and not use DnCreate online features</AppText>
                                     <View style={styles.buttonsView}>
                                         <AppButton fontSize={20} color={Colors.totalWhite} backgroundColor={Colors.berries}
-                                            onPress={() => this.useAppOffline()} borderRadius={100} width={100} height={100} title={"Use Offline"} />
+                                            onPress={() => this.context.offlineLogin()} borderRadius={100} width={100} height={100} title={"Use Offline"} />
                                     </View>
                                 </View>
                                 <Modal

@@ -15,6 +15,7 @@ const authController = require("./controllers/auth-controller")
 const userController = require("./controllers/user-controller")
 const adventureController = require("./controllers/adventure-controller")
 const subClassController = require("./controllers/subClasses-controller")
+const marketController = require("./controllers/market-controller")
 const compression = require("compression");
 const config = require("config");
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/classes", charClassController);
 app.use("/api/user", userController);
 app.use("/api/adventures", adventureController);
 app.use("/api/subClasses", subClassController);
+app.use("/api/market", marketController);
 
 const port = process.env.PORT || config.get("port");
 const listener = app.listen(port, function () { console.log(`Server started on port ${port}...`); });

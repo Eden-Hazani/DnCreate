@@ -18,12 +18,13 @@ import { ScrollView, Switch } from 'react-native-gesture-handler';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
 import * as abilityScores from '../../../jsonDump/abilityScores.json';
+import NumberScroll from '../../components/NumberScroll';
 
 const ValidationSchema = Yup.object().shape({
     name: Yup.string().required().label("Weapon Name"),
     description: Yup.string().required().label("Weapon Description"),
     diceAmount: Yup.number().required().typeError('Dice Amount is required and must be a number').label("Dice Amount"),
-    specialAbilities: Yup.string().label("Special Abilities")
+    specialAbilities: Yup.string().label("Special Abilities"),
 })
 
 const dice = ["D12", "D10", "D8", "D6", "D4"]
@@ -40,6 +41,7 @@ interface CharWeaponsState {
     editingWeapon: boolean
     weaponBeingEdited: WeaponModal
     isProficient: boolean
+    addedDamage: number
 }
 
 export class CharWeapons extends Component<{ navigation: any, route: any }, CharWeaponsState>{
@@ -56,7 +58,8 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             dicePicked: '',
             addWeapon: false,
             character: this.props.route.params.char,
-            isProficient: false
+            isProficient: false,
+            addedDamage: 0
         }
     }
     async componentDidMount() {
@@ -123,6 +126,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 isProficient: this.state.isProficient,
                 modifier: this.state.scorePicked,
                 description: values.description,
+                addedDamage: this.state.addedDamage,
                 diceAmount: values.diceAmount,
                 removable: true
             }
@@ -213,6 +217,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 modifier: this.state.scorePicked,
                 description: values.description,
                 diceAmount: values.diceAmount,
+                addedDamage: this.state.addedDamage,
                 removable: true
             }
             let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
@@ -271,7 +276,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 <Modal visible={this.state.addWeapon || this.state.editingWeapon} animationType="slide" >
                     <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                         <View style={{ marginBottom: 20 }}>
-                            <AppText fontSize={20} textAlign={'center'}>As a {this.state.character.characterClass} you have the following armor Weapon:</AppText>
+                            <AppText fontSize={20} textAlign={'center'}>As a {this.state.character.characterClass} you have the following Weapon proficiencies:</AppText>
                         </View>
                         <View style={{ justifyContent: "center", flexWrap: 'wrap', padding: 5, margin: 15, flexDirection: "row", backgroundColor: Colors.pinkishSilver, borderWidth: 1, borderColor: Colors.berries, borderRadius: 15 }}>
                             {this.state.character.characterClassId && this.state.character.characterClassId.weaponProficiencies && this.state.character.characterClassId.weaponProficiencies.map((item: any) =>
@@ -300,7 +305,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                 name: this.state.editingWeapon ? this.state.weaponBeingEdited.name : '',
                                 description: this.state.editingWeapon ? this.state.weaponBeingEdited.description : '',
                                 diceAmount: this.state.editingWeapon ? this.state.weaponBeingEdited.diceAmount : null,
-                                specialAbilities: this.state.editingWeapon ? this.state.weaponBeingEdited.specialAbilities : ''
+                                specialAbilities: this.state.editingWeapon ? this.state.weaponBeingEdited.specialAbilities : '',
                             }}
                             onSubmit={(values: any) => this.state.editingWeapon ? this.editWeapon(values) : this.addWeapon(values)}
                             validationSchema={ValidationSchema}>
@@ -365,6 +370,14 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                     fieldName={"diceAmount"}
                                     iconName={"text-short"}
                                     placeholder={"Dice Amount"} />
+                                <AppText padding={15} textAlign={'center'}>Does this weapon provide any additional base damage on hit?</AppText>
+                                <NumberScroll modelColor={Colors.pageBackground} max={5000}
+                                    startFromZero={true}
+                                    startingVal={this.state.editingWeapon ? this.state.weaponBeingEdited.addedDamage : 0}
+                                    getValue={(val: any) => {
+                                        if (!val) return
+                                        this.setState({ addedDamage: val })
+                                    }} />
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <SubmitButton textAlign={'center'} title={this.state.editingWeapon ? "Edit Weapon" : "Add Weapon"} />

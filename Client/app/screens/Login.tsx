@@ -52,26 +52,6 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
 
     }
 
-
-    login = async (values: any) => {
-        const newValues = {
-            username: values.username.toLowerCase(),
-            password: values.password
-        }
-        this.setState({ loading: true })
-        await authApi.login(newValues, this.state.remainLoggedIn).then(result => {
-            const userInfo: any = result.data.token;
-            reduxToken.setToken(userInfo).then(validToken => {
-                const { user, setUser } = this.context
-                setUser(validToken);
-                store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
-                this.setState({ loading: false })
-            })
-        }).catch(err => {
-            this.setState({ loading: false })
-            errorHandler(err.request)
-        })
-    }
     componentWillUnmount() {
         this.UnsubscribeStore()
     }
@@ -92,8 +72,18 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
             this.setState({ loading: false })
             errorHandler(err.request)
         });
-
     }
+
+    login = async (values: any) => {
+        this.setState({ loading: true })
+        const newValues = {
+            username: values.username.toLowerCase(),
+            password: values.password
+        }
+        const result = await this.context.login(this.state.remainLoggedIn, newValues)
+        this.setState({ loading: result })
+    }
+
     render() {
         return (
             <ScrollView style={{ marginTop: 35 }}>

@@ -10,6 +10,7 @@ export class WeaponModal {
         public specialAbilities?: string,
         public modifier?: string,
         public isProficient?: boolean,
-        public removable?: boolean
+        public removable?: boolean,
+        public addedDamage?: number
     ) { }
 }

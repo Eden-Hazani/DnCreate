@@ -103,7 +103,7 @@ interface LevelUpOptionsState {
     newFirstLevelMagic: { newSpells: any, spellsKnown: string }
 }
 
-export class LevelUpOptions extends Component<{ options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
+export class LevelUpOptions extends Component<{ index: number, options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
@@ -184,6 +184,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
             }, 1000);
             let beforeLevelUpString: string = JSON.stringify(character);
             const beforeAnyChanges = JSON.parse(JSON.stringify(this.props.character))
+
             if (this.state.character.level) {
                 const result = await AsyncStorage.getItem(`current${this.state.character._id}level${this.state.character.level - 1}`);
                 if (result) {
@@ -191,8 +192,12 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                 }
             }
             this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
-            character.magic = new MagicModel()
+
+            if (!character.magic) {
+                character.magic = new MagicModel()
+            }
             this.setState({ beforeLevelUp: JSON.parse(beforeLevelUpString), beforeAnyChanges, character });
+
             if (this.props.options.spells || this.props.options.spellsKnown) {
                 const character = { ...this.props.character };
                 if (this.props.options.spellSlotLevel && character.charSpecials !== undefined) {
@@ -211,7 +216,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     const spellsKnown = setTotalKnownSpells(this.props.character);
                     character.spellsKnown = spellsKnown;
                 }
-                character.magic = new MagicModel()
+                character.magic = new MagicModel();
                 character.magic.cantrips = this.props.options.cantrips;
                 if (this.props.character.characterClass !== 'Warlock') {
                     character.magic.firstLevelSpells = this.props.options.spells[0];
@@ -1121,6 +1126,7 @@ export class LevelUpOptions extends Component<{ options: any, character: Charact
                     return
                 }
                 userCharApi.updateChar(this.state.character).then(() => {
+                    store.dispatch({ type: ActionType.ReplaceExistingChar, payload: { charIndex: this.props.index, character: character } });
                     this.props.refresh()
                     this.props.close(false);
                 })

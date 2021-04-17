@@ -207,6 +207,10 @@ export default function ClassPick({ route, placeholder }: any) {
                                         justifyContent: undefined,
                                     }}>
                                     <ScrollView style={{ flex: 1 }}>
+                                        <View style={{ position: 'absolute', right: 0 }}>
+                                            <IconGen name={'chevron-down'} size={70} />
+                                            <AppText textAlign={'center'}>Pull down {'\n'}to cancel</AppText >
+                                        </View>
                                         <View style={{ justifyContent: "center", alignItems: "center" }}>
                                             <Image style={{ width: 150, height: 150 }} uri={classesDragonsBackgrounds[pickedClass.name || '']} />
                                         </View>

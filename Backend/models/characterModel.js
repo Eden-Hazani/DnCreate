@@ -194,6 +194,9 @@ const CharacterSchema = mongoose.Schema({
     currentExperience: {
         type: Number
     },
+    marketStatus: {
+        isInMarket: { type: Boolean }, market_id: { type: String }, creator_id: { type: String }
+    },
     feats: {
         type: Array
     },
@@ -221,6 +224,7 @@ const CharacterSchema = mongoose.Schema({
         isProficient: { type: Boolean },
         description: { type: String },
         specialAbilities: { type: String },
+        addedDamage: { type: Number },
         removable: { type: Boolean }
     },
     background: {

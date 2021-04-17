@@ -9,6 +9,12 @@ const saveChar = (character: CharacterModel) => {
     return client.post(`${endpoint}/saveChar`, formData);
 };
 
+const saveCharFromMarket = (character: CharacterModel) => {
+    let formData: FormData = new FormData();
+    formData.append("charInfo", JSON.stringify(character))
+    return client.post(`${endpoint}/addCharFromMarket`, formData);
+};
+
 
 const getChars = (user_id: string) => client.get<CharacterModel[]>(`${endpoint}/getChars/${user_id}`);
 
@@ -35,6 +41,12 @@ const updateChar = (character: CharacterModel) => {
     return client.patch(`${endpoint}/updateCharacter`, formData);
 };
 
+const updateCharacterAndReturnInfo = (character: CharacterModel) => {
+    let formData: FormData = new FormData();
+    formData.append("charInfo", JSON.stringify(character))
+    return client.patch<CharacterModel>(`${endpoint}/updateCharacterAndReturnInfo`, formData);
+};
+
 
 
 export default {
@@ -45,5 +57,6 @@ export default {
     deleteChar,
     validateCharName,
     updateChar,
-
+    saveCharFromMarket,
+    updateCharacterAndReturnInfo
 }
