@@ -11,7 +11,7 @@ import { store } from '../../redux/store';
 import LottieView from 'lottie-react-native';
 import { MagicModel } from '../../models/magicModel';
 import switchModifier from '../../../utility/abillityModifierSwitch';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { filterAlreadyPicked } from './helperFunctions/filterAlreadyPicked';
 import { eldritchInvocations } from "../../classFeatures/eldritchInvocations";
 import { highLightPicked } from './helperFunctions/highLightPicked';
@@ -899,13 +899,6 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                 }
 
             }
-            if (this.state.newFirstLevelMagic.newSpells && character.spells) {
-                for (let spell of this.state.newFirstLevelMagic.newSpells) {
-                    const spellLevel = spellLevelChanger(spell.level)
-                    character.spells[spellLevel].push({ spell: spell, removable: false });
-                }
-                character.spellsKnown = this.state.newFirstLevelMagic.spellsKnown
-            }
             if (this.state.infusionsToPick) {
                 alert('You have additional infusions to pick from')
                 return;
@@ -1098,6 +1091,13 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                 for (let item of character.tools) {
                     item[1] = 2
                 }
+            }
+            if (this.state.newFirstLevelMagic.newSpells && character.spells) {
+                for (let spell of this.state.newFirstLevelMagic.newSpells) {
+                    const spellLevel = spellLevelChanger(spell.level)
+                    character.spells[spellLevel].push({ spell: spell, removable: false });
+                }
+                character.spellsKnown = this.state.newFirstLevelMagic.spellsKnown
             }
             this.setState({ character }, async () => {
                 const character = { ...this.state.character };

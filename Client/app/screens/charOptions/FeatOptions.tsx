@@ -10,7 +10,7 @@ import skillList from '../../../jsonDump/skillList.json'
 import toolList from '../../../jsonDump/toolList.json'
 import abilityScores from '../../../jsonDump/abilityScores.json'
 import { AppMultipleItemPicker } from '../../components/AppMultipleItemPicker';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getSpecialSaveThrows } from '../../../utility/getSpecialSaveThrows';
 
 interface FeatOptionsState {

@@ -37,7 +37,7 @@ export function PrimeMarketItem({ item, index, currentlySnapped, openItem }: Pro
 
     return (
         <Animated.View style={currentAnimated.getLayout()}>
-            <TouchableOpacity onPress={() => openItem(item._id)}>
+            <TouchableOpacity onPress={() => openItem({ charName: item.charName, market_id: item._id })}>
                 <Image source={{ uri: `${Config.serverUrl}/assets/races/${item.raceImag}` }} style={{ height: 100, width: 100, alignSelf: "center" }} />
                 <AppText textAlign={'center'}> {item.charName}</AppText>
                 <AppText textAlign={'center'}>{item.race}</AppText>

@@ -19,7 +19,7 @@ import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 import { io } from 'socket.io-client';
 import { Config } from '../../../config';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import InformationScroller from '../../components/InformationScroller';
 import adventureInfo from '../../../jsonDump/adventuresInformation.json'
 const socket = io(Config.serverUrl);

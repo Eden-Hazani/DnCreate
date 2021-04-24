@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
@@ -69,7 +69,6 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
         } else {
             const characterInfo = { ...this.state.characterInfo };
             characterInfo.characterAlignment = this.state.alignment;
-            console.log(characterInfo)
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })

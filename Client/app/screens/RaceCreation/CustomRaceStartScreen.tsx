@@ -5,6 +5,8 @@ import { Config } from '../../../config';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
+import { ActionType } from '../../redux/action-type';
+import { store } from '../../redux/store';
 
 
 
@@ -20,7 +22,10 @@ export class CustomRaceStartScreen extends Component<{ navigation: any }>{
                     <AppText textAlign={'center'} fontSize={18}>This feature is suggested for more veteran users.</AppText>
                 </View>
                 <AppButton fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
-                    borderRadius={25} title={'Create!'} onPress={() => { this.props.navigation.navigate("BasicRaceInfo") }} />
+                    borderRadius={25} title={'Create!'} onPress={() => {
+                        store.dispatch({ type: ActionType.cleanCustomRace })
+                        this.props.navigation.navigate("BasicRaceInfo")
+                    }} />
             </View>
         )
     }

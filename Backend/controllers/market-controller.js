@@ -37,6 +37,20 @@ router.get("/getPrimeItems", verifyLogged, upload.none(), async (request, respon
     }
 });
 
+router.post("/getItemBatch", verifyLogged, upload.none(), async (request, response) => {
+    try {
+        const filters = JSON.parse(request.body.filters);
+        const start = request.body.start
+        const end = request.body.end
+        const search = request.body.search
+        const items = await marketLogic.getItemBatch(start, end, filters.classFilters, filters.topDownLoaded, search)
+        console.log(items)
+        response.json(items);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
 router.get("/getMarketItem/:market_id", verifyLogged, upload.none(), async (request, response) => {
     try {
         const market_id = request.params.market_id;

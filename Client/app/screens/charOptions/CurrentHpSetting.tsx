@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component, FC, useEffect, useState } from 'react';
 import { View, StyleSheet, Modal, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
@@ -11,13 +12,15 @@ import { Colors } from '../../config/colors';
 
 interface Props {
     currentHp: string;
-    openModal: boolean
+    openModal: boolean;
+    maxHp: number;
+    char_id: string;
     closeModal: Function
 }
 
 const { width, height } = Dimensions.get('window')
 
-export function CurrentHpSetting({ currentHp, openModal, closeModal }: Props) {
+export function CurrentHpSetting({ currentHp, openModal, closeModal, maxHp, char_id }: Props) {
     const [inputState, setInputState] = useState<string>('');
     const [damageAnimatedVal, setDamageAnimatedVal] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: -width / 3, y: 0 }));
     const [healAnimatedVal, setHealAnimatedVal] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: width / 3, y: 0 }));
@@ -25,6 +28,19 @@ export function CurrentHpSetting({ currentHp, openModal, closeModal }: Props) {
     const [healScale, setHealScale] = useState<Animated.Value>(new Animated.Value(0));
     const [currentHealthChange, setCurrentHealthChange] = useState<number>(0)
 
+
+    const setCurrentHp = (newHPVal: number) => {
+        let newHP: number = newHPVal + parseInt(currentHp);
+
+        if (newHP > maxHp) {
+            newHP = maxHp;
+        }
+        if (newHP < 0) {
+            newHP = 0;
+        }
+        AsyncStorage.setItem(`${char_id}currentHp`, newHP.toString())
+        closeModal(newHP)
+    }
 
     useEffect(() => {
         fireAnimation()
@@ -139,11 +155,11 @@ export function CurrentHpSetting({ currentHp, openModal, closeModal }: Props) {
                     <AppButton backgroundColor={Colors.bitterSweetRed} width={100}
                         height={50} borderRadius={25} title={'Ok'} onPress={() => {
                             if (!currentHealthChange) return;
-                            closeModal(inputState === "damage" ? -currentHealthChange : currentHealthChange)
+                            setCurrentHp(inputState === "damage" ? -currentHealthChange : currentHealthChange)
                         }} />
                     <AppButton backgroundColor={Colors.bitterSweetRed} width={100}
                         height={50} borderRadius={25} title={'Cancel'} onPress={() => {
-                            closeModal(0)
+                            setCurrentHp(0)
                         }} />
                 </View>
 

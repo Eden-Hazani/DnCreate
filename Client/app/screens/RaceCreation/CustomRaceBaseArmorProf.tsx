@@ -34,6 +34,9 @@ export class CustomRaceBaseArmorProf extends Component<{ navigation: any }, Cust
     onFocus = () => {
         const customRace = { ...this.state.customRace };
         const armorProf = store.getState().customRace.baseArmorProficiencies;
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (armorProf && armorProf?.length > 0) {
             customRace.baseArmorProficiencies = armorProf
             this.setState({ customRace, activatedInterfaceBase: true })
@@ -76,9 +79,6 @@ export class CustomRaceBaseArmorProf extends Component<{ navigation: any }, Cust
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceBonusAC");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
     removeFeatureSwitch = () => {

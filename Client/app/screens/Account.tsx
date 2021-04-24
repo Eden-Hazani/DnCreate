@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Image, Linking, Alert, Switch, Dimensions, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, Alert, Switch, Dimensions, ScrollView } from 'react-native';
 import { Unsubscribe } from 'redux';
 import { Config } from '../../config';
 import authApi from '../api/authApi';
@@ -14,7 +14,7 @@ import { UserModel } from '../models/userModel';
 import { ActionType } from '../redux/action-type';
 import { store } from '../redux/store';
 import * as Yup from 'yup';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import errorHandler from '../../utility/errorHander';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -25,7 +25,7 @@ import { ListItemSeparator } from '../components/ListItemSeparator';
 import * as Updates from 'expo-updates';
 import logger from '../../utility/logger';
 import { CheckForUpdates } from '../components/CheckForUpdates';
-
+import * as Linking from 'expo-linking';
 
 const ValidationSchema = Yup.object().shape({
     profileImg: Yup.string().required().label("Profile Image").typeError("Must Choose A picture, Press on the camera Icon"),

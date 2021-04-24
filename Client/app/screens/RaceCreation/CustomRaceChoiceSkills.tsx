@@ -41,6 +41,9 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
     onFocus = () => {
         const pickedSkills = store.getState().customRace.skillPickChoice?.skillList;
         let clickedSkills: any[] = []
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (pickedSkills && pickedSkills?.length > 0) {
             for (let item of pickedSkills) {
                 skillsJson.skillList?.forEach((pickedSkill, index) => {
@@ -99,9 +102,6 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceChoiceTools");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
     removeFeatureSwitch = () => {
         this.setState({ pickedSkills: [], amountToPick: 0 }, () => {

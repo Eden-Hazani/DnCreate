@@ -16,7 +16,7 @@ import * as toolsJson from '../../../jsonDump/toolList.json'
 import backgroundsJson from '../../../jsonDump/officialBackgrounds.json'
 import { AppTextInput } from '../../components/forms/AppTextInput';
 import { BackgroundModal } from '../../models/backgroundModal';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Config } from '../../../config';
 import { Image } from 'react-native-expo-image-cache';
 
@@ -280,6 +280,28 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
         })
     }
 
+    pickOfficial = (item: any, index: number) => {
+        if (this.state.pickedOfficial && this.state.characterInfo.skills && this.state.characterInfo.skills.length > 0) {
+            this.cleanUnRelatedSkills(this.state.pickedOfficial.skills)
+        }
+        let officialClicked = this.state.officialClicked;
+        officialClicked = [];
+        officialClicked[index] = true;
+        this.setState({ pickedOfficial: item, officialClicked })
+    }
+
+    cleanUnRelatedSkills = (skills: [skill: string, expertise: number]) => {
+        const character = { ...this.state.characterInfo };
+        let newSkills: any = []
+        for (let item of skills) {
+            newSkills = character.skills?.filter((skill) => {
+                return skill[0] === item[0];
+            });
+        }
+        character.skills = newSkills;
+        this.setState({ characterInfo: character })
+    }
+
 
 
     render() {
@@ -418,12 +440,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "center", alignItems: "center" }}>
                                     {Object.values(backgroundsJson).map((item: any, index: number) =>
                                         <TouchableOpacity style={[styles.skill, { backgroundColor: this.state.officialClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]} key={index}
-                                            onPress={() => {
-                                                let officialClicked = this.state.officialClicked;
-                                                officialClicked = [];
-                                                officialClicked[index] = true;
-                                                this.setState({ pickedOfficial: item, officialClicked })
-                                            }}>
+                                            onPress={() => this.pickOfficial(item, index)}>
                                             <AppText>{item.name}</AppText>
                                         </TouchableOpacity>)}
                                 </View>

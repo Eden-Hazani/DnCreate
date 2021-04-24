@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions, Modal, ScrollView, Linking } from 'react-native';
+import { View, TouchableOpacity, Animated, Button, StyleSheet, Text, Image, Easing, Platform, Dimensions, Modal, ScrollView } from 'react-native';
 import { Colors } from '../config/colors';
 import * as Font from 'expo-font';
 import { AppText } from '../components/AppText';
@@ -13,7 +13,7 @@ import { ActionType } from '../redux/action-type';
 import userCharApi from '../api/userCharApi';
 import AuthContext from '../auth/context';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CharacterModel } from '../models/characterModel';
 import errorHandler from '../../utility/errorHander';
 import Carousel from 'react-native-snap-carousel';
@@ -25,6 +25,7 @@ import { UpdateMessage } from '../components/UpdateMessage';
 import { Config } from '../../config';
 import { IconGen } from '../components/IconGen';
 import { serverDice } from '../../utility/getDiceFromServer';
+import * as Linking from 'expo-linking';
 
 interface HomeState {
     loading: boolean
@@ -84,7 +85,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '1.9.44') {
+        if (!newsFlag || newsFlag !== '2.0') {
             this.setState({ updateNews: true })
         }
     }
@@ -107,15 +108,35 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             if (colorScheme === "firstUse") {
                 this.setState({ colorModal: true })
             }
-            const characters = await userCharApi.getChars(this.context.user._id);
-            if (characters.data) {
-                this.clearStorageJunk(characters.data)
-                store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
-                this.setState({ loading: false, characters: characters.data });
-                this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
+            this.loadCharacters()
+        } catch (err) {
+            this.setState({ loading: false })
+            logger.log(new Error(err))
+        }
+    }
+
+    loadCharacters = async () => {
+        try {
+            if (this.context.user._id === "Offline") {
+                const characters = await AsyncStorage.getItem('offLineCharacterList');
+                if (!characters) {
+                    this.setState({ loading: false })
+                    return;
+                }
+                store.dispatch({ type: ActionType.SetCharacters, payload: JSON.parse(characters) });
+                this.setState({ loading: false })
+            } else {
+                const characters = await userCharApi.getChars(this.context.user._id);
+                if (characters.data) {
+                    this.clearStorageJunk(characters.data)
+                    store.dispatch({ type: ActionType.SetCharacters, payload: characters.data })
+                    this.setState({ loading: false, characters: characters.data });
+                    this.context.user.activated ? this.setState({ activated: true }) : this.setState({ activated: false })
+                }
             }
         } catch (err) {
-            logger.log(new Error(err))
+            this.setState({ loading: false })
+            logger.log(err)
         }
     }
 
@@ -226,7 +247,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '1.9.44')
+                                            AsyncStorage.setItem('newsFlag', '2.0')
                                         })
                                     }} />
                                 </Modal>

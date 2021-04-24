@@ -76,6 +76,13 @@ const registerNotificationToken = ((user: UserModel, token: string) => {
     client.post(`${endpoint}/storeExpoToken`, formData)
 })
 
+const inputAlias = (alias: string, user_id: string) => {
+    let formData: FormData = new FormData();
+    formData.append("alias", alias)
+    formData.append("user_id", user_id)
+    return client.setHeader('content-type', 'multipart/form-data').post<UserModel>(`${endpoint}/inputAlias`, formData)
+}
+
 export default {
     registerNotificationToken,
     register,
@@ -88,5 +95,6 @@ export default {
     resendActivationEmail,
     isActivated,
     isPremium,
-    googleRegister
+    googleRegister,
+    inputAlias
 }

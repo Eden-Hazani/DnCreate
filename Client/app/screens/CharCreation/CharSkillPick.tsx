@@ -11,7 +11,7 @@ import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CharSpacialModel } from '../../models/CharSpacialModel';
 import { startingToolsSwitch } from '../../../utility/startingToolsSwitch';
 import { Register } from '../Register';

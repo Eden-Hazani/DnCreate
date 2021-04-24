@@ -42,6 +42,9 @@ export class CustomRaceSpellPicking extends Component<{ navigation: any }, Custo
     onFocus = () => {
         const customRace = { ...this.state.customRace };
         const pickedSpells = store.getState().customRace.addedSpells;
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (pickedSpells && pickedSpells?.length > 0) {
             customRace.addedSpells = pickedSpells
             this.setState({ customRace, activatedInterface: true })

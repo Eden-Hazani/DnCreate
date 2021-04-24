@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Unsubscribe } from 'redux';
@@ -17,33 +17,26 @@ interface CharBackstoryState {
     characterInfo: CharacterModel
     backstory: string
     confirmed: boolean
-    updateStory: boolean
 }
 
 export class CharBackstory extends Component<{ props: any, route: any, navigation: any, updateStory: boolean }, CharBackstoryState> {
     static contextType = AuthContext;
-    private UnsubscribeStore: Unsubscribe;
     constructor(props: any) {
         super(props)
         this.state = {
             confirmed: false,
             backstory: '',
             characterInfo: store.getState().character,
-            updateStory: this.props.route.params.updateStory
         }
-        this.UnsubscribeStore = store.subscribe(() => { });
     }
 
 
     componentDidMount() {
-        if (this.props.updateStory) {
+        if (this.props.route.params.updateStory) {
             this.setState({ characterInfo: this.props.route.params.character })
         }
     }
 
-    componentWillUnmount() {
-        this.UnsubscribeStore();
-    }
 
     insertInfoAndContinue = () => {
         if (this.state.backstory.length === 0) {
@@ -74,9 +67,10 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
     }
 
     updateInfo = async () => {
+        this.setState({ confirmed: true })
         store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
-        this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
-        this.props.navigation.navigate("SelectCharacter", { character: this.state.characterInfo, isDm: false })
+        this.context.user._id === "Offline" ? this.updateOfflineCharacter().then(() => this.props.navigation.goBack()) :
+            userCharApi.updateChar(this.state.characterInfo).then(() => { this.props.navigation.goBack() })
     }
 
     updateOfflineCharacter = async () => {
@@ -98,7 +92,7 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
         return (
             <ScrollView keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
-                    this.state.updateStory ?
+                    this.props.route.params.updateStory ?
                         <View>
                             <View style={{ paddingBottom: 15 }}>
                                 <AppText textAlign={"center"} color={Colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>

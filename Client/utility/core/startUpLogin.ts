@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import authApi from "../../app/api/authApi";
 import handleToken from "../../app/auth/TokenHandler";
 import { UserModel } from "../../app/models/userModel";

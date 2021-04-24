@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component, useContext } from 'react';
 import { View, StyleSheet, Text, Dimensions, Animated, } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';

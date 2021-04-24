@@ -15,24 +15,20 @@ import { AppFormField } from '../forms/AppFormField';
 import { SubmitButton } from '../forms/SubmitButton';
 import createNewMarketObj from '../../../utility/charHallFunctions/createMarketObj';
 import { updateMarketStatusFromPreviousLevels } from '../../../utility/charHallFunctions/characterStorage';
+import useAuthContext from '../../hooks/useAuthContext';
+import { CreateMarketPlaceAlias } from '../../screens/MarketPlace/marketplaceCompoenents/CreateMarketPlaceAlias';
 
 const { height, width } = Dimensions.get('window')
 const Filter = require('bad-words')
 const filter = new Filter();
 
 const ValidationSchema = Yup.object().shape({
-    name: Yup.string().required().test('test-name', ' Cannot contain profanity', function (value) {
+    description: Yup.string().min(20).max(500).test('test-name', ' Cannot contain profanity', function (value) {
         if (filter.isProfane(value)) {
             return false
         }
         return true
-    }).label("Name"),
-    description: Yup.string().test('test-name', ' Cannot contain profanity', function (value) {
-        if (filter.isProfane(value)) {
-            return false
-        }
-        return true
-    }).matches(/^.{50,500}$/, "Must be 50-500 Characters").required().label("Description"),
+    }).required().label("Description"),
 })
 
 interface Props {
@@ -52,6 +48,8 @@ export function AddCharToMarket({ character, index }: Props) {
     const [animateForm, setAnimateForm] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 700, y: 0 }))
     const [scale, setScale] = useState<Animated.Value>(new Animated.Value(0))
 
+    const userContext = useAuthContext()
+
     const submit = async (values: Values) => {
         Alert.alert("Add To Market", "This character will be added to the market at it's current level including backstory, traits, abilities, magic, and more. ",
             [{ text: 'Yes', onPress: () => addToMarket(values) }, { text: 'No' }])
@@ -60,6 +58,7 @@ export function AddCharToMarket({ character, index }: Props) {
     const addToMarket = async (values: Values) => {
         try {
             setLoading(true)
+            values.name = userContext.user?.marketplaceNickname || '';
             const updatedMarketCharData = await userCharApi.getChar(character._id || '');
             const updatedMarketChar = updatedMarketCharData.data;
 
@@ -106,48 +105,51 @@ export function AddCharToMarket({ character, index }: Props) {
     return (
         <View style={styles.container}>
             {loading ? <AppActivityIndicator visible={loading} /> :
-                <View >
-                    <Animated.View style={[animateStartButt.getLayout(), {
-                        height: scale.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [width / 5, 0],
-                        })
-                    },]}>
-                        <TouchableOpacity style={[styles.addButton, { backgroundColor: Colors.paleGreen }]} onPress={() => handleClick()}>
-                            <AppText fontSize={20} textAlign={'center'}>Add Character To Market</AppText>
-                        </TouchableOpacity>
-                    </Animated.View>
-                    <Animated.View style={[animateForm.getLayout(), {
-                        height: scale.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0, height / 1.9],
-                        })
-                    }]}>
-                        <AppForm
-                            initialValues={{
-                                name: '',
-                                description: '',
-                            }}
-                            onSubmit={(values: Values) => submit(values)}
-                            validationSchema={ValidationSchema}>
-                            <View style={{ marginBottom: 5, justifyContent: "center", alignItems: "center" }}>
-                                <AppFormField
-                                    width={Dimensions.get('screen').width / 1.2}
-                                    fieldName={"name"}
-                                    iconName={"text-short"}
-                                    placeholder={"Your alias..."} />
-                                <AppFormField
-                                    width={Dimensions.get('screen').width / 1.2}
-                                    numberOfLines={7} multiline={true} textAlignVertical={"top"}
-                                    fieldName={"description"}
-                                    iconName={"text-short"}
-                                    placeholder={"Marketplace character Description..."} />
-                            </View>
-                            <View style={{ justifyContent: "center", alignItems: "center" }}>
-                                <SubmitButton backgroundColor={Colors.paleGreen} title={"Finish"} marginBottom={1} />
-                            </View>
-                        </AppForm>
-                    </Animated.View>
+                <View>
+                    {userContext.user?.marketplaceNickname ?
+                        <View>
+
+                            <Animated.View style={[animateStartButt.getLayout(), {
+                                height: scale.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [width / 5, 0],
+                                })
+                            },]}>
+                                <TouchableOpacity style={[styles.addButton, { backgroundColor: Colors.paleGreen }]} onPress={() => handleClick()}>
+                                    <AppText fontSize={20} textAlign={'center'}>Add Character To Market</AppText>
+                                </TouchableOpacity>
+                            </Animated.View>
+                            <Animated.View style={[animateForm.getLayout(), {
+                                height: scale.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [0, height / 1.9],
+                                })
+                            }]}>
+                                <AppForm
+                                    initialValues={{
+                                        description: '',
+                                    }}
+                                    onSubmit={(values: Values) => submit(values)}
+                                    validationSchema={ValidationSchema}>
+                                    <View style={{ marginBottom: 5, justifyContent: "center", alignItems: "center" }}>
+                                        <AppFormField
+                                            width={Dimensions.get('screen').width / 1.2}
+                                            numberOfLines={7} multiline={true} textAlignVertical={"top"}
+                                            fieldName={"description"}
+                                            iconName={"text-short"}
+                                            placeholder={"Marketplace character Description..."} />
+                                    </View>
+                                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                                        <SubmitButton backgroundColor={Colors.paleGreen} title={"Finish"} marginBottom={1} />
+                                    </View>
+                                </AppForm>
+                            </Animated.View>
+                        </View>
+                        :
+                        <View>
+                            <CreateMarketPlaceAlias />
+                        </View>
+                    }
                 </View>
 
             }

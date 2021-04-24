@@ -20,6 +20,7 @@ const createNewMarketObj = async (character: CharacterModel, values: { name: str
     marketObj.charName = character.name;
     marketObj.raceImag = character.raceId?.image;
     marketObj.charClass = character.characterClass;
+    marketObj.downloadedTimes = 0;
     return marketObj;
 }
 

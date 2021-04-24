@@ -73,7 +73,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
         }, 2300);
       })
     } catch (err) {
-      console.log(err.message)
+      logger.log(err)
     }
   }
 

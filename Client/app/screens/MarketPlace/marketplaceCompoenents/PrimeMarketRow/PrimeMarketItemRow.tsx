@@ -12,6 +12,11 @@ interface Props {
     pickedItem: Function
 }
 
+interface Item {
+    charName: string;
+    market_id: string
+}
+
 export function PrimeMarketItemRow({ refresh, pickedItem }: Props) {
     const [loading, setLoading] = useState<boolean>(true)
     const [currentPrimeRaces, setCurrentPrimeRaces] = useState<ItemInMarketModel[]>([])
@@ -29,23 +34,24 @@ export function PrimeMarketItemRow({ refresh, pickedItem }: Props) {
                 setLoading(false)
             }
         } catch (err) {
+            setLoading(false)
             logger.log(err)
-            console.log(err)
         }
     }
 
     return (
         <View style={styles.container}>
             {loading ? <AppActivityIndicator visible={loading} /> :
-                <View >
-                    <Carousel
-                        data={currentPrimeRaces}
-                        renderItem={({ item, index }: any) => (<PrimeMarketItem openItem={(val: string) => pickedItem(val)} currentlySnapped={currentSnappedAni} index={index} item={item} />)}
-                        sliderWidth={Dimensions.get("screen").width}
-                        itemWidth={Dimensions.get("screen").width / 2.5}
-                        enableSnap
-                        onBeforeSnapToItem={(index) => setCurrentSnappedAni(index)}
-                    />
+                <View>
+                    {currentPrimeRaces.length > 0 &&
+                        <Carousel
+                            data={currentPrimeRaces}
+                            renderItem={({ item, index }: any) => (<PrimeMarketItem openItem={(val: Item) => pickedItem(val)} currentlySnapped={currentSnappedAni} index={index} item={item} />)}
+                            sliderWidth={Dimensions.get("screen").width}
+                            itemWidth={Dimensions.get("screen").width / 2.5}
+                            enableSnap
+                            onBeforeSnapToItem={(index) => setCurrentSnappedAni(index)}
+                        />}
                 </View>}
         </View>
     )

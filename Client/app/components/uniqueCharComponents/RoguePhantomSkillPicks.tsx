@@ -7,7 +7,7 @@ import JsonTools from '../../../jsonDump/toolList.json'
 import { AppText } from '../AppText';
 import { AppButton } from '../AppButton';
 import { Colors } from '../../config/colors';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import logger from '../../../utility/logger';
 interface RoguePhantomSkillPicksState {
     totalSkillToolList: string[]

@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { AppButton } from './AppButton';
 import { Colors } from '../config/colors';
 import { IconGen } from './IconGen';
+import logger from '../../utility/logger';
 
 
 export function ImageInput({ imageUri, onChangeImage, idDisabled }: any) {
@@ -42,7 +43,7 @@ export function ImageInput({ imageUri, onChangeImage, idDisabled }: any) {
             });
             if (result.cancelled === false) onChangeImage(result.uri);
         } catch (err) {
-            console.log(err.message)
+            logger.log(err)
         }
     }
 

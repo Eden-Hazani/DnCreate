@@ -16,7 +16,7 @@ import { RaceModel } from '../../models/raceModel';
 import { UserModel } from '../../models/userModel';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { Colors } from '../../config/colors';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppText } from '../../components/AppText';
 import { AnimatedHorizontalList } from '../../components/AnimatedHorizontalList';
 import NetInfo from '@react-native-community/netinfo'
@@ -148,7 +148,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
 
             this.setState({ races: newRaces, error: errorHandler(result), raceColors, loading: false })
         } catch (err) {
-            console.log(err)
             logger.log(err)
         }
     }
@@ -168,7 +167,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             const searchedRaces = await racesApi.SearchRaceList(search, raceType, user_id);
             this.setState({ races: searchedRaces.data })
         } catch (err) {
-            console.log(err)
+            logger.log(err)
         }
     }
 

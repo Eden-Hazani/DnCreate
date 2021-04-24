@@ -28,5 +28,10 @@ export enum ActionType {
     UpdateSubclass,
     CustomRaceEditing,
     addNewCharacter,
-    ReplaceExistingChar
+    ReplaceExistingChar,
+
+    ReplaceMarketClassFilterItem,
+    ChangeMarketFilterAppliedState,
+    ReplaceMarketMostDownloadedFilter,
+    ChangeMarketPlaceSearchText
 }

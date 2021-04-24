@@ -31,6 +31,9 @@ export class CustomRaceBonusAC extends Component<{ navigation: any }, CustomRace
     }
     onFocus = () => {
         const acAmount = store.getState().customRace.addedACPoints;
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (acAmount && acAmount > 0) {
             this.setState({ acAmount, activatedInterface: true })
         }
@@ -45,9 +48,6 @@ export class CustomRaceBonusAC extends Component<{ navigation: any }, CustomRace
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceBackImage");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
     render() {

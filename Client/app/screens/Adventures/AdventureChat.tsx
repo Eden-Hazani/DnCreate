@@ -58,13 +58,11 @@ export function AdventureChat({ navigation, route }: Props) {
 
     const pushMessage = (message: MessageModal) => {
         setMessageArray(oldArray => [...oldArray, message]);
-        console.log(messageArray.length)
     }
 
 
     useEffect(() => {
         if (messageArray.length > 0) {
-            console.log(messageArray.length)
             flatListRef.current?.scrollToEnd({ animated: true })
         }
     }, [currentMessage])

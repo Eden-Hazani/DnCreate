@@ -36,6 +36,9 @@ export class CustomRaceBaseTools extends Component<{ navigation: any }, CustomRa
     onFocus = () => {
         const pickedTools = store.getState().customRace.baseAddedTools;
         let clickedTools: any[] = []
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (pickedTools && pickedTools?.length > 0) {
             for (let item of pickedTools) {
                 toolsJson.tools?.forEach((pickedTool, index) => {
@@ -90,9 +93,7 @@ export class CustomRaceBaseTools extends Component<{ navigation: any }, CustomRa
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceChoiceSkills");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
+
     }
 
     removeFeatureSwitch = () => {

@@ -18,6 +18,10 @@ function validateInSystem(_id) {
     return User.findOne({ _id: { $eq: _id } });
 }
 
+function validateExistingAlias(alias) {
+    return User.findOne({ marketplaceNickname: { $eq: alias } });
+}
+
 async function getProfileImagesAsAdmin(start, end) {
     return User.find().select('profileImg').skip(parseInt(start)).limit(parseInt(end)).exec();
 }
@@ -73,5 +77,6 @@ module.exports = {
     deleteAccount,
     validateInSystem,
     findUserAsAdmin,
-    getProfileImagesAsAdmin
+    getProfileImagesAsAdmin,
+    validateExistingAlias
 }

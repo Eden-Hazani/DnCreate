@@ -21,7 +21,7 @@ import { AppText } from '../components/AppText';
 import reduxToken from '../auth/reduxToken';
 import { ActionType } from '../redux/action-type';
 import { GoogleLogin } from '../auth/GoogleLogin';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CharacterModel } from '../models/characterModel';
 
 

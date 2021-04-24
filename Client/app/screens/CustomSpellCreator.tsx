@@ -8,7 +8,7 @@ import { AppFormField } from '../components/forms/AppFormField';
 import { CustomSpellModal } from '../models/CustomSpellModal';
 import { Colors } from '../config/colors';
 import { SubmitButton } from '../components/forms/SubmitButton';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import logger from '../../utility/logger';
 
 const ValidationSchema = Yup.object().shape({

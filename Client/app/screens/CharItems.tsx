@@ -17,7 +17,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
 import { IconGen } from '../components/IconGen';
 import AuthContext from '../auth/context';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface CharItemsState {
     character: CharacterModel

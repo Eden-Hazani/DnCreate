@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CharacterModel } from "../../app/models/characterModel";
 
 const getCharacterPreviousLevels = async (character: CharacterModel) => {
@@ -21,7 +21,6 @@ const updateMarketStatusFromPreviousLevels = async (character: CharacterModel, m
             if (level) {
                 let char: CharacterModel = JSON.parse(level);
                 char.marketStatus = marketStatus
-                console.log(char.marketStatus)
                 await AsyncStorage.setItem(`current${character._id}level${i}`, JSON.stringify(char));
             }
         }

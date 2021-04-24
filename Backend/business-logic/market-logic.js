@@ -23,9 +23,46 @@ function getPrimeItems() {
 }
 
 
+async function getItemBatch(start, end, classFilters, isTopDownloaded, search) {
+    if (search) {
+        if (classFilters.length > 0) {
+            console.log(search)
+            return MarketCharItem.aggregate([
+                { "$match": { "charName": { "$regex": search, "$options": "i" } } },
+                { "$match": { 'charClass': { '$in': classFilters } } },
+                { $sort: { downloadedTimes: isTopDownloaded } }
+            ]).skip(parseInt(start)).limit(parseInt(end)).exec();
+        }
+        else {
+            return MarketCharItem.aggregate([
+                { "$match": { "charName": { "$regex": search, "$options": "i" } } },
+                { $sort: { downloadedTimes: isTopDownloaded } }
+            ]).skip(parseInt(start)).limit(parseInt(end)).exec();
+        }
+    } else {
+        if (classFilters.length > 0) {
+            return MarketCharItem.aggregate([{ "$match": { 'charClass': { '$in': classFilters } } },
+            { $sort: { downloadedTimes: isTopDownloaded } }]).skip(parseInt(start)).limit(parseInt(end)).exec();
+        }
+        else {
+            return MarketCharItem.aggregate([{ $sort: { downloadedTimes: isTopDownloaded } }]).skip(parseInt(start)).limit(parseInt(end)).exec();
+        }
+    }
+}
+
+async function addDownloadNumber(market_id) {
+    const marketItem = await MarketCharItem.findOne({ _id: { $eq: market_id } }).exec();
+    const updatedVal = parseInt(marketItem.downloadedTimes) + 1;
+    MarketCharItem.updateOne({ _id: marketItem._id }, { "$set": { "downloadedTimes": updatedVal } }).exec()
+}
+
+
+
 module.exports = {
     getPrimeItems,
     addCharToMarket,
     removeFromMarket,
-    getSingleItem
+    getSingleItem,
+    getItemBatch,
+    addDownloadNumber
 }

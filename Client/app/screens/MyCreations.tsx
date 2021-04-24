@@ -35,6 +35,7 @@ export class MyCreations extends Component<{ navigation: any }, MyCreationsState
     }
 
     onFocus = () => {
+        store.dispatch({ type: ActionType.cleanCustomRace })
         this.getRaces()
     }
 
@@ -71,7 +72,8 @@ export class MyCreations extends Component<{ navigation: any }, MyCreationsState
                     </View>
                 </Modal>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
-                    this.state.currentRaces.length === 0 ? <View style={{ paddingTop: 40 }}><AppText fontSize={25} textAlign={'center'}>You have not created any custom races, to do so please go to the creation tab.</AppText></View> :
+                    this.state.currentRaces.length === 0 ? <View style={{ paddingTop: 40 }}>
+                        <AppText fontSize={25} textAlign={'center'}>You have not created any custom races, to do so please go to the creation tab.</AppText></View> :
                         <AnimatedHorizontalList
                             loadNextRaceBatch={() => { }}
                             data={this.state.currentRaces} backDropColors={this.state.raceColors}

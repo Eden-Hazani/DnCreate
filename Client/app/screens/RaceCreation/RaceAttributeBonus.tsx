@@ -35,6 +35,9 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
     }
     onFocus = () => {
         const chooseAttPoints = store.getState().customRace.changeBaseAttributePoints?.changePoints;
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (chooseAttPoints) {
             this.setState({ activatedInterface: true })
         }
@@ -68,9 +71,6 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceAbilities");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
     render() {
         const storeItem = store.getState().customRace.abilityBonus || 0;

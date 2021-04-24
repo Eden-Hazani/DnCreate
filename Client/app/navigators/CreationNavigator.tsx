@@ -42,7 +42,7 @@ const CreationNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="BasicRaceInfo" component={BasicRaceInfo} />
         <Stack.Screen options={{ title: "" }} name="RaceAttributeBonus" component={RaceAttributeBonus} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceAbilities" component={CustomRaceAbilities} />
-        <Stack.Screen options={{ title: "" }} name="CustomRaceBaseSkillsState" component={CustomRaceBaseSkills} />
+        <Stack.Screen options={{ title: "" }} name="CustomRaceBaseSkills" component={CustomRaceBaseSkills} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceBaseTools" component={CustomRaceBaseTools} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceChoiceSkills" component={CustomRaceChoiceSkills} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceChoiceTools" component={CustomRaceChoiceTools} />

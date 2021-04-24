@@ -3,6 +3,7 @@ import { Alert, Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 
 import { Image } from 'react-native-expo-image-cache';
 import { Config } from '../../../config';
 import { Colors } from '../../config/colors';
+import useAuthContext from '../../hooks/useAuthContext';
 import { CharacterModel } from '../../models/characterModel';
 import { AppText } from '../AppText';
 import { IconGen } from '../IconGen';
@@ -27,7 +28,7 @@ const classesBackgrounds = {
 
 
 export default function CharacterHallList({ characters, openCharacter, deleteChar }: any) {
-
+    const userContext = useAuthContext()
     const scrollX = React.useRef(new Animated.Value(0)).current;
     return (
         <View style={{ height }}>
@@ -116,8 +117,9 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                                     alignSelf: 'flex-end',
                                     position: 'absolute', right: -30, bottom: -65, width: 70, height: 70
                                 }}>
-
-                                <CharacterMarketInfo index={index} character={item} />
+                                {userContext.user?._id !== 'Offline' &&
+                                    <CharacterMarketInfo index={index} character={item} />
+                                }
                             </Animated.View>
                         </View>
                     </View>

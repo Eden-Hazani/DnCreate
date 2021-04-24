@@ -9,6 +9,7 @@ const uuid = require('uuid');
 const verifyInSystem = require('../middleware/validateUserInSystem')
 const verifyLoggedIn = require('../middleware/verify-logged-in')
 const validateExistingImage = require('../middleware/validateExistingImage')
+const validateExistingAlias = require('../middleware/validateExistingAlias')
 const fs = require('fs');
 const cors = require('cors')
 const { Expo } = require("expo-server-sdk");
@@ -426,6 +427,22 @@ router.post("/googleRegister", upload.none(), verifyInSystem, async (request, re
         newUser.activated = true;
         const user = await authLogic.register(newUser);
         return response.json({ message: "Welcome to DnCreate, your account has been activated!", user: user })
+
+    } catch (err) {
+        response.status(500).send(errorHandler.getError(err));
+    }
+});
+
+
+
+router.post("/inputAlias", upload.none(), validateExistingAlias, async (request, response) => {
+    try {
+        const alias = request.body.alias;
+        const user_id = request.body.user_id
+        const userInSystem = await authLogic.validateInSystem(user_id);
+        userInSystem.marketplaceNickname = alias;
+        const newUser = await authLogic.updateUser(userInSystem);
+        return response.json(newUser)
 
     } catch (err) {
         response.status(500).send(errorHandler.getError(err));

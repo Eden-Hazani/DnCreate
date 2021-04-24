@@ -8,7 +8,7 @@ import { EquipmentModal } from '../../models/EquipmentModal';
 import { store } from '../../redux/store';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import userCharApi from '../../api/userCharApi';
 import { AppFormField } from '../../components/forms/AppFormField';
 import { AppText } from '../../components/AppText';

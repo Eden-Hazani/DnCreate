@@ -234,6 +234,7 @@
                 "I": {
                     "name": "Storm Aura",
                     "description": "When you select this path at 3rd level, you emanate a stormy, magical aura while you rage. The aura extends 10 feet from you in every direction, but not through total cover. Your aura has an effect that activates when you enter your rage, and you can activate the effect again on each of your turns as a bonus action. Choose desert, sea, or tundra. Your aura's effect depends on that chosen environment, as detailed below. You can change your environment choice whenever you gain a level in this class. If your aura's effects require a saving throw, the DC equals 8 + your proficiency bonus + your Constitution modifier.",
+                    "numberOfChoices": 1,
                     "choice": [
                         {
                             "name": "Desert",
@@ -1983,7 +1984,8 @@
                 "I": {
                     "name": "Bonus Cantrip",
                     "description": "When you choose this domain at 1st level, you gain the Light cantrip.",
-                    "specificCantrip": "Light"
+                    "specificCantrip": "Light",
+                    "notCountAgainstKnownCantrips": true
                 },
                 "II": {
                     "name": "Warding Flare",

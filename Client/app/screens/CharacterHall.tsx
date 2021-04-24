@@ -10,7 +10,7 @@ import errorHandler from '../../utility/errorHander';
 import { AppError } from '../components/AppError';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AdMobInterstitial } from 'expo-ads-admob'
 import NetInfo from '@react-native-community/netinfo'
 import { AppNoInternet } from '../components/AppNoInternet';
@@ -72,7 +72,6 @@ export default function CharacterHall({ navigation }: Props) {
             }
             return () => {
                 setIsMounted(false)
-                console.log(isMounted)
                 navigationSubscription();
                 NetUnSub()
             };
@@ -127,6 +126,7 @@ export default function CharacterHall({ navigation }: Props) {
 
     const handleDelete = async (character: CharacterModel) => {
         if (userContext.user?._id === "Offline") {
+
             for (let item of characters) {
                 if (item._id === character._id) {
                     const filteredCharacters = characters.filter(m => m._id !== item._id)

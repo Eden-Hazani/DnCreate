@@ -16,6 +16,7 @@ export class MarketCharItemModel {
         public raceImag?: string,
         public charClass?: string,
         public currentLevel?: number,
-        public charName?: string
+        public charName?: string,
+        public downloadedTimes?: number
     ) { }
 }

@@ -9,9 +9,10 @@ const saveChar = (character: CharacterModel) => {
     return client.post(`${endpoint}/saveChar`, formData);
 };
 
-const saveCharFromMarket = (character: CharacterModel) => {
+const saveCharFromMarket = (character: CharacterModel, market_id: string) => {
     let formData: FormData = new FormData();
     formData.append("charInfo", JSON.stringify(character))
+    formData.append("market_id", market_id)
     return client.post(`${endpoint}/addCharFromMarket`, formData);
 };
 

@@ -12,7 +12,7 @@ import reduxToken from './reduxToken';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
 import errorHandler from '../../utility/errorHander';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface AuthState {
@@ -23,6 +23,7 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
     login: (remainedLogged: boolean, values: any, isGoogleSignIn: boolean) => Promise<any>;
+    updateUser: (user: UserModel) => void;
     register: (values: any) => Promise<any>;
     offlineLogin: () => void;
     logout: () => void;
@@ -48,6 +49,14 @@ type LoginAction = {
     };
 };
 
+
+type UpdateUser = {
+    type: 'UPDATE_USER';
+    payload: {
+        user: UserModel;
+    };
+};
+
 type LogoutAction = {
     type: 'LOGOUT';
 };
@@ -67,6 +76,7 @@ type Action =
     | LoginAction
     | LogoutAction
     | OfflineLogin
+    | UpdateUser
 
 const initialAuthState: AuthState = {
     isAuthenticated: false,
@@ -99,6 +109,14 @@ const reducer = (state: AuthState, action: Action): AuthState => {
             };
         }
 
+        case 'UPDATE_USER': {
+            const { user } = action.payload;
+            return {
+                ...state,
+                isAuthenticated: true,
+                user,
+            };
+        }
 
         case 'OFFLINELOGIN': {
             const { user } = action.payload;
@@ -129,6 +147,7 @@ const AuthContext = createContext<AuthContextValue>({
     register: () => Promise.resolve(),
     offlineLogin: () => { },
     logout: () => { },
+    updateUser: () => { },
 });
 
 
@@ -151,6 +170,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             errorHandler(err.request)
             return false
         })
+    }
+
+    const updateUser = (userValue: UserModel) => {
+        store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: userValue })
+        dispatch({ type: 'UPDATE_USER', payload: { user: userValue } })
     }
 
     const register = async (values: any) => {
@@ -233,6 +257,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                 register,
                 offlineLogin,
                 logout,
+                updateUser
             }}
         >
             {children}

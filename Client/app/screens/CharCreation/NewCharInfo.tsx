@@ -14,7 +14,7 @@ import { SubmitButton } from '../../components/forms/SubmitButton';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
 import { AppConfirmation } from '../../components/AppConfirmation';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import NumberScroll from '../../components/NumberScroll';
 import { Switch } from 'react-native-gesture-handler';

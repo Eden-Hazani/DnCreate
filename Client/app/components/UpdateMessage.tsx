@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Linking, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
 import { Config } from '../../config';
 import { Colors } from '../config/colors';
 import { AppButton } from './AppButton';
 import { AppText } from './AppText';
+import * as Linking from 'expo-linking';
 
 export class UpdateMessage extends Component<{ close: any }> {
     render() {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 1.9.44</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 2.0</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
@@ -20,15 +21,16 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={20} color={Colors.berries}>For donating and contributing to the future of DnCreate</AppText>
                 </View>
                 <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure chat!</AppText>
-                    <Image uri={`${Config.serverUrl}/assets/misc/diceRollsD20/diceRollAni.gif`} style={{ height: 150, width: 150 }} />
-                    <AppText textAlign={'center'} fontSize={25} >You can now chat in app with your entire adventure party!</AppText>
-                    <AppText textAlign={'center'} fontSize={25} >This feature is reserved for donating members of DnCreate (Only the adventure DM is required to be a donating member)</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.paleGreen}>The Marketplace!</AppText>
+                    <Image uri={`${Config.serverUrl}/assets/specificDragons/marketPlaceDragon1.png`} style={{ height: 150, width: 150 }} />
+                    <AppText textAlign={'center'} fontSize={25} >After a long development phase, the marketplace is finally out!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >Everyone on DnCreate can now not only create things but share them as well!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >From the character hall you can now upload your character to the market and offer it to the DnCreate community</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >Share builds, races, unique backstories and more!</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Adventure mode now features the Image Gallery!</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>You as the DM or as a participating member can upload any images you want into your adventure for your fellow adventurers to see!</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>share maps, monsters, stats, landscapes, or just memes with your entire party</AppText>
+                    <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Major bug fixes and improvements!</AppText>
+                    <AppText textAlign={'center'} fontSize={20}>2.0 includes a major update to DnCreates infrastructure, many of the glitches and bugs are now gone!</AppText>
                 </View>
 
                 <View style={{ padding: 15 }}>

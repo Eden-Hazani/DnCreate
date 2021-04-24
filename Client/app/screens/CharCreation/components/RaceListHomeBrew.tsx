@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component, useState } from 'react';
 import { View, StyleSheet, Switch } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';

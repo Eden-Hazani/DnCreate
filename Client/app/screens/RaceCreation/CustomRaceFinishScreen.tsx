@@ -61,7 +61,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                 })
             }
         })
-        AdMobRewarded.addEventListener("rewardedVideoDidRewardUser", () => {
+        AdMobRewarded.addEventListener("rewardedVideoUserDidEarnReward", () => {
             if (!this.state.spamGuard)
                 this.setState({ requestingAdConfirm: false, spamGuard: true }, () => {
                     const customRace = { ...store.getState().customRace };

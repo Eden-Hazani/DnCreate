@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal } from 'react-native';
 import InformationScroller from '../../../components/InformationScroller';
 import marketPlaceInfo from '../../../../jsonDump/marketPlaceInformation.json';
 import { firstMarketPlaceUse, setFirstMarketPlaceUse } from '../functions/storageFunctions';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -14,7 +14,6 @@ export function WelcomeToMarket() {
     }, [])
 
     const checkOpenStatus = async () => {
-        await AsyncStorage.removeItem('isMarketPlaceFirstUse')
         setIsOpen(await firstMarketPlaceUse())
     }
 

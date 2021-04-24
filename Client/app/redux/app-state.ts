@@ -1,8 +1,11 @@
 import { AdventureModel } from "../models/AdventureModel";
 import { CharacterModel } from "../models/characterModel";
+import { MarketFilterModal } from "../models/MarketFilterModal";
 import { RaceModel } from "../models/raceModel";
 import { SubClassModal } from "../models/SubClassModal";
 import { UserModel } from "../models/userModel";
+
+
 
 export class AppState {
     public nonUser: boolean;
@@ -18,10 +21,14 @@ export class AppState {
     public customRaceEditing: boolean
     public customRace: RaceModel
     public customSubClass: SubClassModal
+    public marketPlaceFilters: MarketFilterModal
+    public marketPlaceSearchText: string
     public constructor() {
         this.colorScheme = false,
             this.nonUser = false;
         this.beforeRegisterChar = new CharacterModel();
+        this.marketPlaceFilters = { classFilters: [], topDownLoaded: 1, isApplied: false }
+        this.marketPlaceSearchText = '';
         this.character = new CharacterModel();
         this.characters = [];
         this.firstLoginAd = true;

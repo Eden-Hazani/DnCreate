@@ -29,6 +29,9 @@ const userSchema = mongoose.Schema({
     },
     isAdmin: {
         type: Boolean
+    },
+    marketplaceNickname: {
+        type: String
     }
 
 }, {

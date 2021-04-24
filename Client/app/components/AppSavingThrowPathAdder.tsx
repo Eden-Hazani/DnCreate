@@ -9,7 +9,7 @@ import { store } from '../redux/store';
 import { AppText } from './AppText';
 import jsonSkills from '../../jsonDump/skillList.json'
 import { generateSavingThrowsPathConditions } from '../classFeatures/generateSavingThrowsPathConditions';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AppSavingThrowPathAdderState {
     savingThrowsClicked: boolean[]

@@ -27,7 +27,7 @@ export class ChangeMaxHp extends Component<{ currentMax: any, sendNewMax: any, c
         const character = { ...this.state.character };
         character.maxHp = this.state.maxHp;
         this.setState({ character }, () => {
-            userCharApi.updateChar(this.state.character).then(() => this.props.sendNewMax(this.state.maxHp))
+            userCharApi.updateChar(this.state.character).then(() => this.props.sendNewMax())
         })
     }
     render() {

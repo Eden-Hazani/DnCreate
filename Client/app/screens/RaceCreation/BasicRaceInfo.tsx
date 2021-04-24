@@ -60,6 +60,7 @@ interface BasicRaceInfoState {
 }
 
 export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoState>{
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -67,8 +68,15 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
             customRace: store.getState().customRaceEditing ? store.getState().customRace : new RaceModel(),
             confirmed: false,
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+
+    onFocus = () => {
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
+    }
 
     confirmAndContinue = (values: any) => {
         const customRace = { ...this.state.customRace };
@@ -89,9 +97,6 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
         setTimeout(() => {
             this.props.navigation.navigate("RaceAttributeBonus");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
 

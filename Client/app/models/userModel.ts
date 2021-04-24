@@ -6,6 +6,7 @@ export class UserModel {
         public profileImg?: string,
         public activated?: boolean,
         public premium?: boolean,
+        public marketplaceNickname?: string,
         public expoPushToken?: string) {
     }
 }

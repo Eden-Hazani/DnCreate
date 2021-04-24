@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
 import * as Yup from 'yup';
 import { Config } from '../../../config';

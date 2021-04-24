@@ -22,7 +22,7 @@ import Slider from '@react-native-community/slider';
 import { AppConfirmation } from '../components/AppConfirmation';
 import { spellLevelReadingChanger } from './charOptions/helperFunctions/spellLevelReadingChanger';
 import AuthContext from '../auth/context';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { charCanSpellCast } from './charOptions/helperFunctions/charCanSpellCast';
 import logger from '../../utility/logger';
 
@@ -104,8 +104,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             }
             return newSpells
         } catch (err) {
-            console.log(err)
-            // logger.log(new Error(err))
+            logger.log(err)
         }
     }
     loadSpells = (shownSpells: any[]) => {
@@ -485,7 +484,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                         </View>
                         <Modal visible={this.state.pickSpellModal} >
                             {this.state.pickSpellModal &&
-                                <View style={{ flex: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: Colors.pageBackground }}>
                                     {this.state.confirmed ?
                                         <AppConfirmation visible={this.state.confirmed} />
                                         :

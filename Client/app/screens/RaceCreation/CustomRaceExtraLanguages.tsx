@@ -37,6 +37,9 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
         const customRace = { ...this.state.customRace };
         const languages = store.getState().customRace.languages;
         const extraLanguages = store.getState().customRace.extraLanguages;
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (languages && languages?.length > 0) {
             customRace.languages = languages
             this.setState({ customRace, activatedInterfaceBaseLanguages: true })
@@ -84,9 +87,6 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceBaseWeaponProf");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
     removeFeatureSwitch = () => {

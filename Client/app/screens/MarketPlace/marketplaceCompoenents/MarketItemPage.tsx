@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { View, StyleSheet, Modal } from 'react-native';
+import { View, StyleSheet, Modal, ScrollView } from 'react-native';
 import logger from '../../../../utility/logger';
 import { AppActivityIndicator } from '../../../components/AppActivityIndicator';
 import { AppButton } from '../../../components/AppButton';
@@ -20,24 +20,29 @@ import { CharacterModel } from '../../../models/characterModel';
 
 
 interface Props {
-    item_id: string
+    item: Item
     close: Function
 }
 
-export function MarketItemPage({ item_id, close }: Props) {
+interface Item {
+    charName: string;
+    market_id: string
+}
+
+export function MarketItemPage({ item, close }: Props) {
     const [loading, setLoading] = useState<boolean>(true)
     const [marketItem, setMarketItem] = useState<MarketCharItemModel | null>(null)
-    const [canDownload, setCanDownload] = useState<boolean>(false)
+    const [canDownload, setCanDownload] = useState<string>('')
 
     const userContext = useAuthContext();
 
     useEffect(() => {
-        loadItem().then(() => setCanDownload(checkMarketItemValidity(item_id))).finally(() => setLoading(false))
+        loadItem().then(() => setCanDownload(checkMarketItemValidity(item.market_id, item.charName))).finally(() => setLoading(false))
     }, [])
 
     const loadItem = async () => {
         try {
-            const result = await marketApi.getSingleMarketItem(item_id);
+            const result = await marketApi.getSingleMarketItem(item.market_id);
             if (result.data)
                 setMarketItem(result.data)
         } catch (err) {
@@ -50,15 +55,14 @@ export function MarketItemPage({ item_id, close }: Props) {
             if (marketItem?.currentLevelChar) {
                 setLoading(true)
                 const newChar = implantIdIntoSavedChar(marketItem.currentLevelChar, userContext.user?._id || '')
-                const result = await userCharApi.saveCharFromMarket(newChar);
-                console.log(result.data)
+                const result = await userCharApi.saveCharFromMarket(newChar, marketItem._id || '');
                 const savedChar: CharacterModel = result.data as any
                 store.dispatch({ type: ActionType.addNewCharacter, payload: savedChar });
                 if (marketItem.characterLevelList && marketItem.characterLevelList.length > 0) {
                     addAllCharLevelsToStorage(marketItem.characterLevelList, savedChar._id || '', savedChar.user_id || '')
                 }
                 saveCharArmaments(savedChar._id, marketItem.weaponItems, marketItem.armorItems, marketItem.shieldItems)
-                setCanDownload(checkMarketItemValidity(item_id))
+                setCanDownload(checkMarketItemValidity(item.market_id, item.charName))
                 setLoading(false)
             }
         } catch (err) {
@@ -71,31 +75,35 @@ export function MarketItemPage({ item_id, close }: Props) {
         <Modal visible={true} animationType="slide">
             <View style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 {loading ? <AppActivityIndicator visible={loading} /> :
-                    <View>
+                    <ScrollView>
                         <View style={styles.upperBlock}>
                             <View style={styles.leftBlock}>
                                 <Image uri={`${Config.serverUrl}/assets/races/${marketItem?.raceImag}`} style={{ height: 120, width: 120 }} />
                                 <View style={{ paddingTop: 20 }}>
                                     <AppText fontSize={20} color={Colors.pinkishSilver}>{marketItem?.charName}</AppText>
-                                    <AppText>Class: {marketItem?.charClass}</AppText>
-                                    <AppText>Race: {marketItem?.race}</AppText>
-                                    <AppText>Current Level: {marketItem?.currentLevel}</AppText>
-                                    <AppText>{marketItem?.charName}</AppText>
+                                    <AppText fontSize={18}>Class: {marketItem?.charClass}</AppText>
+                                    <AppText fontSize={18}>Race: {marketItem?.race}</AppText>
+                                    <AppText fontSize={18}>Current Level: {marketItem?.currentLevel}</AppText>
+                                    <View style={{ paddingTop: 15 }}>
+                                        <AppText fontSize={18}>Downloads: {marketItem?.downloadedTimes}</AppText>
+                                    </View>
                                 </View>
                             </View>
                             <View style={styles.rightBlock}>
-                                <View>
+                                <View style={{ paddingTop: 15, paddingBottom: 15 }}>
                                     <AppText fontSize={18} color={Colors.pinkishSilver}>About</AppText>
                                     <AppText>{marketItem?.description}</AppText>
                                 </View>
-                                {marketItem?.currentLevelChar?.backStory && <View>
+                                {marketItem?.currentLevelChar?.backStory && <View style={{ paddingTop: 15, paddingBottom: 15 }}>
                                     <AppText fontSize={18} color={Colors.pinkishSilver}>Backstory</AppText>
                                     <AppText>{marketItem?.currentLevelChar?.backStory}</AppText>
                                 </View>}
                             </View>
                         </View>
-                        <MarketItemPageButtons addCharacter={() => saveCharInfo()} closeModel={() => close()} canDownload={canDownload} />
-                    </View>
+                        <View style={{ marginBottom: 30 }}>
+                            <MarketItemPageButtons addCharacter={() => saveCharInfo()} closeModel={() => close()} canDownload={canDownload} />
+                        </View>
+                    </ScrollView>
                 }
             </View>
         </Modal>
@@ -105,7 +113,7 @@ export function MarketItemPage({ item_id, close }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     rightBlock: {
         flex: .5

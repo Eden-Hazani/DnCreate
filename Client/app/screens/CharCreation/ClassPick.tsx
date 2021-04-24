@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { View, StyleSheet, Linking, FlatList, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions, Animated, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import errorHandler from '../../../utility/errorHander';
@@ -15,7 +15,7 @@ import { CharacterModel } from '../../models/characterModel';
 import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, CacheManager } from 'react-native-expo-image-cache';
 import { Config } from '../../../config';
 import { IconGen } from '../../components/IconGen';

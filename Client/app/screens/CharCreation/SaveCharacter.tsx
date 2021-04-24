@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Linking, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { AppText } from '../../components/AppText';
 import LottieView from 'lottie-react-native';
 import { Colors } from '../../config/colors';
@@ -10,7 +10,7 @@ import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { ActionType } from '../../redux/action-type';
 import AuthContext from '../../auth/context';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as StoreReview from 'expo-store-review';
 
 interface SaveCharacterState {
@@ -36,6 +36,7 @@ export class SaveCharacter extends Component<{ navigation: any }, SaveCharacterS
 
     async componentDidMount() {
         this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo);
+        store.dispatch({ type: ActionType.ReplaceExistingChar, payload: { charIndex: store.getState().characters.length - 1, character: this.state.characterInfo } })
     }
 
     updateOfflineCharacter = async () => {

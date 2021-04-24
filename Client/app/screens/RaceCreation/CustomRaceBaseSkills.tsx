@@ -36,6 +36,9 @@ export class CustomRaceBaseSkills extends Component<{ navigation: any }, CustomR
     onFocus = () => {
         const pickedSkills = store.getState().customRace.baseAddedSkills;
         let clickedSkills: any[] = []
+        if (this.state.confirmed) {
+            this.setState({ confirmed: false })
+        }
         if (pickedSkills && pickedSkills?.length > 0) {
             for (let item of pickedSkills) {
                 skillsJson.skillList?.forEach((pickedSkill, index) => {
@@ -90,9 +93,6 @@ export class CustomRaceBaseSkills extends Component<{ navigation: any }, CustomR
         setTimeout(() => {
             this.props.navigation.navigate("CustomRaceBaseTools");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
     removeFeatureSwitch = () => {

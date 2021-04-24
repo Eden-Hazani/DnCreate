@@ -37,7 +37,6 @@ export function setTotalKnownSpells(character: CharacterModel) {
             knownSpells = cha + (Math.floor(level / 2));
             break;
         case charClass === "Cleric":
-            console.log('wiz', wiz + level)
             knownSpells = wiz + level;
             break;
     }

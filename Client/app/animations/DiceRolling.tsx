@@ -5,8 +5,8 @@ import { Config } from '../../config';
 import { AppText } from '../components/AppText';
 import { Colors } from '../config/colors';
 import LottieView from 'lottie-react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 
+const { height } = Dimensions.get('window')
 interface DiceRollingState {
     currentImages: string[]
     showResults: boolean
@@ -40,7 +40,7 @@ const test = (diceAmount: number, diceType: number) => {
     return { currentImages, animatedXYVal }
 }
 
-export class DiceRolling extends Component<{ showResults: boolean, isClosedTimer: boolean, diceAmount: number, diceType: number, rollValue: number, close: any, returnResultArray: any }, DiceRollingState>{
+export class DiceRolling extends Component<{ scrollHandle: number, showResults: boolean, isClosedTimer: boolean, diceAmount: number, diceType: number, rollValue: number, close: any, returnResultArray: any }, DiceRollingState>{
     constructor(props: any) {
         super(props)
         this.state = {
@@ -149,135 +149,141 @@ export class DiceRolling extends Component<{ showResults: boolean, isClosedTimer
     }
     render() {
         return (
-            <TouchableOpacity style={styles.container} onPress={() => {
-                if (this.state.showResults) {
-                    this.props.close()
-                }
-            }}>
-                <Animated.View style={{ justifyContent: "center", alignItems: "center" }}>
-                    {this.state.currentImages.map((item, index) => {
-                        if (index === 0 && this.state.currentImages.length === 1) {
-                            return <Animated.View key={index} style={[this.state.animatedXYVal[index].getLayout(), {
-                                width: 150,
-                                height: 150,
-                                transform: [
-                                    {
-                                        rotate: this.state.animatedVal.interpolate({
-                                            inputRange: [0, 1, 1],
-                                            outputRange: ['0deg', '360deg', '0deg']
-                                        })
-                                    }
-                                ]
-                            }]}>
-                                <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
-                            </Animated.View>
-                        }
-                        if (index === 0 && this.state.currentImages.length > 1) {
-                            return <View key={index} style={{ flexDirection: 'row' }}>
-                                <Animated.View style={[this.state.animatedXYVal[index].getLayout(), {
-                                    width: 150,
-                                    height: 150,
-                                    transform: [
-                                        {
-                                            rotate: this.state.animatedVal.interpolate({
-                                                inputRange: [0, 1, 1],
-                                                outputRange: ['0deg', '360deg', '0deg']
-                                            })
-                                        }
-                                    ]
-                                }]}>
-                                    <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
-                                </Animated.View>
-                                <Animated.View style={[this.state.animatedXYVal[index + 1].getLayout(), {
-                                    width: 150,
-                                    height: 150,
-                                    transform: [
-                                        {
-                                            rotate: this.state.animatedVal.interpolate({
-                                                inputRange: [0, 1, 1],
-                                                outputRange: ['0deg', '360deg', '0deg']
-                                            })
-                                        }
-                                    ]
-                                }]}>
-                                    <Image uri={this.state.currentImages[index + 1]} style={{ height: 150, width: 150 }} />
-                                </Animated.View>
-                            </View>
-                        }
-                        if (index > 1 && index % 2 !== 0) {
-                            return <View key={index} style={{ flexDirection: 'row' }}>
-                                <Animated.View style={[this.state.animatedXYVal[index - 1].getLayout(), {
-                                    width: 150,
-                                    height: 150,
-                                    transform: [
-                                        {
-                                            rotate: this.state.animatedVal.interpolate({
-                                                inputRange: [0, 1, 1],
-                                                outputRange: ['0deg', '360deg', '0deg']
-                                            })
-                                        }
-                                    ]
-                                }]}>
-                                    <Image uri={this.state.currentImages[index - 1]} style={{ height: 150, width: 150 }} />
-                                </Animated.View>
-                                <Animated.View style={[this.state.animatedXYVal[index].getLayout(), {
-                                    width: 150,
-                                    height: 150,
-                                    transform: [
-                                        {
-                                            rotate: this.state.animatedVal.interpolate({
-                                                inputRange: [0, 1, 1],
-                                                outputRange: ['0deg', '360deg', '0deg']
-                                            })
-                                        }
-                                    ]
-                                }]}>
-                                    <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
-                                </Animated.View>
-                            </View>
-                        }
-                        if (index === this.state.currentImages.length - 1 && index % 2 === 0) {
-                            return <Animated.View key={index} style={[this.state.animatedXYVal[index].getLayout(), {
-                                width: 150,
-                                height: 150,
-                                transform: [
-                                    {
-                                        rotate: this.state.animatedVal.interpolate({
-                                            inputRange: [0, 1, 1],
-                                            outputRange: ['0deg', '360deg', '0deg']
-                                        })
-                                    }
-                                ]
-                            }]}>
-                                <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
-                            </Animated.View>
-                        }
-                    })}
-                </Animated.View>
-                {this.state.showResults && this.props.showResults && <Animated.View style={{
-                    position: "absolute", top: this.props.diceAmount > 2 ? Dimensions.get('window').height / 3 : Dimensions.get('window').height / 5,
-                    alignSelf: "center", transform: [{
-                        scale: this.state.animatedPopVal.interpolate({
-                            inputRange: [0, 0.5, 1],
-                            outputRange: [0, 1.5, 1]
-                        })
-                    }]
+            <>
+                <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 4 }]}></View>
+                <TouchableOpacity style={[styles.container, {
+                    zIndex: 10, position: 'absolute', top: this.props.scrollHandle + (this.props.diceAmount > 2 ? 50 : height / 3),
+                    left: 0, right: 0, bottom: 0
+                }]} onPress={() => {
+                    if (this.state.showResults) {
+                        this.props.close()
+                    }
                 }}>
-                    <View style={{
-                        backgroundColor: Colors.softWhiteInDarkMode, padding: 10, borderRadius: 15, flexDirection: "row",
+                    <Animated.View style={{ justifyContent: "center", alignItems: "center" }}>
+                        {this.state.currentImages.map((item, index) => {
+                            if (index === 0 && this.state.currentImages.length === 1) {
+                                return <Animated.View key={index} style={[this.state.animatedXYVal[index].getLayout(), {
+                                    width: 150,
+                                    height: 150,
+                                    transform: [
+                                        {
+                                            rotate: this.state.animatedVal.interpolate({
+                                                inputRange: [0, 1, 1],
+                                                outputRange: ['0deg', '360deg', '0deg']
+                                            })
+                                        }
+                                    ]
+                                }]}>
+                                    <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
+                                </Animated.View>
+                            }
+                            if (index === 0 && this.state.currentImages.length > 1) {
+                                return <View key={index} style={{ flexDirection: 'row' }}>
+                                    <Animated.View style={[this.state.animatedXYVal[index].getLayout(), {
+                                        width: 150,
+                                        height: 150,
+                                        transform: [
+                                            {
+                                                rotate: this.state.animatedVal.interpolate({
+                                                    inputRange: [0, 1, 1],
+                                                    outputRange: ['0deg', '360deg', '0deg']
+                                                })
+                                            }
+                                        ]
+                                    }]}>
+                                        <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
+                                    </Animated.View>
+                                    <Animated.View style={[this.state.animatedXYVal[index + 1].getLayout(), {
+                                        width: 150,
+                                        height: 150,
+                                        transform: [
+                                            {
+                                                rotate: this.state.animatedVal.interpolate({
+                                                    inputRange: [0, 1, 1],
+                                                    outputRange: ['0deg', '360deg', '0deg']
+                                                })
+                                            }
+                                        ]
+                                    }]}>
+                                        <Image uri={this.state.currentImages[index + 1]} style={{ height: 150, width: 150 }} />
+                                    </Animated.View>
+                                </View>
+                            }
+                            if (index > 1 && index % 2 !== 0) {
+                                return <View key={index} style={{ flexDirection: 'row' }}>
+                                    <Animated.View style={[this.state.animatedXYVal[index - 1].getLayout(), {
+                                        width: 150,
+                                        height: 150,
+                                        transform: [
+                                            {
+                                                rotate: this.state.animatedVal.interpolate({
+                                                    inputRange: [0, 1, 1],
+                                                    outputRange: ['0deg', '360deg', '0deg']
+                                                })
+                                            }
+                                        ]
+                                    }]}>
+                                        <Image uri={this.state.currentImages[index - 1]} style={{ height: 150, width: 150 }} />
+                                    </Animated.View>
+                                    <Animated.View style={[this.state.animatedXYVal[index].getLayout(), {
+                                        width: 150,
+                                        height: 150,
+                                        transform: [
+                                            {
+                                                rotate: this.state.animatedVal.interpolate({
+                                                    inputRange: [0, 1, 1],
+                                                    outputRange: ['0deg', '360deg', '0deg']
+                                                })
+                                            }
+                                        ]
+                                    }]}>
+                                        <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
+                                    </Animated.View>
+                                </View>
+                            }
+                            if (index === this.state.currentImages.length - 1 && index % 2 === 0) {
+                                return <Animated.View key={index} style={[this.state.animatedXYVal[index].getLayout(), {
+                                    width: 150,
+                                    height: 150,
+                                    transform: [
+                                        {
+                                            rotate: this.state.animatedVal.interpolate({
+                                                inputRange: [0, 1, 1],
+                                                outputRange: ['0deg', '360deg', '0deg']
+                                            })
+                                        }
+                                    ]
+                                }]}>
+                                    <Image uri={this.state.currentImages[index]} style={{ height: 150, width: 150 }} />
+                                </Animated.View>
+                            }
+                        })}
+                    </Animated.View>
+                    {this.state.showResults && this.props.showResults && <Animated.View style={{
+                        position: "absolute", top: this.props.diceAmount > 2 ? Dimensions.get('window').height / 3 : Dimensions.get('window').height / 5,
+                        alignSelf: "center", transform: [{
+                            scale: this.state.animatedPopVal.interpolate({
+                                inputRange: [0, 0.5, 1],
+                                outputRange: [0, 1.5, 1]
+                            })
+                        }]
                     }}>
-                        <AppText fontSize={35}
-                            color={this.diceColor()} >{this.state.diceResult.mainDice}</AppText>
-                        <AppText fontSize={35} color={Colors.totalWhite}>({this.props.rollValue >= 0 ? '+' : '-'}{this.props.rollValue})</AppText>
-                        <AppText fontSize={35} color={Colors.totalWhite}> | {this.state.diceResult.result <= 0 && '-'}{this.state.diceResult.result}</AppText>
-                    </View>
-                    <AppText color={Colors.totalWhite} fontSize={16} textAlign={'center'}>Press To Close</AppText>
-                </Animated.View>}
-                {this.props.diceType === 20 && this.state.diceResultArray.includes(20) &&
-                    <View >
-                        <LottieView style={{ zIndex: 1, width: "100%" }} autoPlay source={require('../../assets/lottieAnimations/confeetiAnimation.json')} />
-                    </View>}
-            </TouchableOpacity>
+                        <View style={{
+                            backgroundColor: Colors.softWhiteInDarkMode, padding: 10, borderRadius: 15, flexDirection: "row",
+                        }}>
+                            <AppText fontSize={35}
+                                color={this.diceColor()} >{this.state.diceResult.mainDice}</AppText>
+                            <AppText fontSize={35} color={Colors.totalWhite}>({this.props.rollValue >= 0 ? '+' : '-'}{this.props.rollValue})</AppText>
+                            <AppText fontSize={35} color={Colors.totalWhite}> | {this.state.diceResult.result <= 0 && '-'}{this.state.diceResult.result}</AppText>
+                        </View>
+                        <AppText color={Colors.totalWhite} fontSize={16} textAlign={'center'}>Press To Close</AppText>
+                    </Animated.View>}
+                    {this.props.diceType === 20 && this.state.diceResultArray.includes(20) &&
+                        <View >
+                            <LottieView style={{ zIndex: 1, width: "100%" }} autoPlay source={require('../../assets/lottieAnimations/confeetiAnimation.json')} />
+                        </View>}
+                </TouchableOpacity>
+            </>
         )
     }
 }
@@ -285,6 +291,7 @@ export class DiceRolling extends Component<{ showResults: boolean, isClosedTimer
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        zIndex: 10
     }
 });

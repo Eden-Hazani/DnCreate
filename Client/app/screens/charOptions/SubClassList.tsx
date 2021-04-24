@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { SearchBar } from 'react-native-elements';
@@ -31,7 +31,9 @@ export class SubClassList extends Component<{ baseClass: string, baseSubClassLis
         }
     }
     componentDidMount() {
-        this.loadNextRaceBatch(0, 10)
+        if (this.context.user._id !== "Offline") {
+            this.loadNextRaceBatch(0, 10)
+        }
     }
     loadNextRaceBatch = async (start: number, end: number) => {
         try {
@@ -78,15 +80,17 @@ export class SubClassList extends Component<{ baseClass: string, baseSubClassLis
     render() {
         return (
             <View style={styles.container}>
-                <SearchBar
-                    searchIcon={false}
-                    containerStyle={{ backgroundColor: Colors.pageBackground, borderRadius: 150 }}
-                    inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
-                    lightTheme={Colors.pageBackground === "#121212" ? false : true}
-                    placeholder="Search For Subclass"
-                    onChangeText={this.updateSearch}
-                    value={this.state.search}
-                />
+                {this.context.user._id !== 'Offline' &&
+                    <SearchBar
+                        searchIcon={false}
+                        containerStyle={{ backgroundColor: Colors.pageBackground, borderRadius: 150 }}
+                        inputContainerStyle={{ backgroundColor: Colors.pageBackground }}
+                        lightTheme={Colors.pageBackground === "#121212" ? false : true}
+                        placeholder="Search For Subclass"
+                        onChangeText={this.updateSearch}
+                        value={this.state.search}
+                    />
+                }
                 {(this.state.pathChosen && this.state.pathChosen.name && this.props.pathClicked.includes(true)) &&
                     <View style={{ justifyContent: "center", alignItems: "center" }}>
                         <TouchableOpacity
@@ -112,7 +116,9 @@ export class SubClassList extends Component<{ baseClass: string, baseSubClassLis
                         contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
                         onEndReachedThreshold={2}
                         onEndReached={() => {
-                            this.loadNextRaceBatch(this.state.currentLoaded, 10)
+                            if (this.context.user._id !== "Offline") {
+                                this.loadNextRaceBatch(this.state.currentLoaded, 10)
+                            }
                         }}
                         keyExtractor={(item: any, index: any) => index.toString()}
                         data={this.state.data}

@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-community/async-storage"
 import authApi from "../../app/api/authApi"
 import handleToken from "../../app/auth/TokenHandler"
 import { Colors } from "../../app/config/colors"
@@ -7,11 +6,14 @@ import { ActionType } from "../../app/redux/action-type"
 import { store } from "../../app/redux/store"
 import errorHandler from "../errorHander"
 import * as Font from 'expo-font'
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { CacheManager } from "react-native-expo-image-cache"
+import { Config } from "../../config"
 
 const startUp = async () => {
     await loadColors();
-    // await checkLoginStatus();
     await loadFonts();
+    await loadStartGif();
     return { fontsLoaded: true, AppMainLoadAnimation: true }
 }
 
@@ -19,6 +21,11 @@ const startUp = async () => {
 const loadFonts = async () => {
     Font.loadAsync({ 'KumbhSans-Light': require('../../assets/fonts/KumbhSans-Light.ttf') })
 }
+
+const loadStartGif = async () => {
+    await CacheManager.get(`${Config.serverUrl}/assets/core/startLoadGif.gif`, {}).getPath()
+}
+
 
 
 const loadColors = async () => {

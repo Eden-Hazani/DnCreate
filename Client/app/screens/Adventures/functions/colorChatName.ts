@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const setColorName = async (sender_id: string) => {
     const currentColor = await AsyncStorage.getItem(`${sender_id}color`);

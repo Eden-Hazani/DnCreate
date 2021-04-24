@@ -18,6 +18,7 @@ interface CustomRaceAbilitiesState {
 }
 
 export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRaceAbilitiesState>{
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -25,6 +26,12 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
             modalTruthList: [],
             customRace: store.getState().customRace
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+
+    }
+
+    onFocus = () => {
+        this.setState({ confirmed: false })
     }
 
     addFeature = () => {
@@ -62,11 +69,8 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: storeItem })
         })
         setTimeout(() => {
-            this.props.navigation.navigate("CustomRaceBaseSkillsState");
+            this.props.navigation.navigate("CustomRaceBaseSkills");
         }, 800);
-        setTimeout(() => {
-            this.setState({ confirmed: false })
-        }, 1100);
     }
 
     render() {

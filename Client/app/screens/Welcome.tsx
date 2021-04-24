@@ -9,7 +9,7 @@ import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
 import { AppButton } from '../components/AppButton';
 import { store } from '../redux/store';
 import { ActionType } from '../redux/action-type';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import Carousel from 'react-native-snap-carousel';
 import AuthContext from '../auth/context';

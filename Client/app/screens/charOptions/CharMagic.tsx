@@ -7,7 +7,7 @@ import { CharacterModel } from '../../models/characterModel';
 import { CharMagicLists } from './CharMagicLists';
 import { checkAvailableKnownSpells } from './helperFunctions/cheakSpellSlots';
 import * as SpellCastingJson from '../../../jsonDump/spellCastingScores.json'
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { spellCharMagicRenaming } from './helperFunctions/spellCharMagicRenaming';
 import { hpColors } from '../../../utility/hpColors';
 import { AppButton } from '../../components/AppButton';

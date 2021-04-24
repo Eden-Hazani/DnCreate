@@ -1,5 +1,6 @@
 const express = require("express");
 const userLogic = require('../business-logic/user-logic')
+const marketLogic = require('../business-logic/market-logic')
 const router = express.Router();
 const verifyLogged = require('../middleware/verify-logged-in');
 const validateCharInSystem = require('../middleware/validateCharInSystem');
@@ -126,12 +127,13 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
 router.post("/addCharFromMarket", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
     try {
         const char = new Character(JSON.parse(request.body.charInfo));
-        console.log(char)
+        const market_id = request.body.market_id
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)
         }
         const addedChar = await userLogic.addCharacter(char);
+        marketLogic.addDownloadNumber(market_id)
         response.json(addedChar);
     } catch (err) {
         response.status(500).send(err.message);

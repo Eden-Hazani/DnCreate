@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, FlatList, Alert, Modal, Dimensions, TouchableOpacity } from 'react-native';
 import { Config } from '../../../../config';

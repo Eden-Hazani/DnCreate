@@ -60,7 +60,6 @@ export function reduce(currentState: AppState | undefined = initialState, action
 
         case ActionType.ReplaceExistingChar:
             const { charIndex, character } = action.payload;
-            console.log(character.maxHp)
             newState.characters[charIndex] = character;
             break;
 
@@ -97,12 +96,14 @@ export function reduce(currentState: AppState | undefined = initialState, action
                 newState.participatingAdv.push(adv)
             }
             break;
+
         case ActionType.ClearParticipatingAdv:
             newState.participatingAdv = [];
             for (let adv of action.payload) {
                 newState.participatingAdv.push(adv)
             }
             break;
+
         case ActionType.ReplaceLeadAdventure:
             const newLeadingAdv = newState.leadingAdv.map((item, index) => {
                 if (item._id === action.payload._id) {
@@ -113,6 +114,7 @@ export function reduce(currentState: AppState | undefined = initialState, action
             })
             newState.leadingAdv = newLeadingAdv;
             break;
+
         case ActionType.ReplaceParticipateAdventure:
             const newParticipateAdv = newState.participatingAdv.map((item, index) => {
                 if (item._id === action.payload._id) {
@@ -129,37 +131,63 @@ export function reduce(currentState: AppState | undefined = initialState, action
                 newState.leadingAdv.push(adv)
             }
             break;
+
         case ActionType.ClearLeadingAdv:
             newState.leadingAdv = [];
             for (let adv of action.payload) {
                 newState.leadingAdv.push(adv)
             }
             break;
+
         case ActionType.UpdateLeadingAdv:
             newState.leadingAdv.push(action.payload)
             break;
+
         case ActionType.UpdateParticipatingAdv:
             newState.participatingAdv.push(action.payload)
             break;
+
         case ActionType.DeleteAdventure:
             newState.leadingAdv = newState.leadingAdv.filter(adv => adv._id !== action.payload);
             break;
+
         case ActionType.UpdateSingleAdventure:
             const index = newState.leadingAdv.findIndex(adv => adv._id === action.payload._id);
             newState.leadingAdv[index] = action.payload;
             break;
+
         case ActionType.UpdateCustomRace:
             newState.customRace = action.payload
             break;
+
         case ActionType.cleanCustomRace:
             newState.customRace = new RaceModel()
             break;
+
         case ActionType.UpdateSubclass:
             newState.customSubClass = action.payload
             break;
+
         case ActionType.CustomRaceEditing:
             newState.customRaceEditing = action.payload
             break;
+
+        case ActionType.ReplaceMarketClassFilterItem:
+            newState.marketPlaceFilters.classFilters = action.payload;
+            break;
+
+        case ActionType.ChangeMarketFilterAppliedState:
+            newState.marketPlaceFilters.isApplied = action.payload;
+            break;
+
+        case ActionType.ReplaceMarketMostDownloadedFilter:
+            newState.marketPlaceFilters.topDownLoaded = action.payload;
+            break;
+
+        case ActionType.ChangeMarketPlaceSearchText:
+            newState.marketPlaceSearchText = action.payload;
+            break;
+
         default: break;
     }
 
