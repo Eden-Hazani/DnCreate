@@ -22,11 +22,13 @@ export class AppState {
     public customRace: RaceModel
     public customSubClass: SubClassModal
     public marketPlaceFilters: MarketFilterModal
+    public marketPlaceType: string
     public marketPlaceSearchText: string
     public constructor() {
         this.colorScheme = false,
             this.nonUser = false;
         this.beforeRegisterChar = new CharacterModel();
+        this.marketPlaceType = 'CHAR'
         this.marketPlaceFilters = { classFilters: [], topDownLoaded: 1, isApplied: false }
         this.marketPlaceSearchText = '';
         this.character = new CharacterModel();

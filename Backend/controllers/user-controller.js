@@ -124,16 +124,17 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
     }
 });
 
-router.post("/addCharFromMarket", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
+router.post("/addCharFromMarket/:type", verifyLogged, upload.none(), validateCharInSystem, async (request, response) => {
     try {
         const char = new Character(JSON.parse(request.body.charInfo));
+        const type = request.params.type;
         const market_id = request.body.market_id
         const error = await char.validate();
         if (error) {
             response.status(400).send(error.message)
         }
         const addedChar = await userLogic.addCharacter(char);
-        marketLogic.addDownloadNumber(market_id)
+        marketLogic.addDownloadNumber(market_id, type)
         response.json(addedChar);
     } catch (err) {
         response.status(500).send(err.message);

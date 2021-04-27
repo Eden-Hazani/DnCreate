@@ -34,13 +34,13 @@ export function PrimeMarketItem({ item, index, currentlySnapped, openItem }: Pro
             })
         ]).start()
     }
-
     return (
         <Animated.View style={currentAnimated.getLayout()}>
-            <TouchableOpacity onPress={() => openItem({ charName: item.charName, market_id: item._id })}>
-                <Image source={{ uri: `${Config.serverUrl}/assets/races/${item.raceImag}` }} style={{ height: 100, width: 100, alignSelf: "center" }} />
-                <AppText textAlign={'center'}> {item.charName}</AppText>
-                <AppText textAlign={'center'}>{item.race}</AppText>
+            <TouchableOpacity onPress={() => openItem({ itemName: item.itemName, market_id: item._id, marketType: item.marketType })}>
+                {item.marketType === "CHAR" && <Image source={{ uri: `${Config.serverUrl}/assets/races/${item.image}` }} style={{ height: 100, width: 100, alignSelf: "center" }} />}
+                {item.marketType === "WEAP" && <Image source={{ uri: `${Config.serverUrl}/assets/charEquipment/${item.image ? item.image : 'sword.png'}` }} style={{ height: 100, width: 100, alignSelf: "center" }} />}
+                <AppText textAlign={'center'}> {item.itemName}</AppText>
+                <AppText textAlign={'center'}>{item.race || item.creatorName}</AppText>
                 <AppText textAlign={'center'}>{item.charClass}</AppText>
             </TouchableOpacity>
         </Animated.View>

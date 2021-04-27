@@ -104,7 +104,7 @@ export class CharEquipmentTree extends Component<{ character: CharacterModel }, 
                                         <AppText fontSize={12}>Equipped</AppText>
                                     </View>
                                     <View style={{ justifyContent: "space-evenly", alignItems: "center", top: 5 }}>
-                                        <Image style={{ width: 120, height: 120 }} uri={`${Config.serverUrl}/assets/charEquipment/sword.png`} />
+                                        <Image style={{ width: 60, height: 60 }} uri={`${Config.serverUrl}/assets/charEquipment/${this.state.currentWeapon.image ? this.state.currentWeapon.image : 'sword.png'}`} />
                                     </View>
                                 </View>
                                 :

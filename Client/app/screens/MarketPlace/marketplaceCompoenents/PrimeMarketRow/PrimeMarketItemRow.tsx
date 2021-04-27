@@ -1,10 +1,13 @@
 import React, { Component, useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, Animated, Dimensions } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
+import { useSelector } from 'react-redux';
 import logger from '../../../../../utility/logger';
 import marketApi from '../../../../api/marketApi';
 import { AppActivityIndicator } from '../../../../components/AppActivityIndicator';
+import useDidUpdateEffect from '../../../../hooks/useDidUpdateEffect';
 import { ItemInMarketModel } from '../../../../models/ItemInMarketModel';
+import { RootState } from '../../../../redux/reducer';
 import { PrimeMarketItem } from './PrimeMarketItem';
 
 interface Props {
@@ -22,13 +25,17 @@ export function PrimeMarketItemRow({ refresh, pickedItem }: Props) {
     const [currentPrimeRaces, setCurrentPrimeRaces] = useState<ItemInMarketModel[]>([])
     const [currentSnappedAni, setCurrentSnappedAni] = useState<number>(-1)
 
+    const marketType = useSelector((state: RootState) => { return state.marketPlaceType });
+
     useEffect(() => {
         loadUp()
     }, [refresh])
 
+
+
     const loadUp = async () => {
         try {
-            const result = await marketApi.getPrimeItemsFromMarket();
+            const result = await marketApi.getPrimeItemsFromMarket(marketType);
             if (result.data) {
                 setCurrentPrimeRaces(result.data)
                 setLoading(false)
@@ -38,6 +45,9 @@ export function PrimeMarketItemRow({ refresh, pickedItem }: Props) {
             logger.log(err)
         }
     }
+
+    useDidUpdateEffect(loadUp, [marketType])
+
 
     return (
         <View style={styles.container}>

@@ -51,7 +51,7 @@ export class AppPicker extends Component<{ itemColor?: string, itemList: any, pl
                             renderItem={({ item }) => <AppPickerItem
                                 iconBackgroundColor={item.backgroundColor ? item.backgroundColor : this.props.itemColor}
                                 text={item.name}
-                                imageUrl={`${Config.serverUrl}/assets/${item.image}`}
+                                imageUrl={`${Config.serverUrl}/assets/races/${item.image}`}
                                 iconName={item.icon}
                                 padding={80} width={100} height={100}
                                 direction={'column'} onPress={() => {

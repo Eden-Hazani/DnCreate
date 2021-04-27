@@ -5,6 +5,7 @@ import { Config } from '../../../../config';
 import { AppText } from '../../../components/AppText';
 import { Colors } from '../../../config/colors';
 import { ItemInMarketModel } from '../../../models/ItemInMarketModel';
+import { MarketItemImage } from './MarketItemImage';
 
 interface Props {
     item: ItemInMarketModel
@@ -24,13 +25,13 @@ export function MarketMainPageItem({ item, index, openItem }: Props) {
     }
 
     return (
-        <TouchableOpacity onPress={() => openItem({ charName: item.charName, market_id: item._id })}
+        <TouchableOpacity onPress={() => openItem({ itemName: item.itemName, market_id: item._id, marketType: item.marketType })}
             style={[styles.container, { borderColor: Colors.whiteInDarkMode, backgroundColor: getBackColors() }]}>
             <View style={styles.innerContainer}>
-                <Image uri={`${Config.serverUrl}/assets/races/${item.raceImag}`} style={{ height: 80, width: 80, flex: .2 }} />
+                <MarketItemImage marketType={item.marketType || ''} img={item.image || ''} />
                 <View style={{ flex: .5 }}>
-                    <AppText>Name: {item.charName}</AppText>
-                    <AppText>Level: {item.currentLevel}</AppText>
+                    <AppText>Name: {item.itemName}</AppText>
+                    {item.currentLevel && <AppText>Level: {item.currentLevel}</AppText>}
                     <AppText>Created By: {item.creatorName}</AppText>
                     <AppText>Downloads: {item.downloadedTimes}</AppText>
                 </View>

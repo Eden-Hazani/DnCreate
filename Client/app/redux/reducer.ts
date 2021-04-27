@@ -188,6 +188,10 @@ export function reduce(currentState: AppState | undefined = initialState, action
             newState.marketPlaceSearchText = action.payload;
             break;
 
+        case ActionType.ChangeMarketPlaceType:
+            newState.marketPlaceType = action.payload
+            break;
+
         default: break;
     }
 

@@ -33,5 +33,6 @@ export enum ActionType {
     ReplaceMarketClassFilterItem,
     ChangeMarketFilterAppliedState,
     ReplaceMarketMostDownloadedFilter,
-    ChangeMarketPlaceSearchText
+    ChangeMarketPlaceSearchText,
+    ChangeMarketPlaceType
 }

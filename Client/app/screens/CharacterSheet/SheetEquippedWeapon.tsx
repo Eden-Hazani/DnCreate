@@ -23,13 +23,14 @@ export function SheetEquippedWeapon({ character, isDm, returnRoll, currentProfic
         if (character.modifiers && character.currentWeapon?.isProficient && character.currentWeapon.modifier) {
             returnRoll({
                 diceAmount: 1, diceType: 20, diceRolling: true,
-                currentDiceRollValue: character.modifiers[character.currentWeapon.modifier.toLowerCase()] + currentProficiency
+                currentDiceRollValue: character.modifiers[character.currentWeapon.modifier.toLowerCase()] + currentProficiency + (character.currentWeapon.addedHitChance || 0)
             })
 
         } else {
-            returnRoll({
-                diceAmount: 1, diceType: 20, diceRolling: true, currentDiceRollValue: currentProficiency
-            })
+            if (character.currentWeapon)
+                returnRoll({
+                    diceAmount: 1, diceType: 20, diceRolling: true, currentDiceRollValue: currentProficiency + (character.currentWeapon.addedHitChance || 0)
+                })
         }
     }
 

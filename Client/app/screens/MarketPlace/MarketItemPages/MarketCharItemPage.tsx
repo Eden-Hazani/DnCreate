@@ -2,15 +2,14 @@ import React, { Component, useEffect, useState } from 'react';
 import { View, StyleSheet, Modal, ScrollView } from 'react-native';
 import logger from '../../../../utility/logger';
 import { AppActivityIndicator } from '../../../components/AppActivityIndicator';
-import { AppButton } from '../../../components/AppButton';
 import { Colors } from '../../../config/colors';
 import marketApi from '../../../api/marketApi';
 import { MarketCharItemModel } from '../../../models/MarketCharItemModel';
 import { AppText } from '../../../components/AppText';
 import { Image } from 'react-native-expo-image-cache';
 import { Config } from '../../../../config';
-import { checkMarketItemValidity } from '../functions/marketInteractions';
-import { MarketItemPageButtons } from './MarketItemPageButtons';
+import { checkMarketCharItemValidity } from '../functions/marketInteractions';
+import { MarketItemPageButtons } from '../marketplaceCompoenents/MarketItemPageButtons';
 import userCharApi from '../../../api/userCharApi';
 import { addAllCharLevelsToStorage, implantIdIntoSavedChar, saveCharArmaments } from '../functions/storageFunctions';
 import useAuthContext from '../../../hooks/useAuthContext';
@@ -25,24 +24,25 @@ interface Props {
 }
 
 interface Item {
-    charName: string;
+    itemName: string;
+    marketType: string;
     market_id: string
 }
 
-export function MarketItemPage({ item, close }: Props) {
+export function MarketCharItemPage({ item, close }: Props) {
     const [loading, setLoading] = useState<boolean>(true)
     const [marketItem, setMarketItem] = useState<MarketCharItemModel | null>(null)
-    const [canDownload, setCanDownload] = useState<string>('')
+    const [canDownload, setCanDownload] = useState<{ error: string, description: string }>({ error: '', description: '' })
 
     const userContext = useAuthContext();
 
     useEffect(() => {
-        loadItem().then(() => setCanDownload(checkMarketItemValidity(item.market_id, item.charName))).finally(() => setLoading(false))
+        loadItem().then(() => setCanDownload(checkMarketCharItemValidity(item.market_id, item.itemName))).finally(() => setLoading(false))
     }, [])
 
     const loadItem = async () => {
         try {
-            const result = await marketApi.getSingleMarketItem(item.market_id);
+            const result = await marketApi.getSingleMarketItem(item.market_id, item.marketType);
             if (result.data)
                 setMarketItem(result.data)
         } catch (err) {
@@ -55,14 +55,14 @@ export function MarketItemPage({ item, close }: Props) {
             if (marketItem?.currentLevelChar) {
                 setLoading(true)
                 const newChar = implantIdIntoSavedChar(marketItem.currentLevelChar, userContext.user?._id || '')
-                const result = await userCharApi.saveCharFromMarket(newChar, marketItem._id || '');
+                const result = await userCharApi.saveCharFromMarket(newChar, marketItem._id || '', item.marketType);
                 const savedChar: CharacterModel = result.data as any
                 store.dispatch({ type: ActionType.addNewCharacter, payload: savedChar });
                 if (marketItem.characterLevelList && marketItem.characterLevelList.length > 0) {
                     addAllCharLevelsToStorage(marketItem.characterLevelList, savedChar._id || '', savedChar.user_id || '')
                 }
                 saveCharArmaments(savedChar._id, marketItem.weaponItems, marketItem.armorItems, marketItem.shieldItems)
-                setCanDownload(checkMarketItemValidity(item.market_id, item.charName))
+                setCanDownload(checkMarketCharItemValidity(item.market_id, item.itemName))
                 setLoading(false)
             }
         } catch (err) {
@@ -78,9 +78,9 @@ export function MarketItemPage({ item, close }: Props) {
                     <ScrollView>
                         <View style={styles.upperBlock}>
                             <View style={styles.leftBlock}>
-                                <Image uri={`${Config.serverUrl}/assets/races/${marketItem?.raceImag}`} style={{ height: 120, width: 120 }} />
+                                <Image uri={`${Config.serverUrl}/assets/races/${marketItem?.image}`} style={{ height: 120, width: 120 }} />
                                 <View style={{ paddingTop: 20 }}>
-                                    <AppText fontSize={20} color={Colors.pinkishSilver}>{marketItem?.charName}</AppText>
+                                    <AppText fontSize={20} color={Colors.pinkishSilver}>{marketItem?.itemName}</AppText>
                                     <AppText fontSize={18}>Class: {marketItem?.charClass}</AppText>
                                     <AppText fontSize={18}>Race: {marketItem?.race}</AppText>
                                     <AppText fontSize={18}>Current Level: {marketItem?.currentLevel}</AppText>
@@ -101,7 +101,7 @@ export function MarketItemPage({ item, close }: Props) {
                             </View>
                         </View>
                         <View style={{ marginBottom: 30 }}>
-                            <MarketItemPageButtons addCharacter={() => saveCharInfo()} closeModel={() => close()} canDownload={canDownload} />
+                            <MarketItemPageButtons addItem={() => saveCharInfo()} closeModel={() => close()} canDownload={canDownload} />
                         </View>
                     </ScrollView>
                 }

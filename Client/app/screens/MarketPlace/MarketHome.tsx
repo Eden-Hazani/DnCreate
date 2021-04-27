@@ -3,8 +3,9 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
 import { MarketFilters } from './marketplaceCompoenents/MarketFilters';
-import { MarketItemPage } from './marketplaceCompoenents/MarketItemPage';
+import { MarketCharItemPage } from './MarketItemPages/MarketCharItemPage';
 import { MarketMainPage } from './marketplaceCompoenents/MarketMainPage';
+import { MarketWeaponItemPage } from './MarketItemPages/MarketWeaponItemPage';
 import { MarketSearch } from './marketplaceCompoenents/MarketSearch';
 import { PrimeMarketItemRow } from './marketplaceCompoenents/PrimeMarketRow/PrimeMarketItemRow';
 import { WelcomeToMarket } from './marketplaceCompoenents/WelcomeToMarket';
@@ -14,13 +15,14 @@ interface Props {
 }
 
 interface Item {
-    charName: string;
+    itemName: string;
+    marketType: string;
     market_id: string
 }
 
 export function MarketHome({ navigation }: Props) {
     const [refresh, setRefresh] = useState<boolean>(false)
-    const [chosenItem, setChosenItem] = useState<{ charName: string, market_id: string } | null>(null)
+    const [chosenItem, setChosenItem] = useState<{ itemName: string, market_id: string, marketType: string } | null>(null)
     navigation.addListener('focus', () => {
         setRefresh(prevState => !prevState)
     });
@@ -37,7 +39,8 @@ export function MarketHome({ navigation }: Props) {
             <View style={{ flex: 1 }}>
                 <MarketMainPage refresh={refresh} pickedItem={(val: Item) => setChosenItem(val)} />
             </View>
-            {chosenItem && <MarketItemPage item={chosenItem} close={() => setChosenItem(null)} />}
+            {chosenItem && chosenItem.marketType === "CHAR" && <MarketCharItemPage item={chosenItem} close={() => setChosenItem(null)} />}
+            {chosenItem && chosenItem.marketType === "WEAP" && <MarketWeaponItemPage item={chosenItem} close={() => setChosenItem(null)} />}
         </View>
     )
 }

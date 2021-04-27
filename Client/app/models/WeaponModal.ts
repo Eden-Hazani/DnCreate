@@ -11,6 +11,9 @@ export class WeaponModal {
         public modifier?: string,
         public isProficient?: boolean,
         public removable?: boolean,
-        public addedDamage?: number
+        public image?: string,
+        public addedHitChance?: number,
+        public addedDamage?: number,
+        public marketStatus?: { isInMarket: boolean, market_id: string, creator_id: string }
     ) { }
 }

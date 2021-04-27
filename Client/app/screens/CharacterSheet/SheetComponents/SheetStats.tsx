@@ -47,7 +47,7 @@ export function SheetStats({ character, closeModel }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-
+        flex: 1
     },
     modifier: {
         width: "50%",

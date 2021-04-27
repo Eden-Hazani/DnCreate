@@ -12,7 +12,7 @@ export class UpdateMessage extends Component<{ close: any }> {
         return (
             <ScrollView style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
                 <View style={{ padding: 15 }}>
-                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 2.0</AppText>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Update 2.02</AppText>
                 </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={30} color={Colors.bitterSweetRed}>Patreon Supporters!</AppText>
@@ -28,9 +28,16 @@ export class UpdateMessage extends Component<{ close: any }> {
                     <AppText textAlign={'center'} fontSize={25} >From the character hall you can now upload your character to the market and offer it to the DnCreate community</AppText>
                     <AppText textAlign={'center'} fontSize={25} >Share builds, races, unique backstories and more!</AppText>
                 </View>
+                <View style={{ padding: 15, justifyContent: "center", alignItems: "center" }}>
+                    <AppText textAlign={'center'} fontSize={30} color={Colors.paleGreen}>The Marketplace For Weapons!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >You can now trade with your weapon creations!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >from the weapon page within your character sheet you can upload your weapon creation to the marketplace!</AppText>
+                    <AppText textAlign={'center'} fontSize={25} >Once the weapon is uploaded anyone one DnCreate can download it and enjoy your creation</AppText>
+
+                </View>
                 <View style={{ padding: 15 }}>
                     <AppText textAlign={'center'} fontSize={25} color={Colors.berries}>Major bug fixes and improvements!</AppText>
-                    <AppText textAlign={'center'} fontSize={20}>2.0 includes a major update to DnCreates infrastructure, many of the glitches and bugs are now gone!</AppText>
+                    <AppText textAlign={'center'} fontSize={20}>2.02 includes a major update to DnCreates infrastructure, many of the glitches and bugs are now gone!</AppText>
                 </View>
 
                 <View style={{ padding: 15 }}>

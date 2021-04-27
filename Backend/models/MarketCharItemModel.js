@@ -23,15 +23,18 @@ const MarketCharItemSchema = mongoose.Schema({
     description: {
         type: String
     },
+    marketType: {
+        type: String
+    },
     creatorName: {
         type: String
     },
     downloadedTimes: { type: Number },
     race: { type: String },
-    raceImag: { type: String },
+    image: { type: String },
     charClass: { type: String },
     currentLevel: { type: String },
-    charName: { type: String }
+    itemName: { type: String }
 
 }, {
     versionKey: false

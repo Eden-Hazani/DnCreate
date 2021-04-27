@@ -28,7 +28,7 @@ export function RemoveCharFromMarket({ marketplace_id, character, index }: Props
 
     const removeFromMarket = async () => {
         setLoading(true)
-        const result = await marketApi.deleteFromMarket(marketplace_id);
+        const result = await marketApi.deleteFromMarket(marketplace_id, 'char');
         if (result.status === 204) {
             const updatedMarketCharData = await userCharApi.getChar(character._id || '');
             const updatedMarketChar = updatedMarketCharData.data;

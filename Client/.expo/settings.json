@@ -3,7 +3,7 @@
   "lanType": "ip",
   "dev": true,
   "minify": false,
-  "urlRandomness": null,
+  "urlRandomness": "q6-tdf",
   "https": false,
   "scheme": null,
   "devClient": false

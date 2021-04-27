@@ -30,11 +30,12 @@ export function MarketMainPage({ pickedItem, refresh }: Props) {
 
     const marketPlaceFilters = useSelector((state: RootState) => { return { ...state.marketPlaceFilters } });
     const currentText = useSelector((state: RootState) => state.marketPlaceSearchText)
+    const marketType = useSelector((state: RootState) => state.marketPlaceType)
 
     useEffect(() => {
         setLoading(true)
         getMarketItemBatch(0, 10, marketPlaceFilters, false, null)
-    }, [refresh])
+    }, [refresh, marketType])
 
     const search = () => {
         if (currentText === '') {
@@ -61,7 +62,7 @@ export function MarketMainPage({ pickedItem, refresh }: Props) {
 
     const getMarketItemBatch = async (start: number, end: number, filters: MarketFilterModal, isNextBatch: boolean, isSearch: string | null) => {
         try {
-            const { data } = await marketApi.getMarketItemBatchFromServer(start, end, filters, isSearch);
+            const { data } = await marketApi.getMarketItemBatchFromServer(start, end, filters, isSearch, marketType);
             if (isSearch && data) {
                 setCurrentItems(data)
                 if (data.length !== 0) {

@@ -10,7 +10,6 @@ import { CharacterModel } from '../../models/characterModel';
 import { WeaponModal } from '../../models/WeaponModal';
 import * as Yup from 'yup';
 import { SubmitButton } from '../../components/forms/SubmitButton';
-import { set } from 'react-native-reanimated';
 import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import userCharApi from '../../api/userCharApi';
@@ -19,6 +18,13 @@ import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
 import * as abilityScores from '../../../jsonDump/abilityScores.json';
 import NumberScroll from '../../components/NumberScroll';
+import { AddWeaponToMarket } from '../../components/weaponMarketComponents/AddWeaponToMarket';
+import { RemoveWeaponFromMarket } from '../../components/weaponMarketComponents/RemoveWeaponFromMarket';
+import { checkMarketWeaponValidity } from '../MarketPlace/functions/marketInteractions';
+import { AppEquipmentImagePicker } from '../../components/AppEquipmentImagePicker';
+import { img } from '../../../jsonDump/equipmentImgJson.json'
+import { Image } from 'react-native-expo-image-cache';
+import { Config } from '../../../config';
 
 const ValidationSchema = Yup.object().shape({
     name: Yup.string().required().label("Weapon Name"),
@@ -42,6 +48,8 @@ interface CharWeaponsState {
     weaponBeingEdited: WeaponModal
     isProficient: boolean
     addedDamage: number
+    pickedImg: string
+    addedHitChance: number
 }
 
 export class CharWeapons extends Component<{ navigation: any, route: any }, CharWeaponsState>{
@@ -59,23 +67,29 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
             addWeapon: false,
             character: this.props.route.params.char,
             isProficient: false,
-            addedDamage: 0
+            addedDamage: 0,
+            pickedImg: '',
+            addedHitChance: 0
         }
     }
-    async componentDidMount() {
+    componentDidMount() {
         try {
-            const character = { ...this.state.character };
-            const weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
-            if (weaponList) {
-                this.setState({ weaponList: JSON.parse(weaponList) })
-            }
-            if (!this.state.character.currentWeapon) {
-                character.currentWeapon = new WeaponModal();
-            }
-            this.setState({ character })
+            this.refreshWeapons(new WeaponModal())
         } catch (err) {
             logger.log(new Error(err))
         }
+    }
+
+    refreshWeapons = async (currentWeapon: WeaponModal) => {
+        const character = { ...this.state.character };
+        const weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
+        if (weaponList) {
+            this.setState({ weaponList: JSON.parse(weaponList) })
+        }
+        if (!this.state.character.currentWeapon) {
+            character.currentWeapon = new WeaponModal();
+        }
+        this.setState({ character, pickedWeapon: currentWeapon })
     }
 
     updateOfflineCharacter = async () => {
@@ -123,12 +137,15 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 _id: WeaponName + Math.floor((Math.random() * 1000000) + 1),
                 name: WeaponName,
                 dice: dice,
+                specialAbilities: values.specialAbilities,
                 isProficient: this.state.isProficient,
                 modifier: this.state.scorePicked,
                 description: values.description,
                 addedDamage: this.state.addedDamage,
+                addedHitChance: this.state.addedHitChance,
                 diceAmount: values.diceAmount,
-                removable: true
+                removable: true,
+                image: this.state.pickedImg === "" ? 'sword.png' : this.state.pickedImg
             }
             let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
             if (!weaponList) {
@@ -213,12 +230,16 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 _id: this.state.weaponBeingEdited._id,
                 name: WeaponName,
                 dice: dice,
+                specialAbilities: values.specialAbilities,
                 isProficient: this.state.isProficient,
                 modifier: this.state.scorePicked,
                 description: values.description,
                 diceAmount: values.diceAmount,
                 addedDamage: this.state.addedDamage,
-                removable: true
+                addedHitChance: this.state.addedHitChance,
+                removable: true,
+                image: this.state.pickedImg === "" ? this.state.weaponBeingEdited.image : this.state.pickedImg,
+                marketStatus: this.state.weaponBeingEdited.marketStatus
             }
             let weaponList = await AsyncStorage.getItem(`${this.state.character._id}WeaponList`);
             if (!weaponList) {
@@ -237,6 +258,21 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
         } catch (err) {
             logger.log(new Error(err))
         }
+    }
+
+    marketPlaceNode = () => {
+        const validity = checkMarketWeaponValidity(this.state.pickedWeapon.marketStatus, this.context.user._id);
+        if (validity === 'NOT_OWNED') return <View></View>
+        if (validity === 'OWNED_NOT_PUBLISHED') return <AddWeaponToMarket refreshWeapons={(updatedWeapon: WeaponModal) => this.refreshWeapons(updatedWeapon)} char_id={this.state.character._id || ''} weapon={this.state.pickedWeapon} />
+        if (validity === 'OWNED_PUBLISHED') return <RemoveWeaponFromMarket refreshWeapons={(updatedWeapon: WeaponModal) => this.refreshWeapons(updatedWeapon)} char_id={this.state.character._id || ''} weapon={this.state.pickedWeapon} />
+        return <View></View>
+    }
+
+    marketValidity = (weapon: WeaponModal) => {
+        const validity = checkMarketWeaponValidity(weapon.marketStatus, this.context.user._id);
+        if (validity === 'NOT_OWNED') return <AppText color={Colors.deepGold}>Market - Not Owned</AppText>
+        if (validity === 'OWNED_NOT_PUBLISHED') return <AppText color={Colors.danger}>Market - Not Published</AppText>
+        if (validity === 'OWNED_PUBLISHED') return <AppText color={Colors.paleGreen}>Market - Published</AppText>
     }
 
     render() {
@@ -260,11 +296,12 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                         this.state.character.currentWeapon &&
                                             this.setState({ pickedWeapon: this.state.character.currentWeapon, weaponInfoModal: true })
                                     }}>
+                                        <Image uri={`${Config.serverUrl}/assets/charEquipment/${this.state.character.currentWeapon.image}`} style={{ height: 40, width: 40, justifyContent: "center" }} />
                                         <AppText>Name: {this.state.character.currentWeapon.name}</AppText>
                                         <AppText>Description: {this.state.character.currentWeapon.description?.substr(0, 10)}...</AppText>
                                         <AppText>Damage dice: {this.state.character.currentWeapon.diceAmount}-{this.state.character.currentWeapon.dice}</AppText>
                                         <AppText >Modifier: {this.state.character.currentWeapon.modifier && this.state.character.currentWeapon.modifier}</AppText>
-                                        <AppText >Proficient: {this.state.character.currentWeapon.isProficient && this.state.character.currentWeapon.isProficient.toString()}</AppText>
+                                        {this.state.character.currentWeapon.isProficient && <AppText >Proficient: {this.state.character.currentWeapon.isProficient.toString()}</AppText>}
                                         <AppText>Special abilities: {this.state.character.currentWeapon.specialAbilities ? `${this.state.character.currentWeapon.specialAbilities.substr(0, 10)}...` : "No spacial abilities"}</AppText>
                                     </TouchableOpacity>
                                 </View>
@@ -378,6 +415,23 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                         if (!val) return
                                         this.setState({ addedDamage: val })
                                     }} />
+                                <AppText padding={15} textAlign={'center'}>Does this weapon provide any additional chance to hit?</AppText>
+                                <NumberScroll modelColor={Colors.pageBackground} max={5000}
+                                    startFromZero={true}
+                                    startingVal={this.state.editingWeapon ? this.state.weaponBeingEdited.addedHitChance : 0}
+                                    getValue={(val: any) => {
+                                        if (!val) return
+                                        this.setState({ addedHitChance: val })
+                                    }} />
+                            </View>
+                            <View>
+                                <AppText padding={15} textAlign={'center'}>Pick an Image For Your Weapon?</AppText>
+                                <AppEquipmentImagePicker itemList={img} selectedItemIcon={this.state.pickedImg}
+                                    resetImgPick={(val: string) => {
+                                        this.setState({ pickedImg: val })
+                                    }}
+                                    selectedItem={this.state.editingWeapon ? this.state.weaponBeingEdited.image : this.state.pickedImg} selectItem={(pickedImg: any) => { this.setState({ pickedImg: pickedImg }) }}
+                                    numColumns={3} placeholder={"Pick Image"} iconName={"apps"} />
                             </View>
                             <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
                                 <SubmitButton textAlign={'center'} title={this.state.editingWeapon ? "Edit Weapon" : "Add Weapon"} />
@@ -389,7 +443,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                 </Modal>
                 {
                     this.state.weaponList &&
-                    <View>
+                    <ScrollView style={{ flex: 1 }}>
                         {this.state.weaponList.map(weapon =>
                             <View key={weapon._id} style={styles.weaponUnit}>
                                 <TouchableOpacity style={{ position: 'absolute', right: 10, top: 10, zIndex: 1 }}>
@@ -411,27 +465,32 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
                                     </View>
                                 }
                                 <TouchableOpacity style={{ width: '65%' }} onPress={() => { this.setState({ pickedWeapon: weapon, weaponInfoModal: true }) }}>
+                                    <Image uri={`${Config.serverUrl}/assets/charEquipment/${weapon.image}`} style={{ height: 40, width: 40, justifyContent: "center" }} />
                                     <AppText fontSize={16}>Name: {weapon.name}</AppText>
                                     <AppText fontSize={16}>Damage dice: {weapon.diceAmount}-{weapon.dice}</AppText>
                                     <AppText fontSize={16}>Description: {weapon.description?.substr(0, 10)}...</AppText>
                                     <AppText fontSize={16}>Modifier: {weapon.modifier && weapon.modifier}</AppText>
-                                    <AppText >Proficient: {weapon.isProficient && weapon.isProficient.toString()}</AppText>
-                                    <AppText fontSize={16}>{weapon.specialAbilities ? `Special abilities ${weapon.specialAbilities.substr(0, 10)}...` : "No spacial abilities"}</AppText>
+                                    {weapon.isProficient && <AppText >Proficient: {weapon.isProficient.toString()}</AppText>}
+                                    <AppText fontSize={16}>{weapon.specialAbilities ? `Special abilities: ${weapon.specialAbilities.substr(0, 10)}...` : "No spacial abilities"}</AppText>
+                                    {this.marketValidity(weapon)}
                                 </TouchableOpacity>
                             </View>)}
-                    </View>
+                    </ScrollView>
                 }
                 <Modal visible={this.state.weaponInfoModal} animationType="slide">
                     <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
                         {this.state.pickedWeapon.name &&
                             <View>
                                 <View>
-                                    <AppText textAlign={'center'} fontSize={22}>Name: {this.state.pickedWeapon.name}</AppText>
-                                    <AppText textAlign={'center'} fontSize={16}>Damage dice: {this.state.pickedWeapon.diceAmount}-{this.state.pickedWeapon.dice}</AppText>
-                                    <AppText textAlign={'center'} fontSize={16}>Description: {this.state.pickedWeapon.description}</AppText>
-                                    <AppText textAlign={'center'} fontSize={16}>Modifier: {this.state.pickedWeapon.modifier && this.state.pickedWeapon.modifier}</AppText>
-                                    <AppText textAlign={'center'} fontSize={16}>Proficient: {this.state.pickedWeapon.isProficient && this.state.pickedWeapon.isProficient.toString()}</AppText>
-                                    <AppText textAlign={'center'} fontSize={16}>{this.state.pickedWeapon.specialAbilities ? `Special abilities ${this.state.pickedWeapon.specialAbilities}` : null}</AppText>
+                                    <AppText textAlign={'center'} fontSize={22} padding={5}>Name: {this.state.pickedWeapon.name}</AppText>
+                                    <AppText textAlign={'center'} fontSize={16} padding={5}>Damage dice: {this.state.pickedWeapon.diceAmount}-{this.state.pickedWeapon.dice}</AppText>
+                                    <AppText textAlign={'center'} fontSize={16} padding={5}>Description: {this.state.pickedWeapon.description}</AppText>
+                                    <AppText textAlign={'center'} fontSize={16} padding={5}>Modifier: {this.state.pickedWeapon.modifier && this.state.pickedWeapon.modifier}</AppText>
+                                    {this.state.pickedWeapon.isProficient && <AppText textAlign={'center'} fontSize={16}>Proficient: {this.state.pickedWeapon.isProficient.toString()}</AppText>}
+                                    <AppText textAlign={'center'} fontSize={16}>{this.state.pickedWeapon.specialAbilities ? `Special abilities:\n ${this.state.pickedWeapon.specialAbilities}` : null}</AppText>
+                                </View>
+                                <View style={{ paddingTop: 10 }}>
+                                    {this.marketPlaceNode()}
                                 </View>
                                 <View>
                                     <AppButton backgroundColor={Colors.berries} color={Colors.totalWhite} width={80} height={50} borderRadius={25}
@@ -449,7 +508,7 @@ export class CharWeapons extends Component<{ navigation: any, route: any }, Char
 
 const styles = StyleSheet.create({
     container: {
-
+        flex: 1
     },
     item: {
         width: 150,
@@ -470,7 +529,7 @@ const styles = StyleSheet.create({
         margin: 20
     },
     weaponUnit: {
-        height: 180,
+        height: 220,
         position: "relative",
         padding: 15,
         paddingBottom: 30,

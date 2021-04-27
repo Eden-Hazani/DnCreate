@@ -6,21 +6,21 @@ import { MarketFilterModal } from '../models/MarketFilterModal';
 
 const endpoint = '/market'
 
-const addCharToMarket = (marketCharItem: MarketCharItemModel) => {
+const addToMarket = (marketCharItem: MarketCharItemModel, type: string) => {
     let formData: FormData = new FormData();
     formData.append("marketItem", JSON.stringify(marketCharItem))
-    return client.post<string>(`${endpoint}/addCharToMarket`, formData)
+    return client.post<string>(`${endpoint}/addToMarket/${type}`, formData)
 };
 
-const deleteFromMarket = (market_id: string) => client.delete(`${endpoint}/removeCharFromMarket/${market_id}`);
+const deleteFromMarket = (market_id: string, type: string) => client.delete(`${endpoint}/removeItemFromMarket/${market_id}/${type}`);
 
 
-const getPrimeItemsFromMarket = () => client.get<ItemInMarketModel[]>(`${endpoint}/getPrimeItems`);
+const getPrimeItemsFromMarket = (marketType: string) => client.get<ItemInMarketModel[]>(`${endpoint}/getPrimeItems/${marketType}`);
 
 
-const getSingleMarketItem = (market_id: string) => client.get<MarketCharItemModel>(`${endpoint}/getMarketItem/${market_id}`);
+const getSingleMarketItem = (market_id: string, type: string) => client.get<MarketCharItemModel>(`${endpoint}/getMarketItem/${market_id}/${type}`);
 
-const getMarketItemBatchFromServer = (start: number, end: number, filters: MarketFilterModal, search: string | null) => {
+const getMarketItemBatchFromServer = (start: number, end: number, filters: MarketFilterModal, search: string | null, marketType: string) => {
     let formData: FormData = new FormData();
     formData.append("filters", JSON.stringify(filters))
     formData.append("start", start.toString())
@@ -28,14 +28,18 @@ const getMarketItemBatchFromServer = (start: number, end: number, filters: Marke
     if (search) {
         formData.append("search", search)
     }
-    return client.post<ItemInMarketModel[]>(`${endpoint}/getItemBatch`, formData)
+    return client.post<ItemInMarketModel[]>(`${endpoint}/getItemBatch/${marketType}`, formData)
 };
 
 
+const addDownloadToMarketItem = (market_id: string, marketType: string) => client.patch(`${endpoint}/addToItemDownloadAmount/${marketType}/${market_id}`);
+
+
 export default {
-    addCharToMarket,
+    addToMarket,
     deleteFromMarket,
     getPrimeItemsFromMarket,
     getSingleMarketItem,
-    getMarketItemBatchFromServer
+    getMarketItemBatchFromServer,
+    addDownloadToMarketItem
 }

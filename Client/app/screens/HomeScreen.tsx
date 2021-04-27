@@ -85,7 +85,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '2.0') {
+        if (!newsFlag || newsFlag !== '2.02') {
             this.setState({ updateNews: true })
         }
     }
@@ -247,7 +247,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '2.0')
+                                            AsyncStorage.setItem('newsFlag', '2.02')
                                         })
                                     }} />
                                 </Modal>

@@ -9,11 +9,11 @@ const saveChar = (character: CharacterModel) => {
     return client.post(`${endpoint}/saveChar`, formData);
 };
 
-const saveCharFromMarket = (character: CharacterModel, market_id: string) => {
+const saveCharFromMarket = (character: CharacterModel, market_id: string, marketType: string) => {
     let formData: FormData = new FormData();
     formData.append("charInfo", JSON.stringify(character))
     formData.append("market_id", market_id)
-    return client.post(`${endpoint}/addCharFromMarket`, formData);
+    return client.post(`${endpoint}/addCharFromMarket/${marketType}`, formData);
 };
 
 
@@ -59,5 +59,5 @@ export default {
     validateCharName,
     updateChar,
     saveCharFromMarket,
-    updateCharacterAndReturnInfo
+    updateCharacterAndReturnInfo,
 }

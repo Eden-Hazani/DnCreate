@@ -6,10 +6,11 @@ export class ItemInMarketModel {
         public description?: string,
         public creatorName?: string,
         public race?: string,
-        public raceImag?: string,
+        public image?: string,
         public charClass?: string,
         public currentLevel?: number,
-        public charName?: string,
-        public downloadedTimes?: number
+        public itemName?: string,
+        public downloadedTimes?: number,
+        public marketType?: string,
     ) { }
 }

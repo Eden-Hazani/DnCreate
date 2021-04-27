@@ -13,10 +13,13 @@ import { AppForm } from '../forms/AppForm';
 import * as Yup from 'yup';
 import { AppFormField } from '../forms/AppFormField';
 import { SubmitButton } from '../forms/SubmitButton';
-import { createNewCharMarketObj } from '../../screens/MarketPlace/functions/createMarketObj';
 import { updateMarketStatusFromPreviousLevels } from '../../../utility/charHallFunctions/characterStorage';
 import useAuthContext from '../../hooks/useAuthContext';
 import { CreateMarketPlaceAlias } from '../../screens/MarketPlace/marketplaceCompoenents/CreateMarketPlaceAlias';
+import { WeaponModal } from '../../models/WeaponModal';
+import { createNewWeaponMarketObj } from '../../screens/MarketPlace/functions/createMarketObj';
+import { MarketWeaponItemModel } from '../../models/MarketWeaponItemModel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height, width } = Dimensions.get('window')
 const Filter = require('bad-words')
@@ -32,8 +35,9 @@ const ValidationSchema = Yup.object().shape({
 })
 
 interface Props {
-    character: CharacterModel
-    index: number
+    weapon: WeaponModal
+    char_id: string
+    refreshWeapons: Function
 }
 
 interface Values {
@@ -42,7 +46,7 @@ interface Values {
 }
 
 
-export function AddCharToMarket({ character, index }: Props) {
+export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
     const [loading, setLoading] = useState<boolean>(false);
     const [animateStartButt, setAnimateStartButt] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 0, y: 0 }))
     const [animateForm, setAnimateForm] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 700, y: 0 }))
@@ -51,34 +55,43 @@ export function AddCharToMarket({ character, index }: Props) {
     const userContext = useAuthContext()
 
     const submit = async (values: Values) => {
-        Alert.alert("Add To Market", "This character will be added to the market at it's current level including backstory, traits, abilities, magic, and more. ",
-            [{ text: 'Yes', onPress: () => addToMarket(values) }, { text: 'No' }])
+        Alert.alert("Add To Market", "This weapon will be added to the marketplace",
+            [{ text: 'Yes', onPress: () => addToMarket(weapon, values) }, { text: 'No' }])
     }
 
-    const addToMarket = async (values: Values) => {
+    const addToMarket = async (weapon: WeaponModal, values: Values) => {
         try {
             setLoading(true)
             values.name = userContext.user?.marketplaceNickname || '';
-            const updatedMarketCharData = await userCharApi.getChar(character._id || '');
-            const updatedMarketChar = updatedMarketCharData.data;
-
-            if (updatedMarketChar) {
-                updatedMarketChar.marketStatus = { creator_id: character.user_id || '', isInMarket: true, market_id: '' }
-                const marketObj = await createNewCharMarketObj(updatedMarketChar, values)
-                const result = await marketApi.addToMarket(marketObj, 'CHAR');
-
-                if (result.data) {
-                    updatedMarketChar.marketStatus = { creator_id: character.user_id || '', isInMarket: true, market_id: result.data }
-                    const charResult = await userCharApi.updateCharacterAndReturnInfo(updatedMarketChar);
-                    store.dispatch({ type: ActionType.ReplaceExistingChar, payload: { charIndex: index, character: charResult.data } })
-                    await updateMarketStatusFromPreviousLevels(updatedMarketChar, { creator_id: character.user_id || '', isInMarket: true, market_id: result.data })
-                }
+            weapon.marketStatus = { creator_id: userContext.user?._id || '', isInMarket: true, market_id: '' }
+            const marketObj = createNewWeaponMarketObj(userContext.user?._id || '', weapon, values)
+            const result: any = await marketApi.addToMarket(marketObj, 'WEAP');
+            if (result.data) {
+                const updatedWeapon: WeaponModal = result.data.weaponInfo
+                await saveWeapon(updatedWeapon, weapon._id || '');
+                refreshWeapons(updatedWeapon)
                 setLoading(false)
             }
         } catch (err) {
             setLoading(false)
             logger.log(err)
         }
+    }
+
+    const saveWeapon = async (weapon: WeaponModal, weapon_id: string) => {
+        let weaponList = await AsyncStorage.getItem(`${char_id}WeaponList`);
+        if (!weaponList) {
+            return;
+        }
+        const newWeaponList = JSON.parse(weaponList)
+        let index: number = 0
+        for (let item of newWeaponList) {
+            if (item._id === weapon_id) {
+                newWeaponList[index] = weapon
+            }
+            index++
+        }
+        await AsyncStorage.setItem(`${char_id}WeaponList`, JSON.stringify(newWeaponList))
     }
 
     const handleClick = () => {
@@ -116,7 +129,7 @@ export function AddCharToMarket({ character, index }: Props) {
                                 })
                             },]}>
                                 <TouchableOpacity style={[styles.addButton, { backgroundColor: Colors.paleGreen }]} onPress={() => handleClick()}>
-                                    <AppText fontSize={20} textAlign={'center'}>Add Character To Market</AppText>
+                                    <AppText fontSize={20} textAlign={'center'}>Add Weapon To Market</AppText>
                                 </TouchableOpacity>
                             </Animated.View>
                             <Animated.View style={[animateForm.getLayout(), {
