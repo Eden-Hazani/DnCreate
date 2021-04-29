@@ -34,6 +34,7 @@ import subClassesApi from '../../api/subClassesApi';
 import { SubClassList } from './SubClassList';
 import { getSpecialSaveThrows } from '../../../utility/getSpecialSaveThrows';
 import { AppArtificerInfusionPicker } from '../../components/AppArtificerInfusionPicker';
+import { PathingLevelRoute } from './LevelUpRoutes/PathingLevelRoute';
 
 
 interface LevelUpOptionsState {
@@ -191,7 +192,7 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                     beforeLevelUpString = result;
                 }
             }
-            this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
+            // this.state.character.path && this.extractCustomPathJson(this.state.character.path.name);
 
             if (!character.magic) {
                 character.magic = new MagicModel()
@@ -304,38 +305,38 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
         }
     }
 
-    pickPath = (path: any, index: number) => {
-        try {
-            this.setState({ pathInfoLoading: true })
-            setTimeout(() => {
-                this.setState({ pathInfoLoading: false })
-            }, 800);
-            let character = { ...this.state.character };
-            if (!this.state.pathClicked[index]) {
-                if (this.state.pathChosen !== null) {
-                    alert(`Can't pick more then one path`)
-                    return
-                }
-                const pathClicked = this.state.pathClicked;
-                pathClicked[index] = true
-                this.setState({ pathClicked, pathChosen: path }, () => {
-                    this.extractCustomPathJson(this.state.pathChosen.name)
-                });
-            }
-            else if (this.state.pathClicked[index]) {
-                character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
-                const pathClicked = this.state.pathClicked;
-                pathClicked[index] = false;
-                this.setState({ pathClicked, pathChosen: null, character }, () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
-                });
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
+    // pickPath = (path: any, index: number) => {
+    //     try {
+    //         this.setState({ pathInfoLoading: true })
+    //         setTimeout(() => {
+    //             this.setState({ pathInfoLoading: false })
+    //         }, 800);
+    //         let character = { ...this.state.character };
+    //         if (!this.state.pathClicked[index]) {
+    //             if (this.state.pathChosen !== null) {
+    //                 alert(`Can't pick more then one path`)
+    //                 return
+    //             }
+    //             const pathClicked = this.state.pathClicked;
+    //             pathClicked[index] = true
+    //             this.setState({ pathClicked, pathChosen: path }, () => {
+    //                 this.extractCustomPathJson(this.state.pathChosen.name)
+    //             });
+    //         }
+    //         else if (this.state.pathClicked[index]) {
+    //             character = JSON.parse(JSON.stringify(this.state.beforeAnyChanges));
+    //             const pathClicked = this.state.pathClicked;
+    //             pathClicked[index] = false;
+    //             this.setState({ pathClicked, pathChosen: null, character }, () => {
+    //                 store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+    //             });
+    //         }
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
 
-    resetExpertiseSkills = async (skill: any) => {
+    resetExpertiseSkills = async () => {
         try {
             store.dispatch({ type: ActionType.ResetCharSkillsToLowerLevel })
             this.setState({ reloadingSkills: true, skillsClicked: [] })
@@ -688,27 +689,27 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
             logger.log(new Error(err))
         }
     }
-    disableExtraPathChoice = () => {
-        try {
-            if (!this.state.extraPathChoice) {
-                return;
-            }
-            this.setState({ extraPathChoice: false })
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
+    // disableExtraPathChoice = () => {
+    //     try {
+    //         if (!this.state.extraPathChoice) {
+    //             return;
+    //         }
+    //         this.setState({ extraPathChoice: false })
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
 
-    enableExtraPathChoice = () => {
-        try {
-            if (this.state.extraPathChoice) {
-                return;
-            }
-            this.setState({ extraPathChoice: true })
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
+    // enableExtraPathChoice = () => {
+    //     try {
+    //         if (this.state.extraPathChoice) {
+    //             return;
+    //         }
+    //         this.setState({ extraPathChoice: true })
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
 
     applyExtraPathChoice = (choice: any, index: number) => {
         try {
@@ -1154,29 +1155,29 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
         }
     }
 
-    extractCustomPathJson = async (pathName: any) => {
-        try {
-            const path: any = await subClassesApi.getSubclass(pathName)
-            if (this.props.options.pathFeature && path.data && this.state.character.level) {
-                this.setState({ customPathFeatureList: Object.values(path.data.levelUpChart[this.state.character.level]) })
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
+    // extractCustomPathJson = async (pathName: any) => {
+    //     try {
+    //         const path: any = await subClassesApi.getSubclass(pathName)
+    //         if (this.props.options.pathFeature && path.data && this.state.character.level) {
+    //             this.setState({ customPathFeatureList: Object.values(path.data.levelUpChart[this.state.character.level]) })
+    //         }
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
 
-    customOrOfficialPath = () => {
-        try {
-            if (Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name]) {
-                return Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level])
-            } else {
-                return this.state.customPathFeatureList
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-            return []
-        }
-    }
+    // customOrOfficialPath = () => {
+    //     try {
+    //         if (Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name]) {
+    //             return Object.values(Path[this.state.character.characterClass][this.state.pathChosen?.name || this.state.character.path.name][this.state.character.level])
+    //         } else {
+    //             return this.state.customPathFeatureList
+    //         }
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //         return []
+    //     }
+    // }
 
     render() {
         let CharSkillsFromStore: any = []
@@ -1196,7 +1197,13 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                     </View>
                     :
                     <View>
-                        {this.props.options.pathSelector ?
+                        <PathingLevelRoute
+                            beforeAnyChanges={this.state.beforeAnyChanges}
+                            pathFeature={this.props.options.pathFeature}
+                            returnUpdatedCharacter={() => { }}
+                            character={this.state.character}
+                            pathSelector={this.props.options.pathSelector} />
+                        {/* {this.props.options.pathSelector ?
                             <View>
                                 <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
                                     <AppText fontSize={20} textAlign={'center'}>As a {this.props.character.characterClass} at level {this.props.character.level} you can pick a path</AppText>
@@ -1209,7 +1216,7 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                                 </View>
                             </View>
                             :
-                            null}
+                            null} */}
                         {this.props.options.alwaysOnToolExpertise ?
                             <View style={{ padding: 15 }}>
                                 <AppText fontSize={18} textAlign={'center'}>You have expertise with all your proficient tools, doubling your proficiency score for them</AppText>
@@ -1293,7 +1300,7 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                             </View>
                             :
                             null}
-                        {this.props.options.pathFeature ?
+                        {/* {this.props.options.pathFeature ?
                             this.state.pathChosen || this.state.character.path ?
                                 <View>
                                     {this.state.pathInfoLoading ?
@@ -1403,7 +1410,7 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                                 :
                                 null
                             :
-                            null}
+                            null} */}
 
                         {this.state.character.level && this.state.character.level > 3 && allowedChangingPaths(this.state.character) ?
                             <AppChangePathChoiceAtLevelUp character={this.props.character} newPathChoice={(val: any) => { this.setState({ newPathChoice: val }) }} />
