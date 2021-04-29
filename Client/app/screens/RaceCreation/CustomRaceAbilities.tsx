@@ -106,33 +106,35 @@ export class CustomRaceAbilities extends Component<{ navigation: any }, CustomRa
                                         <IconGen name={'trash-can'} size={50} iconColor={Colors.danger} />
                                     </TouchableOpacity>
                                     <Modal visible={this.state.modalTruthList[index] === true} animationType='slide'>
-                                        <AppTextInput placeholder={"Feature Name"}
-                                            defaultValue={defaultVal[index].name}
-                                            onChangeText={(name: string) => {
-                                                const customRace = { ...this.state.customRace };
-                                                if (customRace.raceAbilities?.uniqueAbilities) {
-                                                    customRace.raceAbilities.uniqueAbilities[index].name = name
-                                                    this.setState({ customRace })
-                                                }
-                                            }} />
-                                        <AppTextInput
-                                            placeholder={"Feature Description"}
-                                            defaultValue={defaultVal[index].description}
-                                            onChangeText={(description: string) => {
-                                                const customRace = { ...this.state.customRace };
-                                                if (customRace.raceAbilities?.uniqueAbilities) {
-                                                    customRace.raceAbilities.uniqueAbilities[index].description = description
-                                                    this.setState({ customRace })
-                                                }
-                                            }}
-                                            numberOfLines={7} textAlignVertical={"top"} multiline={true} />
-                                        <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed}
-                                            width={180} height={50}
-                                            borderRadius={25} title={'Done'} onPress={() => {
-                                                let modalTruthList = this.state.modalTruthList;
-                                                modalTruthList[index] = false
-                                                this.setState({ modalTruthList })
-                                            }} />
+                                        <ScrollView style={{ backgroundColor: Colors.pageBackground }}>
+                                            <AppTextInput placeholder={"Feature Name"}
+                                                defaultValue={defaultVal[index].name}
+                                                onChangeText={(name: string) => {
+                                                    const customRace = { ...this.state.customRace };
+                                                    if (customRace.raceAbilities?.uniqueAbilities) {
+                                                        customRace.raceAbilities.uniqueAbilities[index].name = name
+                                                        this.setState({ customRace })
+                                                    }
+                                                }} />
+                                            <AppTextInput
+                                                placeholder={"Feature Description"}
+                                                defaultValue={defaultVal[index].description}
+                                                onChangeText={(description: string) => {
+                                                    const customRace = { ...this.state.customRace };
+                                                    if (customRace.raceAbilities?.uniqueAbilities) {
+                                                        customRace.raceAbilities.uniqueAbilities[index].description = description
+                                                        this.setState({ customRace })
+                                                    }
+                                                }}
+                                                numberOfLines={7} textAlignVertical={"top"} multiline={true} />
+                                            <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed}
+                                                width={180} height={50}
+                                                borderRadius={25} title={'Done'} onPress={() => {
+                                                    let modalTruthList = this.state.modalTruthList;
+                                                    modalTruthList[index] = false
+                                                    this.setState({ modalTruthList })
+                                                }} />
+                                        </ScrollView>
                                     </Modal>
                                 </View>
                             })}

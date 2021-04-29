@@ -111,20 +111,22 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
                         />}
                         ItemSeparatorComponent={ListItemSeparator} />
                     <Modal visible={this.state.pickSpellModal}>
-                        <AppText fontSize={25} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
-                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description}</AppText>
-                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
-                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
-                        <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
-                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                title={'Close'} onPress={() => { this.setState({ pickSpellModal: false, pickedSpell: new CustomSpellModal() }) }} />
+                        <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
+                            <AppText fontSize={25} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
+                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description}</AppText>
+                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
+                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
+                            <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                    title={'Close'} onPress={() => { this.setState({ pickSpellModal: false, pickedSpell: new CustomSpellModal() }) }} />
 
-                            <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                title={'Edit'} onPress={() => {
-                                    this.props.navigation.navigate("CustomSpellCreator", { character: this.props.route.params.character, edit: { true: true, spell: this.state.pickedSpell } })
-                                    this.setState({ pickSpellModal: false })
-                                }} />
+                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
+                                    title={'Edit'} onPress={() => {
+                                        this.props.navigation.navigate("CustomSpellCreator", { character: this.props.route.params.character, edit: { true: true, spell: this.state.pickedSpell } })
+                                        this.setState({ pickSpellModal: false })
+                                    }} />
+                            </View>
                         </View>
                     </Modal>
                 </View>

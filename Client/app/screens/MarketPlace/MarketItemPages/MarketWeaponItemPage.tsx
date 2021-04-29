@@ -69,6 +69,9 @@ export function MarketWeaponItemPage({ item, close }: Props) {
             if (!weaponList) {
                 const weaponList = [marketItem?.weaponInfo]
                 AsyncStorage.setItem(`${currentChar?._id}WeaponList`, JSON.stringify(weaponList))
+                await marketApi.addDownloadToMarketItem(item.market_id, item.marketType)
+                checkIfDownloadable()
+                setLoading(false)
                 return
             }
             const newWeaponList = JSON.parse(weaponList)

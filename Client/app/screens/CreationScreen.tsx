@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { AppButton } from '../components/AppButton';
 import { AppText } from '../components/AppText';
 import { Colors } from '../config/colors';
@@ -16,8 +17,8 @@ export class CreationScreen extends Component<{ navigation: any }, CreationScree
     }
     render() {
         return (
-            <View style={styles.container}>
-                <View style={{ flex: .5 }}>
+            <ScrollView style={styles.container}>
+                <View >
                     <AppText padding={10} textAlign={'center'} fontSize={30}>Create your own custom race!</AppText>
                     <AppText padding={10} textAlign={'center'} fontSize={18}>You can now create and share your very own race!</AppText>
                     <AppText padding={10} textAlign={'center'} fontSize={18}>Just follow the steps and start using your very own race</AppText>
@@ -31,7 +32,7 @@ export class CreationScreen extends Component<{ navigation: any }, CreationScree
                             this.props.navigation.navigate("CustomRaceStartScreen")
                         }} />
                 </View>
-                <View style={{ flex: .5 }}>
+                <View style={{ paddingTop: 40 }}>
                     <AppText padding={10} textAlign={'center'} fontSize={30}>Create your own custom Subclass!</AppText>
                     <AppText padding={10} textAlign={'center'} fontSize={18}>New in DnCreate!</AppText>
                     <AppText padding={10} textAlign={'center'} fontSize={18}>Just follow the steps and start using your very own Subclass</AppText>
@@ -45,7 +46,7 @@ export class CreationScreen extends Component<{ navigation: any }, CreationScree
                             this.props.navigation.navigate("CustomSubClassStart")
                         }} />
                 </View>
-            </View>
+            </ScrollView>
         )
     }
 }
@@ -54,7 +55,5 @@ export class CreationScreen extends Component<{ navigation: any }, CreationScree
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "space-evenly",
-        alignItems: "center"
     }
 });

@@ -48,6 +48,7 @@ interface SpellsState {
 
 export class Spells extends Component<{ navigation: any, route: any }, SpellsState>{
     static contextType = AuthContext;
+    private navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -69,7 +70,10 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
             character: this.props.route.params.char
 
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+
+
     async componentDidMount() {
         try {
             const stringedCustomSpellsJson = await AsyncStorage.getItem('customSpellList');
@@ -87,6 +91,21 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
         } catch (err) {
             logger.log(new Error(err))
         }
+    }
+
+    onFocus = async () => {
+        const stringedCustomSpellsJson = await AsyncStorage.getItem('customSpellList');
+        if (!stringedCustomSpellsJson) {
+            this.setState({ spellsJSON: spellsJsonImport, contentLoading: false }, () => {
+                this.loadSpells(this.state.shownSpells)
+            })
+            return
+        }
+        const CustomSpellsJson = JSON.parse(stringedCustomSpellsJson);
+        const spellsJSON = spellsJsonImport.concat(CustomSpellsJson)
+        this.setState({ spellsJSON, contentLoading: false }, () => {
+            this.loadSpells(this.state.shownSpells)
+        })
     }
 
     filterByClass = (shownSpells: any, newSpells: any) => {
@@ -296,6 +315,7 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                     return;
                 }
             }
+            // console.log(this.state.pickedSpell)
             const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
             if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
                 alert('You already possess this spell');

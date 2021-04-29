@@ -47,6 +47,7 @@ function checkSpellSlots(character: CharacterModel, spell: any) {
 
 
 function checkOnlyIfPicked(character: CharacterModel, spell: any) {
+    console.log(spell)
     const spellLevel = spellLevelChanger(spell.level);
     if (character.spells) {
         for (let item of character.spells[spellLevel]) {

@@ -28,7 +28,7 @@ import React, { useEffect, useState } from 'react'
 import { CreatePDF } from '../screens/CreatePDF';
 import { CustomSpellCreator } from '../screens/CustomSpellCreator';
 import { CustomSpellList } from '../screens/CustomSpellList';
-import { CharWeapons } from '../screens/charOptions/CharWeapons';
+import { CharWeapons } from '../screens/charOptions/CharacterWeapons/CharWeapons';
 import { CharEquipment } from '../screens/charOptions/CharEquipment';
 import { PersonalNotes } from '../screens/PersonalNotes';
 import { CitiesNote } from '../screens/charOptions/personalNoteTypes/CitiesNotes';

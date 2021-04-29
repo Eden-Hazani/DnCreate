@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Platform, Image } from 'react-native';
+import { View, StyleSheet, Platform, Image, ScrollView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AppText } from '../components/AppText';
 import * as Print from 'expo-print';
@@ -409,32 +409,35 @@ export class CreatePDF extends Component<{ route: any, navigation: any }, Create
 
     render() {
         return (
-            <View style={styles.container}>
-                <AppText textAlign={'center'} fontSize={20}> Generate a new PDF character sheet. </AppText>
-                <AppText padding={5} textAlign={'center'}>Generate a new PDF document based on your current character stats.</AppText>
-                <View style={styles.container}>
-                    <Image
-                        source={require('../../assets/pdfDragon.png')}
-                        style={{ width: 150, height: 150 }}
-                    />
-                    <AppText padding={15}>Press below to generate your pdf.</AppText>
-                    <AppText padding={15} textAlign={'center'}>This might take some time, please be patient.</AppText>
-                    {this.state.loading ?
-                        <AppActivityIndicator visible={this.state.loading} />
-                        :
-                        <TouchableOpacity onPress={() => {
-                            this.share(this.state.uri)
-                        }}>
-                            <View>
-                                <Image
-                                    source={require('../../assets/pdf.png')}
-                                    style={styles.imageStyle}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    }
+            <ScrollView style={styles.container}>
+                <View style={{ alignItems: 'center' }}>
+
+                    <AppText textAlign={'center'} fontSize={20}> Generate a new PDF character sheet. </AppText>
+                    <AppText padding={5} textAlign={'center'}>Generate a new PDF document based on your current character stats.</AppText>
+                    <View style={styles.image}>
+                        <Image
+                            source={require('../../assets/pdfDragon.png')}
+                            style={{ width: 150, height: 150 }}
+                        />
+                        <AppText padding={15}>Press below to generate your pdf.</AppText>
+                        <AppText padding={15} textAlign={'center'}>This might take some time, please be patient.</AppText>
+                        {this.state.loading ?
+                            <AppActivityIndicator visible={this.state.loading} />
+                            :
+                            <TouchableOpacity onPress={() => {
+                                this.share(this.state.uri)
+                            }}>
+                                <View>
+                                    <Image
+                                        source={require('../../assets/pdf.png')}
+                                        style={styles.imageStyle}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        }
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         )
     }
 }
@@ -445,7 +448,12 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         paddingTop: 50,
-        alignItems: 'center',
+    },
+    image: {
+        flex: 1,
+        padding: 10,
+        paddingTop: 50,
+        alignItems: "center"
     },
     titleText: {
         fontSize: 22,

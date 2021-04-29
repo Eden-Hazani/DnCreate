@@ -70,7 +70,7 @@ export default function CharacterHallList({ characters, openCharacter, deleteCha
                         inputRange,
                         outputRange: [0, 1, 0]
                     })
-                    return <View key={index} style={{ width, justifyContent: "center", alignItems: "center" }}>
+                    return <View key={index} style={{ width, justifyContent: "center", alignItems: "center", marginBottom: height / 5 }}>
                         <View style={{ position: "relative" }}>
                             <Animated.View
                                 style={{

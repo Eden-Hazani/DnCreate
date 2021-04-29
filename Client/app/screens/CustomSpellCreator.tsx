@@ -160,7 +160,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 description: values.description,
                 name: values.name,
                 classes: this.state.classPicked,
-                level: spellLevel
+                level: spellLevel === 'c' ? 'cantrip' : spellLevel
             }
             const stringedCustomSpells = await AsyncStorage.getItem('customSpellList');
             if (!stringedCustomSpells) {
@@ -180,8 +180,9 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
 
     editSpell = async (values: any, _id: string) => {
         try {
+            console.log(values)
             const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
-            const spellLevel = this.state.pickedLevel.charAt(0);
+            let spellLevel = this.state.pickedLevel.charAt(0);
             const newSpell: CustomSpellModal = {
                 type: spellType,
                 school: this.state.pickedSchool,
@@ -193,7 +194,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 higher_levels: values.higher_levels,
                 name: values.name,
                 classes: this.state.classPicked,
-                level: spellLevel
+                level: spellLevel === 'c' ? 'cantrip' : spellLevel
             }
             const customSpellString = await AsyncStorage.getItem('customSpellList');
             if (customSpellString) {
@@ -237,30 +238,21 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                         , description: this.state.isEdit.true ? this.state.isEdit.spell.description : ''
                         , duration: this.state.isEdit.true ? this.state.isEdit.spell.duration : ''
                         , name: this.state.isEdit.true ? this.state.isEdit.spell.name : ''
-                        , range: this.state.isEdit.true ? this.state.isEdit.spell.range : ''
+                        , range: this.state.isEdit.true ? this.state.isEdit.spell.range : '',
+                        higher_levels: this.state.isEdit.true ? this.state.isEdit.spell.higher_levels : ''
                     }}
                     onSubmit={(values: any) => this.state.isEdit.true ? this.editSpell(values, this.state.isEdit.spell._id) : this.createSpell(values)}
                     validationSchema={ValidationSchema}>
                     <View style={{ marginBottom: 40, justifyContent: "center", alignItems: "center" }}>
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.name : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.name = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.name : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
                             fieldName={"name"}
                             iconName={"text-short"}
                             placeholder={"Spell Name..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.description : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.description = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.description : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
                             numberOfLines={7} multiline={true} textAlignVertical={"top"}
@@ -268,24 +260,14 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                             iconName={"text-short"}
                             placeholder={"Spell Description..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.materials_needed : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.materials_needed = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.materials_needed : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
                             fieldName={"materials_needed"}
                             iconName={"text-short"}
                             placeholder={"Material requirements..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.duration : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.duration = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.duration : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
 
@@ -293,12 +275,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                             iconName={"text-short"}
                             placeholder={"Spell Duration..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.range : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.range = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.range : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
 
@@ -306,24 +283,14 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                             iconName={"text-short"}
                             placeholder={"Spell Range..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.casting_time : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.casting_time = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.casting_time : null}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
                             fieldName={"casting_time"}
                             iconName={"text-short"}
                             placeholder={"Casting Time..."} />
                         <AppFormField
-                            value={this.state.isEdit.true ? this.state.oldSpellValues.higher_levels : null}
-                            onChange={(e: any = {}) => {
-                                const oldSpellValues = { ...this.state.oldSpellValues };
-                                oldSpellValues.higher_levels = e.nativeEvent.text
-                                this.setState({ oldSpellValues })
-                            }}
+                            defaultValue={this.state.isEdit.true ? this.state.oldSpellValues.higher_levels : null}
                             numberOfLines={7} multiline={true} textAlignVertical={"top"}
                             width={Dimensions.get('screen').width / 1.4}
                             internalWidth={Dimensions.get('screen').width / 0.9}
