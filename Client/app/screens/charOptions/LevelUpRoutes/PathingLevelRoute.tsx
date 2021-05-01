@@ -159,8 +159,8 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
                                                 numberOfChoices={(numberOfChoices: number) => { this.setState({ numberOfChoices }) }}
                                                 resetExpertiseSkills={() => { resetExpertiseSkills() }}
                                                 character={character}
-                                                isExtraChoice={(val: boolean) => { this.setState({ extraPathChoice: val }) }}
-                                                applyExtraPathChoice={(val: CharacterModel) => console.log(val.pathFeatures)}
+                                                isExtraChoice={(val: boolean) => { }}
+                                                applyExtraPathChoice={(val: CharacterModel) => { }}
                                                 item={item}
                                                 extraPathChoiceClicked={[]}
                                                 isAdditionalSkillChoice={(val: any) => { this.setState({ additionalSkillPicks: val }) }}

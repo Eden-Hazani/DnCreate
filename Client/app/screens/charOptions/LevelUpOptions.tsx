@@ -1198,6 +1198,9 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                     :
                     <View>
                         <PathingLevelRoute
+                            errorList={[]}
+                            updateErrorList={() => { }}
+                            resetExpertiseSkills={() => this.resetExpertiseSkills()}
                             beforeAnyChanges={this.state.beforeAnyChanges}
                             pathFeature={this.props.options.pathFeature}
                             returnUpdatedCharacter={() => { }}

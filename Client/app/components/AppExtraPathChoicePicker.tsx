@@ -73,7 +73,7 @@ export class AppExtraPathChoicePicker extends Component<{
             const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
             extraPathChoiceClicked[index] = true;
             extraPathChoiceValue.push(choice);
-            this.setState({ extraPathChoiceValue }, () => this.updateCharacter())
+            this.setState({ extraPathChoiceValue }, () => this.updateCharacter('ADD', choice))
 
         }
         else if (this.state.extraPathChoiceClicked[index]) {
@@ -81,20 +81,37 @@ export class AppExtraPathChoicePicker extends Component<{
             const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
             extraPathChoiceClicked[index] = false;
             extraPathChoiceValue = extraPathChoiceValue.filter((val: any) => choice.name !== val.name);
-            this.setState({ extraPathChoiceValue }, () => this.updateCharacter())
+            this.setState({ extraPathChoiceValue }, () => this.updateCharacter('REMOVE', choice))
         }
 
 
     }
 
-    updateCharacter = () => {
+    updateCharacter = (removeOrAdd: string, choice: any) => {
         const character = { ...this.props.character }
         const officialOrCustom = Path[this.props.character.characterClass][this.props.pathChosen.name] ? Path[this.props.character.characterClass][this.props.pathChosen.name][this.props.character.level] : this.props.customPathFeatureList
-        const pathResult = PathFeatureOrganizer(officialOrCustom, [])
+        const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
         for (let item of pathResult) {
-            if (character.pathFeatures)
-                character.pathFeatures.push(item)
+            if (removeOrAdd === "ADD") {
+                if (character.pathFeatures)
+                    character.pathFeatures.push(item)
+            }
+            if (removeOrAdd === "REMOVE") {
+                if (character.pathFeatures) {
+                    let index: number = 0;
+                    for (let pathItem of character.pathFeatures) {
+                        if (pathItem.choice) {
+                            if (pathItem.choice[0].name === choice.name) {
+                                console.log(pathItem.choice[0].name === choice.name)
+                                character.pathFeatures.splice(index, 1)
+                            }
+                        }
+                        index++
+                    }
+                }
+            }
         }
+        console.log(character.pathFeatures)
         this.props.applyExtraPathChoice(character)
     }
 
