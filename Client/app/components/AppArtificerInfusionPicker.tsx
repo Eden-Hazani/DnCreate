@@ -9,6 +9,7 @@ import { AppText } from './AppText';
 import * as infusionList from '../../jsonDump/artificerInfusions.json'
 import { AppButton } from './AppButton';
 import { AppTextInput } from './forms/AppTextInput';
+import { alterErrorSequence } from '../screens/charOptions/LevelUpRoutes/functions/LevelUpUtilityFunctions';
 
 interface AppArtificerInfusionPickerState {
     beforeChangeChar: CharacterModel,
@@ -25,7 +26,7 @@ interface AppArtificerInfusionPickerState {
 
 
 export class AppArtificerInfusionPicker extends Component<{
-    character: CharacterModel, totalInfusions: any, loadInfusions: any, infusionsToPick: any
+    character: CharacterModel, totalInfusions: any, updateCharacter: Function, errorList: any, updateErrorList: Function,
 }, AppArtificerInfusionPickerState>{
     constructor(props: any) {
         super(props)
@@ -84,9 +85,9 @@ export class AppArtificerInfusionPicker extends Component<{
                             this.state.infusionsClicked[index] = true
                         }
                     }))
-                    this.props.infusionsToPick(true)
+                    alterErrorSequence({ isError: true, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                     if (this.props.totalInfusions === this.state.pickedInfusions.length) {
-                        this.props.infusionsToPick(false)
+                        alterErrorSequence({ isError: false, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                     }
                 }
                 this.setState({ loading: false })
@@ -96,7 +97,38 @@ export class AppArtificerInfusionPicker extends Component<{
         }
     }
     componentWillUnmount() {
-        this.props.infusionsToPick(false)
+        alterErrorSequence({ isError: false, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
+    }
+
+    // alterErrorSequence = (error: { isError: boolean, errorDesc: string }) => {
+    //     let updatedErrorList = [...this.props.errorList];
+    //     let flag: boolean = false;
+    //     for (let item of updatedErrorList) {
+    //         if (error.errorDesc === item.errorDesc) {
+    //             item.isError = error.isError;
+    //             flag = true
+    //         }
+    //     }
+    //     if (!flag) {
+    //         updatedErrorList = [...this.props.errorList, error]
+    //     }
+    //     this.props.updateErrorList(updatedErrorList)
+    // }
+
+    updatedCharacter = (addOrRemove: string, item: any) => {
+        const character = { ...this.props.character };
+        if (addOrRemove === "ADD") {
+            if (character.charSpecials)
+                character.charSpecials.artificerInfusions = this.state.pickedInfusions;
+            this.props.updateCharacter(character)
+        }
+        if (addOrRemove === "REMOVE") {
+            if (character.charSpecials) {
+                const updatedInfusions = character.charSpecials.artificerInfusions?.filter((infusion) => infusion.name !== item.name);
+                character.charSpecials.artificerInfusions = updatedInfusions;
+                this.props.updateCharacter(character)
+            }
+        }
     }
 
 
@@ -116,9 +148,9 @@ export class AppArtificerInfusionPicker extends Component<{
                         infusionsClicked[index] = false;
                         pickedInfusions = pickedInfusions.filter((val: any) => item.name !== val.name);
                         this.setState({ pickedInfusions, extraInfusionChange: true }, () => {
-                            this.props.loadInfusions(this.state.pickedInfusions)
+                            this.updatedCharacter("ADD", item)
                         })
-                        this.props.infusionsToPick(true)
+                        alterErrorSequence({ isError: true, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                         return;
                     }
                     if (unit.name === item.name && this.state.beforeChangeChar.level >= 2 && !this.state.infusionsClicked[index]) {
@@ -131,9 +163,9 @@ export class AppArtificerInfusionPicker extends Component<{
                         infusionsClicked[index] = true;
                         pickedInfusions.push(item);
                         this.setState({ pickedInfusions, extraInfusionChange: false }, () => {
-                            this.props.loadInfusions(this.state.pickedInfusions)
+                            this.updatedCharacter("ADD", item)
                             if (this.state.pickedInfusions.length === this.props.totalInfusions) {
-                                this.props.infusionsToPick(false)
+                                alterErrorSequence({ isError: false, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                             }
                         })
                         return;
@@ -149,9 +181,9 @@ export class AppArtificerInfusionPicker extends Component<{
                     infusionsClicked[index] = true;
                     pickedInfusions.push(item);
                     this.setState({ pickedInfusions }, () => {
-                        this.props.loadInfusions(this.state.pickedInfusions)
+                        this.updatedCharacter("ADD", item)
                         if (this.state.pickedInfusions.length === this.props.totalInfusions) {
-                            this.props.infusionsToPick(false)
+                            alterErrorSequence({ isError: false, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                         }
                     })
                 }
@@ -161,9 +193,9 @@ export class AppArtificerInfusionPicker extends Component<{
                     infusionsClicked[index] = false;
                     pickedInfusions = pickedInfusions.filter((val: any) => item.name !== val.name);
                     this.setState({ pickedInfusions }, () => {
-                        this.props.loadInfusions(this.state.pickedInfusions)
+                        this.updatedCharacter("REMOVE", item)
                     })
-                    this.props.infusionsToPick(true)
+                    alterErrorSequence({ isError: true, errorDesc: "You Have Infusions To Pick" }, this.props.errorList, this.props.updateErrorList)
                 }
             }
         } catch (err) {
@@ -179,7 +211,7 @@ export class AppArtificerInfusionPicker extends Component<{
                 </View>
                 {infusionList.infusions.concat(this.state.replicatedItems).map((item: any, index: number) =>
                     <View key={item.name}>
-                        {this.state.disabledInfusions[index] && <AppText padding={5} color={Colors.danger} textAlign={'center'}>This Infusion has a level requirement of {item.perReq}</AppText>}
+                        {this.state.disabledInfusions[index] && <AppText padding={5} color={Colors.danger} textAlign={'center'}>This Infusion has a level requirement of {item.preReq}</AppText>}
                         <TouchableOpacity style={[styles.item, {
                             backgroundColor: this.state.disabledInfusions[index] ? Colors.earthYellow : this.state.infusionsClicked[index] ?
                                 Colors.bitterSweetRed : Colors.lightGray

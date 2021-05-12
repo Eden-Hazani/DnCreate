@@ -12,38 +12,34 @@ import { spellCharMagicRenaming } from './helperFunctions/spellCharMagicRenaming
 import { hpColors } from '../../../utility/hpColors';
 import { AppButton } from '../../components/AppButton';
 import logger from '../../../utility/logger';
+import { AppActivityIndicator } from '../../components/AppActivityIndicator';
+import { nonWarlockSpellCounter, warlockSpellCounter } from './helperFunctions/magicSpellCounters';
 
 interface CharMagicState {
-    availableMagic: number[]
+    availableMagic: number[];
+    loading: boolean;
 }
 
 export class CharMagic extends Component<{ isDm: boolean, character: CharacterModel, currentProficiency: number, reloadChar: any }, CharMagicState> {
     constructor(props: any) {
         super(props)
         this.state = {
+            loading: true,
             availableMagic: []
         }
     }
 
     async componentDidMount() {
         try {
-            let availableMagic = await AsyncStorage.getItem(`${this.props.character._id}availableMagic`);
-            if (this.props.character.magic) {
-                const totalMagic = Object.values(this.props.character.magic);
-                if (availableMagic) {
-                    let availableMagicArray = JSON.parse(availableMagic);
-                    availableMagicArray = availableMagicArray.filter((item: number) => item !== 0);
-                    this.setState({ availableMagic: availableMagicArray })
-                }
-                if (!availableMagic) {
-                    const newAvailableMagic: number[] = [];
-                    for (let item of totalMagic) {
-                        newAvailableMagic.push(item)
-                    }
-                    this.setState({ availableMagic: newAvailableMagic })
-                    await AsyncStorage.setItem(`${this.props.character._id}availableMagic`, JSON.stringify(newAvailableMagic));
-                }
+            if (this.props.character.characterClass !== "Warlock") {
+                const { availableMagic, loading } = await nonWarlockSpellCounter(this.props.character)
+                this.setState({ availableMagic, loading })
+
+            } else if (this.props.character.characterClass === "Warlock") {
+                const { availableMagic, loading } = await warlockSpellCounter(this.props.character);
+                this.setState({ availableMagic, loading })
             }
+
         } catch (err) {
             logger.log(new Error(err))
         }
@@ -193,13 +189,24 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                     <View>
                         {this.props.character.characterClass === "Warlock" ?
                             <View>
-                                <View style={{ marginBottom: 5, padding: 15, paddingBottom: 5 }}>
-                                    <AppText fontSize={18} textAlign={'center'}>You currently have a total of {this.props.character.magic && this.props.character.magic.cantrips} Available</AppText>
-                                </View>
-                                <View style={{ marginBottom: 20, padding: 15 }}>
-                                    <AppText fontSize={18} textAlign={'center'}>You currently have {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
-                                    <AppText fontSize={18} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
-                                    <AppText fontSize={18} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
+                                <View style={{ marginBottom: 20, padding: 15, justifyContent: "center", alignItems: "center" }}>
+                                    <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Tap the spell slot to use it.</AppText>
+                                    <AppText textAlign={'center'} color={Colors.berries} fontSize={18}>Long tap the spell slot to restore it.</AppText>
+                                    <TouchableOpacity style={[styles.spellSlot,
+                                    { backgroundColor: hpColors(this.state.availableMagic[0], this.props.character.charSpecials?.warlockSpellSlots || 0) }]}
+                                        onLongPress={() => {
+                                            Vibration.vibrate(400)
+                                            this.renewSpellSlot(0)
+                                        }} onPress={() => {
+                                            this.useSpellSlot(0)
+                                        }}>
+                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Max slot level: {this.props.character.charSpecials?.warlockSpellSlotLevel}</AppText>
+                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {this.props.character.charSpecials?.warlockSpellSlots}</AppText>
+                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[0]}</AppText>
+                                    </TouchableOpacity>
+                                    <AppText fontSize={18} padding={15} textAlign={'center'}>You currently have {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlots} spell slots that can be used up to {this.props.character.charSpecials && this.props.character.charSpecials.warlockSpellSlotLevel} spell level</AppText>
+                                    <AppText fontSize={18} padding={5} textAlign={'center'}>Remember that as a warlock your spell slots are different from all other classes.</AppText>
+                                    <AppText fontSize={18} padding={5} textAlign={'center'}>you are able to use any of your spell slots for any spell level (that you have access to.)</AppText>
                                 </View>
                             </View>
                             :
@@ -221,30 +228,32 @@ export class CharMagic extends Component<{ isDm: boolean, character: CharacterMo
                                         }} />
 
                                 </View>
-                                <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
-                                    {Object.entries(this.props.character.magic !== undefined && this.props.character.magic).map((item, index) =>
-                                        <View key={index}>
-                                            {item[0] === "cantrips" ?
-                                                <View style={[styles.spellSlot, { backgroundColor: Colors.metallicBlue }]}>
-                                                    <AppText padding={5} textAlign={'left'} fontSize={22} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
-                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={20}>Cantrips have unlimited uses</AppText>
-                                                </View>
-                                                :
-                                                <TouchableOpacity disabled={item[1] === 0 || item[1] === null} style={[styles.spellSlot,
-                                                { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
-                                                    onLongPress={() => {
-                                                        Vibration.vibrate(400)
-                                                        this.renewSpellSlot(index)
-                                                    }} onPress={() => {
-                                                        this.useSpellSlot(index)
-                                                    }}>
-                                                    <AppText padding={5} textAlign={'left'} fontSize={18} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
-                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {item[1]}</AppText>
-                                                    <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[index]}</AppText>
-                                                </TouchableOpacity>
-                                            }
-                                        </View>)}
-                                </View>
+                                {this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
+                                    <View style={{ justifyContent: "space-evenly", flexDirection: 'row', flexWrap: "wrap" }}>
+                                        {Object.entries(this.props.character.magic !== undefined && this.props.character.magic).map((item, index) =>
+                                            <View key={index}>
+                                                {item[0] === "cantrips" ?
+                                                    <View style={[styles.spellSlot, { backgroundColor: Colors.metallicBlue }]}>
+                                                        <AppText padding={5} textAlign={'left'} fontSize={22} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
+                                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={20}>Cantrips have unlimited uses</AppText>
+                                                    </View>
+                                                    :
+                                                    <TouchableOpacity disabled={item[1] === 0 || item[1] === null} style={[styles.spellSlot,
+                                                    { backgroundColor: hpColors(this.state.availableMagic[index], item[1]) }]}
+                                                        onLongPress={() => {
+                                                            Vibration.vibrate(400)
+                                                            this.renewSpellSlot(index)
+                                                        }} onPress={() => {
+                                                            this.useSpellSlot(index)
+                                                        }}>
+                                                        <AppText padding={5} textAlign={'left'} fontSize={18} color={Colors.whiteInDarkMode}>{spellCharMagicRenaming(item[0])}</AppText>
+                                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={15}>Total slots: {item[1]}</AppText>
+                                                        <AppText padding={5} textAlign={'left'} color={Colors.black} fontSize={18}>Available slots: {this.state.availableMagic[index]}</AppText>
+                                                    </TouchableOpacity>
+                                                }
+                                            </View>)}
+                                    </View>
+                                }
                             </View>
                         }
                     </View>

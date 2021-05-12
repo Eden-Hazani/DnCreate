@@ -4,7 +4,6 @@ import { RaceModel } from "../../../models/raceModel";
 
 export function addRacialSpells(race: RaceModel, character: CharacterModel) {
     let spells: string[] = []
-
     if (character.addedRaceFeatures) {
         for (let item of character.addedRaceFeatures) {
             if (item.addedSpells) {

@@ -1,14 +1,34 @@
 export class SpellsModel {
-    public constructor(
-        public cantrips?: any[],
-        public firstLevelSpells?: any[],
-        public secondLevelSpells?: any[],
-        public thirdLevelSpells?: any[],
-        public forthLevelSpells?: any[],
-        public fifthLevelSpells?: any[],
-        public sixthLevelSpells?: any[],
-        public seventhLevelSpells?: any[],
-        public eighthLevelSpells?: any[],
-        public ninthLevelSpells?: any[],
-    ) { }
+    cantrips: any[];
+    firstLevelSpells?: any[];
+    secondLevelSpells?: any[];
+    thirdLevelSpells?: any[];
+    forthLevelSpells?: any[];
+    fifthLevelSpells?: any[];
+    sixthLevelSpells?: any[];
+    seventhLevelSpells?: any[];
+    eighthLevelSpells?: any[];
+    ninthLevelSpells?: any[];
+    constructor(
+        cantrips?: any[],
+        firstLevelSpells?: any[],
+        secondLevelSpells?: any[],
+        thirdLevelSpells?: any[],
+        forthLevelSpells?: any[],
+        fifthLevelSpells?: any[],
+        sixthLevelSpells?: any[],
+        seventhLevelSpells?: any[],
+        eighthLevelSpells?: any[],
+        ninthLevelSpells?: any[],
+    ) {
+        this.cantrips = []
+        this.firstLevelSpells = []
+        this.thirdLevelSpells = []
+        this.forthLevelSpells = []
+        this.fifthLevelSpells = []
+        this.sixthLevelSpells = []
+        this.seventhLevelSpells = []
+        this.eighthLevelSpells = []
+        this.ninthLevelSpells = []
+    }
 }

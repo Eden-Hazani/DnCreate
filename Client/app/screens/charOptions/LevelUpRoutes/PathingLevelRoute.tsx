@@ -10,7 +10,8 @@ import { ActionType } from '../../../redux/action-type';
 import { store } from '../../../redux/store';
 import { AppPathAdditionalApply } from '../AppPathAdditionalApply';
 import { SubClassList } from '../SubClassList';
-import { addPathArmor, addSpellAvailabilityByName, loadPathElements, loadSpellsFromList, addPathArmorProficiency, newPathFirstLevelMagic, loadPathBattleManuevers, loadPathSavingThrows, loadPathUnrestrictedMagic, loadPathSpecificSpell, addPathLanguages, addPathWeaponProficiency, applyExtraPathChoice } from './functions/characterUpdateFunctions';
+import { addPathArmor, addSpellAvailabilityByName, loadPathElements, loadSpellsFromList, addPathArmorProficiency, newPathFirstLevelMagic, loadPathBattleManuevers, loadPathSavingThrows, loadPathUnrestrictedMagic, loadPathSpecificSpell, addPathLanguages, addPathWeaponProficiency } from './functions/characterUpdateFunctions';
+import { alterErrorSequence } from './functions/LevelUpUtilityFunctions';
 import { extractCustomPathJson, customOrOfficialPath } from './functions/pathFunctions';
 
 
@@ -33,14 +34,27 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
     const [currentPathInformation, setCurrentPathInformation] = useState<any>(null)
 
     useEffect(() => {
+        if (!character.path && pathSelector) {
+            alterErrorSequence({ isError: true, errorDesc: 'Must Pick A Path' }, errorList, updateErrorList)
+        }
         if (pathChosen !== null && character.level) {
             getPathDetails()
+        } else {
+            if (character.path !== null) {
+                const updatedCharacter = { ...character };
+                updatedCharacter.path = null
+                returnUpdatedCharacter(updatedCharacter)
+            }
         }
     }, [pathChosen])
 
     const getPathDetails = async () => {
         if (pathChosen !== null && character.level) {
+            const updatedCharacter = { ...character };
             const result = await customOrOfficialPath(character, pathChosen, character.path, pathFeature)
+            updatedCharacter.path = pathChosen
+            returnUpdatedCharacter(updatedCharacter)
+            alterErrorSequence({ isError: false, errorDesc: 'Must Pick A Path' }, errorList, updateErrorList)
             setCurrentPathInformation(result)
         }
     }
@@ -72,16 +86,6 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
         } catch (err) {
             logger.log(new Error(err))
         }
-    }
-
-    const alterErrorSequence = (error: { isError: boolean, errorDesc: string }) => {
-        const updatedErrorList = [...errorList];
-        for (let item of updatedErrorList) {
-            if (error.errorDesc === item.errorDesc) {
-                item.isError = error.isError;
-            }
-        }
-        updateErrorList(updatedErrorList)
     }
 
     return (
@@ -129,14 +133,14 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
                                                 armorToLoad={(val: any) => { addPathArmor(val, character) }}
                                                 loadFirstLevelSpells={(val: any) => returnUpdatedCharacter(newPathFirstLevelMagic(val.newSpells, val.spellsKnown, character))}
                                                 loadCharacter={(character: CharacterModel) => returnUpdatedCharacter(character)}
-                                                languagesToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Still Have Languages To Pick From' })}
-                                                pickDruidCircle={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick Druid Circle' })}
-                                                fightingStylesToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick A Fighting Style' })}
-                                                isAdditionalToolChoice={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Tools To Pick From' })}
+                                                languagesToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Still Have Languages To Pick From' }, errorList, updateErrorList)}
+                                                pickDruidCircle={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick Druid Circle' }, errorList, updateErrorList)}
+                                                fightingStylesToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick A Fighting Style' }, errorList, updateErrorList)}
+                                                isAdditionalToolChoice={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Tools To Pick From' }, errorList, updateErrorList)}
                                                 pathChosen={pathChosen?.name || character.path.name}
                                                 pathChosenObj={pathChosen || character.path}
-                                                maneuversToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Maneuvers To Pick' })}
-                                                elementsToPick={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Elements To Pick' })}
+                                                maneuversToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Maneuvers To Pick' }, errorList, updateErrorList)}
+                                                elementsToPick={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Elements To Pick' }, errorList, updateErrorList)}
                                                 loadElements={(val: any) => returnUpdatedCharacter(loadPathElements(character, val))}
                                                 loadManeuvers={(val: any) => returnUpdatedCharacter(loadPathBattleManuevers(character, val))}
                                                 returnSavingThrows={(val: any) => returnUpdatedCharacter(loadPathSavingThrows(character, val))}
@@ -147,26 +151,24 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
                                                 loadWeapons={(weapons: any) => returnUpdatedCharacter(addPathWeaponProficiency(character, weapons))}
                                                 resetExpertiseSkills={(skill: any) => { resetExpertiseSkills(skill) }}
                                                 loadArmors={(armors: any) => returnUpdatedCharacter(addPathArmorProficiency(character, armors))}
-                                                isAdditionalSkillChoice={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Choices To Pick From' })}
+                                                isAdditionalSkillChoice={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Choices To Pick From' }, errorList, updateErrorList)}
                                                 character={character}
                                                 pathItem={item}
                                                 loadSkills={() => returnUpdatedCharacter(store.getState().character)} />
                                         }
                                         {item.choice &&
                                             <AppExtraPathChoicePicker
+                                                returnError={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Choices To Pick From' }, errorList, updateErrorList)}
+                                                beforeAnyChanges={beforeAnyChanges}
                                                 customPathFeatureList={currentPathInformation}
                                                 pathChosen={pathChosen}
-                                                numberOfChoices={(numberOfChoices: number) => { this.setState({ numberOfChoices }) }}
                                                 resetExpertiseSkills={() => { resetExpertiseSkills() }}
                                                 character={character}
-                                                isExtraChoice={(val: boolean) => { }}
-                                                applyExtraPathChoice={(val: CharacterModel) => { }}
+                                                applyExtraPathChoice={(val: CharacterModel) => { returnUpdatedCharacter(val) }}
                                                 item={item}
                                                 extraPathChoiceClicked={[]}
-                                                isAdditionalSkillChoice={(val: any) => { this.setState({ additionalSkillPicks: val }) }}
-                                                loadSkills={(val: any[]) => {
-                                                    this.setState({ character: store.getState().character })
-                                                }}
+                                                isAdditionalSkillChoice={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Choices To Pick From' }, errorList, updateErrorList)}
+                                                loadSkills={(val: any[]) => returnUpdatedCharacter(store.getState().character)}
                                             />}
                                     </View>)}
                             </View>
