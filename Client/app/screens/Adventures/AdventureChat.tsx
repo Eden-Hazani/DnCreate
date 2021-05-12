@@ -67,6 +67,13 @@ export function AdventureChat({ navigation, route }: Props) {
         }
     }, [currentMessage])
 
+    useEffect(() => {
+        console.log(messageArray.length)
+        if (messageArray.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: true })
+        }
+    }, [messageArray])
+
     const getMessages = async () => {
         const { messageArray, usernameColor } = await getStartingMessages(props.adventure_id, userNameColorArray);
         setMessageArray(messageArray);
@@ -94,14 +101,10 @@ export function AdventureChat({ navigation, route }: Props) {
                 <View style={styles.messageBoardContainer}>
                     <FlatList
                         keyboardShouldPersistTaps="always"
-                        onScrollToIndexFailed={info => {
-                            const wait = new Promise(resolve => setTimeout(resolve, 500));
-                            wait.then(() => {
-                                flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
-                            });
-                        }}
+                        getItemLayout={(data, index) => (
+                            { length: 70, offset: 70 * index, index }
+                        )}
                         ref={flatListRef}
-                        style={{ flex: 1 }}
                         refreshControl={
                             <RefreshControl
                                 enabled={true}

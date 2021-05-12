@@ -265,7 +265,7 @@ router.post("/sendMessage", verifyLogged, upload.none(), async (request, respons
         const targetAdventure = await adventureLogic.findAdventure(message.adventureIdentifier);
         for (let charId of targetAdventure[0].participants_id) {
             if (charId.toString() !== message.sender_id) {
-                let char = await userLogic.getChar(charId);
+                let char = await userLogic.getChar(charId.toString());
                 let user = await authLogic.validateInSystem(char.user_id.toString())
                 const { expoPushToken } = user;
                 if (Expo.isExpoPushToken(expoPushToken)) {
@@ -273,7 +273,6 @@ router.post("/sendMessage", verifyLogged, upload.none(), async (request, respons
                 }
             }
         }
-        console.log(message.sender_id, targetAdventure[0].leader_id)
         if (message.sender_id !== targetAdventure[0].leader_id) {
             let user = await authLogic.validateInSystem(targetAdventure[0].leader_id)
             const { expoPushToken } = user;

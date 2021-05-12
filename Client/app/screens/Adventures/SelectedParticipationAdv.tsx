@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { Config } from '../../../config';
 import logger from '../../../utility/logger';
 import adventureApi from '../../api/adventureApi';
+import AuthContext from '../../auth/context';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
@@ -24,6 +25,7 @@ interface SelectedParticipationAdvState {
 
 export class SelectedParticipationAdv extends Component<{ navigation: any, route: any }, SelectedParticipationAdvState> {
     navigationSubscription: any;
+    static contextType = AuthContext;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -142,7 +144,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                                 borderRadius={15} width={150} height={70} title={"Adventure Chat"} backgroundColor={Colors.bitterSweetRed}
                                 onPress={() => this.props.navigation.navigate('AdventureChat',
                                     {
-                                        participantChar: { name: "DM", _id: this.context.user._id },
+                                        participantChar: this.state.participantChar,
                                         adventureIdentifier: this.state.adventure.adventureIdentifier,
                                         adventure_id: this.state.adventure._id,
                                         DM_id: this.state.adventure.leader_id,
