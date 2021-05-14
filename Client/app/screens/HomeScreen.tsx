@@ -95,7 +95,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         try {
             serverDice()
             this.checkForNews();
-            if (store.getState().nonUser) {
+            if (store.getState().nonUser && this.checkValidNonUserChar()) {
                 this.setState({ loading: true }, () => {
                     setTimeout(() => {
                         this.props.navigation.navigate("CharSkillPick", { nonUser: true });
@@ -112,6 +112,18 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         } catch (err) {
             this.setState({ loading: false })
             logger.log(new Error(err))
+        }
+    }
+
+    checkValidNonUserChar = () => {
+        const char: CharacterModel = store.getState().beforeRegisterChar;
+        console.log(char)
+        if (!char.background?.backgroundName) {
+            store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
+            store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })
+            return false
+        } else {
+            return true
         }
     }
 

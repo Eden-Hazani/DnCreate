@@ -142,6 +142,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 this.sendInfo(characterInfo)
                 return;
             }
+            store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: characterInfo })
             this.setState({ nonUserPauseModel: true })
             return;
         }

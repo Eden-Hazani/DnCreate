@@ -121,7 +121,7 @@ export class Register extends Component<{ fireOnCancel: any, showCancelButt: any
                                                     await AsyncStorage.removeItem(`DicePool`)
                                                     await AsyncStorage.removeItem(`AttributeStage`)
                                                     store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
-                                                    store.dispatch({ type: ActionType.SetInfoToChar, payload: new CharacterModel() })
+                                                    store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar, payload: new CharacterModel() })
                                                     this.props.fireOnCancel()
                                                 }} />
                                         }
