@@ -43,6 +43,7 @@ import { LevelUpMagic } from './LevelUpRoutes/LevelUpMagic';
 import { LevelUpFightingStyle } from './LevelUpRoutes/LevelUpFightingStyle';
 import { LevelUpMonkArts } from './LevelUpRoutes/LevelUpMonkArts';
 import { LevelUpSneakAttackDie } from './LevelUpRoutes/LevelUpSneakAttackDie';
+import { LevelUpMetaMagic } from './LevelUpRoutes/LevelUpMetaMagic';
 
 
 interface LevelUpOptionsState {
@@ -280,9 +281,9 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
             if (this.props.options.abilityPointIncrease) {
                 this.setState({ totalAbilityPoints: 2 });
             }
-            if (this.props.options.metamagic) {
-                this.setState({ totalMetaMagicPoints: this.props.options.metamagic.amount });
-            }
+            // if (this.props.options.metamagic) {
+            //     this.setState({ totalMetaMagicPoints: this.props.options.metamagic.amount });
+            // }
             if (this.props.options.eldritchInvocations) {
                 this.setState({ totalInvocationPoints: this.props.options.eldritchInvocations })
             }
@@ -542,40 +543,40 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
     //     }
     // }
 
-    pickMetaMagic = (magic: any, index: number) => {
-        try {
-            let metaMagic = this.state.metaMagic;
-            if (!this.state.metamagicClicked[index]) {
-                if (this.state.metaMagic.length >= this.state.totalMetaMagicPoints) {
-                    alert(`You can only pick ${this.state.totalMetaMagicPoints} Metamagic abilities.`)
-                    return;
-                }
-                const metamagicClicked = this.state.metamagicClicked;
-                metamagicClicked[index] = true;
-                metaMagic.push(magic)
-                this.setState({ metaMagic, metamagicClicked })
-            }
-            else if (this.state.metamagicClicked[index]) {
-                metaMagic = metaMagic.filter(val => val.name !== magic.name);
-                const metamagicClicked = this.state.metamagicClicked;
-                metamagicClicked[index] = false;
-                this.setState({ metaMagic, metamagicClicked })
-            }
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
-    addMetaMagic = () => {
-        try {
-            if (this.state.metaMagic.length !== this.state.totalMetaMagicPoints) {
-                alert(`You still have ${this.state.totalMetaMagicPoints - this.state.metaMagic.length} Metamagic points`);
-                return false;
-            }
-            return true;
-        } catch (err) {
-            logger.log(new Error(err))
-        }
-    }
+    // pickMetaMagic = (magic: any, index: number) => {
+    //     try {
+    //         let metaMagic = this.state.metaMagic;
+    //         if (!this.state.metamagicClicked[index]) {
+    //             if (this.state.metaMagic.length >= this.state.totalMetaMagicPoints) {
+    //                 alert(`You can only pick ${this.state.totalMetaMagicPoints} Metamagic abilities.`)
+    //                 return;
+    //             }
+    //             const metamagicClicked = this.state.metamagicClicked;
+    //             metamagicClicked[index] = true;
+    //             metaMagic.push(magic)
+    //             this.setState({ metaMagic, metamagicClicked })
+    //         }
+    //         else if (this.state.metamagicClicked[index]) {
+    //             metaMagic = metaMagic.filter(val => val.name !== magic.name);
+    //             const metamagicClicked = this.state.metamagicClicked;
+    //             metamagicClicked[index] = false;
+    //             this.setState({ metaMagic, metamagicClicked })
+    //         }
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
+    // addMetaMagic = () => {
+    //     try {
+    //         if (this.state.metaMagic.length !== this.state.totalMetaMagicPoints) {
+    //             alert(`You still have ${this.state.totalMetaMagicPoints - this.state.metaMagic.length} Metamagic points`);
+    //             return false;
+    //         }
+    //         return true;
+    //     } catch (err) {
+    //         logger.log(new Error(err))
+    //     }
+    // }
 
 
     addFightingStyle = () => {
@@ -1285,20 +1286,20 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                             />
                             : null}
                         {this.props.options.metamagic ?
-                            // <View>
-                            //     <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}> level {this.props.character.level} {this.props.character.characterClass}</AppText>
-                            //     <AppText textAlign={'center'}>You now gain the ability to twist your spells to suit your needs.</AppText>
-                            //     <AppText textAlign={'center'}>You gain two of the following Metamagic options of your choice. You gain another one at 10th and 17th level.</AppText>
-                            //     {filterAlreadyPicked(this.props.options.metamagic.value, this.state.character.charSpecials && this.state.character.charSpecials.sorcererMetamagic ? this.state.character.charSpecials.sorcererMetamagic : []).map((magic: any, index: number) =>
-                            //         <TouchableOpacity key={index} onPress={() => { this.pickMetaMagic(magic, index) }} style={[styles.longTextItem, { backgroundColor: this.state.metamagicClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}>
-                            //             <AppText fontSize={20} color={this.state.metamagicClicked[index] ? Colors.black : Colors.bitterSweetRed}>{magic.name}</AppText>
-                            //             <AppText>{magic.description}</AppText>
-                            //         </TouchableOpacity>)}
-                            // </View>
-                            : null}
-                        {this.props.options.sorceryPoints ?
-                            <AppText textAlign={'center'}>You now Possess {this.props.options.sorceryPoints} sorcery points!</AppText>
-                            : null}
+                            <LevelUpMetaMagic
+                                character={this.state.character}
+                                metaMagic={this.props.options.metamagic}
+                                totalMetaMagicPoints={this.props.options.metamagic.amount}
+                                beforeLevelUp={this.state.beforeAnyChanges}
+                                errorList={this.state.errorList}
+                                updateErrorList={(errorList: { isError: boolean, errorDesc: string }[]) => {
+                                    console.log(errorList)
+                                    this.setState({ errorList })
+                                }}
+                                updateCharacter={(character: CharacterModel) => this.setState({ character })}
+                            /> : null}
+
+                        {this.props.options.sorceryPoints ? <AppText textAlign={'center'}>You now Possess {this.props.options.sorceryPoints} sorcery points!</AppText> : null}
 
                         {this.props.options.eldritchInvocations ?
                             <View>
