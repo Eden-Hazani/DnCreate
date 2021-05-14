@@ -107,7 +107,7 @@ export default function ClassPick({ route, placeholder }: any) {
             setClasses(wholeClasses)
             setLoading(false)
         } catch (err) {
-            setClasses([])
+            setError(true)
             setLoading(false)
             logger.log(err)
         }
