@@ -23,6 +23,7 @@ import Modal from 'react-native-modal';
 import { useNavigation } from '@react-navigation/native';
 import InformationDrawer from '../../components/InformationDrawer';
 import { classesDragonsBackgrounds } from '../../../utility/charClassesBackgrounds'
+import logger from '../../../utility/logger';
 
 const { width, height } = Dimensions.get('window');
 
@@ -99,21 +100,17 @@ export default function ClassPick({ route, placeholder }: any) {
 
 
     const getClasses = async () => {
-        AsyncStorage.removeItem('classList')
-        const cachedClasses = await AsyncStorage.getItem('classList');
-        if (cachedClasses) {
-            const classes = JSON.parse(cachedClasses);
+        try {
+            const result = await charClassApi.getClassesList();
+            const classes: any = result.data;
             const wholeClasses: any = starterImg.concat(classes)
             setClasses(wholeClasses)
             setLoading(false)
-            return;
+        } catch (err) {
+            setClasses([])
+            setLoading(false)
+            logger.log(err)
         }
-        const result = await charClassApi.getClassesList();
-        await AsyncStorage.setItem('classList', JSON.stringify(result.data));
-        const classes: any = result.data;
-        const wholeClasses: any = starterImg.concat(classes)
-        setClasses(wholeClasses)
-        setLoading(false)
     }
     return (
         <View style={styles.container}>
