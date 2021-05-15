@@ -310,6 +310,7 @@ router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
 
 router.get("/isActivated", verifyLoggedIn, async (request, response) => {
     try {
+        console.log(response.locals)
         const user = await authLogic.validateInSystem(response.locals.user._id);
         if (!user.activated) {
             response.json('false');

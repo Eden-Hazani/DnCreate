@@ -32,7 +32,7 @@ async function updateCustomRace(race) {
 
 
 function searchRaces(text, raceType, _id) {
-    if (_id === 'noUserId') {
+    if (_id === 'Offline') {
         return Race.find({
             user_id: { $exists: false },
             name: { $regex: text, $options: "i" }

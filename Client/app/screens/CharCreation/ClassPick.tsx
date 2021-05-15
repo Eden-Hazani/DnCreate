@@ -64,10 +64,6 @@ interface ClassPickState {
 
 
 export default function ClassPick({ route, placeholder }: any) {
-    useEffect(() => {
-        checkIfOffline()
-        getClasses()
-    }, [])
     const navigation = useNavigation();
     const [isUserOffline, setIsUserOffline] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -77,6 +73,13 @@ export default function ClassPick({ route, placeholder }: any) {
     const [pickedClass, setPickedClass] = useState(new ClassModel());
     const [characterInfo, setCharacterInfo] = useState(store.getState().character);
     const scrollX = React.useRef(new Animated.Value(0)).current;
+
+
+    useEffect(() => {
+        getClasses()
+        checkIfOffline()
+    }, [])
+
     const checkIfOffline = async () => {
         const isOffline = await AsyncStorage.getItem('isOffline');
         if (isOffline) {

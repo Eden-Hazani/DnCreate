@@ -35,6 +35,7 @@ app.options('/api/auth/sendAdminNotification', cors())
 app.options('/api/auth/removeProfileImagesAsAdmin', cors())
 app.options('/api/auth/getProfileImagesAdmin', cors())
 
+
 app.use("/api/auth", authController);
 app.use("/api/races", raceController);
 app.use("/api/classes", charClassController);

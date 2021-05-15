@@ -1,7 +1,6 @@
 const express = require("express");
 const charClassLogic = require('../business-logic/charClass-logic')
 const router = express.Router();
-const verifyLogged = require('../middleware/verify-logged-in');
 
 router.get("/charClassList", async (request, response) => {
     try {

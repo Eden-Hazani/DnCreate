@@ -243,6 +243,10 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 </View>
                                 <View style={styles.buttonsView}>
                                     <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
+                                        if (this.context.user._id === "Offline") {
+                                            this.props.navigation.navigate("RaceList")
+                                            return;
+                                        }
                                         const isActive = await authApi.isActivated();
                                         if (isActive.data === 'false' && this.state.characters.length >= 1) {
                                             this.setState({ errorModal: true })

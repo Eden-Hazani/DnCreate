@@ -163,7 +163,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 this.setState({ currentLoadedRaces: 20, races: [] }, () => this.getPrimeRaces())
                 return;
             }
-            const user_id = store.getState().nonUser === true ? 'noUserId' : this.context.user._id
+            const user_id = store.getState().nonUser === true ? 'Offline' : this.context.user._id
             const searchedRaces = await racesApi.SearchRaceList(search, raceType, user_id);
             this.setState({ races: searchedRaces.data })
         } catch (err) {
