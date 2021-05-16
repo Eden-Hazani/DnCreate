@@ -30,7 +30,7 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
 
     const [pathClicked, setPathClicked] = useState<boolean[]>([])
     const [pathChosen, setPathChosen] = useState<any>(null)
-    const [pathInfoLoading, setPathInfoLoading] = useState<boolean>(false)
+    const [pathInfoLoading, setPathInfoLoading] = useState<boolean>(true)
     const [currentPathInformation, setCurrentPathInformation] = useState<any>(null)
 
     useEffect(() => {
@@ -48,11 +48,41 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
         }
     }, [pathChosen])
 
+    useEffect(() => {
+        if (character.path) {
+            getNewPathDetails()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (currentPathInformation) {
+            setPathInfoLoading(false)
+        }
+    }, [currentPathInformation])
+
+    const getNewPathDetails = async () => {
+        if (pathFeature) {
+            const updatedCharacter = { ...character };
+            const result = await customOrOfficialPath(character, pathChosen, character.path, pathFeature)
+            if (updatedCharacter.pathFeatures) {
+                for (let item of result) {
+                    updatedCharacter.pathFeatures.push(item)
+                }
+            }
+            returnUpdatedCharacter(updatedCharacter)
+            alterErrorSequence({ isError: false, errorDesc: 'Must Pick A Path' }, errorList, updateErrorList)
+            setCurrentPathInformation(result)
+        }
+    }
+
     const getPathDetails = async () => {
         if (pathChosen !== null && character.level) {
             const updatedCharacter = { ...character };
             const result = await customOrOfficialPath(character, pathChosen, character.path, pathFeature)
             updatedCharacter.path = pathChosen
+            if (updatedCharacter.pathFeatures) {
+                updatedCharacter.pathFeatures = result
+            }
             returnUpdatedCharacter(updatedCharacter)
             alterErrorSequence({ isError: false, errorDesc: 'Must Pick A Path' }, errorList, updateErrorList)
             setCurrentPathInformation(result)
@@ -62,9 +92,6 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
     const pickPath = (path: any, index: number) => {
         try {
             setPathInfoLoading(true)
-            setTimeout(() => {
-                setPathInfoLoading(false)
-            }, 800);
             if (!pathClicked[index]) {
                 if (pathChosen !== null) {
                     alert(`Can't pick more then one path`)
@@ -112,7 +139,7 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
                             <AppActivityIndicator visible={pathInfoLoading} />
                             :
                             <View style={{ justifyContent: "center", alignItems: "center", padding: 15 }}>
-                                <AppText fontSize={25} textAlign={'center'}>Level {character.level} with the {pathChosen?.name || character.path.name}!</AppText>
+                                <AppText fontSize={25} textAlign={'center'}>Level {character.level} with the {pathChosen?.name || character.path?.name}!</AppText>
                                 {currentPathInformation.map((item: any, index: number) =>
                                     <View key={item.name}>
                                         <View style={item.description && styles.infoContainer}>
@@ -137,7 +164,7 @@ export function PathingLevelRoute({ character, pathSelector, returnUpdatedCharac
                                                 pickDruidCircle={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick Druid Circle' }, errorList, updateErrorList)}
                                                 fightingStylesToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'Must Pick A Fighting Style' }, errorList, updateErrorList)}
                                                 isAdditionalToolChoice={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Tools To Pick From' }, errorList, updateErrorList)}
-                                                pathChosen={pathChosen?.name || character.path.name}
+                                                pathChosen={pathChosen?.name || character.path?.name}
                                                 pathChosenObj={pathChosen || character.path}
                                                 maneuversToPick={(val: boolean) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Maneuvers To Pick' }, errorList, updateErrorList)}
                                                 elementsToPick={(val: any) => alterErrorSequence({ isError: val, errorDesc: 'You Have Additional Elements To Pick' }, errorList, updateErrorList)}

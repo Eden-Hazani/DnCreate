@@ -40,7 +40,6 @@ const levelUpMagic = (character: CharacterModel, spellSlotLevel: string, spellSl
         character.magic.eighthLevelSpells = spells[7];
         character.magic.ninthLevelSpells = spells[8];
     }
-    console.log(character.magic)
     character = raceMagic(character)
     return character
 }
@@ -55,13 +54,11 @@ const raceMagic = (character: CharacterModel) => {
             const spell = spellsJSON.find(spell => spell.name === item)
             if (spell && character.spells !== undefined && character.magic !== undefined && character.magic !== undefined) {
                 const spellLevel = spellLevelChanger(spell.level)
-                console.log(character.spells[spellLevel])
                 character.spells[spellLevel].push({ spell: spell, removable: false });
                 character.spellsKnown = (parseInt(character.spellsKnown) + 1).toString()
                 character.magic[spellLevel] = character.magic[spellLevel] + 1;
             }
         })
-        console.log(character.spells.cantrips)
         return character
     }
     return character

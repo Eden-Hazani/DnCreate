@@ -25,7 +25,7 @@ export function SheetInfoThirdRow({ character, isDm, navigation }: Props) {
             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { navigation.navigate("PathFeatures", { char: character }) }}>
                 <IconGen size={80} backgroundColor={Colors.metallicBlue} name={"chart-arc"} iconColor={Colors.white} />
                 <View style={{ width: 90, marginTop: 10 }}>
-                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Path Features</AppText>
+                    <AppText textAlign="center" fontSize={15} color={Colors.whiteInDarkMode}>Subclass Features</AppText>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => { navigation.navigate("RaceFeatures", { char: character }) }}>
