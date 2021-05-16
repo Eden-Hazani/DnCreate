@@ -10,28 +10,33 @@ import { store } from '../redux/store';
 import { AppActivityIndicator } from './AppActivityIndicator';
 import { AppSkillItemPicker } from './AppSkillItemPicker';
 import { AppText } from './AppText';
+import * as Path from "../../jsonDump/paths.json"
+import { PathFeatureOrganizer } from '../screens/charOptions/helperFunctions/PathFeatureOrganizer';
 
 interface AppExtraPathChoicePickerState {
     disabledChoice: boolean[]
+    extraPathChoiceClicked: boolean[]
+    extraPathChoiceValue: any[]
 }
 
 export class AppExtraPathChoicePicker extends Component<{
-    character: CharacterModel, numberOfChoices: any,
-    item: any, extraPathChoiceClicked: any, applyExtraPathChoice: any, isExtraChoice: any
-    isAdditionalSkillChoice: any, loadSkills: any, resetExpertiseSkills: any
+    character: CharacterModel, customPathFeatureList: any, beforeAnyChanges: CharacterModel, returnError: Function,
+    item: any, extraPathChoiceClicked: any, applyExtraPathChoice: any,
+    isAdditionalSkillChoice: any, loadSkills: any, resetExpertiseSkills: any, pathChosen: any
 }, AppExtraPathChoicePickerState>{
     constructor(props: any) {
         super(props)
         this.state = {
-            disabledChoice: []
+            disabledChoice: [],
+            extraPathChoiceClicked: [],
+            extraPathChoiceValue: []
         }
     }
 
     componentDidMount() {
         try {
             const multipleChoices: any = []
-            this.props.isExtraChoice(true)
-            this.props.numberOfChoices(this.props.item.numberOfChoices)
+            this.props.returnError(true)
             const disabledChoice = this.state.disabledChoice;
             multipleChoices.push(this.props.item);
             if (this.props.item.excludePreviousLevelChoices && this.props.character.pathFeatures) {
@@ -53,24 +58,83 @@ export class AppExtraPathChoicePicker extends Component<{
         }
     }
     componentWillUnmount() {
-        this.props.isExtraChoice(false)
+        this.props.returnError(false)
     }
 
+    applyExtraChoice = (choice: any, index: number) => {
+        if (!this.state.extraPathChoiceClicked[index]) {
+            const extraPathChoiceAmount = this.props.item.numberOfChoices;
+            if (this.state.extraPathChoiceValue.length === extraPathChoiceAmount) {
+                alert(`You can only pick ${extraPathChoiceAmount} choices.`)
+                return;
+            }
+            const extraPathChoiceValue = this.state.extraPathChoiceValue;
+            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+            extraPathChoiceClicked[index] = true;
+            extraPathChoiceValue.push(choice);
+            this.setState({ extraPathChoiceValue }, () => {
+                this.updateCharacter('ADD', choice)
+                this.checkForError()
+            })
 
+        }
+        else if (this.state.extraPathChoiceClicked[index]) {
+            let extraPathChoiceValue = this.state.extraPathChoiceValue;
+            const extraPathChoiceClicked = this.state.extraPathChoiceClicked;
+            extraPathChoiceClicked[index] = false;
+            extraPathChoiceValue = extraPathChoiceValue.filter((val: any) => choice.name !== val.name);
+            this.setState({ extraPathChoiceValue }, () => {
+                this.updateCharacter('REMOVE', choice)
+                this.checkForError()
+            })
+        }
+    }
+
+    checkForError = () => {
+        if (this.props.item.numberOfChoices === this.state.extraPathChoiceValue.length) {
+            this.props.returnError(false)
+            return;
+        }
+        this.props.returnError(true)
+    }
+
+    updateCharacter = (removeOrAdd: string, choice: any) => {
+        const character = { ...this.props.character }
+        const officialOrCustom = Path[this.props.character.characterClass][this.props.pathChosen.name] ? Path[this.props.character.characterClass][this.props.pathChosen.name][this.props.character.level] : this.props.customPathFeatureList
+        const pathResult = PathFeatureOrganizer(officialOrCustom, this.state.extraPathChoiceValue)
+        if (removeOrAdd === "ADD") {
+            if (character.pathFeatures)
+                character.pathFeatures = pathResult
+        }
+        if (removeOrAdd === "REMOVE") {
+            if (character.pathFeatures) {
+                let index: number = 0;
+                for (let pathItem of character.pathFeatures) {
+                    if (pathItem.choice) {
+                        if (pathItem.choice[0].name === choice.name) {
+                            character.pathFeatures.splice(index, 1)
+                        }
+                    }
+                    index++
+                }
+            }
+        }
+        this.props.applyExtraPathChoice(character)
+    }
 
     render() {
         return (
             <View style={styles.container}>
                 {this.props.item.choice.map((item: any, index: number) =>
                     <View key={`${item.name}${index}`}>
-                        <TouchableOpacity disabled={this.state.disabledChoice[index]} style={[styles.item, { backgroundColor: this.state.disabledChoice[index] ? Colors.berries : this.props.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
-                            onPress={() => { this.props.applyExtraPathChoice(item, index) }}>
+                        <TouchableOpacity disabled={this.state.disabledChoice[index]} style={[styles.item, { backgroundColor: this.state.disabledChoice[index] ? Colors.berries : this.state.extraPathChoiceClicked[index] ? Colors.bitterSweetRed : Colors.lightGray }]}
+                            onPress={() => { this.applyExtraChoice(item, index) }}>
                             <AppText color={Colors.whiteInDarkMode} fontSize={18} textAlign={'center'}>{item.name}</AppText>
                             <AppText color={Colors.whiteInDarkMode} fontSize={15} textAlign={'center'}>{item.description.replace(/\. /g, '.\n\n')}</AppText>
                         </TouchableOpacity>
-                        {item.skillList && this.props.extraPathChoiceClicked[index] &&
+                        {item.skillList && this.state.extraPathChoiceClicked[index] &&
                             <AppSkillItemPicker extraSkillsTotal withConditions pathChosen skillsStartAsExpertise={this.props.item.skillsStartAsExpertise} resetExpertiseSkills={(val: any) => { this.props.resetExpertiseSkills(val) }} character={this.props.character}
-                                setAdditionalSkillPicks={(val: boolean) => { this.props.isAdditionalSkillChoice(val) }} sendSkillsBack={(val: any) => { this.props.loadSkills(val) }}
+                                setAdditionalSkillPicks={(val: number) => { this.props.isAdditionalSkillChoice(val > 0 ? false : true) }} sendSkillsBack={(val: any) => { this.props.loadSkills(val) }}
                                 itemList={item.skillList} amount={item.skillPickNumber} />}
                     </View>)}
             </View>

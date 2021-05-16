@@ -11,11 +11,12 @@ export function SpellCastingSwitch(character: CharacterModel, currentProficiency
         let baseSpellAttackModifier: any = 'none'
         let spellSaveDc: number = 0;
         let spellAttackModifier: number = 0
-
         if (character.modifiers && character.race) {
-            baseSpellSaveDc = scoresJson[character?.spellCastingClass as any].baseSpellSaveDc || scoresJson[character.characterClass]?.baseSpellSaveDc || scoresJson[character.path?.name]?.baseSpellSaveDc || scoresJson[character.race]?.baseSpellSaveDc || 'none'
-            spellcastingAbility = scoresJson[character.spellCastingClass as any].spellcastingAbility || scoresJson[character.characterClass]?.spellcastingAbility || scoresJson[character.path?.name]?.spellcastingAbility || scoresJson[character.race]?.spellcastingAbility || 'none'
-            baseSpellAttackModifier = scoresJson[character.spellCastingClass as any].spellAttackModifier || scoresJson[character.characterClass]?.spellAttackModifier || scoresJson[character.path?.name]?.spellAttackModifier || scoresJson[character.race]?.spellAttackModifier || 'none'
+            if (character.spellCastingClass && scoresJson[character.spellCastingClass]) {
+                baseSpellSaveDc = scoresJson[character.spellCastingClass].baseSpellSaveDc || scoresJson[character.characterClass].baseSpellSaveDc || scoresJson[character.path?.name]?.baseSpellSaveDc || scoresJson[character.race]?.baseSpellSaveDc
+                spellcastingAbility = scoresJson[character.spellCastingClass].spellcastingAbility || scoresJson[character.characterClass]?.spellcastingAbility || scoresJson[character.path?.name]?.spellcastingAbility || scoresJson[character.race]?.spellcastingAbility || 'none'
+                baseSpellAttackModifier = scoresJson[character.spellCastingClass].spellAttackModifier || scoresJson[character.characterClass]?.spellAttackModifier || scoresJson[character.path?.name]?.spellAttackModifier || scoresJson[character.race]?.spellAttackModifier || 'none'
+            }
             const modifiers = [['wisdom', character.modifiers.wisdom], ['strength', character.modifiers.strength],
             ['dexterity', character.modifiers.dexterity], ['constitution', character.modifiers.constitution], ['intelligence', character.modifiers.intelligence], ['charisma', character.modifiers.charisma]]
 

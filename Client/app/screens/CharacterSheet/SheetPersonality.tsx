@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'react-native-expo-image-cache';
+import { Config } from '../../../config';
 import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
@@ -48,7 +50,10 @@ export function SheetPersonality({ character, navigation, isDm }: Props) {
                 {character.characterAlignment ?
                     <View>
                         {character.characterAlignment.alignment && character.characterAlignment.alignment.length > 0 ?
-                            <AppText fontSize={20} textAlign={'center'}>{character.characterAlignment.alignment}</AppText>
+                            <View style={{ alignItems: "center" }}>
+                                <Image uri={`${Config.serverUrl}/assets/specificDragons/alignmentDragon.png`} style={{ width: 100, height: 100 }} />
+                                <AppText fontSize={20} textAlign={'center'}>{character.characterAlignment.alignment}</AppText>
+                            </View>
                             :
                             null}
                         {character.characterAlignment.alignmentDescription && character.characterAlignment.alignmentDescription.length > 0 ?

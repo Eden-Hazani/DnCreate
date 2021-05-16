@@ -120,10 +120,9 @@ export class SelectCharacter extends Component<{ route: any, navigation: any }, 
             if (!response.ok) {
                 errorHandler(response);
                 return;
-            }
-            const character = response.data;
-            loadCashedSavingThrows(this.state.character)
-            if (character) {
+            } else if (response.data) {
+                const character: CharacterModel = response.data;
+                loadCashedSavingThrows(character)
                 this.setState({ character }, () => {
                     this.setState({ loading: false, currentProficiency: switchProficiency(this.state.character.level || 0) })
                 });

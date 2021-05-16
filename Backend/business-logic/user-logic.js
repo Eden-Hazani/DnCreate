@@ -3,7 +3,7 @@ const Character = require("../models/characterModel");
 
 
 function addCharacter(character) {
-    return character.save();
+    return character.save().then(character => character.populate('characterClassId').populate('raceId').execPopulate());
 }
 
 async function getCharacters(user_id) {

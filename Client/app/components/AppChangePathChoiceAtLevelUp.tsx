@@ -18,7 +18,7 @@ interface AppChangePathChoiceAtLevelUpState {
 
 
 export class AppChangePathChoiceAtLevelUp extends Component<{
-    character: CharacterModel, newPathChoice: any
+    character: CharacterModel, newPathChoice: any, updateCharacter: Function,
 }, AppChangePathChoiceAtLevelUpState>{
     constructor(props: any) {
         super(props)
@@ -62,11 +62,26 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
             choiceClicked = [];
             choiceClicked[index] = true;
             this.setState({ choiceClicked })
-            this.props.newPathChoice(item)
+            this.setInfoToCharacter(item)
         } catch (err) {
             logger.log(new Error(err))
         }
     }
+
+    setInfoToCharacter = (newPathChoice: any) => {
+        const updatedCharacter = { ...this.props.character };
+        if (updatedCharacter.pathFeatures) {
+            for (let item of updatedCharacter.pathFeatures) {
+                if (pathChoiceChangePicker(updatedCharacter) === item.name) {
+                    item.choice[0] = newPathChoice;
+                }
+            }
+        }
+        console.log(updatedCharacter.pathFeatures)
+        this.props.updateCharacter(updatedCharacter)
+    }
+
+
     render() {
         return (
             <View style={styles.container}>

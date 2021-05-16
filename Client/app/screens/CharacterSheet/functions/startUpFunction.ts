@@ -13,7 +13,6 @@ const checkForFirstLevelStart = async (character: CharacterModel) => {
         const result = { levelUpFunctionActive: operation, levelUpFunction: action }
         return (result)
     }
-
     return (result)
 }
 

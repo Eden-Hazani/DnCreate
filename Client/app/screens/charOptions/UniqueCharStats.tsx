@@ -18,6 +18,7 @@ import { MonkKiPointCounter } from '../../components/uniqueCharComponents/MonkKi
 import { RoguePhantomSkillPicks } from '../../components/uniqueCharComponents/RoguePhantomSkillPicks';
 import logger from '../../../utility/logger';
 import { ArtificerCurrentInfusedItems } from '../../components/uniqueCharComponents/ArtificerCurrentInfusedItems';
+import { IconGen } from '../../components/IconGen';
 
 interface UniqueCharStatsState {
     talesFromTheBeyondModal: boolean
@@ -262,15 +263,15 @@ export class UniqueCharStats extends Component<{ isDm: boolean, character: Chara
                         </View>
                     </View>
                     : null}
-                <View>
-                    <View style={{ marginTop: 10, marginBottom: 10 }}>
-                        <AppButton fontSize={16} backgroundColor={Colors.bitterSweetRed} width={120} height={50}
-                            borderRadius={25} title={'Companions'} onPress={() => { this.setState({ companionModal: true }) }} />
-                    </View>
-                    <Modal animationType={"slide"} visible={this.state.companionModal}>
-                        <PickCompanion isDm={this.props.isDm} proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
-                    </Modal>
+                <View style={{ marginTop: 10, marginBottom: 10, justifyContent: "center", alignItems: "center" }}>
+                    <AppText fontSize={20} textAlign={'center'}>Companions</AppText>
+                    <TouchableOpacity onPress={() => this.setState({ companionModal: true })}>
+                        <IconGen size={80} name={'dog'} iconColor={Colors.whiteInDarkMode} backgroundColor={Colors.bitterSweetRed} />
+                    </TouchableOpacity>
                 </View>
+                <Modal animationType={"slide"} visible={this.state.companionModal}>
+                    <PickCompanion isDm={this.props.isDm} proficiency={this.props.proficiency} character={this.props.character} closeModal={(val: boolean) => { this.setState({ companionModal: val }) }} />
+                </Modal>
             </View>
         )
     }

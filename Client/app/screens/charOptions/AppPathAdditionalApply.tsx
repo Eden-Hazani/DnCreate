@@ -30,7 +30,7 @@ export class AppPathAdditionalApply extends Component<{
     character: CharacterModel, pathItem: any, isAdditionalSkillChoice: any, pathChosen: any, loadManeuvers: any, maneuversToPick: any
     loadSkills: any, resetExpertiseSkills: any, loadArmors: any, loadWeapons: any, loadUnrestrictedMagic: any,
     isAdditionalToolChoice: any, fightingStylesToPick: any, loadSpecificSpell: any, armorToLoad: any, loadFirstLevelSpells: any,
-    pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any, loadSpellPickAvailability: any,
+    pickDruidCircle: any, pathChosenObj: any, languagesToPick: any, loadLanguage: any,
     loadElements: any, elementsToPick: any, loadCharacter: any, updateSpellList: any, addSpellAvailabilityByName: any, returnSavingThrows: any
 }> {
 
