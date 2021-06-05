@@ -1,8 +1,11 @@
 const Character = require("../models/characterModel");
+const Race = require("../models/raceModel");
 
 
-
-function addCharacter(character) {
+async function addCharacter(character) {
+    const race = await Race.findOne({ _id: { $eq: character.raceId.toString() } }).exec()
+    race.popularity = race.popularity + 1
+    await Race.findOneAndUpdate({ _id: character.raceId.toString() }, race, { new: true, useFindAndModify: false }).exec();
     return character.save().then(character => character.populate('characterClassId').populate('raceId').execPopulate());
 }
 

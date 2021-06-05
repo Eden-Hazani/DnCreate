@@ -5,6 +5,9 @@ const raceSchema = mongoose.Schema({
     name: {
         type: String,
     },
+    popularity: {
+        type: Number
+    },
     description: {
         type: String,
     },

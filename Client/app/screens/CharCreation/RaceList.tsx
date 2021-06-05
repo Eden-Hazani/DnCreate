@@ -26,6 +26,7 @@ import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
 import { Image } from 'react-native-expo-image-cache';
 import { RaceListHomeBrew } from './components/RaceListHomeBrew';
+import { RaceListSettings } from './components/RaceListSettings';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -104,38 +105,39 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         this.unsubscribeStore()
     }
 
+    getStorageRaceStats = async () => {
+        let raceType = await AsyncStorage.getItem('showPublicRaces');
+        if (raceType === null) {
+            raceType = 'false'
+        }
+        let isPopularOrder = await AsyncStorage.getItem('racePopularitySetting');
+        if (isPopularOrder === null) {
+            isPopularOrder = 'false'
+        }
+        return { isPopularOrder, raceType }
+    }
+
 
     getPrimeRaces = async () => {
-        let cashedRaces = await AsyncStorage.getItem('cashedRaces');
-        let todayCashed = await AsyncStorage.getItem('cashedRacesToday');
         let raceColors = [];
-        if (!cashedRaces || !todayCashed || JSON.parse(todayCashed) !== new Date().getDate()) {
-            let today = new Date().getDate();
-            await AsyncStorage.setItem('cashedRacesToday', JSON.stringify(today))
-            const result = await racesApi.getPrimeList();
-            await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
-            for (let item of result.data as any) {
-                raceColors.push(item.raceColors)
-            }
-            this.setState({ races: result.data, raceColors, loading: false })
-            return;
-        }
-        for (let item of JSON.parse(cashedRaces)) {
+        const { isPopularOrder, raceType } = await this.getStorageRaceStats()
+        const result = await racesApi.getPrimeList(isPopularOrder, raceType, this.context.user._id);
+        console.log(result)
+        await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
+        for (let item of result.data as any) {
             raceColors.push(item.raceColors)
         }
-        this.setState({ races: JSON.parse(cashedRaces), raceColors, loading: false })
+        this.setState({ races: result.data, raceColors, loading: false })
+
     }
 
     getRacesFromServer = async () => {
         try {
             let raceColors = [];
             const races: any = this.state.races;
-            let raceType = await AsyncStorage.getItem('showPublicRaces');
-            if (raceType === null) {
-                raceType = 'false'
-            }
+            const { isPopularOrder, raceType } = await this.getStorageRaceStats()
             const user_id = store.getState().nonUser === true ? 'noUserId' : this.context.user._id
-            const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, user_id, raceType);
+            const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, user_id, raceType, isPopularOrder);
             if (!result.ok) {
                 this.setState({ error: true, loading: false })
                 return
@@ -215,6 +217,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                         this.state.loading ? <AppActivityIndicator visible={this.state.loading} /> :
                             <View >
                                 <View>
+                                    <RaceListSettings refreshRaces={() => this.setState({ currentLoadedRaces: 20, races: [], loading: true }, () => this.getPrimeRaces())} />
                                     <View style={{
                                         width: width / 2, position: "absolute", zIndex: 10,
                                         alignSelf: 'center',

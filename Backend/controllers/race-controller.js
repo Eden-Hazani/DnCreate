@@ -19,13 +19,14 @@ const storage = multer.diskStorage({
 })
 var upload = multer({ storage: storage })
 
-router.get("/raceList/:start/:end/:user_id/:raceType", async (request, response) => {
+router.get("/raceList/:start/:end/:user_id/:raceType/:isPopularOrder", async (request, response) => {
     try {
         const start = request.params.start;
         const end = request.params.end;
         const _id = request.params.user_id;
         const raceType = request.params.raceType;
-        const races = await raceLogic.getAllRaces(start, end, _id, raceType);
+        const isPopularOrder = request.params.isPopularOrder;
+        const races = await raceLogic.getAllRaces(start, end, _id, raceType, isPopularOrder);
         console.log(races)
         response.json(races);
     } catch (err) {
@@ -33,9 +34,12 @@ router.get("/raceList/:start/:end/:user_id/:raceType", async (request, response)
     }
 });
 
-router.get("/getPrimeRaceList", async (request, response) => {
+router.get("/getPrimeRaceList/:popularity/:raceType/:user_id", async (request, response) => {
     try {
-        const races = await raceLogic.getPrimeRaces();
+        const popularity = request.params.popularity;
+        const raceType = request.params.raceType;
+        const user_id = request.params.user_id;
+        const races = await raceLogic.getPrimeRaces(popularity, raceType, user_id);
         response.json(races);
     } catch (err) {
         response.status(500).send(err.message);
@@ -94,6 +98,16 @@ router.post("/addRace", verifyLogged, upload.single('image'), async (request, re
             race.image = request.file.filename;
         }
         const result = await raceLogic.createRace(race);
+        response.json(true);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/popularizeAllRaces", verifyLogged, async (request, response) => {
+    try {
+        console.log('dfg')
+        raceLogic.popularizeAllRaces();
         response.json(true);
     } catch (err) {
         response.status(500).send(err.message);

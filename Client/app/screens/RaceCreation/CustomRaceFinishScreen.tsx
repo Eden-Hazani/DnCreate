@@ -67,7 +67,8 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                     const customRace = { ...store.getState().customRace };
                     const user: any = store.getState().user._id
                     customRace.visibleToEveryone = this.state.racePublic;
-                    customRace.user_id = user
+                    customRace.user_id = user;
+                    customRace.popularity = 0;
                     const color = this.getRandomColor()
                     customRace.raceColors = color
                     racesApi.addRace(customRace).then(() => {
@@ -85,6 +86,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         const user: any = store.getState().user._id
         customRace.visibleToEveryone = this.state.racePublic;
         customRace.user_id = user
+        customRace.popularity = 0;
         const color = this.getRandomColor()
         customRace.raceColors = color
         racesApi.addRace(customRace).then(() => {

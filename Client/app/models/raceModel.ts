@@ -5,6 +5,7 @@ export class RaceModel {
     public constructor(
         public _id?: string,
         public name?: string,
+        public popularity?: number,
         public description?: string,
         public image?: string,
         public abilityBonus?: ModifiersModel,

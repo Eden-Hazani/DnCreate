@@ -126,7 +126,8 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors, loadNext
                             }} />
                         </TouchableOpacity>
                         <View style={{ flex: .1 }}>
-                            <AppText color={Colors.black} fontWeight={"800"} fontSize={25}>{item.name}</AppText>
+                            <AppText textAlign={'center'} color={Colors.black} fontWeight={"800"} fontSize={28}>{item.name}</AppText>
+                            <AppText textAlign={'center'} color={Colors.black} fontWeight={"800"} fontSize={15}>Characters in DnCreate: {item.popularity}</AppText>
                         </View>
                         <View style={{ flex: .3 }}>
                             <ScrollView style={{}}>

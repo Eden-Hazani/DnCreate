@@ -3,11 +3,12 @@ import client from './client';
 
 const endpoint = '/races'
 
-const getRaceList = (start: number, end: number, _id: string, raceType: any) => client.get(`${endpoint}/raceList/${start}/${end}/${_id}/${raceType}`);
+const getRaceList = (start: number, end: number, _id: string, raceType: any, isPopularOrder: string) => client.get(`${endpoint}/raceList/${start}/${end}/${_id}/${raceType}/${isPopularOrder}`);
 
-const getPrimeList = () => client.get(`${endpoint}/getPrimeRaceList`);
+const getPrimeList = (isPopularOrder: string | boolean, raceType: string, user_id: string) => client.get(`${endpoint}/getPrimeRaceList/${isPopularOrder}/${raceType}/${user_id}`);
 
 const getUserMadeRaces = (uid: string) => client.get(`${endpoint}/getUserCreatedRaces/${uid}`)
+
 
 const editRace = (race: RaceModel) => {
     let formData: FormData = new FormData();

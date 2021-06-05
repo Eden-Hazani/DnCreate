@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Text, StyleSheet, PixelRatio } from 'react-native';
 import * as Font from 'expo-font';
-import { AppLoading } from 'expo';
 import { Colors } from '../config/colors';
 
 /**
