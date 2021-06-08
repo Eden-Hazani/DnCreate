@@ -9,8 +9,10 @@ import * as Font from 'expo-font'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CacheManager } from "react-native-expo-image-cache"
 import { Config } from "../../config"
+import { serverDice } from "../getDiceFromServer"
 
 const startUp = async () => {
+    serverDice();
     await loadColors();
     await loadFonts();
     await loadStartGif();

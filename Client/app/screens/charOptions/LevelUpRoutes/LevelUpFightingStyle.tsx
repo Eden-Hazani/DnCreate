@@ -19,7 +19,6 @@ export function LevelUpFightingStyle({ character, fightingStyles, updateCharacte
             if (updatedCharacter.charSpecials?.fightingStyle) {
                 updatedCharacter.charSpecials.fightingStyle[0] = style
             }
-            console.log(updatedCharacter.charSpecials?.fightingStyle)
             updateCharacter(updatedCharacter)
         } catch (err) {
             logger.log(new Error(err))

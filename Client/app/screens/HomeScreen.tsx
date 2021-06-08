@@ -24,7 +24,6 @@ import { FeedBack } from '../components/FeedBack';
 import { UpdateMessage } from '../components/UpdateMessage';
 import { Config } from '../../config';
 import { IconGen } from '../components/IconGen';
-import { serverDice } from '../../utility/getDiceFromServer';
 import * as Linking from 'expo-linking';
 
 interface HomeState {
@@ -85,7 +84,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkForNews = async () => {
         const newsFlag = await AsyncStorage.getItem('newsFlag');
-        if (!newsFlag || newsFlag !== '2.02') {
+        if (!newsFlag || newsFlag !== '2.07') {
             this.setState({ updateNews: true })
         }
     }
@@ -93,7 +92,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     async componentDidMount() {
         try {
-            serverDice()
             this.checkForNews();
             if (store.getState().nonUser && this.checkValidNonUserChar()) {
                 this.setState({ loading: true }, () => {
@@ -117,7 +115,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
 
     checkValidNonUserChar = () => {
         const char: CharacterModel = store.getState().beforeRegisterChar;
-        console.log(char)
         if (!char.background?.backgroundName) {
             store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
             store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })
@@ -263,7 +260,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                 <Modal visible={this.state.updateNews} animationType="slide">
                                     <UpdateMessage close={(val: boolean) => {
                                         this.setState({ updateNews: val }, async () => {
-                                            AsyncStorage.setItem('newsFlag', '2.02')
+                                            AsyncStorage.setItem('newsFlag', '2.07')
                                         })
                                     }} />
                                 </Modal>

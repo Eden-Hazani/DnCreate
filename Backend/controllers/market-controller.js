@@ -57,7 +57,6 @@ router.post("/getItemBatch/:marketType", verifyLogged, upload.none(), async (req
         const search = request.body.search
         const marketType = request.params.marketType;
         const items = await marketLogic.getItemBatch(start, end, filters.classFilters, filters.topDownLoaded, search, marketType)
-        console.log(items)
         response.json(items);
     } catch (err) {
         response.status(500).send(err.message);

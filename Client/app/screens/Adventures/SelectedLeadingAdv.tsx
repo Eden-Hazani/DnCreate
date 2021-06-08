@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, Alert, Modal, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, Alert, Modal, ScrollView, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { Config } from '../../../config';
 import adventureApi from '../../api/adventureApi';
 import { AppButton } from '../../components/AppButton';
@@ -19,7 +19,11 @@ import { CreateQuest } from './leaderComponents/CreateQuest';
 import logger from '../../../utility/logger';
 import { io } from 'socket.io-client';
 import { AdventureChat } from './AdventureChat';
+import { IconGen } from '../../components/IconGen';
 const socket = io(Config.serverUrl);
+
+const { width, height } = Dimensions.get('window')
+
 
 interface SelectedLeadingAdvState {
     adventure: AdventureModel
@@ -193,15 +197,15 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
     render() {
         const adventure = this.state.adventure;
         return (
-            <View style={styles.container}>
+            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
                 {this.state.loading ? <AppActivityIndicator visible={this.state.loading} />
                     :
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, paddingBottom: '15%' }}>
                         <View style={{ paddingBottom: 15 }}>
-                            <AppText fontSize={25} textAlign={'center'}>{adventure.adventureName}</AppText>
-                            <AppText>Setting: {adventure.adventureSetting}</AppText>
+                            <AppText fontSize={25} textAlign={'center'} color={Colors.bitterSweetRed}>{adventure.adventureName}</AppText>
+                            <AppText padding={10} textAlign={'center'}>Setting: {adventure.adventureSetting}</AppText>
                         </View>
-                        <AppText color={Colors.bitterSweetRed} fontSize={20}>Participants</AppText>
+                        <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={20}>Participants</AppText>
                         {adventure.participants_id !== undefined && adventure.participants_id.length === 0 ?
                             <View style={styles.main}>
                                 <AppText textAlign={'center'} fontSize={15}>No one is currently participating in this adventure.</AppText>
@@ -210,36 +214,38 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                             :
                             <View style={{ paddingBottom: 50 }}>
                                 {this.state.innerLoading ? <AppActivityIndicator visible={this.state.innerLoading} /> :
-                                    <FlatList
-                                        data={adventure.participants_id}
-                                        keyExtractor={(currentParticipants, index) => index.toString()}
-                                        renderItem={({ item, index }) => <ListItem
-                                            title={item.name}
-                                            subTitle={item.characterClass}
-                                            directPicRoute={this.state.profilePicList[index][1]}
-                                            imageUrl={this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}`}
-                                            direction={'row'}
-                                            headerFontSize={18}
-                                            headColor={Colors.bitterSweetRed}
-                                            subFontSize={15}
-                                            padding={20} width={60} height={60}
-                                            headTextAlign={"left"}
-                                            subTextAlign={"left"}
-                                            justifyContent={"flex-start"} textDistanceFromImg={10}
-                                            renderRightActions={() =>
-                                                <ListItemDelete onPress={() => { this.removeFromAdventure(item) }} />}
-                                            onPress={() => this.characterWindow(item)} />}
-                                        ItemSeparatorComponent={ListItemSeparator}
-                                        refreshing={this.state.refreshing}
-                                        onRefresh={() => {
-                                            if (adventure.adventureIdentifier) {
-                                                this.reloadAdventure(adventure.adventureIdentifier)
-                                            }
-                                        }} />
+                                    <>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                            <View style={{ position: 'absolute', left: -10 }}>
+                                                <IconGen name={'chevron-left'} size={70} iconColor={Colors.bitterSweetRed} />
+                                            </View>
+                                            <FlatList
+                                                style={{ width, paddingBottom: 15 }}
+                                                data={adventure.participants_id}
+                                                horizontal
+                                                showsHorizontalScrollIndicator={false}
+                                                pagingEnabled={true}
+                                                keyExtractor={(currentParticipants, index) => index.toString()}
+                                                renderItem={({ item, index }) => <TouchableOpacity
+                                                    onLongPress={() => this.removeFromAdventure(item)}
+                                                    onPress={() => this.characterWindow(item)}
+                                                    style={{ width: width / 2, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Image
+                                                        style={{ width: 100, height: 100 }}
+                                                        source={{ uri: this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}` }} />
+                                                    <AppText padding={10} fontSize={20}>{item.name}</AppText>
+                                                </TouchableOpacity>}
+                                            />
+                                            <View style={{ position: 'absolute', right: -10 }}>
+                                                <IconGen name={'chevron-right'} size={70} iconColor={Colors.bitterSweetRed} />
+                                            </View>
+                                        </View>
+                                        <AppText padding={5} textAlign={'center'} fontSize={15}>Long press on a member to remove from the adventure</AppText>
+                                    </>
                                 }
                             </View>
                         }
-                        <ScrollView keyboardShouldPersistTaps="always">
+                        <View>
                             <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", paddingBottom: 50 }}>
                                 <AppText fontSize={18}>Adventure identifier:</AppText>
                                 <AppText fontSize={20} color={Colors.bitterSweetRed}>{adventure.adventureIdentifier}</AppText>
@@ -287,10 +293,10 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
                                 }}
                                     fontSize={18} borderRadius={25} width={120} height={65} title={"Delete Adventure"} />
                             </View>
-                        </ScrollView>
+                        </View>
                     </View>
                 }
-            </View>
+            </ScrollView>
         )
     }
 }
@@ -299,8 +305,7 @@ export class SelectedLeadingAdv extends Component<{ navigation: any, route: any 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 15,
-
+        paddingTop: 15
     },
     main: {
         padding: 20,

@@ -289,7 +289,6 @@ router.post("/login", upload.none(), async (request, response) => {
         const options = JSON.parse(request.body.options)
         const user = await authLogic.login(credentials);
         if (!user) {
-            console.log(user)
             response.status(401).send("Incorrect username or password");
             return;
         }
@@ -310,7 +309,6 @@ router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
 
 router.get("/isActivated", verifyLoggedIn, async (request, response) => {
     try {
-        console.log(response.locals)
         const user = await authLogic.validateInSystem(response.locals.user._id);
         if (!user.activated) {
             response.json('false');
@@ -326,9 +324,7 @@ router.get("/isActivated", verifyLoggedIn, async (request, response) => {
 router.get("/isPremium/:user_id", verifyLoggedIn, async (request, response) => {
     try {
         const user = await authLogic.validateInSystem(request.params.user_id);
-        console.log(user.premium)
         if (!user.premium) {
-            console.log('dfg')
             response.json('false');
         }
         else {
@@ -344,11 +340,9 @@ router.post("/databaseLoginAdmin", cors(), async (request, response) => {
     try {
         const user = await authLogic.login(request.body);
         if (!user || !user.isAdmin) {
-            console.log(user)
             response.status(403).send('Not authorized');
             return;
         }
-        console.log(user.isAdmin)
         const token = jwt.sign({ user }, config.jwt.secretKey, { expiresIn: "1h" })
         response.json(token);
 
@@ -393,7 +387,6 @@ router.post("/getProfileImagesAdmin", cors(), verifyIsAdmin, async (request, res
     try {
         const reqParams = request.body.reqParams
         const images = await authLogic.getProfileImagesAsAdmin(reqParams.start, reqParams.end)
-        console.log(images)
         response.json({ images });
     } catch (err) {
         response.status(500).send(err.message);
@@ -403,7 +396,6 @@ router.post("/getProfileImagesAdmin", cors(), verifyIsAdmin, async (request, res
 router.patch("/removeProfileImagesAsAdmin", cors(), verifyIsAdmin, async (request, response) => {
     try {
         const user = new User(request.body)
-        console.log(request.body)
         fs.unlink(`./public/uploads/profile-imgs/${user.profileImg}`, function (err) {
             if (err) return console.log(err);
             console.log('file deleted successfully');

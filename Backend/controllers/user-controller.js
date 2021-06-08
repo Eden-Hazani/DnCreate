@@ -64,7 +64,6 @@ router.get("/validateChar/:charName/:user_id", verifyLogged, async (request, res
 router.patch("/updateCharacter", verifyLogged, upload.none(), async (request, response) => {
     try {
         const cleanChar = removeEmptySpecificObj(JSON.parse(request.body.charInfo))
-        console.log(cleanChar.magic)
         const char = new Character(cleanChar);
         const error = await char.validate();
         if (error) {
@@ -119,7 +118,6 @@ router.post("/saveChar", verifyLogged, upload.none(), validateCharInSystem, asyn
             response.status(400).send(error.message)
         }
         const addedChar = await userLogic.addCharacter(char);
-        console.log(addedChar.raceId)
         response.json(addedChar);
     } catch (err) {
         response.status(500).send(err.message);

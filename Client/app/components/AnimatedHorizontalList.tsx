@@ -51,7 +51,6 @@ const Indicator = ({ scrollX, races }: any) => {
                 </Animated.View>
             </View>
         })
-        // </View>
     )
 }
 
@@ -100,6 +99,7 @@ export function AnimatedHorizontalList({ onPress, data, backDropColors, loadNext
     return (
         <View>
             {data.length > 1 && <BackDrop scrollX={scrollX} backDropColors={backDropColors} />}
+            {data.length === 1 && <View style={[StyleSheet.absoluteFillObject, { backgroundColor: Colors.earthYellow }]}></View>}
             <Square scrollX={scrollX} />
             <Animated.FlatList
                 onEndReachedThreshold={2}

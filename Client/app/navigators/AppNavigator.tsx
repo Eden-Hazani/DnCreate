@@ -20,7 +20,6 @@ const AppNavigator = () => {
         askNotificationPermissions();
         Notifications.addNotificationReceivedListener(response => {
             if (AppState.currentState === 'active') {
-                console.log('d')
                 Notifications.dismissAllNotificationsAsync()
             }
         });

@@ -315,7 +315,6 @@ export class Spells extends Component<{ navigation: any, route: any }, SpellsSta
                     return;
                 }
             }
-            // console.log(this.state.pickedSpell)
             const spellLevel = spellLevelChanger(this.state.pickedSpell.level)
             if (!checkOnlyIfPicked(this.state.character, this.state.pickedSpell)) {
                 alert('You already possess this spell');

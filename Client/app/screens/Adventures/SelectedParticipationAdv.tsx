@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
 import { Config } from '../../../config';
 import logger from '../../../utility/logger';
 import adventureApi from '../../api/adventureApi';
@@ -7,6 +7,7 @@ import AuthContext from '../../auth/context';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
+import { IconGen } from '../../components/IconGen';
 import { ListItem } from '../../components/ListItem';
 import { ListItemSeparator } from '../../components/ListItemSeparator';
 import { Colors } from '../../config/colors';
@@ -14,6 +15,8 @@ import { AdventureModel } from '../../models/AdventureModel';
 import { CharacterModel } from '../../models/characterModel';
 import { store } from '../../redux/store';
 import validatePremium from './functions/validatePremium'
+
+const { width, height } = Dimensions.get('window')
 
 interface SelectedParticipationAdvState {
     adventure: AdventureModel
@@ -100,29 +103,36 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
                         <View style={styles.textContainer}>
                             <AppText color={Colors.bitterSweetRed} fontSize={25}>{adventure.adventureName}</AppText>
                             <AppText> - World Setting - </AppText>
-                            <AppText>{adventure.adventureSetting}</AppText>
+                            <AppText textAlign={'center'} padding={10}>{adventure.adventureSetting}</AppText>
                             <View style={{ paddingTop: 25 }}>
-                                <AppText fontSize={20}>Party Members:</AppText>
+                                <AppText fontSize={20} color={Colors.bitterSweetRed} padding={5}>Party Members:</AppText>
                             </View>
                         </View>
                         <View style={styles.party}>
-                            <FlatList
-                                data={adventure.participants_id}
-                                keyExtractor={(currentParticipants, index) => index.toString()}
-                                renderItem={({ item, index }) => <ListItem
-                                    title={item.name}
-                                    subTitle={item.characterClass}
-                                    directPicRoute={this.state.profilePicList[index][1]}
-                                    imageUrl={(this.state.profilePicList.length > 0 && this.state.profilePicList[index][1]) ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}`}
-                                    direction={'row'}
-                                    headerFontSize={18}
-                                    headColor={Colors.bitterSweetRed}
-                                    subFontSize={15}
-                                    padding={20} width={60} height={60}
-                                    headTextAlign={"left"}
-                                    subTextAlign={"left"}
-                                    justifyContent={"flex-start"} textDistanceFromImg={10} />}
-                                ItemSeparatorComponent={ListItemSeparator} />
+                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                <View style={{ position: 'absolute', left: -10 }}>
+                                    <IconGen name={'chevron-left'} size={70} iconColor={Colors.bitterSweetRed} />
+                                </View>
+                                <FlatList
+                                    style={{ width, paddingBottom: 15 }}
+                                    data={adventure.participants_id}
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    pagingEnabled={true}
+                                    keyExtractor={(currentParticipants, index) => index.toString()}
+                                    renderItem={({ item, index }) => <View
+                                        style={{ width: width / 2, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Image
+                                            style={{ width: 100, height: 100 }}
+                                            source={{ uri: this.state.profilePicList[index][1] ? `${Config.serverUrl}/uploads/profile-imgs/${this.state.profilePicList[index][1]}` : `${Config.serverUrl}/assets/races/${item.image}` }} />
+                                        <AppText padding={10} fontSize={20}>{item.name}</AppText>
+                                    </View>}
+                                />
+                                <View style={{ position: 'absolute', right: -10 }}>
+                                    <IconGen name={'chevron-right'} size={70} iconColor={Colors.bitterSweetRed} />
+                                </View>
+                            </View>
+
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
                             <AppButton padding={15} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.props.navigation.navigate('Adventures') }}
@@ -162,7 +172,7 @@ export class SelectedParticipationAdv extends Component<{ navigation: any, route
 
 const styles = StyleSheet.create({
     container: {
-
+        paddingTop: '10%'
     },
     party: {
 

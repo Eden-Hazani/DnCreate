@@ -180,7 +180,6 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
 
     editSpell = async (values: any, _id: string) => {
         try {
-            console.log(values)
             const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
             let spellLevel = this.state.pickedLevel.charAt(0);
             const newSpell: CustomSpellModal = {

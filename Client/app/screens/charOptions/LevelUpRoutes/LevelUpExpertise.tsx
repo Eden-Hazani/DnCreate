@@ -85,7 +85,6 @@ export function LevelUpExpertise({ reloadingSkills, character, expertise }: Prop
                     }
                 })
             }
-            console.log(character.skills)
         } catch (err) {
             logger.log(new Error(err))
         }

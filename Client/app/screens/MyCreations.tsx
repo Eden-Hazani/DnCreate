@@ -59,6 +59,8 @@ export class MyCreations extends Component<{ navigation: any }, MyCreationsState
         store.dispatch({ type: ActionType.CustomRaceEditing, payload: true })
         this.props.navigation.navigate("Creation", { screen: "BasicRaceInfo" })
     }
+
+
     render() {
         return (
             <View style={styles.container}>

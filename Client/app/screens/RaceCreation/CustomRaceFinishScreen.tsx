@@ -124,6 +124,19 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                 {store.getState().customRaceEditing ?
                     <View style={{ alignItems: "center" }}>
                         <Image uri={`${Config.serverUrl}/assets/specificDragons/changeDragon.png`} style={{ width: 250, height: 250 }} />
+                        <AppText fontSize={25} padding={5} textAlign={'center'}>Almost Done!</AppText>
+                        <AppText fontSize={18} padding={15} textAlign={'center'}>Would you like to share your creation with everyone on DnCreate?</AppText>
+                        <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish for this race to become public and visible everyone toggle the option below</AppText>
+                        <View style={{ justifyContent: "center", alignItems: "center" }}>
+                            <Switch value={this.state.racePublic} onValueChange={() => {
+                                if (this.state.racePublic) {
+                                    this.setState({ racePublic: false })
+                                    return;
+                                }
+                                this.setState({ racePublic: true })
+                            }} />
+                        </View>
+
                         <AppText textAlign={'center'} fontSize={25}>Press Edit to publish your changes</AppText>
                         <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                             borderRadius={25} title={'Edit'} onPress={() => { this.editRace() }} />

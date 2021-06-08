@@ -11,12 +11,10 @@ function getSubClass(name) {
 
 
 function createSubClass(subclass) {
-    console.log(subclass)
     return subclass.save();
 }
 
 async function getAllSubClasses(start, end, _id, subclassType, baseClass) {
-    console.log(subclassType)
     if (subclassType === 'true') {
         return SubClass.find({
             $and: [{ baseClass: { $eq: baseClass }, $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { isPublic: true }] }]
@@ -28,14 +26,13 @@ async function getAllSubClasses(start, end, _id, subclassType, baseClass) {
 }
 
 function searchSubClasses(text, _id, subclassType, baseClass) {
-
     if (subclassType === 'true') {
         return SubClass.find({
             $and: [{ baseClass: { $eq: baseClass }, $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { isPublic: true }] }],
             name: { $regex: text, $options: "i" }
         }).exec();
     }
-    if (subclassType === 'null' || subclassType === 'false') {
+    if (subclassType === null || subclassType === 'false') {
         return SubClass.find({ user_id: { $eq: mongoose.Types.ObjectId(_id) }, name: { $regex: text, $options: "i" } }).exec();
     }
 

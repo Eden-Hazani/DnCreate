@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView, Vibration, Image, Dimensions } from 'react-native';
 import { AnimatedLogo } from '../animations/AnimatedLogo';
-import { AppTextHeadline } from '../components/AppTextHeadline';
 import { AppText } from '../components/AppText';
 import { Colors } from '../config/colors';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AnimateContactUpwards } from '../animations/AnimateContactUpwards';
 import { AppButton } from '../components/AppButton';
 import { store } from '../redux/store';
@@ -13,12 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import Carousel from 'react-native-snap-carousel';
 import AuthContext from '../auth/context';
-import { UserModel } from '../models/userModel';
 import Modal from 'react-native-modal';
-import InformationScroller from '../components/InformationScroller';
-import WelcomeInfo from '../../jsonDump/welcomeInformation.json'
 import { Config } from '../../config';
-import { CharacterModel } from '../models/characterModel';
+import { UpdateMessage } from '../components/UpdateMessage';
 
 
 Modal
@@ -64,6 +59,8 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+
+
     _renderItem({ item, index }: any) {
         return (
             <View style={{
@@ -96,12 +93,8 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
         this.clearStorageJunk()
     }
 
-    async componentDidMount() {
-        const firstUse = await AsyncStorage.getItem('isFirstUse')
-        if (!firstUse) {
-            this.setState({ firstUseModal: true })
-        }
-
+    componentDidMount() {
+        this.checkForNews()
         this.clearStorageJunk()
     }
 
@@ -110,6 +103,15 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
         this.setState({ newUserModal: false })
         this.props.navigation.navigate("RaceList")
     }
+
+    checkForNews = async () => {
+        const newsFlag = await AsyncStorage.getItem('newsFlag');
+        const isFirstUse = await AsyncStorage.getItem('isFirstUse');
+        if (!newsFlag || newsFlag !== '2.07' || !isFirstUse) {
+            this.setState({ firstUseModal: true })
+        }
+    }
+
 
 
     render() {
@@ -143,6 +145,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                             onPress={() => this.context.offlineLogin()} borderRadius={100} width={100} height={100} title={"Use Offline"} />
                                     </View>
                                 </View>
+
                                 <Modal
                                     style={{
                                         backgroundColor: Colors.pageBackground,
@@ -241,6 +244,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                     </View>
                                 </Modal>
                             </View>
+
                             <Modal
                                 style={{
                                     backgroundColor: Colors.pageBackground,
@@ -249,14 +253,17 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
                                     justifyContent: undefined,
                                 }}
                                 isVisible={this.state.firstUseModal}>
-                                <InformationScroller list={WelcomeInfo.list} PressClose={async (val: boolean) => {
-                                    this.setState({ firstUseModal: val })
-                                    await AsyncStorage.setItem('isFirstUse', "false")
-                                    const colorScheme = await AsyncStorage.getItem("colorScheme");
-                                    if (colorScheme === "firstUse") {
-                                        this.setState({ colorModal: true })
-                                    }
+                                <UpdateMessage close={(val: boolean) => {
+                                    this.setState({ firstUseModal: val }, async () => {
+                                        await AsyncStorage.setItem('newsFlag', '2.07');
+                                        await AsyncStorage.setItem('isFirstUse', "false");
+                                        const colorScheme = await AsyncStorage.getItem("colorScheme");
+                                        if (colorScheme === "firstUse") {
+                                            this.setState({ colorModal: true })
+                                        }
+                                    })
                                 }} />
+
                             </Modal>
                         </AnimateContactUpwards>
                     </View>

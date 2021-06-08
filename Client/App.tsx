@@ -18,6 +18,7 @@ import startUp from './utility/core/appStartUp'
 import updateCheck from './utility/core/checkForUpdates';
 import { AuthenticationGate } from './AuthenticationGate';
 import { Provider } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

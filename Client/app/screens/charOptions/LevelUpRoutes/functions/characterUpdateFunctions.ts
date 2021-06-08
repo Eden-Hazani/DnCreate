@@ -46,7 +46,6 @@ const addPathArmor = async (armorToLoad: any, character: CharacterModel) => {
 
 const newPathFirstLevelMagic = (newPathSpells: any, spellsKnown: number, character: CharacterModel) => {
     if (character.spells) {
-        console.log(newPathSpells)
         for (let spell of newPathSpells) {
             const spellLevel = spellLevelChanger(spell.level)
             character.spells[spellLevel].push({ spell: spell, removable: false });

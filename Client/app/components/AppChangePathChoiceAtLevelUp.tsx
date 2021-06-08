@@ -77,7 +77,6 @@ export class AppChangePathChoiceAtLevelUp extends Component<{
                 }
             }
         }
-        console.log(updatedCharacter.pathFeatures)
         this.props.updateCharacter(updatedCharacter)
     }
 

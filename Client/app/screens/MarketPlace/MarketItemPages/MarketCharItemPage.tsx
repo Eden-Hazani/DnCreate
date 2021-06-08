@@ -70,7 +70,6 @@ export function MarketCharItemPage({ item, close }: Props) {
         }
     }
 
-
     return (
         <Modal visible={true} animationType="slide">
             <View style={[styles.container, { backgroundColor: Colors.pageBackground }]}>
@@ -94,7 +93,7 @@ export function MarketCharItemPage({ item, close }: Props) {
                                     <AppText fontSize={18} color={Colors.pinkishSilver}>About</AppText>
                                     <AppText>{marketItem?.description}</AppText>
                                 </View>
-                                {marketItem?.currentLevelChar?.backStory && <View style={{ paddingTop: 15, paddingBottom: 15 }}>
+                                {marketItem?.currentLevelChar?.backStory !== undefined && <View style={{ paddingTop: 15, paddingBottom: 15 }}>
                                     <AppText fontSize={18} color={Colors.pinkishSilver}>Backstory</AppText>
                                     <AppText>{marketItem?.currentLevelChar?.backStory}</AppText>
                                 </View>}

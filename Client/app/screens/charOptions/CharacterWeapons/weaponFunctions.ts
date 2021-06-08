@@ -78,7 +78,6 @@ const editExistingWeapon = async (values: any, weapon: WeaponModal, character: C
         weapon.diceAmount = values.diceAmount;
         weapon.removable = true;
         weapon.specialAbilities = values.specialAbilities;
-        console.log(weapon)
         let weaponList = await AsyncStorage.getItem(`${character._id}WeaponList`);
         if (!weaponList) {
             return;

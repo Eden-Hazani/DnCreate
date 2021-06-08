@@ -4,7 +4,6 @@ import { MessageModal } from "../../../models/MessageModal";
 import { setColorName } from "./colorChatName";
 
 const sendMessage = (currentMessage: string, adventure_id: string, participantChar: CharacterModel, adventureIdentifier: string) => {
-    console.log(participantChar)
     if (currentMessage === '') {
         return '';
     }

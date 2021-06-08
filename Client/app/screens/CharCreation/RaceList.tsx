@@ -122,7 +122,6 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         let raceColors = [];
         const { isPopularOrder, raceType } = await this.getStorageRaceStats()
         const result = await racesApi.getPrimeList(isPopularOrder, raceType, this.context.user._id);
-        console.log(result)
         await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
         for (let item of result.data as any) {
             raceColors.push(item.raceColors)

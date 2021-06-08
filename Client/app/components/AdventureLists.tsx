@@ -70,8 +70,8 @@ export default function AdventureLists({ adventures, openAdventure }: any) {
                                         borderColor: Colors.whiteInDarkMode,
                                         borderWidth: 2, width: width * 0.7, alignItems: "center", borderRadius: 25
                                     }}>
-                                        <AppText fontSize={25} color={Colors.deepGold}> - Adventure - </AppText>
-                                        <AppText fontSize={25} color={Colors.deepGold}>{item.adventureName}</AppText>
+                                        <AppText fontSize={25} textAlign={'center'} color={Colors.deepGold}> - Adventure - </AppText>
+                                        <AppText fontSize={25} textAlign={'center'} color={Colors.deepGold}>{item.adventureName}</AppText>
                                     </View>
                                 </TouchableOpacity>
 

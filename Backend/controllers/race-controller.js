@@ -27,7 +27,6 @@ router.get("/raceList/:start/:end/:user_id/:raceType/:isPopularOrder", async (re
         const raceType = request.params.raceType;
         const isPopularOrder = request.params.isPopularOrder;
         const races = await raceLogic.getAllRaces(start, end, _id, raceType, isPopularOrder);
-        console.log(races)
         response.json(races);
     } catch (err) {
         response.status(500).send(err.message);
@@ -49,7 +48,6 @@ router.get("/getPrimeRaceList/:popularity/:raceType/:user_id", async (request, r
 router.get("/getUserCreatedRaces/:uid", verifyLogged, async (request, response) => {
     try {
         const uid = request.params.uid;
-        console.log(uid)
         const races = await raceLogic.getUserCreatedRaces(uid)
         response.json(races);
     } catch (err) {
@@ -62,7 +60,6 @@ router.patch("/editCustomRace", verifyLogged, upload.single('image'), async (req
         const race = new Race(JSON.parse(request.body.raceInfo))
         if (request.file) {
             const raceSnapShot = await raceLogic.getRace(JSON.parse(request.body.raceInfo)._id);
-            console.log(raceSnapShot)
             if (raceSnapShot.image) {
                 fs.unlink(`./public/assets/races/${raceSnapShot.image}`, function (err) {
                     if (err) return console.log(err);
@@ -84,7 +81,6 @@ router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => 
         const raceType = request.params.raceType;
         const user_id = request.params.user_id;
         const items = await raceLogic.searchRaces(request.params.text, raceType, user_id);
-        console.log(items)
         response.json(items);
     } catch (err) {
         response.status(500).send(err.message);
@@ -106,7 +102,6 @@ router.post("/addRace", verifyLogged, upload.single('image'), async (request, re
 
 router.get("/popularizeAllRaces", verifyLogged, async (request, response) => {
     try {
-        console.log('dfg')
         raceLogic.popularizeAllRaces();
         response.json(true);
     } catch (err) {

@@ -81,7 +81,6 @@ router.post("/addImgToGallery", verifyLogged, uploadToGallery.single("newImage")
 
 router.patch("/removeImgFromGallery/:imageUrl/:adventure_id", verifyLogged, upload.none(), async (request, response) => {
     try {
-        console.log(request.body)
         const adventure = new Adventure(JSON.parse(request.body.adventure))
         const adventure_id = request.params.adventure_id;
         const imageUrl = request.params.imageUrl;
@@ -117,7 +116,6 @@ router.patch("/updateAdventure", verifyLogged, upload.none(), async (request, re
         if (Expo.isExpoPushToken(expoPushToken)) {
             await sendPushNotification(expoPushToken, "New adventurer has joined", `${joiningUserCharacter.name} has joined ${adventure.adventureName}`);
         }
-        console.log(adventure)
         const updatedAdventure = await adventureLogic.updateAdventure(adventure);
         global.socketServer.emit(`adventure-${updatedAdventure._id}-change`, updatedAdventure);
         response.json(updatedAdventure);
@@ -294,7 +292,6 @@ router.get("/getMessages/:adventure_id/:start/:end", verifyLogged, upload.none()
         const adventure_id = request.params.adventure_id;
         const start = request.params.start;
         const end = request.params.end;
-        console.log(start, end)
         const messages = await messageLogic.getMessages(adventure_id, start, end)
         response.json(messages);
     } catch (err) {

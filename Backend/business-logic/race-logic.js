@@ -4,14 +4,13 @@ const Character = require("../models/characterModel");
 
 
 async function getAllRaces(start, end, _id, raceType, isPopularOrder) {
-    console.log(isPopularOrder)
     if (_id === 'noUserId') {
         return Race.find({
             user_id: { $exists: false },
         }).skip(parseInt(start)).limit(parseInt(end)).exec();
     }
     if (raceType === 'true') {
-        if (isPopularOrder) {
+        if (isPopularOrder === 'true') {
             return Race.aggregate([
                 { $match: { $or: [{ user_id: mongoose.Types.ObjectId(_id) }, { visibleToEveryone: true }, { visibleToEveryone: { $exists: false } }] } }
                 , { $sort: { popularity: parseInt(isPopularOrder) } }]).skip(parseInt(start)).limit(parseInt(end)).exec();
@@ -21,7 +20,7 @@ async function getAllRaces(start, end, _id, raceType, isPopularOrder) {
         }).skip(parseInt(start)).limit(parseInt(end)).exec();
     }
     if (raceType === 'null' || raceType === 'false') {
-        if (isPopularOrder) {
+        if (isPopularOrder === 'true') {
             return Race.aggregate([
                 {
                     $match: {
@@ -87,7 +86,6 @@ function popularizeAllRaces() {
     Race.find({}, function (err, races) {
         races.map(async (item) => {
             const characters = await Character.find({ raceId: { $eq: item._id.toString() } }).exec();
-            console.log(characters.length)
             item.popularity = characters.length
             await Race.findOneAndUpdate({ _id: item._id }, item, { new: true, useFindAndModify: false }).exec();
         })
@@ -109,8 +107,7 @@ function getPrimeRaces(popularity, raceType, user_id) {
             , { $sort: { popularity: parseInt(popularity) } }]).skip(0).limit(20).exec();
     }
     if (raceType === 'null' || raceType === 'false') {
-        console.log(parseInt(popularity))
-        const test = Race.aggregate([
+        const races = Race.aggregate([
             {
                 $match: {
                     $and: [{
@@ -120,8 +117,7 @@ function getPrimeRaces(popularity, raceType, user_id) {
                 }
             }
             , { $sort: { popularity: parseInt(popularity) } }]).skip(0).limit(20).exec();
-        console.log(test)
-        return test
+        return races
     }
 }
 
