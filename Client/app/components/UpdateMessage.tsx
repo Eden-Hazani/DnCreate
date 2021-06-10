@@ -2,11 +2,10 @@ import React, { Component, useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, FlatList, Image, Animated } from 'react-native';
 import { Config } from '../../config';
 import { Colors } from '../config/colors';
-import { AppButton } from './AppButton';
 import { AppText } from './AppText';
-import * as Linking from 'expo-linking';
 import { AppActivityIndicator } from './AppActivityIndicator';
 import { IconGen } from './IconGen';
+import * as Progress from 'react-native-progress';
 
 const { height, width } = Dimensions.get('screen')
 interface Props {
@@ -81,21 +80,25 @@ const serverData = [
 
 export function UpdateMessage({ close }: Props) {
     const [data, setData] = useState<any[]>([])
+    const [currentProgress, setCurrentProgress] = useState<number>(0)
     const scrollX = useRef(new Animated.Value(0)).current;
     useEffect(() => {
         loadImgFromServer()
     }, [])
 
     const loadImgFromServer = async () => {
-        const returnedData = serverData.map(async (item) => item.image && Image.prefetch(item.image).finally(() => { return item }))
+        const returnedData = serverData.map(async (item) => item.image && Image.prefetch(item.image).then(() => {
+            setCurrentProgress(prevState => prevState + 0.1)
+        }).finally(() => { return item }))
         await Promise.all(returnedData)
         setData(serverData)
     }
 
     return (
         <View style={{ backgroundColor: Colors.totalWhite }}>
-            {data.length === 0 ? <View>
+            {data.length === 0 ? <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <AppActivityIndicator visible={data.length === 0} />
+                <Progress.Bar color={Colors.bitterSweetRed} progress={currentProgress} width={200} />
                 <AppText color={Colors.bitterSweetRed} fontSize={25} textAlign={'center'}>Loading Assets...</AppText>
             </View> :
                 <>

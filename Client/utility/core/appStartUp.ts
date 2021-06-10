@@ -10,9 +10,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CacheManager } from "react-native-expo-image-cache"
 import { Config } from "../../config"
 import { serverDice } from "../getDiceFromServer"
+import { classImagesFromServer } from "../getClassImagesFromServer"
 
 const startUp = async () => {
     serverDice();
+    classImagesFromServer()
     await loadColors();
     await loadFonts();
     await loadStartGif();
