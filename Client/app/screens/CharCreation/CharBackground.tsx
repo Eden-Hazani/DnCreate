@@ -19,6 +19,7 @@ import { BackgroundModal } from '../../models/backgroundModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Config } from '../../../config';
 import { Image } from 'react-native-expo-image-cache';
+import { PickLanguage } from '../../components/PickLanguage';
 
 const ValidationSchema = Yup.object().shape({
     backgroundName: Yup.string().required().label("Background Name"),
@@ -388,9 +389,9 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                 {this.state.oneToolOneLanguageChoice &&
                                                     <View>
                                                         <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra known language</AppText>
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[0] = txt;
+                                                            addedLanguages[0] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
                                                         <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>You can pick 1 tool Proficiency</AppText>
@@ -418,16 +419,17 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                 {this.state.twoLanguageChoice &&
                                                     <View>
                                                         <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 2 known language</AppText>
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[0] = txt;
+                                                            addedLanguages[0] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[1] = txt;
+                                                            addedLanguages[1] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
+
                                                     </View>}
                                             </View>
                                         </View>
@@ -468,11 +470,12 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                         <View style={{ padding: 17 }}>
                                                             <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 1 known language</AppText>
                                                         </View>
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[0] = txt;
+                                                            addedLanguages[0] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
+
                                                     </View>
                                                 }
                                                 {backgroundsJson[this.state.pickedOfficial.name].languages === 2 &&
@@ -480,14 +483,14 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
                                                         <View style={{ padding: 17 }}>
                                                             <AppText fontSize={18} textAlign={'center'} color={Colors.berries}>Please insert your extra 2 known languages</AppText>
                                                         </View>
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[0] = txt;
+                                                            addedLanguages[0] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
-                                                        <AppTextInput placeholder={'Language'} onChangeText={(txt: string) => {
+                                                        <PickLanguage width={'100%'} resetLanguage={undefined} passLanguage={(language: string) => {
                                                             const addedLanguages = this.state.addedLanguages;
-                                                            addedLanguages[1] = txt;
+                                                            addedLanguages[1] = language;
                                                             this.setState({ addedLanguages })
                                                         }} />
                                                     </View>

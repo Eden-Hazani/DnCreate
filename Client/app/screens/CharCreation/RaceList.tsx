@@ -161,7 +161,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 raceType = 'false'
             }
             if (search.trim() === "") {
-                this.setState({ currentLoadedRaces: 20, races: [] }, () => this.getPrimeRaces())
+                this.setState({ currentLoadedRaces: 10, races: [] }, () => this.getPrimeRaces())
                 return;
             }
             const user_id = store.getState().nonUser === true ? 'Offline' : this.context.user._id
@@ -249,7 +249,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                         <AppText textAlign={'center'} fontSize={17}>Purchasing the 5e players handbook is a must if you wish to have the full game experience.</AppText>
                                         <AppText textAlign={'center'} fontSize={17}>DnCreate is only a tool to ease character creation and the leveling process.</AppText>
                                         <AppText textAlign={'center'} fontSize={17}>Before using DnCreate or considering donating to us we extremely
-                                                recommend purchasing the players handbook from Wizards Of The Coast.</AppText>
+                                            recommend purchasing the players handbook from Wizards Of The Coast.</AppText>
                                         <AppButton padding={20} backgroundColor={Colors.metallicBlue} onPress={() => {
                                             this.setState({ disclaimerModal: false, afterDisclaimerModal: true })
                                         }}
@@ -258,7 +258,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                 </Modal>
                                 <Modal visible={this.state.afterDisclaimerModal} animationType="slide">
                                     <RaceListHomeBrew close={async () => {
-                                        this.setState({ afterDisclaimerModal: false })
+                                        this.setState({ afterDisclaimerModal: false, currentLoadedRaces: 20, races: [], loading: true }, () => this.getPrimeRaces())
                                         await AsyncStorage.setItem('shownDisclaimer', "true")
                                     }} />
                                 </Modal>

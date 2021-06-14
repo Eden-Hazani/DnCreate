@@ -13,6 +13,8 @@ import { RaceModel } from '../../models/raceModel';
 import skillJson from '../../../jsonDump/skillList.json';
 import toolJson from '../../../jsonDump/toolList.json';
 import { PickSingleItem } from './helperFunctions/PickSingleItem';
+import { SearchableTextDropDown } from '../../components/SearchableTextDropDown';
+import { PickLanguage } from '../../components/PickLanguage';
 
 interface SpacialRaceBonusesState {
     character: CharacterModel
@@ -130,11 +132,13 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     displayExtraLanguages = (amount: number) => {
         let jsx: any[] = []
         for (let i = 0; i < amount; i++) {
-            jsx.push(<AppTextInput key={i} placeholder={"Language..."} onChangeText={(txt: string) => {
-                const extraLanguages = this.state.extraLanguages;
-                extraLanguages[i] = txt;
-                this.setState({ extraLanguages })
-            }} />)
+            jsx.push(
+                <PickLanguage resetLanguage={undefined} width={'100%'} key={i} passLanguage={(language: string) => {
+                    const extraLanguages = this.state.extraLanguages;
+                    extraLanguages[i] = language;
+                    this.setState({ extraLanguages })
+                }} />
+            )
         }
         return jsx
     }
@@ -310,7 +314,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         {this.state.race.customWeaponProficiencies &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customWeaponProficiencies.amount} extra
-                                 {this.state.race.customWeaponProficiencies.type} Weapon Proficiencies</AppText>
+                                    {this.state.race.customWeaponProficiencies.type} Weapon Proficiencies</AppText>
                                 {this.displayCustomWeapons(this.state.race.customWeaponProficiencies.amount).map((item, index) => item)}
                             </View>
                         }
@@ -318,7 +322,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
                         {this.state.race.customArmorProficiencies &&
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'} fontSize={18}>You can learn {this.state.race.customArmorProficiencies.amount}
-                                extra {this.state.race.customArmorProficiencies.type} Armor Proficiencies</AppText>
+                                    extra {this.state.race.customArmorProficiencies.type} Armor Proficiencies</AppText>
                                 {this.displayCustomArmor(this.state.race.customArmorProficiencies.amount).map((item, index) => item)}
                             </View>
                         }

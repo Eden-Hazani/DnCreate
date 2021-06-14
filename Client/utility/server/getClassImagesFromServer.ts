@@ -1,4 +1,7 @@
 
+import { CacheManager } from "react-native-expo-image-cache"
+import { Config } from "../../config"
+
 
 const images = [`${Config.serverUrl}/assets/classBackGrounds/Starting.png`,
 `${Config.serverUrl}/assets/classBackGrounds/BarbarianFinal.png`,
@@ -14,9 +17,6 @@ const images = [`${Config.serverUrl}/assets/classBackGrounds/Starting.png`,
 `${Config.serverUrl}/assets/classBackGrounds/WarlockFinal.png`,
 `${Config.serverUrl}/assets/classBackGrounds/WizardFinal.jpg`,
 `${Config.serverUrl}/assets/classBackGrounds/ArtificerFinal.png`]
-
-import { CacheManager } from "react-native-expo-image-cache"
-import { Config } from "../config"
 
 export async function classImagesFromServer() {
     for (let item of images) {

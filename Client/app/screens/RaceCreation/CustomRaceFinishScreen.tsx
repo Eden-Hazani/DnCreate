@@ -102,6 +102,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
         customRace.visibleToEveryone = this.state.racePublic;
         racesApi.editRace(customRace).then(() => {
             store.dispatch({ type: ActionType.CustomRaceEditing, payload: false })
+            store.dispatch({ type: ActionType.cleanCustomRace })
             this.props.navigation.navigate('CreationScreen')
         }).catch((err) => {
             alert('There seems to be a problem with our servers, please try again later.')
@@ -172,7 +173,7 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                                 {!this.context.user.premium ?
                                     <View style={{ paddingBottom: 70 }}>
                                         <AppText fontSize={18} padding={10} textAlign={'center'}>DnCreate uses server space to store your races,
-                                as such you will be served an ad to complete the race creation setup and store your new race for free!</AppText>
+                                            as such you will be served an ad to complete the race creation setup and store your new race for free!</AppText>
                                         <AppText fontSize={18} padding={10} textAlign={'center'}>If you wish to disable ads on DnCreate consider donating on Patreon.</AppText>
                                         <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}
                                             borderRadius={25} title={'Finish'} onPress={() => { this.sendRaceToServerWithAds() }} />

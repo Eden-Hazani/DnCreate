@@ -25,6 +25,7 @@ import { UpdateMessage } from '../components/UpdateMessage';
 import { Config } from '../../config';
 import { IconGen } from '../components/IconGen';
 import * as Linking from 'expo-linking';
+import { AnimatedCircleButton } from '../animations/AnimatedCircleButton';
 
 interface HomeState {
     loading: boolean
@@ -223,11 +224,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                         <View style={styles.container}>
                             <AnimateContactUpwards>
                                 <View style={{ alignItems: "center", padding: 5, flex: .05 }}>
-                                    <AppText color={Colors.whiteInDarkMode} fontSize={35}>DnCreate</AppText>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <IconGen name={'chevron-left'} size={50} iconColor={Colors.whiteInDarkMode} />
-                                        <IconGen name={'chevron-right'} size={50} iconColor={Colors.whiteInDarkMode} />
-                                    </View>
+
                                     <Carousel
                                         autoplay
                                         loop
@@ -239,20 +236,21 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     />
                                 </View>
                                 <View style={styles.buttonsView}>
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
-                                        if (this.context.user._id === "Offline") {
+                                    <AnimatedCircleButton direction={'right'} upperWord={'New'} bottomWord={'Character'}
+                                        onPress={async () => {
+                                            if (this.context.user._id === "Offline") {
+                                                this.props.navigation.navigate("RaceList")
+                                                return;
+                                            }
+                                            const isActive = await authApi.isActivated();
+                                            if (isActive.data === 'false' && this.state.characters.length >= 1) {
+                                                this.setState({ errorModal: true })
+                                                return;
+                                            }
                                             this.props.navigation.navigate("RaceList")
-                                            return;
-                                        }
-                                        const isActive = await authApi.isActivated();
-                                        if (isActive.data === 'false' && this.state.characters.length >= 1) {
-                                            this.setState({ errorModal: true })
-                                            return;
-                                        }
-                                        this.props.navigation.navigate("RaceList")
-                                    }} fontSize={15} borderRadius={100} width={120} height={120} title={"New Character"} />
-                                    <AppButton backgroundColor={Colors.bitterSweetRed} onPress={() => this.props.navigation.navigate("CharacterHall")}
-                                        fontSize={15} borderRadius={100} width={120} height={120} title={"Character Hall"} />
+                                        }} />
+                                    <AnimatedCircleButton direction={'left'} upperWord={'Character'} bottomWord={'Hall'}
+                                        onPress={() => this.props.navigation.navigate("CharacterHall")} />
                                 </View>
                                 <Modal visible={this.state.homeMessageModal} animationType="slide">
                                     <FeedBack close={(val: boolean) => { this.setState({ homeMessageModal: val }) }} />
@@ -276,7 +274,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                             <AppText fontSize={18} textAlign={'center'}>Email was sent, if it didn't reach you press to send again after the timer.</AppText>
                                             :
                                             <AppText fontSize={18} textAlign={'center'}>Need us to resend the activation email?
-                                            {'\n'} No worries, just click</AppText>
+                                                {'\n'} No worries, just click</AppText>
                                         }
                                         <AppButton padding={10} backgroundColor={Colors.bitterSweetRed} onPress={() => { this.resendEmail() }} disabled={this.state.emailSentTimer > 0}
                                             fontSize={18} borderRadius={100} width={100} height={100} title={this.state.emailSentTimer > 0 ? this.state.emailSentTimer.toString() : "Here"} />

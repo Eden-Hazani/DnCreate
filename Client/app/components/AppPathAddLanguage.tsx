@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import logger from '../../utility/logger';
 import { AppText } from './AppText';
 import { AppTextInput } from './forms/AppTextInput';
+import { PickLanguage } from './PickLanguage';
 
 interface AppPathAddLanguageState {
     languageToAdd: string[]
@@ -57,7 +58,7 @@ export class AppPathAddLanguage extends Component<{ learnSpecificLanguage: any, 
                         <AppText fontSize={20} textAlign={"center"}>Input your languages, you can use official languages or the languages that fit the world of your adventure.</AppText>
                         {this.props.amountOfLanguages.map((item: string, index: number) =>
                             <View key={index} >
-                                <AppTextInput width={250} placeholder={`language ${index + 1} ...`} iconName={"podium-gold"} onChangeText={(text: string) => { this.setLang(text, index) }} />
+                                <PickLanguage resetLanguage={undefined} width={'100%'} passLanguage={(language: string) => this.setLang(language, index)} />
                             </View>)}
                     </View>
                 }

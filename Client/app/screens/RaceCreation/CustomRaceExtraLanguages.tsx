@@ -12,6 +12,8 @@ import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
 import { store } from '../../redux/store';
 
+import { PickLanguage } from '../../components/PickLanguage'
+
 interface CustomRaceExtraLanguagesState {
     customRace: RaceModel
     confirmed: boolean,
@@ -104,7 +106,7 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
     render() {
         const storeItem = store.getState().customRace.extraLanguages || 0;
         return (
-            <ScrollView style={styles.container}>
+            <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
                     <>
                         <View>
@@ -136,15 +138,16 @@ export class CustomRaceExtraLanguages extends Component<{ navigation: any }, Cus
                                         borderRadius={25} title={'Add Language'} onPress={() => { this.addLanguage() }} />
                                     {this.state.customRace.languages?.map((item, index) => {
                                         return <View key={index} style={{ flexDirection: 'row', justifyContent: "space-evenly" }}>
-                                            <AppTextInput
-                                                width={Dimensions.get('window').width - 150}
-                                                defaultValue={this.state.customRace.languages ? this.state.customRace.languages[index] : ''}
-                                                onChangeText={(txt: string) => {
+                                            <PickLanguage
+                                                width={'100%'}
+                                                resetLanguage={undefined}
+                                                passLanguage={(language: string) => {
                                                     const customRace = { ...this.state.customRace };
                                                     if (customRace.languages)
-                                                        customRace.languages[index] = txt.trim()
+                                                        customRace.languages[index] = language.trim()
                                                     this.setState({ customRace })
-                                                }} placeholder={'Language Name...'} />
+                                                }}
+                                                defaultValue={this.state.customRace.languages ? this.state.customRace.languages[index] : ''} />
                                             <TouchableOpacity onPress={() => this.removeLanguage(index)}>
                                                 <IconGen size={50} name={'trash-can'} iconColor={Colors.danger} />
                                             </TouchableOpacity>

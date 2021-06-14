@@ -36,6 +36,7 @@ export class MyCreations extends Component<{ navigation: any }, MyCreationsState
 
     onFocus = () => {
         store.dispatch({ type: ActionType.cleanCustomRace })
+        store.dispatch({ type: ActionType.CustomRaceEditing, payload: false })
         this.getRaces()
     }
 

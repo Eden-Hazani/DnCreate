@@ -7,6 +7,7 @@ import userCharApi from '../../api/userCharApi';
 import { AppButton } from '../../components/AppButton';
 import { AppText } from '../../components/AppText';
 import { AppTextInput } from '../../components/forms/AppTextInput';
+import { PickLanguage } from '../../components/PickLanguage';
 import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
@@ -16,18 +17,13 @@ import { store } from '../../redux/store';
 interface ReplaceLanguagesState {
     character: CharacterModel
     newLanguage: string
-    openAutoComplete: boolean
-    languageOptions: string[]
 }
-const autoArray = ['Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish', 'Goblin', 'Draconic', 'Abyssal', 'Infernal', 'Deep Speech']
 export class ReplaceLanguages extends Component<{ navigation: any, route: any }, ReplaceLanguagesState>{
     constructor(props: any) {
         super(props)
         this.state = {
-            openAutoComplete: false,
             newLanguage: '',
             character: this.props.route.params.char,
-            languageOptions: autoArray
         }
     }
     addLanguage = () => {
@@ -50,44 +46,20 @@ export class ReplaceLanguages extends Component<{ navigation: any, route: any },
             await userCharApi.updateChar(this.state.character)
         })
     }
-    filterLanguages = (text: string) => {
-        const languageOptions: string[] = [];
-        for (let item of autoArray) {
-            if (item.includes(text)) {
-                languageOptions.push(item)
-            }
-        }
-        this.setState({ languageOptions })
-    }
+
     render() {
         return (
-            <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+            <ScrollView nestedScrollEnabled={true} keyboardShouldPersistTaps="always" style={styles.container}>
                 <View style={{ paddingTop: 25, justifyContent: "center", alignItems: "center" }}>
                     <Image uri={`${Config.serverUrl}/assets/specificDragons/languageDragon.png`} style={{ width: 150, height: 150 }} />
                     <AppText textAlign={'center'} fontSize={25}>Add and remove Languages</AppText>
                     <AppText textAlign={'center'} fontSize={18}>To remove a language press and hold on it's name.</AppText>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                    <AppTextInput
-                        width={250}
-                        padding={10}
-                        onBlur={() => this.setState({ openAutoComplete: false })}
-                        onFocus={() => this.setState({ openAutoComplete: true })}
-                        value={this.state.newLanguage ? this.state.newLanguage : ''}
-                        onChangeText={(newLanguage: string) => {
-                            this.setState({ newLanguage })
-                            this.filterLanguages(newLanguage)
-                        }}
-                        placeholder={'Language Name...'} />
+                <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: 'flex-start' }}>
+                    <PickLanguage resetLanguage={this.state.newLanguage === '' ? true : false} width={'80%'} passLanguage={(newLanguage: string) => this.setState({ newLanguage })} />
                     <AppButton fontSize={25} backgroundColor={Colors.bitterSweetRed}
                         borderRadius={70} width={70} height={70} title={"Add Language"} onPress={() => { this.addLanguage() }} />
                 </View>
-                <TextInputDropDown information={this.state.languageOptions} isOpen={this.state.openAutoComplete}
-                    expendedWidth={Dimensions.get('window').width / 1.2} expendedHeight={'100%'}
-                    sendText={(newLanguage: string) => {
-                        this.setState({ newLanguage, openAutoComplete: false })
-                    }}
-                />
 
                 {this.state.character.languages ?
                     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>

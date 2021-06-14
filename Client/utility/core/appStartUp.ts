@@ -9,12 +9,14 @@ import * as Font from 'expo-font'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CacheManager } from "react-native-expo-image-cache"
 import { Config } from "../../config"
-import { serverDice } from "../getDiceFromServer"
-import { classImagesFromServer } from "../getClassImagesFromServer"
+import { classImagesFromServer } from "../server/getClassImagesFromServer"
+import { serverDice } from "../server/getDiceFromServer"
+import { getGeneralAssets } from "../server/getGeneralAssets"
 
 const startUp = async () => {
     serverDice();
-    classImagesFromServer()
+    classImagesFromServer();
+    getGeneralAssets();
     await loadColors();
     await loadFonts();
     await loadStartGif();

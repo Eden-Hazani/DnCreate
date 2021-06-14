@@ -1,5 +1,6 @@
 import { CacheManager } from "react-native-expo-image-cache"
-import { Config } from "../config"
+import { Config } from "../../config"
+
 
 
 export async function serverDice() {
