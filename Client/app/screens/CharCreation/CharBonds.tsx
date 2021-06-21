@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -12,7 +13,7 @@ import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharBondsState {
     baseState: string
@@ -22,13 +23,22 @@ interface CharBondsState {
     openAutoComplete: boolean[]
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateBonds: boolean;
+}
+
 const fillingList: string[] = ["Everything I do is for the common people", "I'm trying to pay off an old debt I owe to a generous benefactor",
     "I want to be famous, whatever it takes", "I worked the land, I love the land, and I will protect the land", "I protect those who cannot protect themselves",
     "I pursue wealth to secure someone's love"]
 
-export class CharBonds extends Component<{ route: any, navigation: any, updateBonds: boolean }, CharBondsState>{
-    private UnsubscribeStore: Unsubscribe;
+class CharBonds extends Component<Props, CharBondsState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -36,13 +46,19 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
             baseState: '',
             updateBonds: this.props.route.params.updateBonds,
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.UnsubscribeStore = store.subscribe(() => { })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+
+    onFocus = () => {
+        if (!this.props.updateBonds) {
+            this.props.ChangeCreationProgressBar(.93)
+        }
     }
 
     componentWillUnmount() {
-        this.UnsubscribeStore()
+        this.navigationSubscription()
     }
     componentDidMount() {
         this.props.navigation.addListener('beforeRemove', (e: any) => {
@@ -80,15 +96,23 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
         if (!this.state.characterInfo.bonds || this.state.characterInfo.bonds.length === 0) {
             Alert.alert("No Bonds", "Are you sure you want to continue without any Bonds?", [{
                 text: 'Yes', onPress: () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    this.props.navigation.navigate("SaveCharacter")
+                    this.setState({ confirmed: true })
+                    this.props.setStoreCharacterInfo(this.state.characterInfo)
+                    this.props.ChangeCreationProgressBar(1)
+                    setTimeout(() => {
+                        this.props.navigation.navigate("SaveCharacter")
+                    }, 800);
+                    setTimeout(() => {
+                        this.setState({ confirmed: false })
+                    }, 1100);
                 }
             }, { text: 'No' }])
         } else {
             characterInfo.bonds = characterInfo.bonds && characterInfo.bonds.filter(bond => { return bond !== undefined })
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
+                this.props.ChangeCreationProgressBar(1)
                 setTimeout(() => {
                     this.props.navigation.navigate("SaveCharacter")
                 }, 800);
@@ -114,7 +138,7 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
             characterInfo.bonds = characterInfo.bonds && characterInfo.bonds.filter(bond => { return bond !== undefined })
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
                 this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
@@ -202,6 +226,23 @@ export class CharBonds extends Component<{ route: any, navigation: any, updateBo
         )
     }
 }
+
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharBonds)
 
 
 const styles = StyleSheet.create({

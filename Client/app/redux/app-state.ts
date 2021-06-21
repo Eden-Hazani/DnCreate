@@ -24,6 +24,7 @@ export class AppState {
     public marketPlaceFilters: MarketFilterModal
     public marketPlaceType: string
     public marketPlaceSearchText: string
+    public creationProgressBarValue: number
     public constructor() {
         this.colorScheme = false,
             this.nonUser = false;
@@ -41,5 +42,6 @@ export class AppState {
         this.customRaceEditing = false
         this.customRace = new RaceModel()
         this.customSubClass = new SubClassModal()
+        this.creationProgressBarValue = -1
     }
 }

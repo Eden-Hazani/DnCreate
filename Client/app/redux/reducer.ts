@@ -54,7 +54,7 @@ export function reduce(currentState: AppState | undefined = initialState, action
             newState.characters = action.payload
             break;
 
-        case ActionType.addNewCharacter:
+        case ActionType.AddNewCharacter:
             newState.characters = [...newState.characters, action.payload]
             break;
 
@@ -190,6 +190,10 @@ export function reduce(currentState: AppState | undefined = initialState, action
 
         case ActionType.ChangeMarketPlaceType:
             newState.marketPlaceType = action.payload
+            break;
+
+        case ActionType.ChangeCreationProgressBar:
+            newState.creationProgressBarValue = action.payload;
             break;
 
         default: break;

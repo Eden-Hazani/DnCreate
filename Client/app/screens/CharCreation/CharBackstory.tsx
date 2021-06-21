@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Alert, ScrollView } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -11,7 +12,7 @@ import { AppTextInput } from '../../components/forms/AppTextInput';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharBackstoryState {
     characterInfo: CharacterModel
@@ -19,17 +20,34 @@ interface CharBackstoryState {
     confirmed: boolean
 }
 
-export class CharBackstory extends Component<{ props: any, route: any, navigation: any, updateStory: boolean }, CharBackstoryState> {
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateStory: boolean;
+}
+
+
+class CharBackstory extends Component<Props, CharBackstoryState> {
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
             confirmed: false,
             backstory: '',
-            characterInfo: store.getState().character,
+            characterInfo: this.props.character,
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+    onFocus = () => {
+        if (!this.props.updateStory) {
+            this.props.ChangeCreationProgressBar(.7)
+        }
+    }
 
     componentDidMount() {
         if (this.props.route.params.updateStory) {
@@ -42,33 +60,37 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
         if (this.state.backstory.length === 0) {
             Alert.alert("No Story", "Are you sure you want to continue without a backstory?", [{
                 text: 'Yes', onPress: () => {
-                    const characterInfo = { ...this.state.characterInfo };
-                    characterInfo.backStory = this.state.backstory;
-                    this.setState({ characterInfo }, () => {
-                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                        this.props.navigation.navigate("CharacterAppearance", { updateAppearance: false })
-                    })
+                    this.sendData()
                 }
             }, { text: 'No' }])
         } else {
-            const characterInfo = { ...this.state.characterInfo };
-            characterInfo.backStory = this.state.backstory;
-            this.setState({ confirmed: true })
-            this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                setTimeout(() => {
-                    this.props.navigation.navigate("CharacterAppearance", { updateAppearance: false })
-                }, 800);
-                setTimeout(() => {
-                    this.setState({ confirmed: false })
-                }, 1100);
-            })
+            this.sendData()
         }
+    }
+
+    sendData = () => {
+        const characterInfo = { ...this.state.characterInfo };
+        characterInfo.backStory = this.state.backstory;
+        this.setState({ confirmed: true })
+        this.setState({ characterInfo }, () => {
+            this.props.setStoreCharacterInfo(this.state.characterInfo)
+            this.props.ChangeCreationProgressBar(.75)
+            setTimeout(() => {
+                this.props.navigation.navigate("CharacterAppearance", { updateAppearance: false })
+            }, 800);
+            setTimeout(() => {
+                this.setState({ confirmed: false })
+            }, 1100);
+        })
+    }
+
+    componentWillUnmount() {
+        this.navigationSubscription()
     }
 
     updateInfo = async () => {
         this.setState({ confirmed: true })
-        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
+        this.props.setStoreCharacterInfo(this.state.characterInfo)
         this.context.user._id === "Offline" ? this.updateOfflineCharacter().then(() => this.props.navigation.goBack()) :
             userCharApi.updateChar(this.state.characterInfo).then(() => { this.props.navigation.goBack() })
     }
@@ -106,17 +128,10 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
                         </View>
                         :
                         <View style={styles.container}>
-                            <View style={{ marginBottom: 50, padding: 15 }}>
-                                <AppText fontSize={25} textAlign={"center"} color={Colors.bitterSweetRed}>BackStory, Personality Trait, Flaws, Ideals and Bonds </AppText>
-                                <AppText textAlign={"center"} fontSize={18}>In the next section you will need to write and pick Personality Trait, Flaws, Ideals and Bonds that define your character.</AppText>
-                                <AppText textAlign={"center"} fontSize={18}>Feel free to consult with your DM in order to write a good background story that fits the world of the current adventure.</AppText>
-                                <AppText textAlign={"center"} fontSize={18}>From this point on your character has been saved and you can access it through the character hall.</AppText>
-                            </View>
                             <View style={{ padding: 20 }}>
                                 <AppText fontSize={25} textAlign={"center"} color={Colors.bitterSweetRed}>BackStory</AppText>
-                                <AppText textAlign={"center"} fontSize={18}>We heavily recommend that you check online guide sites such as DNDBeyond for searching the background that suites you.</AppText>
                                 <AppText textAlign={"center"} fontSize={18}>Remember that the background story is yours to make and you can consult your DM in order to create unique buffs/debuffs that will fit the world.</AppText>
-                                <AppText textAlign={"center"} fontSize={18}>Your background might give you special items or the knowledge of multiple languages depending on the one of your choosing.</AppText>
+                                <AppText textAlign={"center"} fontSize={18}>Your background might give you special items or the knowledge of multiple languages depending on your DM.</AppText>
                             </View>
                             <View style={{ paddingBottom: 15 }}>
                                 <AppText textAlign={"center"} color={Colors.bitterSweetRed} fontSize={18}>The short backstory of {character.name}'s origins.</AppText>
@@ -129,6 +144,22 @@ export class CharBackstory extends Component<{ props: any, route: any, navigatio
     }
 }
 
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharBackstory)
 
 const styles = StyleSheet.create({
     container: {

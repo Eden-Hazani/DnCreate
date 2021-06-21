@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Animated, Easing, Modal, ScrollView, Switch } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import switchModifier from '../../../utility/abillityModifierSwitch';
 import { attributeColorCodedGuide } from '../../../utility/attributeColorCodedGuide';
@@ -17,6 +18,7 @@ import { CharacterModel } from '../../models/characterModel';
 import { ModifiersModel } from '../../models/modifiersModel';
 import { RaceModel } from '../../models/raceModel';
 import { ActionType } from '../../redux/action-type';
+import { RootState } from '../../redux/reducer';
 import { store } from '../../redux/store';
 import { AttributeHelp } from './AttributeHelp';
 import { ManualAttribute } from './ManualAttribute';
@@ -47,8 +49,17 @@ interface AttributePickingState {
     scrollHandle: number
 }
 
-export class AttributePicking extends Component<{ route: any, navigation: any }, AttributePickingState> {
-    private unsubscribeStore: Unsubscribe;
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    nonUser: boolean;
+    route: any;
+    navigation: any;
+    race: RaceModel;
+}
+
+class AttributePicking extends Component<Props, AttributePickingState> {
     navigationSubscription: any;
     constructor(props: any) {
         super(props)
@@ -71,7 +82,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
             ],
             finishRolls: false,
             dicePool: [],
-            pickedRace: store.getState().race,
+            pickedRace: this.props.race,
             jiggleOn: false,
             diceResults: [],
             rollingDice: false,
@@ -81,11 +92,8 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
             diceIII: false,
             diceIV: false,
             numberOfPickedDice: 0,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.unsubscribeStore = store.subscribe(() => {
-            store.getState().character
-        })
         this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
     componentDidMount() {
@@ -95,6 +103,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
     }
     onFocus = async () => {
         try {
+            this.props.ChangeCreationProgressBar(.4)
             let attributes = ["strength", "constitution", "dexterity", "intelligence", "wisdom", "charisma"]
             let characterInfo = { ...this.state.characterInfo };
             let dicePool = this.state.dicePool;
@@ -137,7 +146,7 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         }
     }
     componentWillUnmount() {
-        this.unsubscribeStore()
+        this.navigationSubscription()
     }
     addDice = (diceNumber: number, diceState: any) => {
         if (this.state.diceResults) {
@@ -218,7 +227,8 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
             && this.state.characterInfo.modifiers.charisma !== undefined
         ) {
             this.setState({ confirmed: true })
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+            this.props.setStoreCharacterInfo(this.state.characterInfo)
+            this.props.ChangeCreationProgressBar(.5)
             AsyncStorage.setItem(`AttributeStage`, JSON.stringify(this.state.characterInfo))
             setTimeout(() => {
                 this.props.navigation.navigate("CharBackground");
@@ -270,10 +280,10 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
                         <View>
                             {this.state.rollingDice && <View style={[StyleSheet.absoluteFillObject, { position: "absolute", backgroundColor: Colors.black, opacity: .7, zIndex: 3 }]}></View>}
                             {this.state.rollingDice && <View style={[{
-                                zIndex: 10, position: 'absolute', top: this.state.scrollHandle + 50,
+                                zIndex: 10, position: 'absolute', top: this.state.scrollHandle,
                                 left: 0, right: 0, bottom: 0
                             }]}>
-                                <DiceRolling isClosedTimer={true} showResults={false}
+                                <DiceRolling scrollHandle={this.state.scrollHandle} isClosedTimer={true} showResults={false}
                                     returnResultArray={(diceResults: number[]) => this.setState({ diceResults })} diceAmount={4} diceType={6} rollValue={0} close={() => this.setState({ rollingDice: false })} />
                             </View>}
                             <View style={styles.container}>
@@ -535,6 +545,23 @@ export class AttributePicking extends Component<{ route: any, navigation: any },
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        nonUser: state.nonUser,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AttributePicking)
 
 
 const styles = StyleSheet.create({

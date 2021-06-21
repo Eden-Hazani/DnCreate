@@ -5,6 +5,9 @@ import cleanCharObj from "../../../../utility/charHallFunctions/cleanCharObj";
 import { getCharArmorArmaments, getCharShieldArmaments, getCharWeaponArmaments } from "../../../../utility/charHallFunctions/getCharArmaments";
 import { MarketWeaponItemModel } from "../../../models/MarketWeaponItemModel";
 import { WeaponModal } from "../../../models/WeaponModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SpellMarketItem } from "../../../models/SpellMarketItem";
+import { CustomSpellModal } from "../../../models/CustomSpellModal";
 
 const createNewCharMarketObj = async (character: CharacterModel, values: { name: string, description: string }) => {
     const previousLevels = await getCharacterPreviousLevels(character);
@@ -24,7 +27,13 @@ const createNewCharMarketObj = async (character: CharacterModel, values: { name:
     marketObj.marketType = "CHAR"
     marketObj.charClass = character.characterClass;
     marketObj.downloadedTimes = 0;
+    marketObj.isFirstLevelNotOpened = await checkIfCharOptimal(character._id || '')
     return marketObj;
+}
+
+const checkIfCharOptimal = async (characterId: string) => {
+    if (await AsyncStorage.getItem(`${characterId}FirstTimeOpened`)) return true
+    return false
 }
 
 const createNewWeaponMarketObj = (user_id: string, weapon: WeaponModal, values: { name: string, description: string }) => {
@@ -40,4 +49,20 @@ const createNewWeaponMarketObj = (user_id: string, weapon: WeaponModal, values: 
     return marketObj
 }
 
-export { createNewCharMarketObj, createNewWeaponMarketObj };
+
+const createNewSpellMarketOb = (user_id: string, spell: CustomSpellModal, values: { name: string, description: string }) => {
+    const marketObj = new SpellMarketItem();
+    marketObj.creatorName = values.name;
+    marketObj.creator_id = user_id;
+    marketObj.itemName = spell.name;
+    marketObj.description = values.description;
+    marketObj.spell = spell;
+    marketObj.marketType = "SPELL"
+    marketObj.downloadedTimes = 0;
+    marketObj.image = spell.school;
+    return marketObj
+}
+
+
+
+export { createNewCharMarketObj, createNewWeaponMarketObj, createNewSpellMarketOb };

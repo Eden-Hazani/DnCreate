@@ -30,6 +30,7 @@ export class AppText extends Component<any, any> {
                 fontSize: this.props.fontSize && PixelRatio.get() <= 2.7 ? this.props.fontSize * .95 : this.props.fontSize,
                 padding: this.props.padding,
                 textAlign: this.props.textAlign,
+                paddingLeft: this.props.paddingLeft,
                 fontFamily: "KumbhSans-Light",
                 color: this.props.color ? this.props.color : Colors.whiteInDarkMode
             }}>{this.props.children}</Text>

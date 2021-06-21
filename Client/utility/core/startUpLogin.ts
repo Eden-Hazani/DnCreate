@@ -10,12 +10,13 @@ const startUpLoginCheck = async () => {
     store.dispatch({ type: ActionType.CleanCreator })
     const user = await handleToken().then(async (tokenUser) => {
         if (tokenUser !== null && tokenUser._id !== "Offline") {
-            const result = await authApi.isUserLogged();
-            if (!result.ok) {
-                errorHandler(result);
+            const settings = await getLoginSettings()
+            const token = await authApi.isUserLogged(settings);
+            if (!token.ok) {
+                errorHandler(token);
                 return;
             }
-            return tokenUser
+            return token.data
         }
 
         if (tokenUser === null) {
@@ -34,6 +35,15 @@ const startUpLoginCheck = async () => {
     })
     if (!user) return null;
     return user
+}
+
+const getLoginSettings = async () => {
+    const settings = await AsyncStorage.getItem('remainLogged');
+    if (!settings) {
+        return false
+    }
+    const objSettings = JSON.parse(settings);
+    return objSettings
 }
 
 export default startUpLoginCheck

@@ -18,6 +18,7 @@ export class MarketCharItemModel {
         public charClass?: string,
         public currentLevel?: number,
         public itemName?: string,
-        public downloadedTimes?: number
+        public downloadedTimes?: number,
+        public isFirstLevelNotOpened?: boolean
     ) { }
 }

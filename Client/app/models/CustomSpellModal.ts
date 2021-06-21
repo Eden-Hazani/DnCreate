@@ -10,8 +10,8 @@ export class CustomSpellModal {
         public level?: string,
         public name?: string,
         public range?: string,
-        public maxHp?: number,
         public school?: string,
         public type?: string,
+        public marketStatus?: { isInMarket: boolean, market_id: string, creator_id: string }
     ) { }
 }

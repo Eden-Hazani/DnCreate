@@ -34,7 +34,8 @@ const MarketCharItemSchema = mongoose.Schema({
     image: { type: String },
     charClass: { type: String },
     currentLevel: { type: String },
-    itemName: { type: String }
+    itemName: { type: String },
+    isFirstLevelNotOpened: { type: Boolean }
 
 }, {
     versionKey: false

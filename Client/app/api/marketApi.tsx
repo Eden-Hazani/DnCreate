@@ -2,13 +2,15 @@ import { MarketCharItemModel } from '../models/MarketCharItemModel';
 import { ItemInMarketModel } from '../models/ItemInMarketModel';
 import client from './client';
 import { MarketFilterModal } from '../models/MarketFilterModal';
+import { MarketWeaponItemModel } from '../models/MarketWeaponItemModel';
+import { SpellMarketItem } from '../models/SpellMarketItem';
 
 
 const endpoint = '/market'
 
-const addToMarket = (marketCharItem: MarketCharItemModel, type: string) => {
+const addToMarket = (marketItem: MarketCharItemModel | MarketWeaponItemModel | SpellMarketItem, type: string) => {
     let formData: FormData = new FormData();
-    formData.append("marketItem", JSON.stringify(marketCharItem))
+    formData.append("marketItem", JSON.stringify(marketItem))
     return client.post<string>(`${endpoint}/addToMarket/${type}`, formData)
 };
 

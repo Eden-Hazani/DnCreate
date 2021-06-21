@@ -3,6 +3,7 @@ const router = express.Router();
 const verifyLogged = require('../middleware/verify-logged-in');
 const MarketCharItem = require('../models/MarketCharItemModel');
 const MarketWeaponItem = require('../models/MarketWeaponItemModel');
+const MarketSpellItem = require('../models/MarketSpellItemModal');
 const marketLogic = require('../business-logic/market-logic')
 var multer = require('multer');
 var upload = multer({});
@@ -18,6 +19,11 @@ router.post("/addToMarket/:type", verifyLogged, upload.none(), async (request, r
         }
         else if (type === 'WEAP') {
             const newItem = await marketLogic.addWeaponToMarket(new MarketWeaponItem(JSON.parse(request.body.marketItem)));
+            response.json(newItem);
+            return;
+        }
+        else if (type === 'SPELL') {
+            const newItem = await marketLogic.addSpellToMarket(new MarketSpellItem(JSON.parse(request.body.marketItem)));
             response.json(newItem);
             return;
         }

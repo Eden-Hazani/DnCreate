@@ -68,17 +68,21 @@ export function MarketMainPage({ pickedItem, refresh }: Props) {
                 if (data.length !== 0) {
                     setCurrentDisplayed(prevState => prevState + 10)
                 }
+                return;
             }
             else if (!isNextBatch && data) {
                 setCurrentItems(data)
                 setCurrentDisplayed(10)
                 setLoading(false)
+                return;
             } else if (isNextBatch && data) {
                 if (data.length !== 0) {
                     setCurrentDisplayed(prevState => prevState + 10)
                 }
                 setCurrentItems(prevState => [...prevState, ...data])
+                return;
             }
+            setLoading(false)
         } catch (err) {
             logger.log(err)
             setLoading(false)
@@ -102,7 +106,6 @@ export function MarketMainPage({ pickedItem, refresh }: Props) {
                     </View>
                     :
                     <FlatList
-
                         onEndReachedThreshold={2}
                         onEndReached={() => {
                             loadNextRaceBatch()

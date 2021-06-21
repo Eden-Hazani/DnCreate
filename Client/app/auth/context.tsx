@@ -214,13 +214,16 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             try {
                 const user = await startUpLoginCheck()
                 if (user) {
-                    dispatch({
-                        type: 'INITIALISE',
-                        payload: {
-                            isAuthenticated: true,
-                            user: user,
-                        },
-                    });
+                    reduxToken.setToken(user).then((validToken: UserModel) => {
+                        store.dispatch({ type: ActionType.SetUserInfoLoginRegister, payload: validToken })
+                        dispatch({
+                            type: 'INITIALISE',
+                            payload: {
+                                isAuthenticated: true,
+                                user: validToken,
+                            },
+                        });
+                    })
                 } else {
                     dispatch({
                         type: 'INITIALISE',

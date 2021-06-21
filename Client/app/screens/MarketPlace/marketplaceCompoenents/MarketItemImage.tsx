@@ -12,6 +12,7 @@ export function MarketItemImage({ img, marketType }: Props) {
     return (
         <View style={styles.container}>
             {marketType === 'CHAR' && <Image uri={`${Config.serverUrl}/assets/races/${img}`} style={{ height: 80, width: 80, flex: .2 }} />}
+            {marketType === 'SPELL' && <Image uri={`${Config.serverUrl}/assets/misc/marketPlaceSpells/${img}.png`} style={{ height: 80, width: 80, flex: .2 }} />}
             {marketType === 'WEAP' && <Image uri={`${Config.serverUrl}/assets/charEquipment/${img ? img : 'sword.png'}`} style={{ height: 80, width: 80, flex: .2 }} />}
         </View>
     )

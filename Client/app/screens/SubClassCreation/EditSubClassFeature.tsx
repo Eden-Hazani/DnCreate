@@ -163,7 +163,9 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                             pickedSpells={this.state.feature.spellsToBeAdded || []}
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.addSpellAvailability = val.pickedSpells;
+                                if (val.pickedSpells.length > 0) {
+                                    feature.addSpellAvailability = val.pickedSpells;
+                                }
                                 this.setState({ feature, spellAvailabilityModal: false })
                             }} />}
                     </Modal>
@@ -174,7 +176,7 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                 <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, padding: 15, margin: 10 }}>
                     <AppText
                         fontSize={20} padding={15} textAlign={'center'}>Does this feature gives any tools to the character? {'\n'} these tools are
-                    auto applied on reaching this feature</AppText>
+                        auto applied on reaching this feature</AppText>
                     <AppButton
                         disabled={this.state.feature.toolsToPick && this.state.feature.toolsToPick.length > 0}
                         fontSize={20} title={'Edit Auto Tools'} onPress={() => this.setState({ autoToolModal: true })}
@@ -202,7 +204,9 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                             itemsAdded={this.state.feature.toolsToBeAdded || []}
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.toolsToBeAdded = val.items;
+                                if (val.items.length > 0) {
+                                    feature.toolsToBeAdded = val.items;
+                                }
                                 this.setState({ feature, autoToolModal: false })
                             }} />}
                     </Modal>
@@ -213,7 +217,7 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                 <View style={{ borderColor: Colors.whiteInDarkMode, borderWidth: 1, borderRadius: 15, padding: 15, margin: 10 }}>
                     <AppText
                         fontSize={20} padding={15} textAlign={'center'}>Does this feature gives any skills to the character? {'\n'} these skills are
-                    auto applied on reaching this feature</AppText>
+                        auto applied on reaching this feature</AppText>
                     <AppButton
                         disabled={this.state.feature.skillList && this.state.feature.skillList.length > 0}
                         fontSize={20} title={'Edit Auto Skills'} onPress={() => this.setState({ autoSkillModal: true })}
@@ -242,8 +246,10 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                             itemsAdded={this.state.feature.addExactSkillProficiency || []}
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.addExactSkillProficiency = val.items;
-                                feature.skillsStartAsExpertise = val.expertise;
+                                if (val.items.length > 0) {
+                                    feature.addExactSkillProficiency = val.items;
+                                    feature.skillsStartAsExpertise = val.expertise;
+                                }
                                 this.setState({ feature, autoSkillModal: false })
                             }} />}
                     </Modal>
@@ -275,7 +281,9 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                             pickedSpells={this.state.feature.spellsToBeAdded || []}
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.spellsToBeAdded = val.pickedSpells;
+                                if (val.pickedSpells.length > 0) {
+                                    feature.spellsToBeAdded = val.pickedSpells;
+                                }
                                 this.setState({ feature, spellModal: false })
                             }} />}
                     </Modal>
@@ -307,8 +315,10 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                         <SubClassToolPick
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.toolsToPick = val.tools;
-                                feature.amount = val.amount;
+                                if (val.tools.length > 0) {
+                                    feature.toolsToPick = val.tools;
+                                    feature.amount = val.amount;
+                                }
                                 this.setState({ feature, toolModel: false })
                             }}
                             toolsAdded={this.state.feature.toolsToPick || []}
@@ -345,9 +355,11 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                         <SubClassSkillPick
                             closeModal={(val: any) => {
                                 const feature = { ...this.state.feature };
-                                feature.skillList = val.skills;
-                                feature.skillsStartAsExpertise = val.expertise;
-                                feature.skillPickNumber = val.amount;
+                                if (val.skills.length > 0) {
+                                    feature.skillList = val.skills;
+                                    feature.skillsStartAsExpertise = val.expertise;
+                                    feature.skillPickNumber = val.amount;
+                                }
                                 this.setState({ feature, skillModal: false })
                             }}
                             isExpertise={this.state.feature.skillsStartAsExpertise || false}
@@ -384,14 +396,18 @@ export class EditSubClassFeature extends Component<{ navigation: any, route: any
                                     existingChoices={this.state.feature.choices || []}
                                     loadChoices={(val: any) => {
                                         const feature = { ...this.state.feature };
-                                        feature.choices = val.choices;
-                                        feature.numberOfChoices = val.amount;
+                                        if (val.choices.length > 0) {
+                                            feature.choices = val.choices;
+                                            feature.numberOfChoices = val.amount;
+                                        }
                                         this.setState({ feature, choiceModal: false })
                                     }}
                                     closeModal={(val: any) => {
                                         const feature = { ...this.state.feature };
-                                        feature.choices = val.choices;
-                                        feature.numberOfChoices = val.amount;
+                                        if (val.choices.length > 0) {
+                                            feature.choices = val.choices;
+                                            feature.numberOfChoices = val.amount;
+                                        }
                                         this.setState({ feature, choiceModal: false })
                                     }} />
                             </View>

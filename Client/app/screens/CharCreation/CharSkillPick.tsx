@@ -10,17 +10,16 @@ import { AppText } from '../../components/AppText';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CharSpacialModel } from '../../models/CharSpacialModel';
 import { startingToolsSwitch } from '../../../utility/startingToolsSwitch';
 import { Register } from '../Register';
-import authApi from '../../api/authApi';
-import reduxToken from '../../auth/reduxToken';
 import AuthContext from '../../auth/context';
 import { UserModel } from '../../models/userModel';
 import { SpellsModel } from '../../models/spellsModel';
 import { killToolArrayDuplicates } from '../../../utility/killToolArrayDuplicates';
+import { RootState } from '../../redux/reducer';
+import { connect } from 'react-redux';
 
 interface CharSkillPickState {
     characterInfo: CharacterModel
@@ -40,8 +39,23 @@ interface CharSkillPickState {
     alreadyPickedSkills: boolean[]
 }
 
-export class CharSkillPick extends Component<{ navigation: any, route: any }, CharSkillPickState> {
-    private UnsubscribeStore: Unsubscribe;
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    changeCreationProgressBar: Function;
+    user: UserModel;
+    nonUser: boolean;
+    route: any;
+    navigation: any;
+    beforeRegisterChar: any;
+    setInfoBeforeRegisterChar: Function;
+    addNewCharacter: Function;
+    clearInfoBeforeRegisterChar: Function;
+    startAsNonUser: Function
+}
+
+class CharSkillPick extends Component<Props, CharSkillPickState> {
+    navigationSubscription: any;
     static contextType = AuthContext;
     constructor(props: any) {
         super(props)
@@ -49,7 +63,7 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             alreadyPickedSkills: [],
             countDownTimerVal: 60,
             resendCountDown: false,
-            userInfo: store.getState().user,
+            userInfo: this.props.user,
             username: '',
             password: '',
             registrationEmailSent: false,
@@ -60,14 +74,15 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             amountToPick: 0,
             availableSkills: [],
             pickedSkills: [],
-            characterInfo: store.getState().beforeRegisterChar.name ? store.getState().beforeRegisterChar : store.getState().character
+            characterInfo: this.props.beforeRegisterChar.name ? this.props.beforeRegisterChar : this.props.character
         }
-        this.UnsubscribeStore = store.subscribe(() => { });
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+    onFocus = () => this.props.changeCreationProgressBar(.6)
 
     componentWillUnmount() {
-        this.UnsubscribeStore();
+        this.navigationSubscription()
     }
 
     componentDidMount() {
@@ -131,18 +146,18 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 characterInfo.charSpecials.fightingStyle = []
                 characterInfo.charSpecials.monkElementsDisciplines = []
                 characterInfo.charSpecials.companion = []
-                let storeChar = store.getState().character.charSpecials;
+                let storeChar = this.props.character.charSpecials;
                 if (storeChar)
                     characterInfo.charSpecials.dragonBornAncestry = storeChar.dragonBornAncestry
             }
         })
         characterInfo.tools = killToolArrayDuplicates(characterInfo.tools || [])
-        if (store.getState().nonUser) {
+        if (this.props.nonUser) {
             if (this.context.user && this.context.user.username) {
                 this.sendInfo(characterInfo)
                 return;
             }
-            store.dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: characterInfo })
+            this.props.setInfoBeforeRegisterChar(characterInfo)
             this.setState({ nonUserPauseModel: true })
             return;
         }
@@ -204,11 +219,11 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                     await AsyncStorage.setItem(`offLineCharacterList`, JSON.stringify(characters))
                 }
                 this.setState({ confirmed: true, loading: false })
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                store.dispatch({ type: ActionType.addNewCharacter, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
+                this.props.addNewCharacter(this.state.characterInfo)
                 await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
                 setTimeout(() => {
-                    this.props.navigation.navigate("CharBackstory", { updateStory: false });
+                    this.props.navigation.navigate("FirstCharSave");
                 }, 800);
                 setTimeout(() => {
                     this.setState({ confirmed: false })
@@ -217,9 +232,9 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
             return;
         }
         this.setState({ characterInfo }, async () => {
-            if (store.getState().beforeRegisterChar.name) {
-                store.dispatch({ type: ActionType.ClearInfoBeforeRegisterChar })
-                store.dispatch({ type: ActionType.StartAsNonUser, payload: false })
+            if (this.props.beforeRegisterChar.name) {
+                this.props.clearInfoBeforeRegisterChar()
+                this.props.startAsNonUser(false)
             }
             await AsyncStorage.removeItem(`${this.state.characterInfo.name}AttributeStage`);
             await AsyncStorage.removeItem(`${this.state.characterInfo.name}DicePool`);
@@ -229,11 +244,12 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
                 result.data === 'Character Already exists in system!' ? characterInfo = this.state.characterInfo : characterInfo = result.data;
                 this.setState({ confirmed: true })
                 this.setState({ characterInfo }, async () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    store.dispatch({ type: ActionType.addNewCharacter, payload: this.state.characterInfo })
+                    this.props.setStoreCharacterInfo(this.state.characterInfo)
+                    this.props.addNewCharacter(this.state.characterInfo)
                     await AsyncStorage.setItem(`${this.state.characterInfo._id}FirstTimeOpened`, 'false')
+                    this.props.changeCreationProgressBar(.7)
                     setTimeout(() => {
-                        this.props.navigation.navigate("CharBackstory", { updateStory: false });
+                        this.props.navigation.navigate("FirstCharSave");
                     }, 800);
                     setTimeout(() => {
                         this.setState({ confirmed: false })
@@ -310,6 +326,28 @@ export class CharSkillPick extends Component<{ navigation: any, route: any }, Ch
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        nonUser: state.nonUser,
+        race: state.race,
+        beforeRegisterChar: state.beforeRegisterChar,
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        changeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+        setInfoBeforeRegisterChar: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: character }) },
+        addNewCharacter: (character: CharacterModel) => { dispatch({ type: ActionType.AddNewCharacter, payload: character }) },
+        clearInfoBeforeRegisterChar: () => { dispatch({ type: ActionType.ClearInfoBeforeRegisterChar }) },
+        startAsNonUser: (value: boolean) => { dispatch({ type: ActionType.StartAsNonUser, payload: value }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharSkillPick)
 
 
 const styles = StyleSheet.create({

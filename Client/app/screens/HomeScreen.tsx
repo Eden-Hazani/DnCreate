@@ -26,6 +26,8 @@ import { Config } from '../../config';
 import { IconGen } from '../components/IconGen';
 import * as Linking from 'expo-linking';
 import { AnimatedCircleButton } from '../animations/AnimatedCircleButton';
+import { RootState } from '../redux/reducer';
+import { connect } from 'react-redux';
 
 interface HomeState {
     loading: boolean
@@ -159,6 +161,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
 
     onFocus = () => {
+        store.dispatch({ type: ActionType.ChangeCreationProgressBar, payload: -1 })
         this.setState({ characters: store.getState().characters }, () => {
             this.clearStorageJunk(this.state.characters)
         })
@@ -343,6 +346,28 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
         )
     }
 }
+
+// const mapStateToProps = (state: RootState) => {
+//     return {
+//         character: state.character,
+//         user: state.user,
+//         nonUser: state.nonUser,
+//         race: state.race,
+//         beforeRegisterChar: state.beforeRegisterChar,
+//     }
+// }
+// const mapDispatchToProps = (dispatch: any) => {
+//     return {
+//         setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+//         changeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+//         setInfoBeforeRegisterChar: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: character }) },
+//         addNewCharacter: (character: CharacterModel) => { dispatch({ type: ActionType.AddNewCharacter, payload: character }) },
+//         clearInfoBeforeRegisterChar: () => { dispatch({ type: ActionType.ClearInfoBeforeRegisterChar }) },
+//         startAsNonUser: (value: boolean) => { dispatch({ type: ActionType.StartAsNonUser, payload: value }) },
+//     }
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 const styles = StyleSheet.create({
     buttonsView: {

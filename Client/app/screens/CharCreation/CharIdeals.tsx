@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -12,7 +13,7 @@ import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharIdealsState {
     baseState: string
@@ -22,12 +23,22 @@ interface CharIdealsState {
     openAutoComplete: boolean[]
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateIdeals: boolean;
+}
+
+
 const fillingList: string[] = ['Independence. I am a free spirit--no one tells me what to do', "Greed. I'm only in it for the money", "Family. Blood runs thicker than water",
     "Honor. If I dishonor myself, I dishonor my whole clan", "Respect. All people, rich or poor, deserve respect", "People. I'm committed to my crewmates, not to ideals"]
 
-export class CharIdeals extends Component<{ route: any, navigation: any, updateIdeals: boolean }, CharIdealsState>{
-    private UnsubscribeStore: Unsubscribe;
+class CharIdeals extends Component<Props, CharIdealsState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -35,13 +46,20 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
             baseState: '',
             updateIdeals: this.props.route.params.updateIdeals,
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.UnsubscribeStore = store.subscribe(() => { })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
+    onFocus = () => {
+        if (!this.props.updateIdeals) {
+            this.props.ChangeCreationProgressBar(.86)
+        }
+    }
+
+
     componentWillUnmount() {
-        this.UnsubscribeStore()
+
     }
 
     componentDidMount() {
@@ -75,15 +93,23 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
         if (!this.state.characterInfo.ideals || this.state.characterInfo.ideals.length === 0) {
             Alert.alert("No Ideals", "Are you sure you want to continue without any Ideals?", [{
                 text: 'Yes', onPress: () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    this.props.navigation.navigate("CharFlaws", { updateFlaws: false })
+                    this.setState({ confirmed: true })
+                    this.props.setStoreCharacterInfo(this.state.characterInfo)
+                    this.props.ChangeCreationProgressBar(.9)
+                    setTimeout(() => {
+                        this.props.navigation.navigate("CharFlaws", { updateFlaws: false })
+                    }, 800);
+                    setTimeout(() => {
+                        this.setState({ confirmed: false })
+                    }, 1100);
                 }
             }, { text: 'No' }])
         } else {
             characterInfo.ideals = characterInfo.ideals && characterInfo.ideals.filter(ideal => { return ideal !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
+                this.props.ChangeCreationProgressBar(.9)
                 setTimeout(() => {
                     this.props.navigation.navigate("CharFlaws", { updateFlaws: false })
                 }, 800);
@@ -109,7 +135,7 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
             characterInfo.ideals = characterInfo.ideals && characterInfo.ideals.filter(ideal => { return ideal !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
                 this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
@@ -196,6 +222,22 @@ export class CharIdeals extends Component<{ route: any, navigation: any, updateI
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharIdeals)
 
 
 const styles = StyleSheet.create({

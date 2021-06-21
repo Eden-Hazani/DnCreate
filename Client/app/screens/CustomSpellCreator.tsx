@@ -23,7 +23,6 @@ const ValidationSchema = Yup.object().shape({
 })
 
 interface CustomSpellCreatorState {
-    character: CharacterModel
     oldSpellValues: CustomSpellModal
     classPicked: string[]
     classClicked: boolean[]
@@ -44,7 +43,6 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
             pickedSchool: '',
             schoolClicked: [],
             isEdit: this.props.route.params.edit,
-            character: this.props.route.params.character,
             oldSpellValues: new CustomSpellModal(),
             classPicked: [],
             classClicked: [],
@@ -164,7 +162,9 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
             }
             const stringedCustomSpells = await AsyncStorage.getItem('customSpellList');
             if (!stringedCustomSpells) {
-                await AsyncStorage.setItem('customSpellList', JSON.stringify([customSpell]))
+                await AsyncStorage.setItem('customSpellList', JSON.stringify([customSpell])).then(async () => {
+                    this.props.navigation.navigate('CustomSpellList');
+                })
                 return;
             }
             const customSpellsList = JSON.parse(stringedCustomSpells);
@@ -182,6 +182,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
         try {
             const spellType = `${this.state.pickedLevel} ${this.state.pickedSchool}`
             let spellLevel = this.state.pickedLevel.charAt(0);
+            let marketStatus = this.state.oldSpellValues.marketStatus
             const newSpell: CustomSpellModal = {
                 type: spellType,
                 school: this.state.pickedSchool,
@@ -193,6 +194,7 @@ export class CustomSpellCreator extends Component<{ route: any, navigation: any 
                 higher_levels: values.higher_levels,
                 name: values.name,
                 classes: this.state.classPicked,
+                marketStatus,
                 level: spellLevel === 'c' ? 'cantrip' : spellLevel
             }
             const customSpellString = await AsyncStorage.getItem('customSpellList');

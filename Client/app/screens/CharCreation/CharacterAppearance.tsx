@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
+import { connect } from 'react-redux';
 import { Config } from '../../../config';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -12,7 +13,7 @@ import { AppTextInput } from '../../components/forms/AppTextInput';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharacterAppearanceState {
     characterInfo: CharacterModel
@@ -20,16 +21,28 @@ interface CharacterAppearanceState {
     confirmed: boolean
     updateAppearance: boolean
 }
-export class CharacterAppearance extends Component<{ props: any, route: any, navigation: any, updateAppearance: boolean }, CharacterAppearanceState>{
+
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateAppearance: boolean;
+}
+
+class CharacterAppearance extends Component<Props, CharacterAppearanceState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
             confirmed: false,
             appearance: '',
-            characterInfo: store.getState().character,
+            characterInfo: this.props.character,
             updateAppearance: this.props.route.params.updateAppearance
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
 
     componentDidMount() {
@@ -38,36 +51,46 @@ export class CharacterAppearance extends Component<{ props: any, route: any, nav
         }
     }
 
+    componentWillUnmount() {
+        this.navigationSubscription()
+    }
+
+    onFocus = () => {
+        if (!this.props.updateAppearance) {
+            this.props.ChangeCreationProgressBar(.75)
+        }
+    }
+
     insertInfoAndContinue = () => {
         if (this.state.appearance.length === 0) {
             Alert.alert("No Appearance", "Are you sure you want to continue without a character appearance?", [{
                 text: 'Yes', onPress: () => {
-                    const characterInfo = { ...this.state.characterInfo };
-                    characterInfo.characterAppearance = this.state.appearance;
-                    this.setState({ characterInfo }, () => {
-                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                        this.props.navigation.navigate("CharacterAlignment", { updateAlignment: false })
-                    })
+                    this.sendData()
                 }
             }, { text: 'No' }])
         } else {
-            const characterInfo = { ...this.state.characterInfo };
-            characterInfo.characterAppearance = this.state.appearance;
-            this.setState({ confirmed: true })
-            this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                setTimeout(() => {
-                    this.props.navigation.navigate("CharacterAlignment", { updateAlignment: false })
-                }, 800);
-                setTimeout(() => {
-                    this.setState({ confirmed: false })
-                }, 1100);
-            })
+            this.sendData()
         }
     }
 
+    sendData = () => {
+        const characterInfo = { ...this.state.characterInfo };
+        characterInfo.characterAppearance = this.state.appearance;
+        this.setState({ confirmed: true })
+        this.setState({ characterInfo }, () => {
+            this.props.setStoreCharacterInfo(this.state.characterInfo)
+            this.props.ChangeCreationProgressBar(.78)
+            setTimeout(() => {
+                this.props.navigation.navigate("CharacterAlignment", { updateAlignment: false })
+            }, 800);
+            setTimeout(() => {
+                this.setState({ confirmed: false })
+            }, 1100);
+        })
+    }
+
     updateInfo = async () => {
-        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
+        this.props.setStoreCharacterInfo(this.state.characterInfo)
         this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
         this.props.navigation.navigate("SelectCharacter", { character: this.state.characterInfo, isDm: false })
     }
@@ -124,6 +147,22 @@ export class CharacterAppearance extends Component<{ props: any, route: any, nav
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharacterAppearance)
 
 
 const styles = StyleSheet.create({

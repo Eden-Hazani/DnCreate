@@ -15,7 +15,7 @@ function validateRegister(username) {
 }
 
 function validateInSystem(_id) {
-    return User.findOne({ _id: { $eq: _id } });
+    return User.findOne({ _id: { $eq: _id } }).exec();
 }
 
 function validateExistingAlias(alias) {

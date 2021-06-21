@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { View, StyleSheet, FlatList, Modal, Alert, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, FlatList, Modal, Alert, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { AppButton } from '../components/AppButton';
 import { AppText } from '../components/AppText';
 import ListItemDelete from '../components/ListItemDelete';
@@ -11,6 +11,10 @@ import { CustomSpellModal } from '../models/CustomSpellModal';
 import { Image, CacheManager } from 'react-native-expo-image-cache';
 import { Config } from '../../config';
 import logger from '../../utility/logger';
+import { checkMarketSpellValidity } from './MarketPlace/functions/marketInteractions';
+import { AddSpellToMarket } from '../components/spellMarketComponents/AddSpellToMarket';
+import { RemoveSpellFromMarket } from '../components/spellMarketComponents/RemoveSpellFromMarket';
+import AuthContext from '../auth/context';
 
 
 interface CustomSpellListState {
@@ -20,6 +24,7 @@ interface CustomSpellListState {
 }
 
 export class CustomSpellList extends Component<{ route: any, navigation: any }, CustomSpellListState>{
+    static contextType = AuthContext;
     navigationSubscription: any;
     constructor(props: any) {
         super(props)
@@ -68,23 +73,46 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
         }
     }
 
+    refreshSpells = async (updatedSpell: CustomSpellModal) => {
+        try {
+            const stringCustomSpellList = await AsyncStorage.getItem('customSpellList');
+            if (!stringCustomSpellList) {
+                return
+            }
+            const customSpellList = JSON.parse(stringCustomSpellList);
+            this.setState({ customSpellList, pickedSpell: updatedSpell })
+        } catch (err) {
+            logger.log(new Error(err))
+        }
+    }
+
+    marketPlaceNode = () => {
+        const validity = checkMarketSpellValidity(this.state.pickedSpell.marketStatus, this.context.user._id);
+        if (validity === 'NOT_OWNED') return <View>
+            <AppText textAlign={'center'} color={Colors.metallicBlue} fontSize={22}>You are not the creator of this spell, as such you cannot add it to the market</AppText>
+        </View>
+        if (validity === 'OWNED_NOT_PUBLISHED') return <AddSpellToMarket refreshSpells={(updatedSpell: CustomSpellModal) => this.refreshSpells(updatedSpell)} spell={this.state.pickedSpell} />
+        if (validity === 'OWNED_PUBLISHED') return <RemoveSpellFromMarket refreshSpells={(updatedSpell: CustomSpellModal) => this.refreshSpells(updatedSpell)} spell={this.state.pickedSpell} />
+        return <View></View>
+    }
+
     render() {
         return (
             <View style={styles.container}>
                 <View style={{ justifyContent: "center", alignItems: "center" }}>
                     <TouchableOpacity style={{ borderRadius: 125, borderWidth: 1, borderColor: Colors.lightGray }}
-                        onPress={() => { this.props.navigation.navigate("CustomSpellCreator", { character: this.props.route.params.character, edit: { true: false } }) }}>
-                        <Image style={{ width: 250, height: 250 }} uri={`${Config.serverUrl}/assets/specificDragons/custom-Spell-Dragon.png`} />
+                        onPress={() => { this.props.navigation.navigate("CustomSpellCreator", { edit: { true: false } }) }}>
+                        <Image style={{ width: 200, height: 200 }} uri={`${Config.serverUrl}/assets/specificDragons/custom-Spell-Dragon.png`} />
                         <View style={{ position: "absolute", top: 150, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
-                            <AppText fontSize={20}>Create New Spell</AppText>
+                            <AppText textAlign={'center'} fontSize={15}>Create {'\n'}New Spell</AppText>
                         </View>
                     </TouchableOpacity>
 
                 </View>
-                <View>
-                    <AppText fontSize={20} textAlign={'center'}>Your Custom Spells</AppText>
+                <View style={{ flex: 1 }}>
+                    <AppText fontSize={22} textAlign={'center'} color={Colors.bitterSweetRed}>Your Custom Spells</AppText>
                     <FlatList
-                        style={{ marginBottom: 120 }}
+                        style={{}}
                         data={this.state.customSpellList}
                         keyExtractor={(spells, index) => index.toString()}
                         renderItem={({ item }) => <SpellListItem
@@ -111,23 +139,26 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
                         />}
                         ItemSeparatorComponent={ListItemSeparator} />
                     <Modal visible={this.state.pickSpellModal}>
-                        <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
+                        <ScrollView style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
                             <AppText fontSize={25} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.name}</AppText>
                             <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{this.state.pickedSpell.description}</AppText>
                             <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`School: ${this.state.pickedSpell.school}`}</AppText>
                             <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Range: ${this.state.pickedSpell.range}`}</AppText>
                             <AppText fontSize={20} color={Colors.whiteInDarkMode} textAlign={'center'}>{`Casting Time: ${this.state.pickedSpell.casting_time}`}</AppText>
-                            <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                                <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
-                                    title={'Close'} onPress={() => { this.setState({ pickSpellModal: false, pickedSpell: new CustomSpellModal() }) }} />
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly", paddingTop: 25 }}>
+                                <AppButton backgroundColor={Colors.earthYellow} width={140} height={50} borderRadius={25}
+                                    title={'Exit'} onPress={() => { this.setState({ pickSpellModal: false, pickedSpell: new CustomSpellModal() }) }} />
 
                                 <AppButton backgroundColor={Colors.bitterSweetRed} width={140} height={50} borderRadius={25}
                                     title={'Edit'} onPress={() => {
-                                        this.props.navigation.navigate("CustomSpellCreator", { character: this.props.route.params.character, edit: { true: true, spell: this.state.pickedSpell } })
+                                        this.props.navigation.navigate("CustomSpellCreator", { edit: { true: true, spell: this.state.pickedSpell } })
                                         this.setState({ pickSpellModal: false })
                                     }} />
                             </View>
-                        </View>
+                            <View style={{ paddingTop: 25, paddingBottom: 25 }}>
+                                {this.marketPlaceNode()}
+                            </View>
+                        </ScrollView>
                     </Modal>
                 </View>
             </View>
@@ -138,6 +169,6 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
 
 const styles = StyleSheet.create({
     container: {
-
+        flex: 1
     }
 });

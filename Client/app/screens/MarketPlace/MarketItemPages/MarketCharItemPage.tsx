@@ -16,6 +16,7 @@ import useAuthContext from '../../../hooks/useAuthContext';
 import { store } from '../../../redux/store';
 import { ActionType } from '../../../redux/action-type';
 import { CharacterModel } from '../../../models/characterModel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface Props {
@@ -50,6 +51,12 @@ export function MarketCharItemPage({ item, close }: Props) {
         }
     }
 
+    const implementCharSettings = async (characterId: string) => {
+        if (marketItem?.isFirstLevelNotOpened) {
+            await AsyncStorage.setItem(`${characterId}FirstTimeOpened`, 'false')
+        }
+    }
+
     const saveCharInfo = async () => {
         try {
             if (marketItem?.currentLevelChar) {
@@ -57,7 +64,8 @@ export function MarketCharItemPage({ item, close }: Props) {
                 const newChar = implantIdIntoSavedChar(marketItem.currentLevelChar, userContext.user?._id || '')
                 const result = await userCharApi.saveCharFromMarket(newChar, marketItem._id || '', item.marketType);
                 const savedChar: CharacterModel = result.data as any
-                store.dispatch({ type: ActionType.addNewCharacter, payload: savedChar });
+                await implementCharSettings(savedChar._id || '')
+                store.dispatch({ type: ActionType.AddNewCharacter, payload: savedChar });
                 if (marketItem.characterLevelList && marketItem.characterLevelList.length > 0) {
                     addAllCharLevelsToStorage(marketItem.characterLevelList, savedChar._id || '', savedChar.user_id || '')
                 }

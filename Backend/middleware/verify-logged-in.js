@@ -23,7 +23,6 @@ function verifiedLoggedIn(request, response, next) {
             return;
         }
         response.locals = payload
-
         next();
     })
 }

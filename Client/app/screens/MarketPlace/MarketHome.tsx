@@ -9,6 +9,7 @@ import { MarketWeaponItemPage } from './MarketItemPages/MarketWeaponItemPage';
 import { MarketSearch } from './marketplaceCompoenents/MarketSearch';
 import { PrimeMarketItemRow } from './marketplaceCompoenents/PrimeMarketRow/PrimeMarketItemRow';
 import { WelcomeToMarket } from './marketplaceCompoenents/WelcomeToMarket';
+import { MarketSpellItemPage } from './MarketItemPages/MarketSpellItemPage';
 
 interface Props {
     navigation: any
@@ -41,6 +42,7 @@ export function MarketHome({ navigation }: Props) {
             </View>
             {chosenItem && chosenItem.marketType === "CHAR" && <MarketCharItemPage item={chosenItem} close={() => setChosenItem(null)} />}
             {chosenItem && chosenItem.marketType === "WEAP" && <MarketWeaponItemPage item={chosenItem} close={() => setChosenItem(null)} />}
+            {chosenItem && chosenItem.marketType === "SPELL" && <MarketSpellItemPage item={chosenItem} close={() => setChosenItem(null)} />}
         </View>
     )
 }

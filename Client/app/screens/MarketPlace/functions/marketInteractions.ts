@@ -27,7 +27,34 @@ const checkMarketWeaponItemValidity = async (char_id: string, market_id: string)
     return { error: 'OK', description: '' }
 }
 
+const checkMarketSpellItemValidity = async (market_id: string) => {
+    const spells = await AsyncStorage.getItem(`customSpellList`);
+    if (spells) {
+        for (let item of JSON.parse(spells)) {
+            if (item.marketStatus?.market_id === market_id) {
+                return { error: 'MATCH_ID', description: 'This spell already exists in your spell book' }
+            }
+        }
+    }
+    return { error: 'OK', description: '' }
+}
+
 const checkMarketWeaponValidity = (marketStatus: { creator_id: string, isInMarket: boolean, market_id: string } | undefined | null, user_id: string) => {
+    if (!marketStatus) {
+        return 'OWNED_NOT_PUBLISHED'
+    }
+    if (user_id !== marketStatus.creator_id && marketStatus.isInMarket) {
+        return 'NOT_OWNED'
+    }
+    if (user_id === marketStatus.creator_id && marketStatus.isInMarket) {
+        return 'OWNED_PUBLISHED'
+    }
+    if (user_id === marketStatus.creator_id && !marketStatus.isInMarket) {
+        return 'OWNED_NOT_PUBLISHED'
+    }
+}
+
+const checkMarketSpellValidity = (marketStatus: { creator_id: string, isInMarket: boolean, market_id: string } | undefined | null, user_id: string) => {
     if (!marketStatus) {
         return 'OWNED_NOT_PUBLISHED'
     }
@@ -45,4 +72,4 @@ const checkMarketWeaponValidity = (marketStatus: { creator_id: string, isInMarke
 
 
 
-export { checkMarketCharItemValidity, checkMarketWeaponValidity, checkMarketWeaponItemValidity };
+export { checkMarketCharItemValidity, checkMarketWeaponValidity, checkMarketWeaponItemValidity, checkMarketSpellValidity, checkMarketSpellItemValidity };

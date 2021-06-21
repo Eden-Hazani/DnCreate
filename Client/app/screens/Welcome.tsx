@@ -90,6 +90,7 @@ export class Welcome extends Component<{ navigation: any }, WelcomeState> {
     }
 
     onFocus = () => {
+        store.dispatch({ type: ActionType.ChangeCreationProgressBar, payload: -1 })
         this.clearStorageJunk()
     }
 

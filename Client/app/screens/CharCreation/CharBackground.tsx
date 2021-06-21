@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Config } from '../../../config';
 import { Image } from 'react-native-expo-image-cache';
 import { PickLanguage } from '../../components/PickLanguage';
+import { RootState } from '../../redux/reducer';
+import { connect } from 'react-redux';
 
 const ValidationSchema = Yup.object().shape({
     backgroundName: Yup.string().required().label("Background Name"),
@@ -47,9 +49,15 @@ interface CharBackgroundState {
     availableSkills: any[]
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+}
 
-
-export class CharBackground extends Component<{ navigation: any }, CharBackgroundState> {
+class CharBackground extends Component<Props, CharBackgroundState> {
     navigationSubscription: any;
     backgroundDragon: any
     constructor(props: any) {
@@ -71,7 +79,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             officialWindow: false,
             makeYourOwnWindow: false,
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
         this.backgroundDragon = {
             Acolyte: `${Config.serverUrl}/assets/backgroundDragons/acolyteDragon.png`,
@@ -108,6 +116,7 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     }
 
     onFocus = async () => {
+        this.props.ChangeCreationProgressBar(.5)
         let characterInfo = { ...this.state.characterInfo }
         const item = await AsyncStorage.getItem(`${this.state.characterInfo.name}BackstoryStage`)
         if (item) {
@@ -271,7 +280,8 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
             }
         }
         this.setState({ characterInfo, confirmed: true }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+            this.props.setStoreCharacterInfo(this.state.characterInfo)
+            this.props.ChangeCreationProgressBar(.6)
             setTimeout(() => {
                 this.props.navigation.navigate("CharSkillPick");
             }, 800);
@@ -510,6 +520,21 @@ export class CharBackground extends Component<{ navigation: any }, CharBackgroun
     }
 }
 
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharBackground)
 
 const styles = StyleSheet.create({
     container: {

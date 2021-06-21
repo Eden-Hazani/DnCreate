@@ -14,7 +14,6 @@ import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ClassModel } from '../../models/classModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, CacheManager } from 'react-native-expo-image-cache';
 import { Config } from '../../../config';
@@ -24,6 +23,8 @@ import { useNavigation } from '@react-navigation/native';
 import InformationDrawer from '../../components/InformationDrawer';
 import { classesDragonsBackgrounds } from '../../../utility/charClassesBackgrounds'
 import logger from '../../../utility/logger';
+import { RootState } from '../../redux/reducer';
+import { connect } from 'react-redux';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,18 +53,16 @@ const starterImg = [
     }
 ]
 
-interface ClassPickState {
-    loading: boolean
-    classes: ClassModel[] | undefined
-    pickedClass: ClassModel
-    characterInfo: CharacterModel
-    error: boolean
-    isUserOffline: boolean
-    confirmed: boolean
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    nonUser: boolean;
+    route: any;
 }
 
 
-export default function ClassPick({ route, placeholder }: any) {
+function ClassPick({ ChangeCreationProgressBar, character, nonUser, route, setStoreCharacterInfo }: Props) {
     const navigation = useNavigation();
     const [isUserOffline, setIsUserOffline] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -71,13 +70,15 @@ export default function ClassPick({ route, placeholder }: any) {
     const [error, setError] = useState(false);
     const [classes, setClasses] = useState([]);
     const [pickedClass, setPickedClass] = useState(new ClassModel());
-    const [characterInfo, setCharacterInfo] = useState(store.getState().character);
+    const [characterInfo, setCharacterInfo] = useState(character);
     const scrollX = React.useRef(new Animated.Value(0)).current;
 
 
     useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => ChangeCreationProgressBar(.3))
         getClasses()
         checkIfOffline()
+        return () => { unsubscribe() }
     }, [])
 
     const checkIfOffline = async () => {
@@ -92,7 +93,8 @@ export default function ClassPick({ route, placeholder }: any) {
         isUserOffline ? characterInfo.characterClassId = pickedClass : characterInfo.characterClassId = pickedClass._id as any;
         setConfirmed(true)
         setCharacterInfo(characterInfo)
-        store.dispatch({ type: ActionType.SetInfoToChar, payload: characterInfo })
+        setStoreCharacterInfo(characterInfo)
+        ChangeCreationProgressBar(.4)
         setTimeout(() => {
             navigation.navigate("AttributePicking", { race: route.params.race })
         }, 800);
@@ -250,7 +252,21 @@ export default function ClassPick({ route, placeholder }: any) {
     )
 }
 
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        nonUser: state.nonUser
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
 
+export default connect(mapStateToProps, mapDispatchToProps)(ClassPick)
 
 const styles = StyleSheet.create({
     container: {

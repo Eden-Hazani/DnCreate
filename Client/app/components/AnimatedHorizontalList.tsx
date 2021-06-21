@@ -21,7 +21,7 @@ const Indicator = ({ scrollX, races }: any) => {
         , [])
     const [newColor, setColor] = useState(baseColor)
     let innerHeight = 0;
-    let innerLeft = 0
+    let innerLeft = 10
     return (
         races.map((_: any, i: any) => {
             innerHeight = innerHeight + 30;

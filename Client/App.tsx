@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, Platform, StatusBar, View } from 'react-native';
+import { StyleSheet, SafeAreaView, Platform, StatusBar, View, Modal } from 'react-native';
 import 'react-native-gesture-handler';
 import { Unsubscribe } from 'redux';
 import { store } from './app/redux/store';
@@ -34,11 +34,11 @@ I18nManager.allowRTL(false);
 Facebook.initializeAsync({ appId: "118004343480971", appName: "DnCreate" });
 
 interface AppState {
-  fontsLoaded: boolean
-  user: UserModel
-  AppMainLoadAnimation: boolean
-  colorScheme: boolean
-  lookingForUpdates: boolean
+  fontsLoaded: boolean;
+  user: UserModel;
+  AppMainLoadAnimation: boolean;
+  colorScheme: boolean;
+  lookingForUpdates: boolean;
 }
 
 export class App extends React.Component<{ props: any, navigation: any }, AppState> {
@@ -55,7 +55,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
       user: new UserModel(),
       fontsLoaded: false,
       colorScheme: false,
-      lookingForUpdates: false
+      lookingForUpdates: false,
     }
 
     this.UnsubscribeStore = store.subscribe(() => {
@@ -69,7 +69,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
     try {
       const { AppMainLoadAnimation, fontsLoaded } = await startUp();
       this.setState({ AppMainLoadAnimation, fontsLoaded }, () => {
-        setTimeout(() => {
+        setTimeout(async () => {
           this.setState({ AppMainLoadAnimation: false })
         }, 2300);
       })

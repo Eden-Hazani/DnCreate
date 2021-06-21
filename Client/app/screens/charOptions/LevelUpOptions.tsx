@@ -59,6 +59,7 @@ interface LevelUpOptionsState {
     reloadingSkills: boolean;
     newPathChoice: any;
     errorList: { isError: boolean, errorDesc: string }[];
+    loading: boolean;
 }
 
 export class LevelUpOptions extends Component<{ index: number, options: any, character: CharacterModel, close: any, refresh: any }, LevelUpOptionsState>{
@@ -66,6 +67,7 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
     constructor(props: any) {
         super(props)
         this.state = {
+            loading: false,
             errorList: [],
             beforeAnyChanges: new CharacterModel,
             reloadingSkills: false,
@@ -133,9 +135,11 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
 
     close = async () => {
         try {
+            this.setState({ loading: true })
             for (let item of this.state.errorList) {
                 if (item.isError) {
                     alert(item.errorDesc);
+                    this.setState({ loading: false })
                     return
                 }
             }
@@ -329,8 +333,13 @@ export class LevelUpOptions extends Component<{ index: number, options: any, cha
                                 updateCharacter={(character: CharacterModel) => this.setState({ character })}
                             />
                             : null}
-                        <View style={{ paddingTop: 15, paddingBottom: 15 }}>
-                            <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100} height={100} title={"Ok"} onPress={() => { this.close() }} />
+                        <View style={{ paddingTop: 15, paddingBottom: 15, marginLeft: 'auto', marginRight: 'auto' }}>
+                            {this.state.loading ? <View style={{ width: 200 }}>
+                                <AppText color={Colors.bitterSweetRed} fontSize={20} textAlign={'center'}>Saving</AppText>
+                                <AppActivityIndicator visible={this.state.loading} />
+                            </View> :
+                                <AppButton fontSize={18} backgroundColor={Colors.bitterSweetRed} borderRadius={100} width={100}
+                                    height={100} title={"Ok"} onPress={() => { this.close() }} />}
                         </View>
                     </View>}
             </View>

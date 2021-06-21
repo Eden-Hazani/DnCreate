@@ -102,12 +102,12 @@ async function getPrimeRaces(popularity, raceType, user_id) {
     if (!popularity || popularity === 'false') {
         return Race.find().skip(0).limit(20).exec();
     }
-    if (user_id === 'noUserId') {
+    if (user_id === 'Offline') {
         return Race.aggregate([
-            { $match: { user_id: { $exists: false } } }, { $sort: { popularity: parseInt(popularity), _id: 1 } }
-        ],
+            { $match: { user_id: { $exists: false } } }, { $sort: { popularity: parseInt(popularity), _id: 1 } },
             { $skip: 0 },
-            { $limit: 20 }).exec();
+            { $limit: 20 }
+        ]).exec();
     }
     if (raceType === 'true') {
         return Race.aggregate([

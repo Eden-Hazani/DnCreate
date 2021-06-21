@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TriangleColorPicker, toHsv, fromHsv } from 'react-native-color-picker'
 import NumberScroll from '../../components/NumberScroll';
 import { Switch } from 'react-native-gesture-handler';
+import { RootState } from '../../redux/reducer';
+import { connect } from 'react-redux';
 
 interface NewCharInfoState {
     characterInfo: CharacterModel
@@ -34,6 +36,15 @@ interface NewCharInfoState {
     feetOrCent: boolean
     feet: number,
     inches: number
+}
+
+interface Props {
+    character: CharacterModel;
+    setCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    navigation: any;
+    nonUser: boolean;
+    route: any;
 }
 
 const ValidationSchema = Yup.object().shape({
@@ -69,10 +80,10 @@ const ValidationSchema = Yup.object().shape({
 
 
 
-export class NewCharInfo extends Component<{ route: any, navigation: any }, NewCharInfoState> {
+class NewCharInfo extends Component<Props, NewCharInfoState> {
     static contextType = AuthContext;
-    private unsubscribeStore: Unsubscribe
-    private scrollView: any
+    private scrollView: any;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -89,13 +100,13 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
             colorPickWindow: false,
             pickedGender: '',
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.unsubscribeStore = store.subscribe(() => {
-            store.getState().character
-        })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
         this.scrollView
     }
+
+    onFocus = () => this.props.ChangeCreationProgressBar(.2)
 
     setInfoAndContinue = (values: any) => {
         const characterInfo = { ...this.state.characterInfo };
@@ -112,8 +123,9 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         characterInfo.hair = this.state.pickedHairColor;
         characterInfo.gender = this.state.pickedGender;
         this.setState({ confirmed: true })
+        this.props.ChangeCreationProgressBar(.3)
         this.setState({ characterInfo }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+            this.props.setCharacterInfo(this.state.characterInfo)
         })
         setTimeout(() => {
             this.props.navigation.navigate("ClassPick", { race: this.props.route.params.race })
@@ -124,7 +136,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
     }
 
     componentWillUnmount() {
-        this.unsubscribeStore()
+        this.navigationSubscription()
     }
 
 
@@ -136,7 +148,7 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
                         <View>
                             <AppText textAlign={'center'} fontSize={20}>{this.state.characterInfo.race}</AppText>
                             <AppForm
-                                initialValues={{ fullName: store.getState().character.name, user_id: store.getState().nonUser ? null : this.context.user._id }}
+                                initialValues={{ fullName: this.props.character.name, user_id: this.props.nonUser ? null : this.context.user._id }}
                                 onSubmit={(values: any) => this.setInfoAndContinue(values)}
                                 validationSchema={ValidationSchema}>
                                 <View style={{ paddingBottom: 15 }}>
@@ -260,6 +272,23 @@ export class NewCharInfo extends Component<{ route: any, navigation: any }, NewC
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        nonUser: state.nonUser
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewCharInfo)
 
 
 const styles = StyleSheet.create({

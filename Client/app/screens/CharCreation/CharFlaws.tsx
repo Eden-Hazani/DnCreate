@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -12,7 +13,7 @@ import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharFlawsState {
     baseState: string
@@ -22,12 +23,21 @@ interface CharFlawsState {
     openAutoComplete: boolean[]
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateFlaws: boolean;
+}
+
 const fillingList: string[] = ['I judge others harshly, and myself even more severely', "I can't resist a pretty face", "I turn tail and run when things go bad.",
     "I'll do anything to win fame and renown", "I am slow to trust members of other races", "In fact, the world does revolve around me"]
 
-export class CharFlaws extends Component<{ route: any, navigation: any, updateFlaws: boolean }, CharFlawsState>{
-    private UnsubscribeStore: Unsubscribe;
+class CharFlaws extends Component<Props, CharFlawsState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -35,14 +45,21 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
             baseState: '',
             updateFlaws: this.props.route.params.updateFlaws,
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.UnsubscribeStore = store.subscribe(() => { })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+
+    onFocus = () => {
+        if (!this.props.updateFlaws) {
+            this.props.ChangeCreationProgressBar(.9)
+        }
     }
 
     componentWillUnmount() {
-        this.UnsubscribeStore()
+        this.navigationSubscription()
     }
+
     componentDidMount() {
         this.props.navigation.addListener('beforeRemove', (e: any) => {
             e.preventDefault();
@@ -79,15 +96,23 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
         if (!this.state.characterInfo.flaws || this.state.characterInfo.flaws.length === 0) {
             Alert.alert("No Flaws", "Are you sure you want to continue without any Flaws?", [{
                 text: 'Yes', onPress: () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    this.props.navigation.navigate("CharBonds", { updateBonds: false })
+                    this.setState({ confirmed: true })
+                    this.props.setStoreCharacterInfo(this.state.characterInfo)
+                    this.props.ChangeCreationProgressBar(.93)
+                    setTimeout(() => {
+                        this.props.navigation.navigate("CharBonds", { updateBonds: false })
+                    }, 800);
+                    setTimeout(() => {
+                        this.setState({ confirmed: false })
+                    }, 1100);
                 }
             }, { text: 'No' }])
         } else {
             characterInfo.flaws = characterInfo.flaws && characterInfo.flaws.filter(flaw => { return flaw !== undefined })
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
+                this.props.ChangeCreationProgressBar(.93)
                 setTimeout(() => {
                     this.props.navigation.navigate("CharBonds", { updateBonds: false })
                 }, 800);
@@ -113,7 +138,7 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
             characterInfo.flaws = characterInfo.flaws && characterInfo.flaws.filter(flaw => { return flaw !== undefined })
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(this.state.characterInfo)
                 this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo);
@@ -201,6 +226,22 @@ export class CharFlaws extends Component<{ route: any, navigation: any, updateFl
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharFlaws)
 
 
 const styles = StyleSheet.create({

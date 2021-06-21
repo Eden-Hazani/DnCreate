@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import { connect } from 'react-redux';
 import { Unsubscribe } from 'redux';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -13,7 +14,7 @@ import TextInputDropDown from '../../components/TextInputDropDown';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharPersonalityTraitsState {
     baseState: string
@@ -23,12 +24,21 @@ interface CharPersonalityTraitsState {
     openAutoComplete: boolean[]
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateTraits: boolean;
+}
+
 const fillingList: string[] = ['Nothing can shake my optimistic attitude', "I idolize a particular hero of my faith and constantly refer to that person's deeds and example",
     "Flattery is my preferred trick for getting what I want", "I pocket anything I see that might have some value", "I blow up at the slightest insult", "My favor, once lost, is lost forever"]
 
-export class CharPersonalityTraits extends Component<{ route: any, navigation: any, updateTraits: boolean }, CharPersonalityTraitsState>{
-    private UnsubscribeStore: Unsubscribe;
+class CharPersonalityTraits extends Component<Props, CharPersonalityTraitsState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -36,13 +46,19 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
             baseState: '',
             updateTraits: this.props.route.params.updateTraits,
             confirmed: false,
-            characterInfo: store.getState().character
+            characterInfo: this.props.character
         }
-        this.UnsubscribeStore = store.subscribe(() => { })
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
+    }
+
+    onFocus = () => {
+        if (!this.props.updateTraits) {
+            this.props.ChangeCreationProgressBar(.83)
+        }
     }
 
     componentWillUnmount() {
-        this.UnsubscribeStore()
+        this.navigationSubscription()
     }
 
     addTrait = (trait: string, index: number) => {
@@ -66,15 +82,23 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
         if (!this.state.characterInfo.personalityTraits || this.state.characterInfo.personalityTraits.length === 0) {
             Alert.alert("No Traits", "Are you sure you want to continue without any Traits?", [{
                 text: 'Yes', onPress: () => {
-                    store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                    this.props.navigation.navigate("CharIdeals", { updateIdeals: false })
+                    this.setState({ confirmed: true })
+                    this.props.setStoreCharacterInfo(characterInfo)
+                    this.props.ChangeCreationProgressBar(.86)
+                    setTimeout(() => {
+                        this.props.navigation.navigate("CharIdeals", { updateIdeals: false })
+                    }, 800);
+                    setTimeout(() => {
+                        this.setState({ confirmed: false })
+                    }, 1100);
                 }
             }, { text: 'No' }])
         } else {
             characterInfo.personalityTraits = characterInfo.personalityTraits && characterInfo.personalityTraits.filter(trait => { return trait !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(characterInfo)
+                this.props.ChangeCreationProgressBar(.86)
                 setTimeout(() => {
                     this.props.navigation.navigate("CharIdeals", { updateIdeals: false })
                 }, 800);
@@ -115,7 +139,7 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
             characterInfo.personalityTraits = characterInfo.personalityTraits && characterInfo.personalityTraits.filter(trait => { return trait !== undefined });
             this.setState({ confirmed: true })
             this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
+                this.props.setStoreCharacterInfo(characterInfo)
                 this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
                 setTimeout(() => {
                     this.props.navigation.navigate("SelectCharacter", this.state.characterInfo)
@@ -201,6 +225,23 @@ export class CharPersonalityTraits extends Component<{ route: any, navigation: a
         )
     }
 }
+
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharPersonalityTraits)
 
 
 const styles = StyleSheet.create({

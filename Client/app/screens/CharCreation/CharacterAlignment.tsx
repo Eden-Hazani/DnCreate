@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { View, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native-expo-image-cache';
+import { connect } from 'react-redux';
 import { Config } from '../../../config';
 import userCharApi from '../../api/userCharApi';
 import AuthContext from '../../auth/context';
@@ -12,7 +13,7 @@ import { AppTextInput } from '../../components/forms/AppTextInput';
 import { Colors } from '../../config/colors';
 import { CharacterModel } from '../../models/characterModel';
 import { ActionType } from '../../redux/action-type';
-import { store } from '../../redux/store';
+import { RootState } from '../../redux/reducer';
 
 interface CharacterAlignmentState {
     characterInfo: CharacterModel
@@ -25,10 +26,20 @@ interface CharacterAlignmentState {
     clickedAlignment: number
 }
 
+interface Props {
+    character: CharacterModel;
+    setStoreCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    route: any;
+    navigation: any;
+    updateAlignment: boolean;
+}
+
 const alignmentList: string[] = ["Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"]
 
-export class CharacterAlignment extends Component<{ props: any, route: any, navigation: any, updateAlignment: boolean }, CharacterAlignmentState>{
+class CharacterAlignment extends Component<Props, CharacterAlignmentState>{
     static contextType = AuthContext;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -38,10 +49,19 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
                 alignment: '',
                 alignmentDescription: ''
             },
-            characterInfo: store.getState().character,
+            characterInfo: this.props.character,
             updateAlignment: this.props.route.params.updateAlignment
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
     }
+
+    onFocus = () => {
+        if (!this.state.updateAlignment) {
+            this.props.ChangeCreationProgressBar(.78)
+        }
+    }
+
+
     componentDidMount() {
         if (this.state.updateAlignment) {
             this.setState({ characterInfo: this.props.route.params.character }, () => {
@@ -58,32 +78,32 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
         if (this.state.alignment.alignment.length === 0 || this.state.alignment.alignmentDescription.length === 0) {
             Alert.alert("No Alignment or Description", "Are you sure you want to continue without character Alignment?", [{
                 text: 'Yes', onPress: () => {
-                    const characterInfo = { ...this.state.characterInfo };
-                    characterInfo.characterAlignment = this.state.alignment;
-                    this.setState({ characterInfo }, () => {
-                        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                        this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: false })
-                    })
+                    this.sendData()
                 }
             }, { text: 'No' }])
         } else {
-            const characterInfo = { ...this.state.characterInfo };
-            characterInfo.characterAlignment = this.state.alignment;
-            this.setState({ confirmed: true })
-            this.setState({ characterInfo }, () => {
-                store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo })
-                setTimeout(() => {
-                    this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: false })
-                }, 800);
-                setTimeout(() => {
-                    this.setState({ confirmed: false })
-                }, 1100);
-            })
+            this.sendData()
         }
     }
 
+    sendData = () => {
+        const characterInfo = { ...this.state.characterInfo };
+        characterInfo.characterAlignment = this.state.alignment;
+        this.setState({ confirmed: true })
+        this.setState({ characterInfo }, () => {
+            this.props.setStoreCharacterInfo(this.state.characterInfo)
+            this.props.ChangeCreationProgressBar(.83)
+            setTimeout(() => {
+                this.props.navigation.navigate("CharPersonalityTraits", { updateTraits: false })
+            }, 800);
+            setTimeout(() => {
+                this.setState({ confirmed: false })
+            }, 1100);
+        })
+    }
+
     updateInfo = async () => {
-        store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
+        this.props.setStoreCharacterInfo(this.state.characterInfo)
         this.context.user._id === "Offline" ? this.updateOfflineCharacter() : userCharApi.updateChar(this.state.characterInfo)
         this.props.navigation.navigate("SelectCharacter", { character: this.state.characterInfo, isDm: false })
     }
@@ -175,6 +195,22 @@ export class CharacterAlignment extends Component<{ props: any, route: any, navi
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        race: state.race
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CharacterAlignment)
 
 
 const styles = StyleSheet.create({

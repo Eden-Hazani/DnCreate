@@ -63,7 +63,9 @@ const deleteAccount = (user_id: string) => {
 
 const resendActivationEmail = (userInfo: UserModel) => { return client.setHeader('content-type', 'multipart/form-data').post<any>(`${endpoint}/resendActivationEmail`, userInfo) }
 
-const isUserLogged = () => client.get(`${endpoint}/isUserLogged`);
+const isUserLogged = (settings: boolean) => client.get<string>(`${endpoint}/isUserLogged/${settings}`);
+
+const isUserConnected = () => client.get<boolean>(`${endpoint}/isUserConnected`);
 
 const isActivated = () => client.get(`${endpoint}/isActivated`);
 
@@ -96,5 +98,6 @@ export default {
     isActivated,
     isPremium,
     googleRegister,
-    inputAlias
+    inputAlias,
+    isUserConnected
 }

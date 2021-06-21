@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, View, Animated, TouchableOpacity, Modal, Switch } from 'react-native';
-import { ListItem } from '../../components/ListItem';
+import { Dimensions, FlatList, View, Modal } from 'react-native';
 import { SearchBar } from 'react-native-elements';
-import { ListItemSeparator } from '../../components/ListItemSeparator';
 import { store } from '../../redux/store';
 import { Unsubscribe } from 'redux';
 import { ActionType } from '../../redux/action-type';
 import { CharacterModel } from '../../models/characterModel';
 import racesApi from '../../api/racesApi'
-import { Config } from '../../../config';
 import errorHandler from '../../../utility/errorHander';
 import { AppActivityIndicator } from '../../components/AppActivityIndicator';
-import { ModifiersModel } from '../../models/modifiersModel';
 import { RaceModel } from '../../models/raceModel';
 import { UserModel } from '../../models/userModel';
 import { AppConfirmation } from '../../components/AppConfirmation';
@@ -24,9 +20,10 @@ import { AppNoInternet } from '../../components/AppNoInternet';
 import { AppButton } from '../../components/AppButton';
 import AuthContext from '../../auth/context';
 import logger from '../../../utility/logger';
-import { Image } from 'react-native-expo-image-cache';
 import { RaceListHomeBrew } from './components/RaceListHomeBrew';
 import { RaceListSettings } from './components/RaceListSettings';
+import { RootState } from '../../redux/reducer';
+import { connect } from 'react-redux';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -50,11 +47,21 @@ interface RaceListState {
     afterDisclaimerModal: boolean
 }
 
+interface Props {
+    user: UserModel;
+    character: CharacterModel;
+    setCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    navigation: any;
+    nonUser: boolean;
+    pickedRace: Function;
+}
 
-export class RaceList extends Component<{ props: any, navigation: any }, RaceListState> {
+
+class RaceList extends Component<Props, RaceListState> {
     static contextType = AuthContext;
-    private unsubscribeStore: Unsubscribe;
     private NetUnSub: any;
+    navigationSubscription: any;
     constructor(props: any) {
         super(props)
         this.state = {
@@ -68,12 +75,13 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             search: '',
             loading: true,
             races: [],
-            userInfo: store.getState().user,
-            characterInfo: store.getState().character,
+            userInfo: this.props.user,
+            characterInfo: this.props.character,
             refreshing: false,
             error: false,
             currentLoadedRaces: 20
         }
+        this.navigationSubscription = this.props.navigation.addListener('focus', this.onFocus);
         setTimeout(() => {
             this.NetUnSub = NetInfo.addEventListener(netInfo => {
                 if (netInfo.isInternetReachable) {
@@ -81,12 +89,10 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 }
             })
         }, 500);
-        this.unsubscribeStore = store.subscribe(() => {
-            store.getState().character
-            this.setState({ searchColor: Colors.pageBackground })
-        })
+
     }
     async componentDidMount() {
+        this.props.ChangeCreationProgressBar(0)
         const disclaimer = await AsyncStorage.getItem('shownDisclaimer');
         if (!disclaimer) {
             this.setState({ disclaimerModal: true })
@@ -98,11 +104,13 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         this.getPrimeRaces();
     }
 
+    onFocus = () => this.props.ChangeCreationProgressBar(0)
+
 
 
     componentWillUnmount() {
         this.NetUnSub();
-        this.unsubscribeStore()
+        // this.unsubscribeStore()
     }
 
     getStorageRaceStats = async () => {
@@ -121,7 +129,8 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
     getPrimeRaces = async () => {
         let raceColors = [];
         const { isPopularOrder, raceType } = await this.getStorageRaceStats()
-        const result = await racesApi.getPrimeList(isPopularOrder, raceType, this.context.user._id);
+        const user_id = this.props.nonUser === true ? 'Offline' : this.context.user._id
+        const result = await racesApi.getPrimeList(isPopularOrder, raceType, user_id);
         await AsyncStorage.setItem('cashedRaces', JSON.stringify(result.data))
         for (let item of result.data as any) {
             raceColors.push(item.raceColors)
@@ -135,7 +144,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
             let raceColors = [];
             const races: any = this.state.races;
             const { isPopularOrder, raceType } = await this.getStorageRaceStats()
-            const user_id = store.getState().nonUser === true ? 'noUserId' : this.context.user._id
+            const user_id = this.props.nonUser === true ? 'noUserId' : this.context.user._id
             const result: any = await racesApi.getRaceList(this.state.currentLoadedRaces, 10, user_id, raceType, isPopularOrder);
             if (!result.ok) {
                 this.setState({ error: true, loading: false })
@@ -164,7 +173,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                 this.setState({ currentLoadedRaces: 10, races: [] }, () => this.getPrimeRaces())
                 return;
             }
-            const user_id = store.getState().nonUser === true ? 'Offline' : this.context.user._id
+            const user_id = this.props.nonUser === true ? 'Offline' : this.context.user._id
             const searchedRaces = await racesApi.SearchRaceList(search, raceType, user_id);
             this.setState({ races: searchedRaces.data })
         } catch (err) {
@@ -184,9 +193,11 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         characterInfo.race = race.name;
         characterInfo.image = race.image;
         this.setState({ confirmed: true })
+        this.props.ChangeCreationProgressBar(.1)
+
         this.setState({ characterInfo }, () => {
-            store.dispatch({ type: ActionType.PickedRace, payload: race });
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.characterInfo });
+            this.props.setCharacterInfo(this.state.characterInfo)
+            this.props.pickedRace(race)
         })
         setTimeout(() => {
             if (race.userPickedFeatures && race.userPickedFeatures.length > 0) {
@@ -224,7 +235,7 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
                                     }}>
                                         <SearchBar
                                             searchIcon={false}
-                                            containerStyle={{ backgroundColor: this.state.searchColor, borderRadius: 150 }}
+                                            containerStyle={{ backgroundColor: Colors.pageBackground, borderRadius: 150 }}
                                             inputContainerStyle={{ backgroundColor: this.state.searchColor }}
                                             lightTheme={this.state.searchColor === "#121212" ? false : true}
                                             placeholder="Search For Race"
@@ -267,3 +278,21 @@ export class RaceList extends Component<{ props: any, navigation: any }, RaceLis
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+        user: state.user,
+        nonUser: state.nonUser
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+        pickedRace: (race: RaceModel) => { dispatch({ type: ActionType.PickedRace, payload: race }) },
+
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RaceList)

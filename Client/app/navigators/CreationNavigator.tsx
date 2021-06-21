@@ -23,16 +23,20 @@ import { LevelChartSetUp } from '../screens/SubClassCreation/LevelChartSetUp';
 import { AddLevelFeature } from '../screens/SubClassCreation/AddLevelFeature';
 import { EditSubClassFeature } from '../screens/SubClassCreation/EditSubClassFeature';
 import { CustomSubClassStart } from '../screens/SubClassCreation/CustomSubClassStart';
+import { CustomSpellList } from '../screens/CustomSpellList';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/reducer';
+import { CustomSpellCreator } from '../screens/CustomSpellCreator';
 
 
 const Stack = createStackNavigator();
 const CreationNavigator = () => {
-    const { subscribe } = store
-    let baseColor = Colors.pageBackground
-    useEffect(() => subscribe(
-        () => setColor(Colors.pageBackground))
-        , [])
-    const [newColor, setColor] = useState(baseColor)
+    const [newColor, setColor] = useState(Colors.pageBackground)
+    const colorScheme = useSelector((state: RootState) => { return state.colorScheme });
+    useEffect(() => {
+        setColor(Colors.pageBackground)
+    }, [colorScheme])
+
     return <Stack.Navigator screenOptions={{
         cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid,
         headerTintColor: Colors.whiteInDarkMode, cardStyle: { backgroundColor: newColor }, headerTransparent: true, headerStyle: { backgroundColor: Colors.bitterSweetRed, height: 45 }, headerTitleAlign: "center"
@@ -53,6 +57,8 @@ const CreationNavigator = () => {
         <Stack.Screen options={{ title: "" }} name="CustomRaceFinishScreen" component={CustomRaceFinishScreen} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceBackImage" component={CustomRaceBackImage} />
         <Stack.Screen options={{ title: "" }} name="CustomRaceBonusAC" component={CustomRaceBonusAC} />
+        <Stack.Screen options={{ title: "" }} name="CustomSpellList" component={CustomSpellList} />
+        <Stack.Screen options={{ title: "" }} name="CustomSpellCreator" component={CustomSpellCreator} />
 
 
         <Stack.Screen options={{ title: "" }} name="CreateSubClass" component={CreateSubClass} />

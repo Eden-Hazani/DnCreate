@@ -20,6 +20,7 @@ import { AppText } from '../components/AppText';
 import { AppTextInput } from '../components/forms/AppTextInput';
 import { AppActivityIndicator } from '../components/AppActivityIndicator';
 import { GoogleLogin } from '../auth/GoogleLogin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface LoginState {
     loading: boolean,
@@ -49,7 +50,25 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
         this.UnsubscribeStore = store.subscribe(() => {
             store.getState().user
         })
+    }
 
+    componentDidMount() {
+        this.getLoggedSettings()
+    }
+
+    getLoggedSettings = async () => {
+        const settings = await AsyncStorage.getItem('remainLogged');
+        if (!settings) {
+            this.setState({ remainLoggedIn: false });
+            return;
+        }
+        const objSettings = JSON.parse(settings);
+        this.setState({ remainLoggedIn: objSettings });
+    }
+
+    setRemainLogged = async (value: boolean) => {
+        await AsyncStorage.setItem('remainLogged', JSON.stringify(value));
+        this.setState({ remainLoggedIn: value })
     }
 
     componentWillUnmount() {
@@ -112,10 +131,12 @@ export class Login extends Component<{ props: any, navigation: any }, LoginState
                                 <AppText>Remain Logged</AppText>
                                 <Switch value={this.state.remainLoggedIn} onValueChange={() => {
                                     if (this.state.remainLoggedIn) {
+                                        this.setRemainLogged(false)
                                         this.setState({ remainLoggedIn: false })
                                         return;
                                     }
                                     this.setState({ remainLoggedIn: true })
+                                    this.setRemainLogged(true)
                                 }} />
                             </View>
                             {!__DEV__ &&

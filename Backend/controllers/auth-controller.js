@@ -299,7 +299,19 @@ router.post("/login", upload.none(), async (request, response) => {
     }
 });
 
-router.get("/isUserLogged", verifyLoggedIn, async (request, response) => {
+router.get("/isUserLogged/:settings", verifyLoggedIn, async (request, response) => {
+    try {
+        const settings = request.params.settings;
+        console.log(settings)
+        const user = await authLogic.validateInSystem(response.locals.user._id)
+        const token = jwt.sign({ user }, config.jwt.secretKey, !settings && { expiresIn: "2d" })
+        response.json(token);
+    } catch (err) {
+        response.status(500).send(err.message);
+    }
+});
+
+router.get("/isUserConnected", verifyLoggedIn, async (request, response) => {
     try {
         response.json(true);
     } catch (err) {

@@ -11,7 +11,7 @@ import { ActionType } from '../../../redux/action-type';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/reducer';
 
-const marketTypes: { val: string, name: string }[] = [{ val: 'CHAR', name: 'Characters' }, { val: 'WEAP', name: 'Weapons' }]
+const marketTypes: { val: string, name: string }[] = [{ val: 'CHAR', name: 'Characters' }, { val: 'WEAP', name: 'Weapons' }, { val: 'SPELL', name: 'Spells' }]
 
 
 export function MarketFilters() {

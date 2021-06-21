@@ -15,6 +15,8 @@ import toolJson from '../../../jsonDump/toolList.json';
 import { PickSingleItem } from './helperFunctions/PickSingleItem';
 import { SearchableTextDropDown } from '../../components/SearchableTextDropDown';
 import { PickLanguage } from '../../components/PickLanguage';
+import { connect } from 'react-redux';
+import { RootState } from '../../redux/reducer';
 
 interface SpacialRaceBonusesState {
     character: CharacterModel
@@ -29,7 +31,15 @@ interface SpacialRaceBonusesState {
     customArmor: any[]
 }
 
-export class SpacialRaceBonuses extends Component<{ navigation: any, route: any }, SpacialRaceBonusesState>{
+interface Props {
+    character: CharacterModel;
+    setCharacterInfo: Function;
+    ChangeCreationProgressBar: Function;
+    navigation: any;
+    route: any;
+}
+
+class SpacialRaceBonuses extends Component<Props, SpacialRaceBonusesState>{
     navigationSubscription: any;
     constructor(props: any) {
         super(props)
@@ -38,10 +48,8 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
             weaponProficiencies: [],
             extraLanguages: [],
             confirmed: false,
-            character: store.getState().character,
+            character: this.props.character,
             race: this.props.route.params.race,
-
-
             customWeapons: [],
             customArmor: [],
             pickedSkills: [],
@@ -51,6 +59,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
     }
 
     onFocus = () => {
+        this.props.ChangeCreationProgressBar(.1)
         const character = { ...this.state.character };
         character.languages = [];
         character.skills = [];
@@ -58,7 +67,7 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         character.addedArmorProf = [];
         character.tools = [];
         this.setState({ character }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            this.props.setCharacterInfo(this.state.character)
         })
     }
 
@@ -118,8 +127,9 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         for (let item of this.state.customWeapons) {
             character.addedWeaponProf.push(item)
         }
+        this.props.ChangeCreationProgressBar(.2)
         this.setState({ character, confirmed: true }, () => {
-            store.dispatch({ type: ActionType.SetInfoToChar, payload: this.state.character })
+            this.props.setCharacterInfo(this.state.character)
             setTimeout(() => {
                 this.props.navigation.navigate("NewCharInfo", { race: this.state.race });
             }, 800);
@@ -352,6 +362,20 @@ export class SpacialRaceBonuses extends Component<{ navigation: any, route: any 
         )
     }
 }
+
+const mapStateToProps = (state: RootState) => {
+    return {
+        character: state.character,
+    }
+}
+const mapDispatchToProps = (dispatch: any) => {
+    return {
+        setCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
+        ChangeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SpacialRaceBonuses)
 
 
 const styles = StyleSheet.create({

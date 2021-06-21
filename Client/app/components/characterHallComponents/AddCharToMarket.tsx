@@ -17,6 +17,7 @@ import { createNewCharMarketObj } from '../../screens/MarketPlace/functions/crea
 import { updateMarketStatusFromPreviousLevels } from '../../../utility/charHallFunctions/characterStorage';
 import useAuthContext from '../../hooks/useAuthContext';
 import { CreateMarketPlaceAlias } from '../../screens/MarketPlace/marketplaceCompoenents/CreateMarketPlaceAlias';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height, width } = Dimensions.get('window')
 const Filter = require('bad-words')

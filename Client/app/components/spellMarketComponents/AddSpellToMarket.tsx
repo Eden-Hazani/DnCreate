@@ -11,16 +11,16 @@ import { AppFormField } from '../forms/AppFormField';
 import { SubmitButton } from '../forms/SubmitButton';
 import useAuthContext from '../../hooks/useAuthContext';
 import { CreateMarketPlaceAlias } from '../../screens/MarketPlace/marketplaceCompoenents/CreateMarketPlaceAlias';
-import { WeaponModal } from '../../models/WeaponModal';
-import { createNewWeaponMarketObj } from '../../screens/MarketPlace/functions/createMarketObj';
+import { createNewSpellMarketOb } from '../../screens/MarketPlace/functions/createMarketObj';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CustomSpellModal } from '../../models/CustomSpellModal';
 
 const { height, width } = Dimensions.get('window')
 const Filter = require('bad-words')
 const filter = new Filter();
 
 const ValidationSchema = Yup.object().shape({
-    description: Yup.string().min(20).max(500).test('test-name', ' Cannot contain profanity', function (value) {
+    description: Yup.string().min(5).max(500).test('test-name', ' Cannot contain profanity', function (value) {
         if (filter.isProfane(value)) {
             return false
         }
@@ -29,9 +29,8 @@ const ValidationSchema = Yup.object().shape({
 })
 
 interface Props {
-    weapon: WeaponModal
-    char_id: string
-    refreshWeapons: Function
+    spell: CustomSpellModal
+    refreshSpells: Function
 }
 
 interface Values {
@@ -40,30 +39,30 @@ interface Values {
 }
 
 
-export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
+export function AddSpellToMarket({ spell, refreshSpells }: Props) {
     const [loading, setLoading] = useState<boolean>(false);
-    const [animateStartButt, setAnimateStartButt] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 0, y: 0 }))
-    const [animateForm, setAnimateForm] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 700, y: 0 }))
-    const [scale, setScale] = useState<Animated.Value>(new Animated.Value(0))
+    const [animateStartButt, setAnimateStartButt] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 0, y: 0 }));
+    const [animateForm, setAnimateForm] = useState<Animated.ValueXY>(new Animated.ValueXY({ x: 700, y: 0 }));
+    const [scale, setScale] = useState<Animated.Value>(new Animated.Value(0));
 
     const userContext = useAuthContext()
 
     const submit = async (values: Values) => {
-        Alert.alert("Add To Market", "This weapon will be added to the marketplace",
-            [{ text: 'Yes', onPress: () => addToMarket(weapon, values) }, { text: 'No' }])
+        Alert.alert("Add To Market", "This spell will be added to the marketplace",
+            [{ text: 'Yes', onPress: () => addToMarket(spell, values) }, { text: 'No' }])
     }
 
-    const addToMarket = async (weapon: WeaponModal, values: Values) => {
+    const addToMarket = async (spell: CustomSpellModal, values: Values) => {
         try {
             setLoading(true)
             values.name = userContext.user?.marketplaceNickname || '';
-            weapon.marketStatus = { creator_id: userContext.user?._id || '', isInMarket: true, market_id: '' }
-            const marketObj = createNewWeaponMarketObj(userContext.user?._id || '', weapon, values)
-            const result: any = await marketApi.addToMarket(marketObj, 'WEAP');
+            spell.marketStatus = { creator_id: userContext.user?._id || '', isInMarket: true, market_id: '' }
+            const marketObj = createNewSpellMarketOb(userContext.user?._id || '', spell, values)
+            const result: any = await marketApi.addToMarket(marketObj, 'SPELL');
             if (result.data) {
-                const updatedWeapon: WeaponModal = result.data.weaponInfo
-                await saveWeapon(updatedWeapon, weapon._id || '');
-                refreshWeapons(updatedWeapon)
+                const updatedSpell: CustomSpellModal = result.data.spell
+                await saveSpell(updatedSpell, spell._id || '');
+                refreshSpells(updatedSpell)
                 setLoading(false)
             }
         } catch (err) {
@@ -72,20 +71,20 @@ export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
         }
     }
 
-    const saveWeapon = async (weapon: WeaponModal, weapon_id: string) => {
-        let weaponList = await AsyncStorage.getItem(`${char_id}WeaponList`);
-        if (!weaponList) {
+    const saveSpell = async (spell: CustomSpellModal, spell_id: string) => {
+        const stringedCustomSpells = await AsyncStorage.getItem('customSpellList');
+        if (!stringedCustomSpells) {
             return;
         }
-        const newWeaponList = JSON.parse(weaponList)
+        const newSpellList = JSON.parse(stringedCustomSpells)
         let index: number = 0
-        for (let item of newWeaponList) {
-            if (item._id === weapon_id) {
-                newWeaponList[index] = weapon
+        for (let item of newSpellList) {
+            if (item._id === spell_id) {
+                newSpellList[index] = spell
             }
             index++
         }
-        await AsyncStorage.setItem(`${char_id}WeaponList`, JSON.stringify(newWeaponList))
+        await AsyncStorage.setItem('customSpellList', JSON.stringify(newSpellList))
     }
 
     const handleClick = () => {
@@ -115,7 +114,6 @@ export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
                 <View>
                     {userContext.user?.marketplaceNickname ?
                         <View>
-
                             <Animated.View style={[animateStartButt.getLayout(), {
                                 height: scale.interpolate({
                                     inputRange: [0, 1],
@@ -123,7 +121,7 @@ export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
                                 })
                             },]}>
                                 <TouchableOpacity style={[styles.addButton, { backgroundColor: Colors.paleGreen }]} onPress={() => handleClick()}>
-                                    <AppText fontSize={20} textAlign={'center'}>Add Weapon To Market</AppText>
+                                    <AppText fontSize={20} textAlign={'center'}>Add Spell To Market</AppText>
                                 </TouchableOpacity>
                             </Animated.View>
                             <Animated.View style={[animateForm.getLayout(), {
@@ -144,7 +142,7 @@ export function AddWeaponToMarket({ weapon, char_id, refreshWeapons }: Props) {
                                             numberOfLines={7} multiline={true} textAlignVertical={"top"}
                                             fieldName={"description"}
                                             iconName={"text-short"}
-                                            placeholder={"Marketplace character Description..."} />
+                                            placeholder={"Marketplace spell Description..."} />
                                     </View>
                                     <View style={{ justifyContent: "center", alignItems: "center" }}>
                                         <SubmitButton backgroundColor={Colors.paleGreen} title={"Finish"} marginBottom={1} />

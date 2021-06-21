@@ -33,7 +33,8 @@ export function CreateMarketPlaceAlias() {
     }
     return (
         <View style={styles.container}>
-            <AppText textAlign={'center'} fontSize={17}>If you wish to start uploading things to the market you first need to pick an alias for yourself, this alias will be shown in the marketplace under the things you create</AppText>
+            <AppText textAlign={'center'} color={Colors.paleGreen} fontSize={25}>- MarketPlace -</AppText>
+            <AppText textAlign={'center'} fontSize={17}>It seems like you don't have a marketplace name yet, please enter one to upload your creation to the DnCreate marketplace!</AppText>
             <View>
                 {loading ? <AppActivityIndicator visible={loading} /> :
                     <View>
