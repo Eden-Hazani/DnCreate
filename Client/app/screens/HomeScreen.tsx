@@ -28,11 +28,11 @@ import * as Linking from 'expo-linking';
 import { AnimatedCircleButton } from '../animations/AnimatedCircleButton';
 import { RootState } from '../redux/reducer';
 import { connect } from 'react-redux';
+import { ColorSchemeModal } from '../components/ColorSchemeModal';
 
 interface HomeState {
     loading: boolean
     colorModal: boolean
-    darkModeOn: boolean
     errorModal: boolean
     characters: CharacterModel[]
     carouselItems: any[]
@@ -59,7 +59,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
             errorModal: false,
             loading: true,
             colorModal: false,
-            darkModeOn: store.getState().colorScheme,
             carouselItems: [
                 {
                     title: "DnCreate is hard work",
@@ -288,55 +287,7 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
                                     </View>
                                 </Modal>
                                 <Modal visible={this.state.colorModal}>
-                                    <View style={{ backgroundColor: Colors.pageBackground, flex: 1 }}>
-                                        <View style={{ flex: 0.1, paddingTop: 150 }}>
-                                            <AppText textAlign={'center'} fontSize={22} color={Colors.whiteInDarkMode}>Pick your style.</AppText>
-                                        </View>
-                                        <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={!this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
-                                                this.setState({ darkModeOn: false, loading: true }, async () => {
-                                                    await AsyncStorage.setItem('colorScheme', "light").then(() => {
-                                                        Colors.InitializeAsync().then(() => {
-                                                            store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
-                                                            this.setState({ loading: false })
-                                                        })
-                                                    });
-                                                })
-                                            }}
-                                                borderRadius={25} width={250} height={100} title={"Let there be LIGHT!"} />
-                                        </View>
-                                        <View style={{ flex: 0.2 }}>
-                                            <AppButton disabled={this.state.darkModeOn} fontSize={10} color={Colors.totalWhite} backgroundColor={Colors.bitterSweetRed} onPress={async () => {
-                                                this.setState({ darkModeOn: true, loading: true }, async () => {
-                                                    await AsyncStorage.setItem('colorScheme', "dark").then(() => {
-                                                        Colors.InitializeAsync().then(() => {
-                                                            store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
-                                                            this.setState({ loading: false })
-                                                        })
-                                                    });
-                                                })
-                                            }}
-                                                borderRadius={25} width={250} height={100} title={"To the darkness we descend..."} />
-                                        </View>
-                                        <View style={{ flex: 0.2 }}>
-                                            <AppButton backgroundColor={Colors.bitterSweetRed} onPress={async () => {
-                                                const colorScheme = await AsyncStorage.getItem("colorScheme");
-                                                if (colorScheme === "firstUse") {
-                                                    this.setState({ darkModeOn: false, loading: true }, async () => {
-                                                        await AsyncStorage.setItem('colorScheme', "light").then(() => {
-                                                            Colors.InitializeAsync().then(() => {
-                                                                store.dispatch({ type: ActionType.colorScheme, payload: this.state.darkModeOn })
-                                                                this.setState({ loading: false, colorModal: false })
-                                                            })
-                                                        });
-                                                    })
-                                                    return;
-                                                }
-                                                this.setState({ colorModal: false })
-                                            }}
-                                                fontSize={18} borderRadius={70} width={70} height={70} title={"O.K"} />
-                                        </View>
-                                    </View>
+                                    <ColorSchemeModal closeModal={() => this.setState({ colorModal: false })} />
                                 </Modal>
                             </AnimateContactUpwards>
                         </View>
@@ -347,27 +298,6 @@ export class HomeScreen extends Component<{ props: any, navigation: any }, HomeS
     }
 }
 
-// const mapStateToProps = (state: RootState) => {
-//     return {
-//         character: state.character,
-//         user: state.user,
-//         nonUser: state.nonUser,
-//         race: state.race,
-//         beforeRegisterChar: state.beforeRegisterChar,
-//     }
-// }
-// const mapDispatchToProps = (dispatch: any) => {
-//     return {
-//         setStoreCharacterInfo: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoToChar, payload: character }) },
-//         changeCreationProgressBar: (amount: number) => { dispatch({ type: ActionType.ChangeCreationProgressBar, payload: amount }) },
-//         setInfoBeforeRegisterChar: (character: CharacterModel) => { dispatch({ type: ActionType.SetInfoBeforeRegisterChar, payload: character }) },
-//         addNewCharacter: (character: CharacterModel) => { dispatch({ type: ActionType.AddNewCharacter, payload: character }) },
-//         clearInfoBeforeRegisterChar: () => { dispatch({ type: ActionType.ClearInfoBeforeRegisterChar }) },
-//         startAsNonUser: (value: boolean) => { dispatch({ type: ActionType.StartAsNonUser, payload: value }) },
-//     }
-// }
-
-// export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 const styles = StyleSheet.create({
     buttonsView: {

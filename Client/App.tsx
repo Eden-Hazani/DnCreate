@@ -79,6 +79,7 @@ export class App extends React.Component<{ props: any, navigation: any }, AppSta
   }
 
   async componentDidMount() {
+    await AsyncStorage.removeItem('colorScheme')
     logger.start();
     try {
       if (!__DEV__) {

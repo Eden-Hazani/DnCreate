@@ -204,6 +204,14 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     </View>
                                 </View>
                             </Modal>
+                            <TouchableOpacity style={{ backgroundColor: Colors.bitterSweetRed, borderRadius: 15, padding: 10, marginBottom: 15 }}
+                                onPress={() => this.props.navigation.navigate("MyCreations")}>
+                                <AppText>Your Created Races</AppText>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ backgroundColor: Colors.paleGreen, borderRadius: 15, padding: 15 }}
+                                onPress={() => this.props.navigation.navigate("PrivacyPolicy")}>
+                                <AppText fontSize={22} color={Colors.totalWhite}>Our Privacy Policy</AppText>
+                            </TouchableOpacity>
 
                             <View style={{ flex: .3, padding: 10, justifyContent: "center", alignItems: "center" }}>
                                 <AppText textAlign={'center'}>Wish to remove ads?</AppText>
@@ -212,10 +220,6 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                     <CashImage uri={`${Config.serverUrl}/assets/logos/patreon.png`} style={{ height: 100, width: 100 }} />
                                 </TouchableOpacity>
                             </View>
-                            <TouchableOpacity style={{ backgroundColor: Colors.bitterSweetRed, borderRadius: 15, padding: 20 }}
-                                onPress={() => this.props.navigation.navigate("MyCreations")}>
-                                <AppText>My Created Races</AppText>
-                            </TouchableOpacity>
                             <View style={{ flexDirection: 'row', justifyContent: "space-evenly", flex: .4, paddingTop: 30, paddingBottom: 30 }}>
                                 <View style={{ flex: .5 }}>
                                     <AppButton onPress={() => { this.logout() }} width={100} height={100} borderRadius={100} fontSize={20} color={Colors.black} backgroundColor={Colors.yellow} title={"Logout"} />
@@ -264,11 +268,11 @@ export class Account extends Component<{ props: any, navigation: any }, AccountS
                                         }} />
                                     </View>
                                     <ListItemSeparator thick={true} />
-                                    <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
+                                    {/* <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
                                         <AppText fontSize={20}>Privacy Policy</AppText>
                                         <AppButton borderRadius={15} width={100} height={50} backgroundColor={Colors.bitterSweetRed}
                                             title={"Policy"} textAlign={"center"} fontSize={30} onPress={() => { Linking.openURL('https://eden-hazani.github.io/DnCreatePrivacyPolicy/') }} />
-                                    </View>
+                                    </View> */}
                                     <ListItemSeparator thick={true} />
                                     <View style={{ flexDirection: 'row', justifyContent: "space-between", alignItems: "center", paddingTop: 5 }}>
                                         <AppText fontSize={20}>Delete Account</AppText>

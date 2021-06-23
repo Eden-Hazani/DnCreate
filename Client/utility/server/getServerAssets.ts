@@ -20,7 +20,9 @@ const assets = [
     `${Config.serverUrl}/assets/misc/animated/darkModeAnimatedRunes.png`,
     `${Config.serverUrl}/assets/specificDragons/raceCreationDragon.png`,
     `${Config.serverUrl}/assets/specificDragons/classCreatorDragon.png`,
-    `${Config.serverUrl}/assets/specificDragons/magicCreatorDragon.png`
+    `${Config.serverUrl}/assets/specificDragons/magicCreatorDragon.png`,
+    `${Config.serverUrl}/assets/specificDragons/lightModeDragon.png`,
+    `${Config.serverUrl}/assets/specificDragons/darkModeDragon.png`
 ]
 
 
