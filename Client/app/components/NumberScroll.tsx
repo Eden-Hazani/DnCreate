@@ -1,4 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { View, StyleSheet, FlatList, Animated, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { number } from 'yup';
 import { Colors } from '../config/colors';
@@ -60,16 +61,22 @@ export default function NumberScroll({ pauseStart, modelColor, startingVal, max,
     const numberArray: number[] = startFromZero ? Array.from({ length: max + 1 }, (x, i) => i) : Array.from({ length: max }, (x, i) => i + 1)
     const scrollX = React.useRef(new Animated.Value(0)).current
     const moveIndexRef: any = React.useRef(null)
-    const onViewRef = React.useRef((viewableItems: any) => {
-        if (preventOnLoad) {
-            preventOnLoad = false
-            setPrimeIndex(viewableItems.viewableItems[0]?.index)
-            return
+    const onViewRef = useRef(({ viewableItems }: any) => {
+        if (viewableItems[0]) {
+            if (preventOnLoad) {
+                preventOnLoad = false
+                setPrimeIndex(viewableItems[0].item)
+                return
+            }
+            getValue(viewableItems[0]?.item)
+            setPrimeIndex(viewableItems[0]?.index)
         }
-        getValue(viewableItems.viewableItems[0]?.item)
-        setPrimeIndex(viewableItems.viewableItems[0]?.index)
+    });
+    const viewConfigRef = React.useRef({
+        itemVisiblePercentThreshold: 50,
+        waitForInteraction: true,
+        minimumViewTime: 5
     })
-    const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: (width / 3) })
 
     const getItemLayout = (data: any, index: any) => (
         { length: (width / 3), offset: (width / 3) * index, index }

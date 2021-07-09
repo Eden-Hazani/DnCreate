@@ -10,7 +10,6 @@ import { store } from '../redux/store';
 import { useEffect } from 'react';
 import { Image } from 'react-native-expo-image-cache';
 import { Config } from '../../config';
-import SvgUri from "expo-svg-uri";
 
 interface Props {
     closeModal: Function
@@ -58,12 +57,7 @@ export function ColorSchemeModal({ closeModal }: Props) {
                     </TouchableOpacity>
                     :
                     <TouchableOpacity onPress={() => setColorMode(true)}>
-                        {/* <Image uri={`${Config.serverUrl}/assets/specificDragons/darkModeDragon.png`} style={{ width: 300, height: 300 }} /> */}
-                        <SvgUri
-                            width="200"
-                            height="200"
-                            source={{ uri: `${Config.serverUrl}/assets/specificDragons/darkModeDragon.svg` }}
-                        />
+                        <Image uri={`${Config.serverUrl}/assets/specificDragons/darkModeDragon.png`} style={{ width: 300, height: 300 }} />
                     </TouchableOpacity>}
             </View>
             <View style={{ flex: 0.4 }}>

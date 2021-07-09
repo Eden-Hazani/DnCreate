@@ -170,8 +170,9 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <AppText textAlign={'center'}>Movement speed</AppText>
                                     <NumberScroll modelColor={Colors.pageBackground} max={50}
+                                        pauseStart={true}
                                         startingVal={speedState}
-                                        getValue={(speed: number) => { this.setState({ speed }) }} />
+                                        getValue={(speed: number) => this.setState({ speed })} />
                                 </View>
                             </View>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
