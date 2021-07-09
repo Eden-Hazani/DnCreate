@@ -11,6 +11,7 @@ import { store } from '../../redux/store';
 import { ActionType } from '../../redux/action-type';
 import NumberScroll from '../../components/NumberScroll';
 import { Colors } from '../../config/colors';
+import racesApi from '../../api/racesApi';
 const Filter = require('bad-words')
 const filter = new Filter();
 
@@ -50,13 +51,14 @@ const ValidationSchema = Yup.object().shape({
             return false
         }
         return true
-    })
+    }),
+    movementSpeed: Yup.number().required().label("Movement Speed")
 })
 
 interface BasicRaceInfoState {
     customRace: RaceModel
     confirmed: boolean
-    speed: number
+    // speed: number
 }
 
 export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoState>{
@@ -64,7 +66,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
     constructor(props: any) {
         super(props)
         this.state = {
-            speed: 0,
+            // speed: 0,
             customRace: store.getState().customRaceEditing ? store.getState().customRace : new RaceModel(),
             confirmed: false,
         }
@@ -88,7 +90,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
             alignment: values.alignment,
             size: values.size,
             uniqueAbilities: store.getState().customRaceEditing ? store.getState().customRace.raceAbilities?.uniqueAbilities : [],
-            speed: this.state.speed
+            speed: values.movementSpeed ? parseInt(values.movementSpeed) : 30
         }
         this.setState({ confirmed: true })
         this.setState({ customRace }, () => {
@@ -102,7 +104,7 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
 
     render() {
         const storeState = store.getState().customRace;
-        const speedState = store.getState().customRace.raceAbilities?.speed || 0;
+        // const speedState = store.getState().customRace.raceAbilities?.speed || 0;
         return (
             <ScrollView style={styles.container}>
                 {this.state.confirmed ? <AppConfirmation visible={this.state.confirmed} /> :
@@ -121,7 +123,8 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
                                 age: storeState.raceAbilities?.age || '',
                                 alignment: storeState.raceAbilities?.alignment || '',
                                 size: storeState.raceAbilities?.size || '',
-                                languages: storeState.raceAbilities?.languages || ''
+                                languages: storeState.raceAbilities?.languages || '',
+                                movementSpeed: storeState.raceAbilities?.speed || 30
                             }}
                             onSubmit={(values: any) => this.confirmAndContinue(values)}
                             validationSchema={ValidationSchema}>
@@ -167,12 +170,22 @@ export class BasicRaceInfo extends Component<{ navigation: any }, BasicRaceInfoS
                                     fieldName={"languages"}
                                     iconName={"text-short"}
                                     placeholder={"Languages Description..."} />
-                                <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
-                                    <AppText textAlign={'center'}>Movement speed</AppText>
+                                <AppFormField
+                                    defaultValue={storeState.raceAbilities?.languages}
+                                    width={Dimensions.get('screen').width / 1.2}
+                                    fieldName={"movementSpeed"}
+                                    iconName={"text-short"}
+                                    keyboardType={'numeric'}
+                                    placeholder={"Movement speed..."} />
+
+                                {/* <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <NumberScroll modelColor={Colors.pageBackground} max={50}
                                         startingVal={speedState}
-                                        getValue={(speed: number) => { this.setState({ speed }) }} />
-                                </View>
+                                        getValue={(speed: number) => {
+                                            racesApi.popularizeAllRaces(`speed --> ${speed}`)
+                                            this.setState({ speed })
+                                        }} />
+                                </View> */}
                             </View>
                             <View style={{ justifyContent: "center", alignItems: "center" }}>
                                 <SubmitButton title={"Continue"} marginBottom={1} />

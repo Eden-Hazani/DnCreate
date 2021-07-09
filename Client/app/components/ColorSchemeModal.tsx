@@ -10,7 +10,6 @@ import { store } from '../redux/store';
 import { useEffect } from 'react';
 import { Image } from 'react-native-expo-image-cache';
 import { Config } from '../../config';
-import SvgUri from "expo-svg-uri";
 
 interface Props {
     closeModal: Function
@@ -55,18 +54,15 @@ export function ColorSchemeModal({ closeModal }: Props) {
                 {colorMode ?
                     <TouchableOpacity onPress={() => setColorMode(false)}>
                         <Image uri={`${Config.serverUrl}/assets/specificDragons/lightModeDragon.png`} style={{ width: 300, height: 300 }} />
+                        <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>Let there be Light</AppText>
                     </TouchableOpacity>
                     :
                     <TouchableOpacity onPress={() => setColorMode(true)}>
-                        {/* <Image uri={`${Config.serverUrl}/assets/specificDragons/darkModeDragon.png`} style={{ width: 300, height: 300 }} /> */}
-                        <SvgUri
-                            width="200"
-                            height="200"
-                            source={{ uri: `${Config.serverUrl}/assets/specificDragons/darkModeDragon.svg` }}
-                        />
+                        <Image uri={`${Config.serverUrl}/assets/specificDragons/darkModeDragon.png`} style={{ width: 300, height: 300 }} />
+                        <AppText textAlign={'center'} color={Colors.bitterSweetRed} fontSize={22}>To The Darkness we descend</AppText>
                     </TouchableOpacity>}
             </View>
-            <View style={{ flex: 0.4 }}>
+            <View style={{ flex: 0.3 }}>
                 <TouchableOpacity onPress={() => finish()}
                     style={[{ backgroundColor: Colors.bitterSweetRed }, styles.button]}>
                     <AppText>O.K</AppText>

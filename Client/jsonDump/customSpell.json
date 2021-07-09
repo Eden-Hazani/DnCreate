@@ -1,0 +1,35 @@
+{
+    "list": [
+        {
+            "headline": "Custom Spells!",
+            "leftTextBlock": "In the upper part of the page you have the create spell button",
+            "rightTextBlock": "In the lower part of the page you will find the list of all the spells you created or downloaded from the market",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/custom-Spell-Dragon.png"
+        },
+        {
+            "headline": "Create Spell",
+            "leftTextBlock": "After pressing the create spell button a popup will appear",
+            "rightTextBlock": "Just fill all the fields with your homebrew spell (if this is your first spell please read online on how to create spells currently)",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/magicCreatorDragon.png"
+        },
+        {
+            "headline": "Edit Spell",
+            "leftTextBlock": "You can edit all the spells you created and the ones you downloaded from the market",
+            "rightTextBlock": "Just open a spell from the list and hit the edit button",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/homeDragon2.png"
+        },
+        {
+            "headline": "Marketplace",
+            "leftTextBlock": "After finishing the spell creation you ill have the option to upload it to the market",
+            "rightTextBlock": "You can upload the spell after picking it from the existing spells list in the bottom of the page",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/specificDragons/welcomeDragon.png"
+        },
+        {
+            "headline": "Ready to create some spells?",
+            "leftTextBlock": "create and share on the market",
+            "rightTextBlock": "Explore the vast universe of imagination!",
+            "ImgUrl": "https://dncreate.azurewebsites.net/assets/backgroundDragons/marketPlaceDragon2.png",
+            "finishButton": true
+        }
+    ]
+}

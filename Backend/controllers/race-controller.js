@@ -89,6 +89,8 @@ router.get("/searchRace/:text/:raceType/:user_id", async (request, response) => 
 
 router.post("/addRace", verifyLogged, upload.single('image'), async (request, response) => {
     try {
+        console.log(JSON.parse(request.body.raceInfo))
+        console.log(new Race(JSON.parse(request.body.raceInfo)))
         const race = new Race(JSON.parse(request.body.raceInfo))
         if (request.file) {
             race.image = request.file.filename;
@@ -100,9 +102,10 @@ router.post("/addRace", verifyLogged, upload.single('image'), async (request, re
     }
 });
 
-router.get("/popularizeAllRaces", verifyLogged, async (request, response) => {
+router.post("/popularizeAllRaces", verifyLogged, upload.none(), async (request, response) => {
     try {
-        raceLogic.popularizeAllRaces();
+        // console.log(request.body.raceInfo)
+        console.log(JSON.parse(request.body.raceInfo))
         response.json(true);
     } catch (err) {
         response.status(500).send(err.message);

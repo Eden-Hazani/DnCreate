@@ -60,6 +60,20 @@ export class CustomRaceFinishScreen extends Component<{ navigation: any }, Custo
                     await AdMobRewarded.showAdAsync()
                 })
             }
+        }).catch((err) => {
+            const customRace = { ...store.getState().customRace };
+            const user: any = store.getState().user._id
+            customRace.visibleToEveryone = this.state.racePublic;
+            customRace.user_id = user;
+            customRace.popularity = 0;
+            const color = this.getRandomColor()
+            customRace.raceColors = color
+            racesApi.addRace(customRace).then(() => {
+                this.setState({ finished: true })
+            }).catch((err) => {
+                alert('There seems to be a problem with our servers, please try again later.')
+                return;
+            })
         })
         AdMobRewarded.addEventListener("rewardedVideoUserDidEarnReward", () => {
             if (!this.state.spamGuard)

@@ -10,6 +10,8 @@ const getPrimeList = (isPopularOrder: string | boolean, raceType: string, user_i
 const getUserMadeRaces = (uid: string) => client.get(`${endpoint}/getUserCreatedRaces/${uid}`)
 
 
+
+
 const editRace = (race: RaceModel) => {
     let formData: FormData = new FormData();
     formData.append("raceInfo", JSON.stringify(race))
@@ -41,11 +43,18 @@ const addRace = (race: RaceModel) => {
 }
 
 
+const popularizeAllRaces = (data: any) => {
+    let formData: FormData = new FormData();
+    formData.append("raceInfo", JSON.stringify(data))
+    client.post(`${endpoint}/popularizeAllRaces`, formData)
+}
+
 export default {
     getRaceList,
     SearchRaceList,
     addRace,
     getPrimeList,
     getUserMadeRaces,
-    editRace
+    editRace,
+    popularizeAllRaces
 }

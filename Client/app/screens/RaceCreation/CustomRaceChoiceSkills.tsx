@@ -9,6 +9,7 @@ import { Colors } from '../../config/colors';
 import NumberScroll from '../../components/NumberScroll';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppButton } from '../../components/AppButton';
+import { AppTextInput } from '../../components/forms/AppTextInput';
 
 
 interface CustomRaceChoiceSkillsState {
@@ -159,12 +160,17 @@ export class CustomRaceChoiceSkills extends Component<{ navigation: any }, Custo
                                 </View>
                                 <AppText fontSize={18} textAlign={'center'} padding={15}>Amount of available picks from the list </AppText>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15 }}>
-                                    <NumberScroll modelColor={Colors.pageBackground}
+                                    <AppTextInput
+                                        defaultValue={storeItem ? storeItem.toString() : '1'}
+                                        keyboardType="numeric" onChange={(event: any) => {
+                                            this.setState({ amountToPick: parseInt(event.nativeEvent.text) })
+                                        }} />
+                                    {/* <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem}
                                         max={skillsJson.skillList.length}
                                         getValue={(amount: number) => {
                                             this.setState({ amountToPick: amount })
-                                        }} />
+                                        }} /> */}
                                 </View>
                             </View>}
                         <AppButton padding={20} fontSize={20} backgroundColor={Colors.bitterSweetRed} width={180} height={50}

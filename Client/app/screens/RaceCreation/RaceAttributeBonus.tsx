@@ -4,6 +4,7 @@ import { boolean } from 'yup';
 import { AppButton } from '../../components/AppButton';
 import { AppConfirmation } from '../../components/AppConfirmation';
 import { AppText } from '../../components/AppText';
+import { AppTextInput } from '../../components/forms/AppTextInput';
 import NumberScroll from '../../components/NumberScroll';
 import { Colors } from '../../config/colors';
 import { RaceModel } from '../../models/raceModel';
@@ -63,7 +64,11 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
             }
             if (storeItem.abilityBonus && this.state.customRace.abilityBonus) {
                 for (let item of abilityList) {
-                    storeItem.abilityBonus[item] = this.state.customRace.abilityBonus[item]
+                    if (!this.state.customRace.abilityBonus[item]) {
+                        storeItem.abilityBonus[item] = 1
+                    } else {
+                        storeItem.abilityBonus[item] = this.state.customRace.abilityBonus[item]
+                    }
                 }
             }
             store.dispatch({ type: ActionType.UpdateCustomRace, payload: storeItem })
@@ -87,7 +92,16 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                             }}>
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
                                     <AppText textAlign={'center'} fontSize={18} color={Colors.bitterSweetRed}>{item[0]} bonus</AppText>
-                                    <NumberScroll modelColor={Colors.pageBackground}
+                                    <AppTextInput
+                                        defaultValue={storeItem[item[0]] ? storeItem[item[0]].toString() : '0'}
+                                        keyboardType="numeric" onChange={(event: any) => {
+                                            let customRace = { ...this.state.customRace };
+                                            if (customRace.abilityBonus) {
+                                                customRace.abilityBonus[item[0]] = parseInt(event.nativeEvent.text)
+                                                this.setState({ customRace })
+                                            }
+                                        }} />
+                                    {/* <NumberScroll modelColor={Colors.pageBackground}
                                         startingVal={storeItem[item[0]]}
                                         startFromZero={true}
                                         max={10}
@@ -98,7 +112,7 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                                                 this.setState({ customRace })
                                             }
                                         }
-                                        } />
+                                        } /> */}
                                 </View>
                             </View>
                         })}
@@ -116,11 +130,17 @@ export class RaceAttributeBonus extends Component<{ navigation: any }, RaceAttri
                             }} />
                             {this.state.activatedInterface ?
                                 <View style={{ borderColor: Colors.whiteInDarkMode, width: 170, borderWidth: 1, borderRadius: 15, }}>
-                                    <NumberScroll modelColor={Colors.pageBackground} max={10}
+                                    <AppTextInput
+                                        defaultValue={choiceAttStore ? choiceAttStore.toString() : '0'}
+                                        keyboardType="numeric" onChange={(event: any) => {
+                                            this.setState({ bonusAmount: parseInt(event.nativeEvent.text) })
+                                        }} />
+                                    {/* <NumberScroll modelColor={Colors.pageBackground} max={10}
                                         startingVal={choiceAttStore}
+                                        pauseStart={true}
                                         getValue={(bonusAmount: number) => {
                                             this.setState({ bonusAmount })
-                                        }} />
+                                        }} /> */}
                                 </View>
                                 : null}
                         </View>

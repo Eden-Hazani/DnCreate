@@ -38,7 +38,7 @@ const Item = ({ item, scrollX, index }: any) => {
  */
 export default function NumberScroll({ pauseStart, modelColor, startingVal, max, getValue, startFromZero }: any) {
     useEffect(() => {
-        if (!preventOnLoad) {
+        if (!pauseStart) {
             getValue(numberArray[0])
         }
         if (startingVal) {
@@ -46,7 +46,6 @@ export default function NumberScroll({ pauseStart, modelColor, startingVal, max,
                 moveIndexRef.current.scrollToIndex({ animation: false, index: primeIndex })
             }, 200);
         }
-
     }, [])
 
     const getPrimeIndexToStart = (): number => {
@@ -66,7 +65,9 @@ export default function NumberScroll({ pauseStart, modelColor, startingVal, max,
             setPrimeIndex(viewableItems.viewableItems[0]?.index)
             return
         }
-        getValue(viewableItems.viewableItems[0]?.item)
+        if (viewableItems.viewableItems[0]?.item) {
+            getValue(viewableItems.viewableItems[0].item)
+        }
         setPrimeIndex(viewableItems.viewableItems[0]?.index)
     })
     const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: (width / 3) })

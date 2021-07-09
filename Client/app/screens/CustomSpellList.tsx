@@ -15,12 +15,15 @@ import { checkMarketSpellValidity } from './MarketPlace/functions/marketInteract
 import { AddSpellToMarket } from '../components/spellMarketComponents/AddSpellToMarket';
 import { RemoveSpellFromMarket } from '../components/spellMarketComponents/RemoveSpellFromMarket';
 import AuthContext from '../auth/context';
+import customSpellsTutorial from '../../jsonDump/customSpell.json'
+import InformationScroller from '../components/InformationScroller'
 
 
 interface CustomSpellListState {
-    customSpellList: CustomSpellModal[]
-    pickSpellModal: boolean
-    pickedSpell: CustomSpellModal
+    customSpellList: CustomSpellModal[];
+    pickSpellModal: boolean;
+    pickedSpell: CustomSpellModal;
+    tutorialMode: boolean;
 }
 
 export class CustomSpellList extends Component<{ route: any, navigation: any }, CustomSpellListState>{
@@ -29,6 +32,7 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
     constructor(props: any) {
         super(props)
         this.state = {
+            tutorialMode: false,
             pickedSpell: new CustomSpellModal(),
             customSpellList: [],
             pickSpellModal: false
@@ -99,16 +103,20 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
     render() {
         return (
             <View style={styles.container}>
-                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                    <TouchableOpacity style={{ borderRadius: 125, borderWidth: 1, borderColor: Colors.lightGray }}
+                <View style={{ justifyContent: "space-around", flexDirection: 'row', width: Dimensions.get('window').width, paddingBottom: '5%' }}>
+                    <TouchableOpacity style={{ padding: 10, borderRadius: 15, borderWidth: 1, borderColor: Colors.lightGray, backgroundColor: Colors.paleGreen }}
                         onPress={() => { this.props.navigation.navigate("CustomSpellCreator", { edit: { true: false } }) }}>
-                        <Image style={{ width: 200, height: 200 }} uri={`${Config.serverUrl}/assets/specificDragons/custom-Spell-Dragon.png`} />
-                        <View style={{ position: "absolute", top: 150, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
-                            <AppText textAlign={'center'} fontSize={15}>Create {'\n'}New Spell</AppText>
-                        </View>
+                        <AppText color={Colors.totalWhite} textAlign={'center'} fontSize={22}>Create {'\n'}New Spell</AppText>
                     </TouchableOpacity>
 
+                    <TouchableOpacity style={{ padding: 10, borderRadius: 15, borderWidth: 1, borderColor: Colors.lightGray, backgroundColor: Colors.deepGold }}
+                        onPress={() => this.setState({ tutorialMode: true })}>
+                        <AppText color={Colors.totalWhite} textAlign={'center'} fontSize={22}>Custom Spell {`\n`} Tutorial</AppText>
+                    </TouchableOpacity>
                 </View>
+                <Modal animationType="slide" visible={this.state.tutorialMode}>
+                    <InformationScroller list={customSpellsTutorial.list} PressClose={async (val: boolean) => { this.setState({ tutorialMode: val }) }} />
+                </Modal>
                 <View style={{ flex: 1 }}>
                     <AppText fontSize={22} textAlign={'center'} color={Colors.bitterSweetRed}>Your Custom Spells</AppText>
                     <FlatList
@@ -169,6 +177,7 @@ export class CustomSpellList extends Component<{ route: any, navigation: any }, 
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        paddingTop: '12%'
     }
 });

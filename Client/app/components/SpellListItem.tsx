@@ -28,10 +28,10 @@ export class SpellListItem extends Component<any>{
         return (
             <Swipeable renderLeftActions={this.props.renderLeftActions}
                 renderRightActions={this.props.renderRightActions}>
-                <TouchableOpacity onPress={this.props.onPress} >
+                <TouchableOpacity onPress={this.props.onPress} style={{ marginLeft: 5, marginRight: 5, backgroundColor: Colors.metallicBlue, borderRadius: 15, borderColor: Colors.whiteInDarkMode, borderWidth: 1 }} >
                     <View style={{
                         justifyContent: this.props.justifyContent, alignItems: this.props.alignListItem ? this.props.alignListItem : 'center',
-                        flexDirection: this.props.direction, padding: this.props.totalPadding ? this.props.totalPadding : 30, paddingBottom: this.props.padding
+                        flexDirection: this.props.direction, padding: this.props.totalPadding ? this.props.totalPadding : 20, paddingBottom: this.props.padding
                     }}>
                         <View>
                             {this.props.imageUrl ?
